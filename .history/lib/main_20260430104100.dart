@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:hive_ce/hive.dart';
 import 'package:path_provider/path_provider.dart' as path_provider;
 import 'router/app_router.dart';
-import 'screens/game_screen.dart';
 import 'theme/app_theme.dart';
 import 'hive_registrar.g.dart';  // ← импортируем extension
 import 'services/storage_service.dart';
@@ -25,14 +24,13 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-//    return MaterialApp.router(
+    return MaterialApp.router(
       title: 'Mafia Help',
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
       themeMode: ThemeMode.system,
       home: const GameScreen(), // ← временно
-      //routerConfig: router,
+      routerConfig: router,
     );
   }
 }

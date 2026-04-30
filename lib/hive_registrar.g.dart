@@ -10,6 +10,7 @@ import 'package:mafia_help/models/game_log.dart';
 import 'package:mafia_help/models/kill.dart';
 import 'package:mafia_help/models/phase.dart';
 import 'package:mafia_help/models/player.dart';
+import 'package:mafia_help/models/player_ui_model.dart';
 import 'package:mafia_help/models/role.dart';
 import 'package:mafia_help/models/rule.dart';
 import 'package:mafia_help/models/user.dart';
@@ -25,6 +26,7 @@ extension HiveRegistrar on HiveInterface {
     registerAdapter(KillAdapter());
     registerAdapter(PhaseAdapter());
     registerAdapter(PlayerAdapter());
+    registerAdapter(PlayerUIModelAdapter());
     registerAdapter(RoleAdapter());
     registerAdapter(RuleAdapter());
     registerAdapter(UserAdapter());
@@ -42,6 +44,7 @@ extension IsolatedHiveRegistrar on IsolatedHiveInterface {
     registerAdapter(KillAdapter());
     registerAdapter(PhaseAdapter());
     registerAdapter(PlayerAdapter());
+    registerAdapter(PlayerUIModelAdapter());
     registerAdapter(RoleAdapter());
     registerAdapter(RuleAdapter());
     registerAdapter(UserAdapter());

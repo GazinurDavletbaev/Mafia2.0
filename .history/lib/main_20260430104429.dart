@@ -25,8 +25,9 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-//    return MaterialApp.router(
+    return MaterialApp.router(
+
+    return MaterialApp.router(
       title: 'Mafia Help',
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
