@@ -3,16 +3,18 @@ import 'package:hive_ce/hive.dart';
 import 'package:path_provider/path_provider.dart' as path_provider;
 import 'router/app_router.dart';
 import 'theme/app_theme.dart';
-import 'hive_registrar.g.dart';  // ← импортируем extension
+import 'models/hive_registrar.g.dart';
+
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
+  // Инициализация Hive для всех платформ
   final appDocumentDir = await path_provider.getApplicationDocumentsDirectory();
   Hive.init(appDocumentDir.path);
 
-  // Регистрация адаптеров через extension
-  Hive.registerAdapters();
+  // Регистрация всех адаптеров (из сгенерированного файла)
+  HiveRegistrar().registerAllAdapters();
 
   runApp(const MyApp());
 }
