@@ -98,49 +98,37 @@ class GameScreen extends ConsumerWidget {
             const SizedBox(height: 20),
 
             // Нижняя панель — кнопка смены фаз
-            // Нижняя панель — одна область, разделённая на две невидимые кнопки
             Container(
               height: 70,
               margin: const EdgeInsets.only(top: 16),
-              child: Stack(
+              child: Row(
                 children: [
-                  // Две невидимые кнопки (левая и правая половины)
-                  Row(
-                    children: [
-                      // Левая половина (назад)
-                      Expanded(
-                        child: GestureDetector(
-                          onTap: () => goToPreviousSubPhase(ref),
-                          child: Container(
-                            color: Colors.transparent, // невидимая
-                          ),
+                  // Левая половина (назад)
+                  Expanded(
+                    child: GestureDetector(
+                      onTap: () => goToPreviousSubPhase(ref),
+                      child: Container(
+                        color: Colors.grey[800],
+                        alignment: Alignment.center,
+                        child: Text(
+                          _getPhaseDisplayName(currentSubPhase),
+                          style: const TextStyle(color: Colors.white70, fontSize: 16),
+                          textAlign: TextAlign.center,
                         ),
                       ),
-                      // Правая половина (далее)
-                      Expanded(
-                        child: GestureDetector(
-                          onTap: () => goToNextSubPhase(ref),
-                          child: Container(
-                            color: Colors.transparent, // невидимая
-                          ),
-                        ),
-                      ),
-                    ],
+                    ),
                   ),
-                  // Текст поверх кнопок (по центру)
-                  Center(
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                      decoration: BoxDecoration(
-                        color: Colors.grey[900],
-                        borderRadius: BorderRadius.circular(30),
-                      ),
-                      child: Text(
-                        _getPhaseDisplayName(currentSubPhase),
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
+                  // Правая половина (далее)
+                  Expanded(
+                    child: GestureDetector(
+                      onTap: () => goToNextSubPhase(ref),
+                      child: Container(
+                        color: Colors.grey[850],
+                        alignment: Alignment.center,
+                        child: Text(
+                          _getPhaseDisplayName(currentSubPhase),
+                          style: const TextStyle(color: Colors.white, fontSize: 16),
+                          textAlign: TextAlign.center,
                         ),
                       ),
                     ),

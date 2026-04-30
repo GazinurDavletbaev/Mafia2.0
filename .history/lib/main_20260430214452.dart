@@ -1,25 +1,25 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';  // ← ДОБАВИТЬ
 import 'package:hive_ce/hive.dart';
 import 'package:path_provider/path_provider.dart' as path_provider;
+import 'router/app_router.dart';
 import 'screens/game_screen.dart';
+import 'state/game_state.dart';
 import 'theme/app_theme.dart';
-import 'hive_registrar.g.dart';
+import 'hive_registrar.g.dart';  // ← импортируем extension
 import 'services/storage_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
+  final gameState = GameState.initial();
+  print(gameState.alivePlayers.length); // должно быть 10
   final appDocumentDir = await path_provider.getApplicationDocumentsDirectory();
   Hive.init(appDocumentDir.path);
 
-  // Регистрация адаптеров
+  // Регистрация адаптеров через extension
   Hive.registerAdapters();
-  
   final storageService = StorageService();
   await storageService.init();
-
-  runApp(const ProviderScope(child: MyApp()));  // ← ОБЕРНУТЬ В ProviderScope
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -28,11 +28,13 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+//    return MaterialApp.router(
       title: 'Mafia Help',
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
       themeMode: ThemeMode.system,
-      home: const GameScreen(),
+      home: const GameScreen(), // ← временно
+      //routerConfig: router,
     );
   }
 }

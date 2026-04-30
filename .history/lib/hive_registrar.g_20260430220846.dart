@@ -34,6 +34,7 @@ extension HiveRegistrar on HiveInterface {
     registerAdapter(UserAdapter());
     registerAdapter(ViolationAdapter());
     registerAdapter(VoteAdapter());
+    registerAdapter(PlayerModelAdapter());
   }
 }
 
