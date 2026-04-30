@@ -15,7 +15,7 @@ void main() async {
   // Регистрация адаптеров через extension
   Hive.registerAdapters();
   final storageService = StorageService();
-  await storageService.init();
+await storageService.init();
   runApp(const MyApp());
 }
 
