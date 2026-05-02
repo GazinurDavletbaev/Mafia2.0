@@ -157,100 +157,98 @@ class GameScreen extends ConsumerWidget {
   Widget _buildPlayerCard(PlayerModel player, WidgetRef ref) {
   final gameNotifier = ref.read(gameStateProvider.notifier);
   
-  return GestureDetector(
+  return PieMenu(
+    actions: [
+      PieAction(
+        tooltip: Text('Убить', style: TextStyle(color: Colors.white)),
+        onSelect: () {
+          print('Убить игрока ${player.seatNumber}');
+          gameNotifier.setAlive(player.seatNumber, false);
+        },
+        child: Icon(Icons., color: Colors.red, size: 28),
+      ),
+      PieAction(
+        tooltip: Text('Оживить', style: TextStyle(color: Colors.white)),
+        onSelect: () {
+          print('Оживить игрока ${player.seatNumber}');
+          gameNotifier.setAlive(player.seatNumber, true);
+        },
+        child: Icon(Icons.favorite, color: Colors.green, size: 28),
+      ),
+      PieAction(
+        tooltip: Text('Выставить', style: TextStyle(color: Colors.white)),
+        onSelect: () {
+          print('Выставить игрока ${player.seatNumber}');
+          gameNotifier.addNomination(player.seatNumber);
+        },
+        child: Icon(Icons.flag, color: Colors.orange, size: 28),
+      ),
+      PieAction(
+        tooltip: Text('Снять', style: TextStyle(color: Colors.white)),
+        onSelect: () {
+          print('Снять выставление игрока ${player.seatNumber}');
+          gameNotifier.removeNomination(player.seatNumber);
+        },
+        child: Icon(Icons.cancel, color: Colors.grey, size: 28),
+      ),
+    ],
     onTap: () {
       gameNotifier.addFoul(player.seatNumber);
     },
-    child: PieMenu(
-      actions: [
-        PieAction(
-          tooltip: Text('Убить', style: const TextStyle(color: Colors.white)),
-          onSelect: () {
-            print('Убить игрока ${player.seatNumber}');
-            gameNotifier.setAlive(player.seatNumber, false);
-          },
-          child: const Icon(Icons.heart_broken, color: Colors.red, size: 28),
-        ),
-        PieAction(
-          tooltip: Text('Оживить', style: const TextStyle(color: Colors.white)),
-          onSelect: () {
-            print('Оживить игрока ${player.seatNumber}');
-            gameNotifier.setAlive(player.seatNumber, true);
-          },
-          child: const Icon(Icons.favorite, color: Colors.green, size: 28),
-        ),
-        PieAction(
-          tooltip: Text('Выставить', style: const TextStyle(color: Colors.white)),
-          onSelect: () {
-            print('Выставить игрока ${player.seatNumber}');
-            gameNotifier.addNomination(player.seatNumber);
-          },
-          child: const Icon(Icons.flag, color: Colors.orange, size: 28),
-        ),
-        PieAction(
-          tooltip: Text('Снять', style: const TextStyle(color: Colors.white)),
-          onSelect: () {
-            print('Снять выставление игрока ${player.seatNumber}');
-            gameNotifier.removeNomination(player.seatNumber);
-          },
-          child: const Icon(Icons.cancel, color: Colors.grey, size: 28),
-        ),
-      ],
-      child: Card(
-        color: player.isSpeaking ? Colors.green[800] : Colors.grey[800],
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Stack(
-                children: [
-                  CircleAvatar(
-                    radius: 28,
-                    backgroundColor: Colors.grey[600],
-                    child: Text(
-                      '${player.seatNumber}',
-                      style: const TextStyle(fontSize: 18, color: Colors.white),
-                    ),
-                  ),
-                  if (!player.isAlive)
-                    Positioned.fill(
-                      child: Container(
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: Colors.black.withOpacity(0.7),
-                        ),
-                        child: const Icon(Icons.close, color: Colors.red, size: 30),
-                      ),
-                    ),
-                ],
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Text(
-                  player.name,
-                  style: TextStyle(
-                    color: player.isAlive ? Colors.white : Colors.grey,
-                    fontSize: 14,
-                    decoration: player.isAlive ? null : TextDecoration.lineThrough,
-                  ),
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-              if (player.fouls > 0)
-                Container(
-                  padding: const EdgeInsets.all(4),
-                  decoration: const BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: Colors.red,
-                  ),
+    child: Card(
+      color: player.isSpeaking ? Colors.green[800] : Colors.grey[800],
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Stack(
+              children: [
+                CircleAvatar(
+                  radius: 28,
+                  backgroundColor: Colors.grey[600],
                   child: Text(
-                    '${player.fouls}',
-                    style: const TextStyle(color: Colors.white, fontSize: 12),
+                    '${player.seatNumber}',
+                    style: const TextStyle(fontSize: 18, color: Colors.white),
                   ),
                 ),
-            ],
-          ),
+                if (!player.isAlive)
+                  Positioned.fill(
+                    child: Container(
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Colors.black.withOpacity(0.7),
+                      ),
+                      child: const Icon(Icons.close, color: Colors.red, size: 30),
+                    ),
+                  ),
+              ],
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                player.name,
+                style: TextStyle(
+                  color: player.isAlive ? Colors.white : Colors.grey,
+                  fontSize: 14,
+                  decoration: player.isAlive ? null : TextDecoration.lineThrough,
+                ),
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+            if (player.fouls > 0)
+              Container(
+                padding: const EdgeInsets.all(4),
+                decoration: const BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.red,
+                ),
+                child: Text(
+                  '${player.fouls}',
+                  style: const TextStyle(color: Colors.white, fontSize: 12),
+                ),
+              ),
+          ],
         ),
       ),
     ),

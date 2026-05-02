@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:pie_menu/pie_menu.dart';
+import 'package:pie_menu/pie_menu.dart';  // ← ДОБАВИТЬ
 import 'package:hive_ce/hive.dart';
 import 'package:path_provider/path_provider.dart' as path_provider;
 import 'screens/game_screen.dart';
@@ -14,6 +14,7 @@ void main() async {
   final appDocumentDir = await path_provider.getApplicationDocumentsDirectory();
   Hive.init(appDocumentDir.path);
 
+  // Регистрация адаптеров
   Hive.registerAdapters();
   
   final storageService = StorageService();
@@ -27,13 +28,19 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(   // ← MaterialApp должен быть снаружи PieCanvas
-      title: 'Mafia Help',
-      theme: AppTheme.lightTheme,
-      darkTheme: AppTheme.darkTheme,
-      themeMode: ThemeMode.system,
-      home: const PieCanvas(   // ← PieCanvas внутри home
-        child: GameScreen(),
+    return PieCanvas(  // ← ОБЕРНУТЬ MaterialApp В PieCanvas
+      theme: const PieTheme(
+        backgroundColor: Colors.black87,
+        actionButtonSize: 50.0,
+        actionIconSize: 28.0,
+        overlayOpacity: 0.5,
+      ),
+      child: MaterialApp(
+        title: 'Mafia Help',
+        theme: AppTheme.lightTheme,
+        darkTheme: AppTheme.darkTheme,
+        themeMode: ThemeMode.system,
+        home: const GameScreen(),
       ),
     );
   }

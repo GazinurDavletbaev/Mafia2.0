@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mafia_help/providers/game_provider.dart';
 import 'package:mafia_help/providers/phase_provider.dart';
+import 'package:mafia_help/state/game_state.dart';
 import 'package:mafia_help/models/phase_config.dart';
 import '../models/player_model.dart';
 import 'package:pie_menu/pie_menu.dart';
@@ -155,47 +156,15 @@ class GameScreen extends ConsumerWidget {
   }
 
   Widget _buildPlayerCard(PlayerModel player, WidgetRef ref) {
-  final gameNotifier = ref.read(gameStateProvider.notifier);
-  
-  return GestureDetector(
-    onTap: () {
-      gameNotifier.addFoul(player.seatNumber);
-    },
-    child: PieMenu(
-      actions: [
-        PieAction(
-          tooltip: Text('Убить', style: const TextStyle(color: Colors.white)),
-          onSelect: () {
-            print('Убить игрока ${player.seatNumber}');
-            gameNotifier.setAlive(player.seatNumber, false);
-          },
-          child: const Icon(Icons.heart_broken, color: Colors.red, size: 28),
-        ),
-        PieAction(
-          tooltip: Text('Оживить', style: const TextStyle(color: Colors.white)),
-          onSelect: () {
-            print('Оживить игрока ${player.seatNumber}');
-            gameNotifier.setAlive(player.seatNumber, true);
-          },
-          child: const Icon(Icons.favorite, color: Colors.green, size: 28),
-        ),
-        PieAction(
-          tooltip: Text('Выставить', style: const TextStyle(color: Colors.white)),
-          onSelect: () {
-            print('Выставить игрока ${player.seatNumber}');
-            gameNotifier.addNomination(player.seatNumber);
-          },
-          child: const Icon(Icons.flag, color: Colors.orange, size: 28),
-        ),
-        PieAction(
-          tooltip: Text('Снять', style: const TextStyle(color: Colors.white)),
-          onSelect: () {
-            print('Снять выставление игрока ${player.seatNumber}');
-            gameNotifier.removeNomination(player.seatNumber);
-          },
-          child: const Icon(Icons.cancel, color: Colors.grey, size: 28),
-        ),
-      ],
+    final gameNotifier = ref.read(gameStateProvider.notifier);
+    
+    return GestureDetector(
+      onTap: () {
+        gameNotifier.addFoul(player.seatNumber);
+      },
+      onLongPress: () {
+        _showPlayerMenu(ref, player);
+      },
       child: Card(
         color: player.isSpeaking ? Colors.green[800] : Colors.grey[800],
         child: Padding(
@@ -253,9 +222,13 @@ class GameScreen extends ConsumerWidget {
           ),
         ),
       ),
-    ),
-  );
-}
+    );
+  }
+
+  void _showPlayerMenu(WidgetRef ref, PlayerModel player) {
+    // TODO: показать меню действий (Убить, Проверить, Выставить, Снять и т.д.)
+    print('Долгое нажатие на игрока ${player.seatNumber}');
+  }
 
   // Функция перевода подфазы в русское название
   String _getPhaseDisplayName(SubPhase phase) {

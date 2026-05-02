@@ -25,8 +25,7 @@ dependencies:
   riverpod: ^2.6.1
   flutter_riverpod: ^2.6.1
 
-  pie_menu: ^3.6.0
-
+  
 
 dev_dependencies:
   flutter_test:
