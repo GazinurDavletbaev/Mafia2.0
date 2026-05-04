@@ -35,14 +35,14 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Mafia Help',
-      theme: AppTheme.lightTheme,
-      darkTheme: AppTheme.darkTheme,
-      themeMode: ThemeMode.system,
-      debugShowCheckedModeBanner: false,
-      home: PieCanvas(
-        child: const GameScreen(gameId: 'test_game_id'),
+    return PieCanvas(
+      child: MaterialApp(
+        title: 'Mafia Help',
+        theme: AppTheme.lightTheme,
+        darkTheme: AppTheme.darkTheme,
+        themeMode: ThemeMode.system,
+        debugShowCheckedModeBanner: false,
+        home: const GameScreen(gameId: 'test_game_id'),
       ),
     );
   }

@@ -1,0 +1,20 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mafia_help/data/local/sources/game_local_source.dart';
+import 'package:mafia_help/data/repositories/game_repository_impl.dart';
+import 'package:mafia_help/domain/repositories/game_repository.dart';
+import 'package:mafia_help/application/providers/game_state_provider.dart';
+
+final gameLocalSourceProvider = Provider<GameLocalSource>((ref) {
+  final source = GameLocalSource();
+  // Инициализация должна быть вызвана отдельно в main.dart
+  return source;
+});
+
+final gameRepositoryProvider = Provider<GameRepository>((ref) {
+  final localSource = ref.read(gameLocalSourceProvider);
+  final notifier = ref.read(gameStateProvider.notifier);
+  return GameRepositoryImpl(
+    localSource: localSource,
+    notifier: notifier,
+  );
+});

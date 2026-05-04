@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_ce/hive.dart';
 import 'package:path_provider/path_provider.dart' as path_provider;
 import 'package:pie_menu/pie_menu.dart';
-import 'application/providers/providers.dart';
 import 'core/themes/app_theme.dart';
 import 'hive_registrar.g.dart';
 import 'data/local/sources/game_local_source.dart';
@@ -35,14 +34,14 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Mafia Help',
-      theme: AppTheme.lightTheme,
-      darkTheme: AppTheme.darkTheme,
-      themeMode: ThemeMode.system,
-      debugShowCheckedModeBanner: false,
-      home: PieCanvas(
-        child: const GameScreen(gameId: 'test_game_id'),
+    return PieCanvas(
+      child: MaterialApp(
+        title: 'Mafia Help',
+        theme: AppTheme.lightTheme,
+        darkTheme: AppTheme.darkTheme,
+        themeMode: ThemeMode.system,
+        debugShowCheckedModeBanner: false,
+        home: const GameScreen(gameId: 'test_game_id'),
       ),
     );
   }

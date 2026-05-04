@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:pie_menu/pie_menu.dart';
 import 'package:hive_ce/hive.dart';
 import 'package:path_provider/path_provider.dart' as path_provider;
-import 'package:pie_menu/pie_menu.dart';
-import 'application/providers/providers.dart';
-import 'core/themes/app_theme.dart';
+import 'screens/game_screen.dart';
+import 'theme/app_theme.dart';
 import 'hive_registrar.g.dart';
-import 'data/local/sources/game_local_source.dart';
-import 'presentation/screens/game_screen.dart';
+import 'data/local/sources/storage_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -17,17 +16,10 @@ void main() async {
 
   Hive.registerAdapters();
   
-  final gameLocalSource = GameLocalSource();
-  await gameLocalSource.init();
+  final storageService = StorageService();
+  await storageService.init();
 
-  runApp(
-    ProviderScope(
-      overrides: [
-        gameLocalSourceProvider.overrideWithValue(gameLocalSource),
-      ],
-      child: const MyApp(),
-    ),
-  );
+  runApp(const ProviderScope(child: MyApp()));
 }
 
 class MyApp extends StatelessWidget {
@@ -35,14 +27,13 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return MaterialApp(   // ← MaterialApp должен быть снаружи PieCanvas
       title: 'Mafia Help',
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
       themeMode: ThemeMode.system,
-      debugShowCheckedModeBanner: false,
-      home: PieCanvas(
-        child: const GameScreen(gameId: 'test_game_id'),
+      home: const PieCanvas(   // ← PieCanvas внутри home
+        child: GameScreen(),
       ),
     );
   }
