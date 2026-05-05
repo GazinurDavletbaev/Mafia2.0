@@ -1,0 +1,49 @@
+name: mafia_help
+description: "A new Flutter project."
+publish_to: 'none'
+
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.11.5
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  cupertino_icons: ^1.0.8
+  
+  # Хранение данных (Hive CE)
+  hive_ce: ^2.10.1
+  hive_ce_flutter: ^2.3.0
+  path_provider: ^2.1.5
+
+  # Навигация
+  go_router: ^14.8.1
+
+  # Управление состоянием
+  riverpod: ^2.6.1
+  flutter_riverpod: ^2.6.1
+
+  pie_menu: ^3.6.0
+
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  flutter_lints: ^6.0.0
+  
+  # Генерация кода для Hive
+  hive_ce_generator: ^1.8.2
+  build_runner: ^2.4.14
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/
+    - assets/citizen.png
+    - assets/sheriff.png
+    - assets/mafia.png
+    - assets/don.png
+    - assets./
