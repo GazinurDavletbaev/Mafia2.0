@@ -1,0 +1,44 @@
+import 'package:mafia_help/data/local/models/game.dart';
+import 'package:mafia_help/data/local/models/phase.dart';
+import 'package:mafia_help/data/local/models/player_model.dart';
+import 'package:mafia_help/domain/helpers/game_end_helper.dart';
+import 'package:mafia_help/presentation/state/game_state.dart';
+
+import '../../data/local/models/sub_phase.dart';
+
+abstract class GameRepository {
+  Future<GameState?> loadCurrentGameState();
+  Future<void> saveCurrentGameState();
+  Future<void> clearCurrentGameState();
+  Future<void> saveCompletedGame(GameState finalState);
+  Future<List<Game>> getAllCompletedGames();
+  Future<List<PlayerModel>> getAllPlayers();
+  Future<List<PlayerModel>> getAlivePlayers();
+  Future<void> updatePlayer(PlayerModel player);
+  Future<List<int>> getCurrentNominations();
+  Future<void> setNominations(List<int> seats);
+  Future<Map<int, int>> getCurrentVotes();
+  Future<void> addVote({required int round, required int targetSeat, required int voteCount});
+  Future<void> clearVotes();
+  Future<List<int>> getPartialBestMove();
+  Future<void> setPartialBestMove(List<int> digits);
+  Future<void> clearPartialBestMove();
+  Future<Phase> getCurrentPhase();
+  Future<void> setCurrentPhase(Phase phase);
+  Future<int> getCurrentSubPhaseIndex();
+  Future<void> setCurrentSubPhaseIndex(int index);
+  Future<int> getCurrentDay();
+  Future<void> setCurrentDay(int day);
+  Future<int?> getCurrentSpeaker();
+  Future<void> setCurrentSpeaker(int? seatNumber);
+  Future<int> getCurrentRound();
+  Future<void> setCurrentRound(int round);
+  Future<void> setGameEnded(bool ended);
+  Future<void> setWinner(GameResult result);
+  Future<void> clearAllGameData();
+  Future<void> addKill({required int seatNumber, required String phase, required String killType});
+  Future<void> addBestMove(List<int> threeSeats);
+  Future<void> saveBestMove(List<int> threeSeats);
+  Future<SubPhase> getCurrentSubPhase();
+  Future<void> setCurrentSubPhase(SubPhase subPhase);
+}
