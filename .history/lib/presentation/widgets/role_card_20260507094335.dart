@@ -1,0 +1,32 @@
+import 'package:flutter/material.dart';
+
+class RoleCard extends StatelessWidget {
+  final String role;
+  final VoidCallback onClose;
+
+  const RoleCard({
+    super.key,
+    required this.role,
+    required this.onClose,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      children: [
+        Positioned.fill(
+          child: GestureDetector(
+            onTap: onClose,
+            child: Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(20),
+                image: DecorationImage(
+                  image: AssetImage('assets/$role.png'),
+                  fit: BoxFit.cover,
+              ),
+            ),
+        ),
+      ),
+      ];
+  }
+}
