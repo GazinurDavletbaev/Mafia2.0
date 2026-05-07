@@ -20,28 +20,22 @@ class PlayerGrid extends StatelessWidget {
   Widget build(BuildContext context) {
     final sortedPlayers = List<PlayerModel>.from(players)
       ..sort((a, b) => a.seatNumber.compareTo(b.seatNumber));
-
+    
     // Левая колонка: места 5,4,3,2,1 (сверху вниз)
-    final leftColumn = sortedPlayers
-        .where((p) => p.seatNumber <= 5)
-        .toList()
-        .reversed
-        .toList();
-
+    final leftColumn = sortedPlayers.where((p) => p.seatNumber <= 5).toList().reversed.toList();
+    
     // Правая колонка: места 6,7,8,9,10 (сверху вниз)
     final rightColumn = sortedPlayers.where((p) => p.seatNumber >= 6).toList();
-
+    
     return Row(
       crossAxisAlignment: CrossAxisAlignment.stretch, // растягиваем по высоте
       children: [
         Expanded(
           child: Column(
-            crossAxisAlignment:
-                CrossAxisAlignment.stretch, // растягиваем по ширине
+            crossAxisAlignment: CrossAxisAlignment.stretch, // растягиваем по ширине
             children: leftColumn.asMap().entries.map((entry) {
               final player = entry.value;
-              return Expanded(
-                // каждая карточка занимает равное место
+              return Expanded( // каждая карточка занимает равное место
                 child: Padding(
                   padding: const EdgeInsets.only(bottom: 8),
                   child: PlayerCard(
@@ -59,12 +53,10 @@ class PlayerGrid extends StatelessWidget {
         const SizedBox(width: 20),
         Expanded(
           child: Column(
-            crossAxisAlignment:
-                CrossAxisAlignment.stretch, // растягиваем по ширине
+            crossAxisAlignment: CrossAxisAlignment.stretch, // растягиваем по ширине
             children: rightColumn.asMap().entries.map((entry) {
               final player = entry.value;
-              return Expanded(
-                // каждая карточка занимает равное место
+              return Expanded( // каждая карточка занимает равное место
                 child: Padding(
                   padding: const EdgeInsets.only(bottom: 8),
                   child: PlayerCard(

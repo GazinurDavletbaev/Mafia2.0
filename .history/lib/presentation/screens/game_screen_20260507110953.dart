@@ -8,6 +8,7 @@ import '../state/game_state_extentions.dart';
 import '../viewmodel/game_viewmodel.dart';
 import '../widgets/player_grid.dart';
 import '../widgets/phase_header.dart';
+import '../widgets/phase_button.dart';
 import '../widgets/candidates_bar.dart';
 import '../widgets/settings_menu.dart';
 import '../widgets/pie_menu_dialog.dart';
@@ -88,7 +89,7 @@ class _GameScreenState extends ConsumerState<GameScreen>
             children: [
               PhaseHeader(
                 phase: gameState.currentPhase,
-                subPhase: gameState.currentSubPhase,
+                subPhaseIndex: gameState.currentSubPhaseIndex,
               ),
               const SizedBox(height: 20),
               if (gameState.nominatedSeats.isNotEmpty)

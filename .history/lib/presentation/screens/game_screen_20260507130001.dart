@@ -88,7 +88,7 @@ class _GameScreenState extends ConsumerState<GameScreen>
             children: [
               PhaseHeader(
                 phase: gameState.currentPhase,
-                subPhase: gameState.currentSubPhase,
+                subPhaseIndex: gameState.currentSubPhase,
               ),
               const SizedBox(height: 20),
               if (gameState.nominatedSeats.isNotEmpty)

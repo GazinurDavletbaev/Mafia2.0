@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mafia_help/presentation/widgets/bottom_controls.dart';
 import 'package:pie_menu/pie_menu.dart';
 import '../../core/logger/app_logger.dart';
 import '../state/game_state.dart';
@@ -8,6 +7,7 @@ import '../state/game_state_extentions.dart';
 import '../viewmodel/game_viewmodel.dart';
 import '../widgets/player_grid.dart';
 import '../widgets/phase_header.dart';
+import '../widgets/phase_button.dart';
 import '../widgets/candidates_bar.dart';
 import '../widgets/settings_menu.dart';
 import '../widgets/pie_menu_dialog.dart';
@@ -88,7 +88,7 @@ class _GameScreenState extends ConsumerState<GameScreen>
             children: [
               PhaseHeader(
                 phase: gameState.currentPhase,
-                subPhase: gameState.currentSubPhase,
+                subPhaseIndex: gameState.currentSubPhaseIndex,
               ),
               const SizedBox(height: 20),
               if (gameState.nominatedSeats.isNotEmpty)
@@ -105,7 +105,7 @@ class _GameScreenState extends ConsumerState<GameScreen>
                 ),
               ),
               const SizedBox(height: 20),
-              BottomControls(
+              Botto(
                 onBack: _vm.onPhaseBack,
                 onForward: _vm.onPhaseForward,
               ),

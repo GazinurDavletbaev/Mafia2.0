@@ -32,25 +32,20 @@ class PlayerGrid extends StatelessWidget {
     final rightColumn = sortedPlayers.where((p) => p.seatNumber >= 6).toList();
 
     return Row(
-      crossAxisAlignment: CrossAxisAlignment.stretch, // растягиваем по высоте
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Expanded(
           child: Column(
-            crossAxisAlignment:
-                CrossAxisAlignment.stretch, // растягиваем по ширине
             children: leftColumn.asMap().entries.map((entry) {
               final player = entry.value;
-              return Expanded(
-                // каждая карточка занимает равное место
-                child: Padding(
-                  padding: const EdgeInsets.only(bottom: 8),
-                  child: PlayerCard(
-                    player: player,
-                    isSpeaking: currentSpeaker == player.seatNumber,
-                    isLeftColumn: true,
-                    onTap: () => onTap(player.seatNumber),
-                    onLongPress: () => onLongPress(player.seatNumber),
-                  ),
+              return Padding(
+                padding: const EdgeInsets.only(bottom: 8),
+                child: PlayerCard(
+                  player: player,
+                  isSpeaking: currentSpeaker == player.seatNumber,
+                  isLeftColumn: true, // левая колонка
+                  onTap: () => onTap(player.seatNumber),
+                  onLongPress: () => onLongPress(player.seatNumber),
                 ),
               );
             }).toList(),
@@ -59,21 +54,16 @@ class PlayerGrid extends StatelessWidget {
         const SizedBox(width: 20),
         Expanded(
           child: Column(
-            crossAxisAlignment:
-                CrossAxisAlignment.stretch, // растягиваем по ширине
             children: rightColumn.asMap().entries.map((entry) {
               final player = entry.value;
-              return Expanded(
-                // каждая карточка занимает равное место
-                child: Padding(
-                  padding: const EdgeInsets.only(bottom: 8),
-                  child: PlayerCard(
-                    player: player,
-                    isSpeaking: currentSpeaker == player.seatNumber,
-                    isLeftColumn: false,
-                    onTap: () => onTap(player.seatNumber),
-                    onLongPress: () => onLongPress(player.seatNumber),
-                  ),
+              return Padding(
+                padding: const EdgeInsets.only(bottom: 8),
+                child: PlayerCard(
+                  player: player,
+                  isSpeaking: currentSpeaker == player.seatNumber,
+                  isLeftColumn: false, // правая колонка
+                  onTap: () => onTap(player.seatNumber),
+                  onLongPress: () => onLongPress(player.seatNumber),
                 ),
               );
             }).toList(),

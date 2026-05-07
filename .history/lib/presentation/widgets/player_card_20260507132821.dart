@@ -4,7 +4,7 @@ import 'package:mafia_help/data/local/models/player_model.dart';
 class PlayerCard extends StatelessWidget {
   final PlayerModel player;
   final bool isSpeaking;
-  final bool isLeftColumn;
+  final bool isLeftColumn; // true = левая колонка (места 5-1), false = правая (6-10)
   final VoidCallback onTap;
   final VoidCallback onLongPress;
 
@@ -23,7 +23,6 @@ class PlayerCard extends StatelessWidget {
       onTap: onTap,
       onLongPress: onLongPress,
       child: Container(
-        width: double.infinity, // растягиваем по ширине
         padding: const EdgeInsets.all(8.0),
         decoration: BoxDecoration(
           color: isSpeaking ? Colors.green.shade800 : Colors.grey.shade800,

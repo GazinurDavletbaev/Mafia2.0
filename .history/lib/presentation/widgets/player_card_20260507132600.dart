@@ -4,7 +4,6 @@ import 'package:mafia_help/data/local/models/player_model.dart';
 class PlayerCard extends StatelessWidget {
   final PlayerModel player;
   final bool isSpeaking;
-  final bool isLeftColumn;
   final VoidCallback onTap;
   final VoidCallback onLongPress;
 
@@ -12,7 +11,6 @@ class PlayerCard extends StatelessWidget {
     super.key,
     required this.player,
     required this.isSpeaking,
-    required this.isLeftColumn,
     required this.onTap,
     required this.onLongPress,
   });
@@ -23,7 +21,6 @@ class PlayerCard extends StatelessWidget {
       onTap: onTap,
       onLongPress: onLongPress,
       child: Container(
-        width: double.infinity, // растягиваем по ширине
         padding: const EdgeInsets.all(8.0),
         decoration: BoxDecoration(
           color: isSpeaking ? Colors.green.shade800 : Colors.grey.shade800,
@@ -32,7 +29,7 @@ class PlayerCard extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // Аватарка
+            // Аватарка с номером места
             Stack(
               alignment: Alignment.center,
               children: [
@@ -56,29 +53,21 @@ class PlayerCard extends StatelessWidget {
                           ),
                         ),
                 ),
-                // Номер места: у левых — слева сверху, у правых — справа сверху
+                // Номер места поверх аватарки
                 if (player.isAlive)
-                  Positioned(
-                    top: 0,
-                    left: isLeftColumn ? 0 : null,
-                    right: isLeftColumn ? null : 0,
-                    child: Container(
-                      width: 20,
-                      height: 20,
-                      decoration: BoxDecoration(
-                        color: Colors.black.withOpacity(0.7),
-                        shape: BoxShape.circle,
-                      ),
-                      child: Center(
-                        child: Text(
-                          '${player.seatNumber}',
-                          style: const TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
+                  Text(
+                    '${player.seatNumber}',
+                    style: const TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                      shadows: [
+                        Shadow(
+                          blurRadius: 4,
+                          color: Colors.black,
+                          offset: Offset(1, 1),
                         ),
-                      ),
+                      ],
                     ),
                   ),
               ],
@@ -96,34 +85,27 @@ class PlayerCard extends StatelessWidget {
               maxLines: 1,
               textAlign: TextAlign.center,
             ),
-            // Фолы: у левых — справа, у правых — слева под именем
+            // Индикатор фолов (маленький, под именем)
             if (player.fouls > 0)
               Padding(
                 padding: const EdgeInsets.only(top: 4),
-                child: Row(
-                  mainAxisAlignment: isLeftColumn 
-                      ? MainAxisAlignment.end   // левые — фол справа
-                      : MainAxisAlignment.start, // правые — фол слева
-                  children: [
-                    Container(
-                      width: 20,
-                      height: 20,
-                      decoration: const BoxDecoration(
-                        color: Colors.red,
-                        shape: BoxShape.circle,
-                      ),
-                      child: Center(
-                        child: Text(
-                          '${player.fouls}',
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 10,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
+                child: Container(
+                  width: 20,
+                  height: 20,
+                  decoration: const BoxDecoration(
+                    color: Colors.red,
+                    shape: BoxShape.circle,
+                  ),
+                  child: Center(
+                    child: Text(
+                      '${player.fouls}',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 10,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
-                  ],
+                  ),
                 ),
               ),
           ],

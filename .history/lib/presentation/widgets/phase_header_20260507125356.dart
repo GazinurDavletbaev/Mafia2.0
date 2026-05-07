@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mafia_help/data/local/models/phase.dart';
 import 'package:mafia_help/data/local/models/sub_phase.dart';
-import 'timer/timer_overlay.dart';
+import '../timer/timer_overlay.dart';
 
 class PhaseHeader extends StatelessWidget {
   final Phase phase;
