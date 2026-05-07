@@ -18,6 +18,7 @@ void main() async {
   
   const windowOptions = WindowOptions(
     size: Size(windowWidth, windowHeight),
+    position: Offset(100, 50),  // фиксированная позиция
     center: false,
     backgroundColor: Colors.transparent,
     skipTaskbar: false,
@@ -28,9 +29,6 @@ void main() async {
     await windowManager.show();
     await windowManager.focus();
   });
-  
-  // Устанавливаем позицию после показа окна
-  await windowManager.setPosition(Offset(1500, 100));
 
   final appDocumentDir = await path_provider.getApplicationDocumentsDirectory();
   Hive.init(appDocumentDir.path);

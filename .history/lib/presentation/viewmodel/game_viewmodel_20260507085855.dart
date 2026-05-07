@@ -165,11 +165,11 @@ class GameViewModel extends StateNotifier<GameState> {
   // ========== Завершение и сброс игры ==========
 
   Future<void> onEndGame(GameResult result) async {
-    final usecase = _ref.read(endGameUsecaseProvider);
-    final newState = await usecase(result);
-    state = newState;
-    await _saveCompletedGame();
-  }
+  final usecase = _ref.read(endGameUsecaseProvider);
+  final newState = await usecase(result);
+  state = newState;
+  await _saveCompletedGame();
+}
 
   Future<void> onResetGame() async {
     final usecase = _ref.read(resetGameUsecaseProvider);

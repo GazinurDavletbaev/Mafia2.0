@@ -25,12 +25,14 @@ void main() async {
   );
   
   await windowManager.waitUntilReadyToShow(windowOptions, () async {
+    // Правильный метод: getPrimaryDisplay()
+    final primaryDisplay = await windowManager.getPrimaryDisplay();
+    final screenWidth = primaryDisplay.size.width;
+    
+    await windowManager.setPosition(Offset(screenWidth - windowWidth, 50));
     await windowManager.show();
     await windowManager.focus();
   });
-  
-  // Устанавливаем позицию после показа окна
-  await windowManager.setPosition(Offset(1500, 100));
 
   final appDocumentDir = await path_provider.getApplicationDocumentsDirectory();
   Hive.init(appDocumentDir.path);

@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mafia_help/application/providers/providers.dart';
 import 'package:mafia_help/domain/helpers/game_end_helper.dart';
+
 import 'package:mafia_help/data/local/models/phase.dart';
 import 'package:mafia_help/data/local/models/player_model.dart';
 import '../../core/logger/app_logger.dart';
@@ -167,7 +168,9 @@ class GameViewModel extends StateNotifier<GameState> {
   Future<void> onEndGame(GameResult result) async {
     final usecase = _ref.read(endGameUsecaseProvider);
     final newState = await usecase(result);
-    state = newState;
+    if (newState != null) {
+      state = newState;
+    }
     await _saveCompletedGame();
   }
 

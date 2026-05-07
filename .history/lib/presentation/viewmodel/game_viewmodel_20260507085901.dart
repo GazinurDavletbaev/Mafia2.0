@@ -168,8 +168,8 @@ class GameViewModel extends StateNotifier<GameState> {
     final usecase = _ref.read(endGameUsecaseProvider);
     final newState = await usecase(result);
     state = newState;
-    await _saveCompletedGame();
-  }
+  await _saveCompletedGame();
+}
 
   Future<void> onResetGame() async {
     final usecase = _ref.read(resetGameUsecaseProvider);

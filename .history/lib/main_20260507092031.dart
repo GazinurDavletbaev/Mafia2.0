@@ -30,7 +30,7 @@ void main() async {
   });
   
   // Устанавливаем позицию после показа окна
-  await windowManager.setPosition(Offset(1500, 100));
+  await windowManager.setPosition(Offset(screenWidth - windowWidth, 50));
 
   final appDocumentDir = await path_provider.getApplicationDocumentsDirectory();
   Hive.init(appDocumentDir.path);

@@ -16,6 +16,10 @@ void main() async {
   const windowWidth = 400.0;
   const windowHeight = 800.0;
   
+  // Получаем размер экрана
+  final screenSize = await windowManager.getPrimaryDisplaySize();
+  final screenWidth = screenSize.width;
+  
   const windowOptions = WindowOptions(
     size: Size(windowWidth, windowHeight),
     center: false,
@@ -25,12 +29,11 @@ void main() async {
   );
   
   await windowManager.waitUntilReadyToShow(windowOptions, () async {
+    // Устанавливаем позицию справа сверху
+    await windowManager.setPosition(Offset(screenWidth - windowWidth, 50));
     await windowManager.show();
     await windowManager.focus();
   });
-  
-  // Устанавливаем позицию после показа окна
-  await windowManager.setPosition(Offset(1500, 100));
 
   final appDocumentDir = await path_provider.getApplicationDocumentsDirectory();
   Hive.init(appDocumentDir.path);

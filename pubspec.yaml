@@ -28,6 +28,7 @@ dependencies:
   pie_menu: ^3.6.0
 
   logger: ^2.0.2
+  window_manager: ^0.5.1
 
 
 

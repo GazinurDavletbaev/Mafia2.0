@@ -11,8 +11,11 @@ import 'hive_registrar.g.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   
+  // Настройка окна для desktop
   await windowManager.ensureInitialized();
   
+  // Получаем размер экрана
+  final screenSize = await windowManager.getPrimaryDisplaySize();
   const windowWidth = 400.0;
   const windowHeight = 800.0;
   
@@ -25,12 +28,11 @@ void main() async {
   );
   
   await windowManager.waitUntilReadyToShow(windowOptions, () async {
+    // Устанавливаем позицию справа сверху
+    await windowManager.setPosition(Offset(screenSize.width - windowWidth, 50));
     await windowManager.show();
     await windowManager.focus();
   });
-  
-  // Устанавливаем позицию после показа окна
-  await windowManager.setPosition(Offset(1500, 100));
 
   final appDocumentDir = await path_provider.getApplicationDocumentsDirectory();
   Hive.init(appDocumentDir.path);
