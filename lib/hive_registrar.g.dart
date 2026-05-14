@@ -16,6 +16,9 @@ import 'package:mafia_help/data/local/models/rule.dart';
 import 'package:mafia_help/data/local/models/user.dart';
 import 'package:mafia_help/data/local/models/violation.dart';
 import 'package:mafia_help/data/local/models/vote.dart';
+import 'package:mafia_help/domain/entities/phase_stack.dart';
+import 'package:mafia_help/domain/entities/speech_stack.dart';
+import 'package:mafia_help/domain/entities/vote_stack.dart';
 
 extension HiveRegistrar on HiveInterface {
   void registerAdapters() {
@@ -24,14 +27,17 @@ extension HiveRegistrar on HiveInterface {
     registerAdapter(GameAdapter());
     registerAdapter(GameLogAdapter());
     registerAdapter(KillAdapter());
+    registerAdapter(PhaseStackAdapter());
     registerAdapter(PlayerAdapter());
     registerAdapter(PlayerModelAdapter());
     registerAdapter(PlayerUIModelAdapter());
     registerAdapter(RoleAdapter());
     registerAdapter(RuleAdapter());
+    registerAdapter(SpeechStackAdapter());
     registerAdapter(UserAdapter());
     registerAdapter(ViolationAdapter());
     registerAdapter(VoteAdapter());
+    registerAdapter(VoteStackAdapter());
   }
 }
 
@@ -42,13 +48,16 @@ extension IsolatedHiveRegistrar on IsolatedHiveInterface {
     registerAdapter(GameAdapter());
     registerAdapter(GameLogAdapter());
     registerAdapter(KillAdapter());
+    registerAdapter(PhaseStackAdapter());
     registerAdapter(PlayerAdapter());
     registerAdapter(PlayerModelAdapter());
     registerAdapter(PlayerUIModelAdapter());
     registerAdapter(RoleAdapter());
     registerAdapter(RuleAdapter());
+    registerAdapter(SpeechStackAdapter());
     registerAdapter(UserAdapter());
     registerAdapter(ViolationAdapter());
     registerAdapter(VoteAdapter());
+    registerAdapter(VoteStackAdapter());
   }
 }
