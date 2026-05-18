@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../core/logger/app_logger.dart';
 import '../../data/local/models/player_model.dart';
-import '../../data/local/models/sub_phase.dart';
 import 'player_card.dart';
 import 'player_timer_type.dart';
 
@@ -9,17 +8,16 @@ class PlayerGrid extends StatelessWidget {
   final List<PlayerModel> players;
   final int? currentSpeaker;
   final PlayerTimerType timerType;
-  final SubPhase? currentSubPhase; // добавляем текущую фазу
   final VoidCallback? onTimerComplete;
   final Function(int) onTap;
   final Function(int) onLongPress;
-  
+  inal bool isBlackTeam = _vm.state.currentSubPhase == SubPhase.contract &&
+    (player.role == 'don' || player.role == 'mafia');
   const PlayerGrid({
     super.key,
     required this.players,
     this.currentSpeaker,
     required this.timerType,
-    this.currentSubPhase,
     this.onTimerComplete,
     required this.onTap,
     required this.onLongPress,
@@ -37,6 +35,8 @@ class PlayerGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+   // AppLogger.d('PlayerGrid.build() → currentSpeaker=$currentSpeaker, timerType=$timerType');
+    
     final sortedPlayers = List<PlayerModel>.from(players)
       ..sort((a, b) => a.seatNumber.compareTo(b.seatNumber));
     
@@ -56,9 +56,7 @@ class PlayerGrid extends StatelessWidget {
               final isSpeaking = currentSpeaker == player.seatNumber;
               final timerValue = isSpeaking ? timerSeconds : null;
               
-              // Для фазы contract подсвечиваем чёрных
-              final isBlackTeam = currentSubPhase == SubPhase.contract &&
-                  (player.role == 'don' || player.role == 'mafia');
+       //       AppLogger.d('PlayerGrid left: seat=${player.seatNumber}, isSpeaking=$isSpeaking, timerSeconds=$timerValue');
               
               return Expanded(
                 child: Padding(
@@ -66,7 +64,6 @@ class PlayerGrid extends StatelessWidget {
                   child: PlayerCard(
                     player: player,
                     isSpeaking: isSpeaking,
-                    isBlackTeam: isBlackTeam,
                     isLeftColumn: true,
                     timerSeconds: timerValue,
                     onTimerComplete: onTimerComplete,
@@ -87,9 +84,7 @@ class PlayerGrid extends StatelessWidget {
               final isSpeaking = currentSpeaker == player.seatNumber;
               final timerValue = isSpeaking ? timerSeconds : null;
               
-              // Для фазы contract подсвечиваем чёрных
-              final isBlackTeam = currentSubPhase == SubPhase.contract &&
-                  (player.role == 'don' || player.role == 'mafia');
+     //         AppLogger.d('PlayerGrid right: seat=${player.seatNumber}, isSpeaking=$isSpeaking, timerSeconds=$timerValue');
               
               return Expanded(
                 child: Padding(
@@ -97,7 +92,6 @@ class PlayerGrid extends StatelessWidget {
                   child: PlayerCard(
                     player: player,
                     isSpeaking: isSpeaking,
-                    isBlackTeam: isBlackTeam,
                     isLeftColumn: false,
                     timerSeconds: timerValue,
                     onTimerComplete: onTimerComplete,

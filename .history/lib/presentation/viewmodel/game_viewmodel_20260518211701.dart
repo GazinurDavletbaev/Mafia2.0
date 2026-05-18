@@ -87,6 +87,7 @@ class GameViewModel extends StateNotifier<GameState> {
       case SubPhase.speeches:
         await _speeches.nextSpeaker();
         _history.push(state);
+
         break;
       case SubPhase.voting:
         print('hi');

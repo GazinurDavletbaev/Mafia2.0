@@ -32,11 +32,10 @@ class SpeechesActions {
       aliveSeats: allAlive,
       speechHistory: _vm.state.speechHistory,
     );
-    final k = _vm.state.speechHistory;
-    AppLogger.d('speechystory: $k');
+    AppLogger.d('nextspeaker: $_vm.state.speechHistory');
 
     if (nextSpeaker != null) {
-      final newHistory = List<int>.from(_vm.state.speechHistory)
+      final newHistory = List<int>.from(_vm.state.speechHistory.length)
         ..add(nextSpeaker);
       _vm.state = _vm.state.copyWith(
         currentSpeakerSeat: nextSpeaker,

@@ -84,6 +84,7 @@ class GameViewModel extends StateNotifier<GameState> {
         final newState = await _phase.calculateNextState(state);
         state = newState;
         break;
+      case SubPhase.contract
       case SubPhase.speeches:
         await _speeches.nextSpeaker();
         _history.push(state);

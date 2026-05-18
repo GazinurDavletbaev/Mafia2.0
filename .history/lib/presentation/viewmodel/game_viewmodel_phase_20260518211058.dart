@@ -110,7 +110,7 @@ class PhaseActions {
           currentPhase: Phase.day,
           currentSpeakerSeat: firstSpeaker,
           dayStarterSeat: firstSpeaker,
-          speechHistory: [?firstSpeaker], // только первый
+          speechHistory: [firstSpeaker], // только первый
         );
       }
     }

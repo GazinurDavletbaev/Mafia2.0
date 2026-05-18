@@ -32,8 +32,6 @@ class SpeechesActions {
       aliveSeats: allAlive,
       speechHistory: _vm.state.speechHistory,
     );
-    final k = _vm.state.speechHistory;
-    AppLogger.d('speechystory: $k');
 
     if (nextSpeaker != null) {
       final newHistory = List<int>.from(_vm.state.speechHistory)

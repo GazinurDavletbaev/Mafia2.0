@@ -183,6 +183,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
                 subPhase: gameState.currentSubPhase,
                 currentDay: gameState.currentDay,
                 currentSpeaker: gameState.currentSpeakerSeat,
+
               ),
               const SizedBox(height: 20),
               if (gameState.nominatedSeats.isNotEmpty)
@@ -198,7 +199,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
                   onTimerComplete: () => _vm.onTimerComplete(),
                   onTap: _vm.onPlayerTap,
                   onLongPress: (seat) => PieMenuDialog.show(context, seat, _vm),
-                  currentSubPhase: gameState.currentSubPhase,
+                  currentSubPhase: gameState.currentSubPhase
                 ),
               ),
               const SizedBox(height: 20),

@@ -33,7 +33,7 @@ class SpeechesActions {
       speechHistory: _vm.state.speechHistory,
     );
     final k = _vm.state.speechHistory;
-    AppLogger.d('speechystory: $k');
+    AppLogger.d('speechystory: $');
 
     if (nextSpeaker != null) {
       final newHistory = List<int>.from(_vm.state.speechHistory)

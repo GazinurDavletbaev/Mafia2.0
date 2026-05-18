@@ -6,7 +6,6 @@ import 'timer/timer_overlay.dart';
 class PlayerCard extends StatelessWidget {
   final PlayerModel player;
   final bool isSpeaking;
-  final bool isBlackTeam; // для подсветки чёрных в фазе contract
   final bool isLeftColumn;
   final int? timerSeconds;
   final VoidCallback? onTimerComplete;
@@ -17,7 +16,6 @@ class PlayerCard extends StatelessWidget {
     super.key,
     required this.player,
     required this.isSpeaking,
-    this.isBlackTeam = false,
     required this.isLeftColumn,
     this.timerSeconds,
     this.onTimerComplete,
@@ -27,9 +25,12 @@ class PlayerCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // AppLogger.d('PlayerCard.build(): seat=${player.seatNumber}, isSpeaking=$isSpeaking, timerSeconds=$timerSeconds, isAlive=${player.isAlive}');
+
     final card = _buildCard();
 
     if (isSpeaking && timerSeconds != null) {
+      //  AppLogger.d('PlayerCard: showing TimerOverlay for seat ${player.seatNumber}, seconds=$timerSeconds');
       return TimerOverlay(
         seconds: timerSeconds!,
         onComplete: onTimerComplete,
@@ -42,21 +43,11 @@ class PlayerCard extends StatelessWidget {
   }
 
   Widget _buildCard() {
-    // Определяем цвет фона
-    Color backgroundColor;
-    if (isBlackTeam) {
-      backgroundColor = Colors.purple.shade800;
-    } else if (isSpeaking) {
-      backgroundColor = Colors.green.shade800;
-    } else {
-      backgroundColor = Colors.grey.shade800;
-    }
-
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(8.0),
       decoration: BoxDecoration(
-        color: backgroundColor,
+        color: isSpeaking ? Colors.green.shade800 : Colors.grey.shade800,
         borderRadius: BorderRadius.circular(12),
       ),
       child: Column(

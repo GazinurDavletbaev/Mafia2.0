@@ -42,6 +42,7 @@ class SpeechesActions {
         currentSpeakerSeat: nextSpeaker,
         speechHistory: newHistory,
       );
+      a
     } else {
       // День закончен
       _vm.state = _vm.state.copyWith(
