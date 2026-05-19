@@ -11,6 +11,7 @@ import 'game_viewmodel_phase.dart';
 import 'game_viewmodel_speeches.dart';
 import 'game_viewmodel_actions.dart';
 import 'game_viewmodel_reset.dart';
+import 'game_viewmodel_timer.dart';
 import 'game_viewmodel_vote_calc.dart';
 
 final gameViewModelFamily =
@@ -156,6 +157,8 @@ class GameViewModel extends StateNotifier<GameState> {
 
   Future<void> onResetGame() => _reset.onResetGame();
   Future<void> dealRoles() => _reset.dealRoles();
+
+  Future<void> onTimerComplete() => _timer.onTimerComplete();
 
   void startVoting(List<int> candidates) => _voteCalc.startVoting(candidates);
   void submitVote(int votes) => _voteCalc.submitVote(votes);

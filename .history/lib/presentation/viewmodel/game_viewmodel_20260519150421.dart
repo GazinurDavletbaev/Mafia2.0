@@ -157,6 +157,7 @@ class GameViewModel extends StateNotifier<GameState> {
   Future<void> onResetGame() => _reset.onResetGame();
   Future<void> dealRoles() => _reset.dealRoles();
 
+
   void startVoting(List<int> candidates) => _voteCalc.startVoting(candidates);
   void submitVote(int votes) => _voteCalc.submitVote(votes);
   void hideVoteCalculator() => _voteCalc.hideVoteCalculator();

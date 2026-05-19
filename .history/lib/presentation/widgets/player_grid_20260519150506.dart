@@ -127,6 +127,7 @@ class PlayerGrid extends StatelessWidget {
                     isCurrentCandidate: isCurrentCandidate,
                     isLeftColumn: false,
                     timerSeconds: timerValue,
+                    onTimerComplete: onTimerComplete,
                     onTap: () => onTap(player.seatNumber),
                     onLongPress: () => onLongPress(player.seatNumber),
                   ),

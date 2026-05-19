@@ -11,6 +11,7 @@ class PlayerGrid extends StatelessWidget {
   final int? currentSpeaker;
   final PlayerTimerType timerType;
   final SubPhase? currentSubPhase; // добавляем текущую фазу
+  final VoidCallback? onTimerComplete;
   final Function(int) onTap;
   final Function(int) onLongPress;
   final bool isVotingActive;
@@ -89,6 +90,7 @@ class PlayerGrid extends StatelessWidget {
                     isCurrentCandidate: isCurrentCandidate,
                     isLeftColumn: true,
                     timerSeconds: timerValue,
+                    onTimerComplete: onTimerComplete,
                     onTap: () => onTap(player.seatNumber),
                     onLongPress: () => onLongPress(player.seatNumber),
                   ),
@@ -127,6 +129,7 @@ class PlayerGrid extends StatelessWidget {
                     isCurrentCandidate: isCurrentCandidate,
                     isLeftColumn: false,
                     timerSeconds: timerValue,
+                    onTimerComplete: onTimerComplete,
                     onTap: () => onTap(player.seatNumber),
                     onLongPress: () => onLongPress(player.seatNumber),
                   ),
