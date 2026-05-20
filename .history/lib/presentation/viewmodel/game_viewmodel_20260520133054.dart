@@ -167,16 +167,13 @@ class GameViewModel extends StateNotifier<GameState> {
 
   void submitNightAction(int value) {
     final subPhase = state.currentSubPhase;
-
+    
     if (subPhase == SubPhase.mafiaShoot) {
       final usecase = _ref.read(killPlayerUsecaseProvider);
       final (newPlayers, winner) = usecase.execute(state.players, value);
       state = state.copyWith(players: newPlayers);
       if (winner != null) {
-        state = state.copyWith(
-          isGameEnded: true,
-          winner: winner ? 'red' : 'black',
-        );
+        state = state.copyWith(isGameEnded: true, winner: winner ? 'red' : 'black');
       }
     } else if (subPhase == SubPhase.donCheck) {
       final target = state.players.firstWhere((p) => p.seatNumber == value);
@@ -186,7 +183,7 @@ class GameViewModel extends StateNotifier<GameState> {
       final team = target.team == 'black' ? 'чёрный' : 'красный';
       AppLogger.d('Sheriff check: игрок $value - $team');
     }
-
+    
     // Переход к следующей фазе
     onPhaseForward();
   }

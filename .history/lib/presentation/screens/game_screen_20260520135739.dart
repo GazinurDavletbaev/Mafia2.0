@@ -118,10 +118,9 @@ class _GameScreenState extends ConsumerState<GameScreen> {
 
   Widget _buildMainScaffold(GameState gameState) {
     final timerType = _getTimerType(gameState);
-
+    
     // Определяем, нужно ли показывать калькулятор
-    final showCalculator =
-        gameState.isVotingActive ||
+    final showCalculator = gameState.isVotingActive ||
         gameState.currentSubPhase == SubPhase.mafiaShoot ||
         gameState.currentSubPhase == SubPhase.donCheck ||
         gameState.currentSubPhase == SubPhase.sheriffCheck;
@@ -169,23 +168,21 @@ class _GameScreenState extends ConsumerState<GameScreen> {
                 ),
               ),
               const SizedBox(height: 20),
-              SizedBox(
-                height:
-                    MediaQuery.of(context).size.height *
-                    0.08, // 8% от высоты экрана
-                child: BottomControls(
-                  onBack: () => _vm.onPhaseBack(),
-                  onForward: () => _vm.onPhaseForward(),
-                  showCalculator: showCalculator,
-                  onCalculatorTap: (value) {
-                    if (gameState.isVotingActive) {
-                      _vm.submitVote(value);
-                    } else {
-                      // Для ночных действий
-                      _vm.submitNightAction(value);
-                    }
-                  },
-                ),
+              SizeBox(
+                height: MediaQuery.of(context).size.height * 0.08, // 8% от высоты экрана
+                chi
+                BottomControls(
+                onBack: () => _vm.onPhaseBack(),
+                onForward: () => _vm.onPhaseForward(),
+                showCalculator: showCalculator,
+                onCalculatorTap: (value) {
+                  if (gameState.isVotingActive) {
+                    _vm.submitVote(value);
+                  } else {
+                    // Для ночных действий
+                    _vm.submitNightAction(value);
+                  }
+                },
               ),
             ],
           ),

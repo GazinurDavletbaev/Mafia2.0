@@ -22,9 +22,9 @@ class BottomControls extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         PhaseNavButton(icon: Icons.arrow_back_ios, onTap: onBack),
-
+        
         showCalculator ? _buildCalculator() : const MinimizeButton(),
-
+        
         PhaseNavButton(icon: Icons.arrow_forward_ios, onTap: onForward),
       ],
     );
@@ -39,30 +39,21 @@ class BottomControls extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              _calcButton(10),
-              _calcButton(9),
-              _calcButton(8),
-              _calcButton(7),
+              _calcButton(10), _calcButton(9), _calcButton(8), _calcButton(7),
             ],
           ),
           const SizedBox(height: 2),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              _calcButton(6),
-              _calcButton(5),
-              _calcButton(4),
-              _calcButton(3),
+              _calcButton(6), _calcButton(5), _calcButton(4), _calcButton(3),
             ],
           ),
           const SizedBox(height: 2),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              _calcButton(2),
-              _calcButton(1),
-              _calcButton(0),
-              _battleButton(),
+              _calcButton(2), _calcButton(1), _calcButton(0), _battleButton(),
             ],
           ),
         ],
@@ -81,9 +72,7 @@ class BottomControls extends StatelessWidget {
             foregroundColor: Colors.white,
             padding: EdgeInsets.zero,
             minimumSize: const Size(30, 30),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(6),
-            ),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
           ),
           child: Text(n.toString(), style: const TextStyle(fontSize: 14)),
         ),
@@ -102,9 +91,7 @@ class BottomControls extends StatelessWidget {
             foregroundColor: Colors.white,
             padding: EdgeInsets.zero,
             minimumSize: const Size(30, 30),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(6),
-            ),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
           ),
           child: const Icon(Icons.crisis_alert, size: 16),
         ),
