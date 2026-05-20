@@ -53,7 +53,7 @@ class _FloatingCalculatorState extends ConsumerState<FloatingCalculator> {
         },
         onPanEnd: (_) => setState(() => _isDragging = false),
         child: Container(
-          width: 150,
+          width: 200,
           decoration: BoxDecoration(
             color: Colors.grey.shade900,
             borderRadius: BorderRadius.circular(20),

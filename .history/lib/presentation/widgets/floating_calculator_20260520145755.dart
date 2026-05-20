@@ -53,7 +53,7 @@ class _FloatingCalculatorState extends ConsumerState<FloatingCalculator> {
         },
         onPanEnd: (_) => setState(() => _isDragging = false),
         child: Container(
-          width: 150,
+          width: 200,
           decoration: BoxDecoration(
             color: Colors.grey.shade900,
             borderRadius: BorderRadius.circular(20),
@@ -89,17 +89,13 @@ class _FloatingCalculatorState extends ConsumerState<FloatingCalculator> {
                 children: [
                   _buildKey('4', () => _onNumberTap(4)),
                   _buildKey('3', () => _onNumberTap(3)),
+
                   _buildKey('2', () => _onNumberTap(2)),
-                ],
-              ),
-              Row(
-                children: [
                   _buildKey('1', () => _onNumberTap(1)),
                   _buildKey('0', () => _onNumberTap(0)),
                   _buildKey('⚔️', () => _onNumberTap(-1)),
                 ],
               ),
-
               const Divider(height: 1, color: Colors.grey),
               // Ряд навигации
               Row(

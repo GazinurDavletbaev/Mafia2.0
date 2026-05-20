@@ -53,7 +53,7 @@ class _FloatingCalculatorState extends ConsumerState<FloatingCalculator> {
         },
         onPanEnd: (_) => setState(() => _isDragging = false),
         child: Container(
-          width: 150,
+          width: 200,
           decoration: BoxDecoration(
             color: Colors.grey.shade900,
             borderRadius: BorderRadius.circular(20),
@@ -74,32 +74,27 @@ class _FloatingCalculatorState extends ConsumerState<FloatingCalculator> {
                   _buildKey('10', () => _onNumberTap(10)),
                   _buildKey('9', () => _onNumberTap(9)),
                   _buildKey('8', () => _onNumberTap(8)),
+                  _buildKey('7', () => _onNumberTap(7)),
                 ],
               ),
               // Ряд 2: 6 5 4 3
               Row(
                 children: [
-                  _buildKey('7', () => _onNumberTap(7)),
                   _buildKey('6', () => _onNumberTap(6)),
                   _buildKey('5', () => _onNumberTap(5)),
+                  _buildKey('4', () => _onNumberTap(4)),
+                  _buildKey('3', () => _onNumberTap(3)),
                 ],
               ),
               // Ряд 3: 2 1 0 ⚔️
               Row(
                 children: [
-                  _buildKey('4', () => _onNumberTap(4)),
-                  _buildKey('3', () => _onNumberTap(3)),
                   _buildKey('2', () => _onNumberTap(2)),
-                ],
-              ),
-              Row(
-                children: [
                   _buildKey('1', () => _onNumberTap(1)),
                   _buildKey('0', () => _onNumberTap(0)),
                   _buildKey('⚔️', () => _onNumberTap(-1)),
                 ],
               ),
-
               const Divider(height: 1, color: Colors.grey),
               // Ряд навигации
               Row(

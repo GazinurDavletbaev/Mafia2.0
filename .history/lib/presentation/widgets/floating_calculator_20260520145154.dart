@@ -4,8 +4,6 @@ import 'package:mafia_help/application/providers/providers.dart';
 import 'package:mafia_help/data/local/models/sub_phase.dart';
 import 'package:mafia_help/presentation/viewmodel/game_viewmodel.dart';
 
-import '../state/game_state.dart';
-
 class FloatingCalculator extends ConsumerStatefulWidget {
   final String gameId;
 
@@ -19,8 +17,7 @@ class _FloatingCalculatorState extends ConsumerState<FloatingCalculator> {
   Offset _position = const Offset(20, 100);
   bool _isDragging = false;
 
-  GameViewModel get _vm =>
-      ref.read(gameViewModelFamily(widget.gameId).notifier);
+  GameViewModel get _vm => ref.read(gameViewModelFamily(widget.gameId).notifier);
   GameState get _state => ref.read(gameViewModelFamily(widget.gameId));
 
   void _onNumberTap(int value) {
@@ -53,7 +50,7 @@ class _FloatingCalculatorState extends ConsumerState<FloatingCalculator> {
         },
         onPanEnd: (_) => setState(() => _isDragging = false),
         child: Container(
-          width: 150,
+          width: 240,
           decoration: BoxDecoration(
             color: Colors.grey.shade900,
             borderRadius: BorderRadius.circular(20),
@@ -74,32 +71,27 @@ class _FloatingCalculatorState extends ConsumerState<FloatingCalculator> {
                   _buildKey('10', () => _onNumberTap(10)),
                   _buildKey('9', () => _onNumberTap(9)),
                   _buildKey('8', () => _onNumberTap(8)),
+                  _buildKey('7', () => _onNumberTap(7)),
                 ],
               ),
               // Ряд 2: 6 5 4 3
               Row(
                 children: [
-                  _buildKey('7', () => _onNumberTap(7)),
                   _buildKey('6', () => _onNumberTap(6)),
                   _buildKey('5', () => _onNumberTap(5)),
+                  _buildKey('4', () => _onNumberTap(4)),
+                  _buildKey('3', () => _onNumberTap(3)),
                 ],
               ),
               // Ряд 3: 2 1 0 ⚔️
               Row(
                 children: [
-                  _buildKey('4', () => _onNumberTap(4)),
-                  _buildKey('3', () => _onNumberTap(3)),
                   _buildKey('2', () => _onNumberTap(2)),
-                ],
-              ),
-              Row(
-                children: [
                   _buildKey('1', () => _onNumberTap(1)),
                   _buildKey('0', () => _onNumberTap(0)),
                   _buildKey('⚔️', () => _onNumberTap(-1)),
                 ],
               ),
-
               const Divider(height: 1, color: Colors.grey),
               // Ряд навигации
               Row(
@@ -131,7 +123,7 @@ class _FloatingCalculatorState extends ConsumerState<FloatingCalculator> {
             onTap: onTap,
             borderRadius: BorderRadius.circular(12),
             child: Container(
-              padding: const EdgeInsets.symmetric(vertical: 6),
+              padding: const EdgeInsets.symmetric(vertical: 16),
               alignment: Alignment.center,
               child: Text(
                 text,
