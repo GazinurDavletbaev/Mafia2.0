@@ -106,7 +106,7 @@ class BottomControls extends StatelessWidget {
               borderRadius: BorderRadius.circular(6),
             ),
           ),
-          child: const Icon(Icons.share, size: 16),
+          child: const Icon(Icons.shar, size: 16),
         ),
       ),
     );
