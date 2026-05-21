@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mafia_help/application/providers/providers.dart';
 import 'package:mafia_help/data/local/models/sub_phase.dart';
 import 'package:mafia_help/presentation/viewmodel/game_viewmodel.dart';
-import 'package:mafia_help/presentation/widgets/pie_menu_dialog.dart';
 
 import '../state/game_state.dart';
 
@@ -17,7 +16,7 @@ class FloatingCalculator extends ConsumerStatefulWidget {
 }
 
 class _FloatingCalculatorState extends ConsumerState<FloatingCalculator> {
-  Offset _position = const Offset(150, 450);
+  Offset _position = const Offset(150, 4500);
   bool _isDragging = false;
 
   GameViewModel get _vm =>
@@ -31,18 +30,6 @@ class _FloatingCalculatorState extends ConsumerState<FloatingCalculator> {
         _state.currentSubPhase == SubPhase.donCheck ||
         _state.currentSubPhase == SubPhase.sheriffCheck) {
       _vm.submitNightAction(value);
-    } else {
-      // Обычный режим: ставим фол
-      _vm.onPlayerTap(value);
-    }
-  }
-
-  void _onNumberLongPress(int value) {
-    if (!_state.isVotingActive &&
-        _state.currentSubPhase != SubPhase.mafiaShoot &&
-        _state.currentSubPhase != SubPhase.donCheck &&
-        _state.currentSubPhase != SubPhase.sheriffCheck) {
-      PieMenuDialog.show(context, value, _vm);
     }
   }
 
@@ -58,7 +45,7 @@ class _FloatingCalculatorState extends ConsumerState<FloatingCalculator> {
             setState(() {
               _position += details.delta;
               _position = Offset(
-                _position.dx.clamp(0, MediaQuery.of(context).size.width - 150),
+                _position.dx.clamp(0, MediaQuery.of(context).size.width - 240),
                 _position.dy.clamp(0, MediaQuery.of(context).size.height - 280),
               );
             });
@@ -84,32 +71,32 @@ class _FloatingCalculatorState extends ConsumerState<FloatingCalculator> {
               // Ряд 1: 10 9 8 7
               Row(
                 children: [
-                  _buildKey('10', 10),
-                  _buildKey('9', 9),
-                  _buildKey('8', 8),
+                  _buildKey('10', () => _onNumberTap(10)),
+                  _buildKey('9', () => _onNumberTap(9)),
+                  _buildKey('8', () => _onNumberTap(8)),
                 ],
               ),
               // Ряд 2: 6 5 4 3
               Row(
                 children: [
-                  _buildKey('7', 7),
-                  _buildKey('6', 6),
-                  _buildKey('5', 5),
+                  _buildKey('7', () => _onNumberTap(7)),
+                  _buildKey('6', () => _onNumberTap(6)),
+                  _buildKey('5', () => _onNumberTap(5)),
                 ],
               ),
               // Ряд 3: 2 1 0 ⚔️
               Row(
                 children: [
-                  _buildKey('4', 4),
-                  _buildKey('3', 3),
-                  _buildKey('2', 2),
+                  _buildKey('4', () => _onNumberTap(4)),
+                  _buildKey('3', () => _onNumberTap(3)),
+                  _buildKey('2', () => _onNumberTap(2)),
                 ],
               ),
               Row(
                 children: [
-                  _buildKey('1', 1),
-                  _buildKey('0', 0),
-                  _buildKey('⚔️', -1),
+                  _buildKey('1', () => _onNumberTap(1)),
+                  _buildKey('0', () => _onNumberTap(0)),
+                  _buildKey('⚔️', () => _onNumberTap(-1)),
                 ],
               ),
 
@@ -129,7 +116,7 @@ class _FloatingCalculatorState extends ConsumerState<FloatingCalculator> {
     );
   }
 
-  Widget _buildKey(String text, int value) {
+  Widget _buildKey(String text, VoidCallback onTap) {
     return Expanded(
       child: Container(
         margin: const EdgeInsets.all(4),
@@ -141,8 +128,7 @@ class _FloatingCalculatorState extends ConsumerState<FloatingCalculator> {
         child: Material(
           color: Colors.transparent,
           child: InkWell(
-            onTap: () => _onNumberTap(value),
-            onLongPress: () => _onNumberLongPress(value),
+            onTap: onTap,
             borderRadius: BorderRadius.circular(12),
             child: Container(
               padding: const EdgeInsets.symmetric(vertical: 6),
