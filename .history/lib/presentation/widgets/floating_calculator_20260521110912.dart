@@ -53,10 +53,10 @@ class _FloatingCalculatorState extends ConsumerState<FloatingCalculator> {
     setState(() {
       if (_isMinimized) {
         // Разворачиваем: возвращаем позицию вверх
-        _position = Offset(_position.dx, _position.dy - _digitsHeight + 44);
+        _position = Offset(_position.dx, _position.dy - _digitsHeight + 27);
       } else {
         // Сворачиваем: опускаем вниз
-        _position = Offset(_position.dx, _position.dy + _digitsHeight - 44);
+        _position = Offset(_position.dx, _position.dy + _digitsHeight - 25);
       }
       _isMinimized = !_isMinimized;
     });
@@ -64,13 +64,9 @@ class _FloatingCalculatorState extends ConsumerState<FloatingCalculator> {
 
   @override
   Widget build(BuildContext context) {
-    final screenHeight = MediaQuery.of(context).size.height;
-    final screenWidth = MediaQuery.of(context).size.width;
-    final maxTop = screenHeight - (_isMinimized ? 60 : 280);
-
     return Positioned(
-      left: _position.dx.clamp(0, screenWidth - 150),
-      top: _position.dy.clamp(0, maxTop),
+      left: _position.dx,
+      top: _position.dy,
       child: GestureDetector(
         onPanStart: (_) => setState(() => _isDragging = true),
         onPanUpdate: (details) {
@@ -78,8 +74,8 @@ class _FloatingCalculatorState extends ConsumerState<FloatingCalculator> {
             setState(() {
               _position += details.delta;
               _position = Offset(
-                _position.dx.clamp(0, screenWidth - 150),
-                _position.dy.clamp(0, maxTop),
+                _position.dx.clamp(0, MediaQuery.of(context).size.width - 150),
+                _position.dy.clamp(0, MediaQuery.of(context).size.height - 280),
               );
             });
           }
@@ -164,7 +160,7 @@ class _FloatingCalculatorState extends ConsumerState<FloatingCalculator> {
   Widget _buildKey(String text, int value) {
     return Expanded(
       child: Container(
-        margin: const EdgeInsets.all(2),
+        margin: const EdgeInsets.all(4),
         decoration: BoxDecoration(
           color: Colors.grey.shade800,
           borderRadius: BorderRadius.circular(12),
@@ -197,7 +193,7 @@ class _FloatingCalculatorState extends ConsumerState<FloatingCalculator> {
   Widget _buildNavKey(String text, VoidCallback onTap) {
     return Expanded(
       child: Container(
-        margin: const EdgeInsets.all(2),
+        margin: const EdgeInsets.all(4),
         decoration: BoxDecoration(
           color: Colors.grey.shade800,
           borderRadius: BorderRadius.circular(12),

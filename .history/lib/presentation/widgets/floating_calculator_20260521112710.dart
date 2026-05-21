@@ -53,10 +53,10 @@ class _FloatingCalculatorState extends ConsumerState<FloatingCalculator> {
     setState(() {
       if (_isMinimized) {
         // Разворачиваем: возвращаем позицию вверх
-        _position = Offset(_position.dx, _position.dy - _digitsHeight + 44);
+        _position = Offset(_position.dx, _position.dy - _digitsHeight + );
       } else {
         // Сворачиваем: опускаем вниз
-        _position = Offset(_position.dx, _position.dy + _digitsHeight - 44);
+        _position = Offset(_position.dx, _position.dy + _digitsHeight - 15);
       }
       _isMinimized = !_isMinimized;
     });

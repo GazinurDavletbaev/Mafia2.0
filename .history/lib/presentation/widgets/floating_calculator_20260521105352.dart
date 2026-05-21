@@ -21,8 +21,8 @@ class _FloatingCalculatorState extends ConsumerState<FloatingCalculator> {
   bool _isDragging = false;
   bool _isMinimized = false;
 
-  // Высота цифровых рядов с отступами (~4 строки * (6+4) + divider)
-  static const double _digitsHeight = 220;
+  static const double _expandedHeight = 280;
+  static const double _collapsedHeight = 60;
 
   GameViewModel get _vm =>
       ref.read(gameViewModelFamily(widget.gameId).notifier);
@@ -51,26 +51,15 @@ class _FloatingCalculatorState extends ConsumerState<FloatingCalculator> {
 
   void _toggleMinimize() {
     setState(() {
-      if (_isMinimized) {
-        // Разворачиваем: возвращаем позицию вверх
-        _position = Offset(_position.dx, _position.dy - _digitsHeight + 44);
-      } else {
-        // Сворачиваем: опускаем вниз
-        _position = Offset(_position.dx, _position.dy + _digitsHeight - 44);
-      }
       _isMinimized = !_isMinimized;
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    final screenHeight = MediaQuery.of(context).size.height;
-    final screenWidth = MediaQuery.of(context).size.width;
-    final maxTop = screenHeight - (_isMinimized ? 60 : 280);
-
     return Positioned(
-      left: _position.dx.clamp(0, screenWidth - 150),
-      top: _position.dy.clamp(0, maxTop),
+      left: _position.dx,
+      top: _position.dy,
       child: GestureDetector(
         onPanStart: (_) => setState(() => _isDragging = true),
         onPanUpdate: (details) {
@@ -78,15 +67,21 @@ class _FloatingCalculatorState extends ConsumerState<FloatingCalculator> {
             setState(() {
               _position += details.delta;
               _position = Offset(
-                _position.dx.clamp(0, screenWidth - 150),
-                _position.dy.clamp(0, maxTop),
+                _position.dx.clamp(0, MediaQuery.of(context).size.width - 150),
+                _position.dy.clamp(
+                  0,
+                  MediaQuery.of(context).size.height - _expandedHeight,
+                ),
               );
             });
           }
         },
         onPanEnd: (_) => setState(() => _isDragging = false),
-        child: Container(
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          curve: Curves.easeInOut,
           width: 150,
+          height: _isMinimized ? _collapsedHeight : _expandedHeight,
           decoration: BoxDecoration(
             color: Colors.grey.shade900,
             borderRadius: BorderRadius.circular(20),
@@ -101,10 +96,10 @@ class _FloatingCalculatorState extends ConsumerState<FloatingCalculator> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              // Цифровые ряды с анимацией высоты
-              AnimatedSize(
-                duration: const Duration(milliseconds: 200),
-                curve: Curves.easeInOut,
+              // Цифровые ряды с анимацией прозрачности
+              AnimatedOpacity(
+                duration: const Duration(milliseconds: 150),
+                opacity: _isMinimized ? 0 : 1,
                 child: _isMinimized
                     ? const SizedBox.shrink()
                     : Column(
@@ -146,7 +141,8 @@ class _FloatingCalculatorState extends ConsumerState<FloatingCalculator> {
                         ],
                       ),
               ),
-              // Ряд навигации (всегда внизу)
+              // Панель навигации (прибита к низу через Spacer)
+              const Spacer(),
               Row(
                 children: [
                   _buildNavKey('←', () => _vm.onPhaseBack()),
@@ -154,6 +150,7 @@ class _FloatingCalculatorState extends ConsumerState<FloatingCalculator> {
                   _buildNavKey('→', () => _vm.onPhaseForward()),
                 ],
               ),
+              const SizedBox(height: 8),
             ],
           ),
         ),
@@ -164,7 +161,7 @@ class _FloatingCalculatorState extends ConsumerState<FloatingCalculator> {
   Widget _buildKey(String text, int value) {
     return Expanded(
       child: Container(
-        margin: const EdgeInsets.all(2),
+        margin: const EdgeInsets.all(4),
         decoration: BoxDecoration(
           color: Colors.grey.shade800,
           borderRadius: BorderRadius.circular(12),
@@ -197,7 +194,7 @@ class _FloatingCalculatorState extends ConsumerState<FloatingCalculator> {
   Widget _buildNavKey(String text, VoidCallback onTap) {
     return Expanded(
       child: Container(
-        margin: const EdgeInsets.all(2),
+        margin: const EdgeInsets.all(4),
         decoration: BoxDecoration(
           color: Colors.grey.shade800,
           borderRadius: BorderRadius.circular(12),

@@ -21,12 +21,21 @@ class _FloatingCalculatorState extends ConsumerState<FloatingCalculator> {
   bool _isDragging = false;
   bool _isMinimized = false;
 
-  // Высота цифровых рядов с отступами (~4 строки * (6+4) + divider)
-  static const double _digitsHeight = 220;
+  static const double _width = 150;
+  double get _height => _isMinimized ? 60 : 280;
 
   GameViewModel get _vm =>
       ref.read(gameViewModelFamily(widget.gameId).notifier);
   GameState get _state => ref.read(gameViewModelFamily(widget.gameId));
+
+  double _getAnimatedTop() {
+    if (_isMinimized) {
+      // При сворачивании поднимаем, но не выше 0
+      return (_position.dy + 220).clamp(0, double.infinity);
+    } else {
+      return _position.dy;
+    }
+  }
 
   void _onNumberTap(int value) {
     if (_state.isVotingActive) {
@@ -51,13 +60,6 @@ class _FloatingCalculatorState extends ConsumerState<FloatingCalculator> {
 
   void _toggleMinimize() {
     setState(() {
-      if (_isMinimized) {
-        // Разворачиваем: возвращаем позицию вверх
-        _position = Offset(_position.dx, _position.dy - _digitsHeight + 44);
-      } else {
-        // Сворачиваем: опускаем вниз
-        _position = Offset(_position.dx, _position.dy + _digitsHeight - 44);
-      }
       _isMinimized = !_isMinimized;
     });
   }
@@ -65,12 +67,12 @@ class _FloatingCalculatorState extends ConsumerState<FloatingCalculator> {
   @override
   Widget build(BuildContext context) {
     final screenHeight = MediaQuery.of(context).size.height;
-    final screenWidth = MediaQuery.of(context).size.width;
-    final maxTop = screenHeight - (_isMinimized ? 60 : 280);
 
-    return Positioned(
-      left: _position.dx.clamp(0, screenWidth - 150),
-      top: _position.dy.clamp(0, maxTop),
+    return AnimatedPositioned(
+      duration: const Duration(milliseconds: 200),
+      curve: Curves.easeInOut,
+      left: _position.dx.clamp(0, MediaQuery.of(context).size.width - _width),
+      top: _getAnimatedTop().clamp(0, screenHeight - _height),
       child: GestureDetector(
         onPanStart: (_) => setState(() => _isDragging = true),
         onPanUpdate: (details) {
@@ -78,15 +80,21 @@ class _FloatingCalculatorState extends ConsumerState<FloatingCalculator> {
             setState(() {
               _position += details.delta;
               _position = Offset(
-                _position.dx.clamp(0, screenWidth - 150),
-                _position.dy.clamp(0, maxTop),
+                _position.dx.clamp(
+                  0,
+                  MediaQuery.of(context).size.width - _width,
+                ),
+                _position.dy.clamp(0, MediaQuery.of(context).size.height - 280),
               );
             });
           }
         },
         onPanEnd: (_) => setState(() => _isDragging = false),
-        child: Container(
-          width: 150,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          curve: Curves.easeInOut,
+          width: _width,
+          height: _height,
           decoration: BoxDecoration(
             color: Colors.grey.shade900,
             borderRadius: BorderRadius.circular(20),
@@ -101,52 +109,42 @@ class _FloatingCalculatorState extends ConsumerState<FloatingCalculator> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              // Цифровые ряды с анимацией высоты
-              AnimatedSize(
-                duration: const Duration(milliseconds: 200),
-                curve: Curves.easeInOut,
-                child: _isMinimized
-                    ? const SizedBox.shrink()
-                    : Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          // Ряд 1: 10 9 8
-                          Row(
-                            children: [
-                              _buildKey('10', 10),
-                              _buildKey('9', 9),
-                              _buildKey('8', 8),
-                            ],
-                          ),
-                          // Ряд 2: 7 6 5
-                          Row(
-                            children: [
-                              _buildKey('7', 7),
-                              _buildKey('6', 6),
-                              _buildKey('5', 5),
-                            ],
-                          ),
-                          // Ряд 3: 4 3 2
-                          Row(
-                            children: [
-                              _buildKey('4', 4),
-                              _buildKey('3', 3),
-                              _buildKey('2', 2),
-                            ],
-                          ),
-                          // Ряд 4: 1 0 ⚔️
-                          Row(
-                            children: [
-                              _buildKey('1', 1),
-                              _buildKey('0', 0),
-                              _buildKey('⚔️', -1),
-                            ],
-                          ),
-                          const Divider(height: 1, color: Colors.grey),
-                        ],
-                      ),
-              ),
-              // Ряд навигации (всегда внизу)
+              if (!_isMinimized) ...[
+                // Ряд 1: 10 9 8
+                Row(
+                  children: [
+                    _buildKey('10', 10),
+                    _buildKey('9', 9),
+                    _buildKey('8', 8),
+                  ],
+                ),
+                // Ряд 2: 7 6 5
+                Row(
+                  children: [
+                    _buildKey('7', 7),
+                    _buildKey('6', 6),
+                    _buildKey('5', 5),
+                  ],
+                ),
+                // Ряд 3: 4 3 2
+                Row(
+                  children: [
+                    _buildKey('4', 4),
+                    _buildKey('3', 3),
+                    _buildKey('2', 2),
+                  ],
+                ),
+                // Ряд 4: 1 0 ⚔️
+                Row(
+                  children: [
+                    _buildKey('1', 1),
+                    _buildKey('0', 0),
+                    _buildKey('⚔️', -1),
+                  ],
+                ),
+                const Divider(height: 1, color: Colors.grey),
+              ],
+              // Ряд навигации
               Row(
                 children: [
                   _buildNavKey('←', () => _vm.onPhaseBack()),
@@ -164,7 +162,7 @@ class _FloatingCalculatorState extends ConsumerState<FloatingCalculator> {
   Widget _buildKey(String text, int value) {
     return Expanded(
       child: Container(
-        margin: const EdgeInsets.all(2),
+        margin: const EdgeInsets.all(4),
         decoration: BoxDecoration(
           color: Colors.grey.shade800,
           borderRadius: BorderRadius.circular(12),
@@ -197,7 +195,7 @@ class _FloatingCalculatorState extends ConsumerState<FloatingCalculator> {
   Widget _buildNavKey(String text, VoidCallback onTap) {
     return Expanded(
       child: Container(
-        margin: const EdgeInsets.all(2),
+        margin: const EdgeInsets.all(4),
         decoration: BoxDecoration(
           color: Colors.grey.shade800,
           borderRadius: BorderRadius.circular(12),

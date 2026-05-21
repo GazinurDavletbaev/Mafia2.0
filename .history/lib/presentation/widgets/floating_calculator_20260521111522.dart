@@ -53,10 +53,10 @@ class _FloatingCalculatorState extends ConsumerState<FloatingCalculator> {
     setState(() {
       if (_isMinimized) {
         // Разворачиваем: возвращаем позицию вверх
-        _position = Offset(_position.dx, _position.dy - _digitsHeight + 44);
+        _position = Offset(_position.dx, _position.dy - _digitsHeight + 27);
       } else {
         // Сворачиваем: опускаем вниз
-        _position = Offset(_position.dx, _position.dy + _digitsHeight - 44);
+        _position = Offset(_position.dx, _position.dy + _digitsHeight - 27);
       }
       _isMinimized = !_isMinimized;
     });
@@ -164,7 +164,7 @@ class _FloatingCalculatorState extends ConsumerState<FloatingCalculator> {
   Widget _buildKey(String text, int value) {
     return Expanded(
       child: Container(
-        margin: const EdgeInsets.all(2),
+        margin: const EdgeInsets.all(4),
         decoration: BoxDecoration(
           color: Colors.grey.shade800,
           borderRadius: BorderRadius.circular(12),
@@ -197,7 +197,7 @@ class _FloatingCalculatorState extends ConsumerState<FloatingCalculator> {
   Widget _buildNavKey(String text, VoidCallback onTap) {
     return Expanded(
       child: Container(
-        margin: const EdgeInsets.all(2),
+        margin: const EdgeInsets.all(4),
         decoration: BoxDecoration(
           color: Colors.grey.shade800,
           borderRadius: BorderRadius.circular(12),
