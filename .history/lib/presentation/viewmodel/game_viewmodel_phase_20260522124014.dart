@@ -185,22 +185,6 @@ class PhaseActions {
       );
     }
 
-    if (nextPhase == SubPhase.finalWordKill) {
-      final nightActions = currentState.nightActions ?? [];
-      final killedSeat = nightActions.length >= 3
-          ? nightActions[nightActions.length - 3]
-          : null;
-
-      print('finalWordKill: killedSeat = $killedSeat');
-
-      return currentState.copyWith(
-        phaseHistory: newPhaseHistory,
-        currentSubPhase: nextPhase,
-        currentDay: currentState.currentDay, // день не увеличивается
-        currentPhase: Phase.day,
-        currentSpeakerSeat: killedSeat,
-      );
-    }
     // Речи
     if (nextPhase == SubPhase.speeches) {
       final allAlive =

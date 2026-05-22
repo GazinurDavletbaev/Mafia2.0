@@ -97,7 +97,6 @@ class GameViewModel extends StateNotifier<GameState> {
         break;
       case SubPhase.tieBreak:
       case SubPhase.speeches:
-        _history.push(state);
         await _speeches.nextSpeaker();
         break;
       case SubPhase.voting:
@@ -117,6 +116,7 @@ class GameViewModel extends StateNotifier<GameState> {
       case SubPhase.finalWordKill:
         print("finalwordkill onphaseforward");
         _history.push(state);
+        state = state.copyWith(hasKillInLastNight: false);
         final playerToKill = state.currentSpeakerSeat;
         if (playerToKill != null) {
           final usecase = _ref.read(killPlayerUsecaseProvider);

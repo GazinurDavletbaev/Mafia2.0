@@ -77,10 +77,9 @@ class GameViewModel extends StateNotifier<GameState> {
   }
 
   Future<void> onPhaseForward() async {
-    print(_skipNextBack);
+    print(_)
     // При каждом Forward включаем флаг пропуска следующего Back
     _skipNextBack = true;
-    print(_skipNextBack);
     print(state.currentSubPhase);
     switch (state.currentSubPhase) {
       case SubPhase.roleDistribution:
@@ -97,8 +96,8 @@ class GameViewModel extends StateNotifier<GameState> {
         break;
       case SubPhase.tieBreak:
       case SubPhase.speeches:
-        _history.push(state);
         await _speeches.nextSpeaker();
+        _history.push(state);
         break;
       case SubPhase.voting:
       case SubPhase.revote:
@@ -117,6 +116,7 @@ class GameViewModel extends StateNotifier<GameState> {
       case SubPhase.finalWordKill:
         print("finalwordkill onphaseforward");
         _history.push(state);
+        state = state.copyWith(hasKillInLastNight: false);
         final playerToKill = state.currentSpeakerSeat;
         if (playerToKill != null) {
           final usecase = _ref.read(killPlayerUsecaseProvider);

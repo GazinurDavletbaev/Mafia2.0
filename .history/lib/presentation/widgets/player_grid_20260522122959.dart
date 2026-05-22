@@ -80,10 +80,9 @@ class PlayerGrid extends StatelessWidget {
               final isCurrentCandidate =
                   isVotingActive &&
                   voteController?.currentSeat == player.seatNumber;
-
+              
               // ← добавить подсветку для bestMove
-              final isSelectedForBestMove =
-                  currentSubPhase == SubPhase.bestMove &&
+              final isSelectedForBestMove = currentSubPhase == SubPhase.bestMove &&
                   partialBestMove.contains(player.seatNumber);
 
               return Expanded(
@@ -121,15 +120,12 @@ class PlayerGrid extends StatelessWidget {
                   (currentSubPhase == SubPhase.sheriffLook ||
                       currentSubPhase == SubPhase.sheriffCheck) &&
                   player.role == 'sheriff';
-              final isCurrentCandidate =
-                  isVotingActive &&
-                      voteController?.currentSeat == player.seatNumber ||
-                  currentSubPhase == SubPhase.finalWordKill &&
-                      currentSpeaker == player.seatNumber;
-
+              final isCurrentCandidate = 
+    (isVotingActive && voteController?.currentSeat == player.seatNumber) ||
+    (currentSubPhase == SubPhase.finalWordKill && currentSpeaker == player.seatNumber);
+              
               // ← добавить подсветку для bestMove
-              final isSelectedForBestMove =
-                  currentSubPhase == SubPhase.bestMove &&
+              final isSelectedForBestMove = currentSubPhase == SubPhase.bestMove &&
                   partialBestMove.contains(player.seatNumber);
 
               return Expanded(

@@ -24,7 +24,7 @@ class PhaseActions {
 
   Future<GameState> calculateNextState(GameState currentState) async {
     AppLogger.d('calculateNextState called');
-
+    _
     final phaseHistory = currentState.phaseHistory;
     final isNight0Completed = currentState.currentDay > 0;
 
@@ -167,40 +167,6 @@ class PhaseActions {
       );
     }
 
-    if (nextPhase == SubPhase.bestMove) {
-      final nightActions = currentState.nightActions ?? [];
-      final killedSeat = nightActions.length >= 3
-          ? nightActions[nightActions.length - 3]
-          : null;
-
-      print('bestMove: killedSeat = $killedSeat');
-      print('nightActions = $nightActions');
-
-      return currentState.copyWith(
-        phaseHistory: newPhaseHistory,
-        currentSubPhase: nextPhase,
-        currentDay: currentState.currentDay + 1, // день увеличивается
-        currentPhase: Phase.day,
-        currentSpeakerSeat: killedSeat, // ← убитый игрок
-      );
-    }
-
-    if (nextPhase == SubPhase.finalWordKill) {
-      final nightActions = currentState.nightActions ?? [];
-      final killedSeat = nightActions.length >= 3
-          ? nightActions[nightActions.length - 3]
-          : null;
-
-      print('finalWordKill: killedSeat = $killedSeat');
-
-      return currentState.copyWith(
-        phaseHistory: newPhaseHistory,
-        currentSubPhase: nextPhase,
-        currentDay: currentState.currentDay, // день не увеличивается
-        currentPhase: Phase.day,
-        currentSpeakerSeat: killedSeat,
-      );
-    }
     // Речи
     if (nextPhase == SubPhase.speeches) {
       final allAlive =

@@ -122,10 +122,8 @@ class PlayerGrid extends StatelessWidget {
                       currentSubPhase == SubPhase.sheriffCheck) &&
                   player.role == 'sheriff';
               final isCurrentCandidate =
-                  isVotingActive &&
-                      voteController?.currentSeat == player.seatNumber ||
-                  currentSubPhase == SubPhase.finalWordKill &&
-                      currentSpeaker == player.seatNumber;
+    isVotingActive && voteController?.currentSeat == player.seatNumber ||
+    currentSubPhase == SubPhase.finalWordKill && currentSpeaker == player.seatNumber;
 
               // ← добавить подсветку для bestMove
               final isSelectedForBestMove =

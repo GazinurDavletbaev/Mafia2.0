@@ -117,6 +117,7 @@ class GameViewModel extends StateNotifier<GameState> {
       case SubPhase.finalWordKill:
         print("finalwordkill onphaseforward");
         _history.push(state);
+        state = state.copyWith(hasKillInLastNight: false);
         final playerToKill = state.currentSpeakerSeat;
         if (playerToKill != null) {
           final usecase = _ref.read(killPlayerUsecaseProvider);

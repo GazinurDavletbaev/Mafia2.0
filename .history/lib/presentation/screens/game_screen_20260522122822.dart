@@ -45,9 +45,9 @@ class _GameScreenState extends ConsumerState<GameScreen> {
     if (subPhase == SubPhase.speeches && currentSpeaker != null) {
       return PlayerTimerType.seconds60;
     }
-    if (subPhase == SubPhase.finalWordKill && currentSpeaker != null) {
-      return PlayerTimerType.seconds60;
-    }
+if (subPhase == SubPhase.finalWordKill && currentSpeaker != null) {
+  return PlayerTimerType.seconds60;
+}
     if (subPhase == SubPhase.tieBreak) {
       return PlayerTimerType.seconds30;
     }
