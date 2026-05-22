@@ -158,12 +158,12 @@ class _GameScreenState extends ConsumerState<GameScreen> {
                       currentSpeaker: gameState.currentSpeakerSeat,
                       timerType: timerType,
                       onTap: _vm.onPlayerTap,
-                      onLongPress: (seat) =>
-                          PieMenuDialog.show(context, seat, _vm),
+                      onLongPress: (seat) => PieMenuDialog.show(context, seat, _vm),
                       currentSubPhase: gameState.currentSubPhase,
                       isVotingActive: gameState.isVotingActive,
                       voteController: gameState.voteController,
-                      partialBestMove: gameState.partialBestMove, // ← добавить
+                        partialBestMove: gameState.partialBestMove, // ← добавить
+
                     ),
                   ),
                   const SizedBox(height: 20),

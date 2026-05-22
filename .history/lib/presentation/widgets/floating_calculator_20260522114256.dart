@@ -29,18 +29,18 @@ class _FloatingCalculatorState extends ConsumerState<FloatingCalculator> {
   GameState get _state => ref.read(gameViewModelFamily(widget.gameId));
 
   void _onNumberTap(int value) {
-    if (_state.isVotingActive) {
-      _vm.submitVote(value);
-    } else if (_state.currentSubPhase == SubPhase.bestMove) {
-      _vm.submitBestMoveNumber(value);
-    } else if (_state.currentSubPhase == SubPhase.mafiaShoot ||
-        _state.currentSubPhase == SubPhase.donCheck ||
-        _state.currentSubPhase == SubPhase.sheriffCheck) {
-      _vm.submitNightAction(value);
-    } else {
-      _vm.onPlayerTap(value);
-    }
+  if (_state.isVotingActive) {
+    _vm.submitVote(value);
+  } else if (_state.currentSubPhase == SubPhase.bestMove) {
+    _vm.submitBestMoveNumber(value);
+  } else if (_state.currentSubPhase == SubPhase.mafiaShoot ||
+      _state.currentSubPhase == SubPhase.donCheck ||
+      _state.currentSubPhase == SubPhase.sheriffCheck) {
+    _vm.submitNightAction(value);
+  } else {
+    _vm.onPlayerTap(value);
   }
+}
 
   void _onNumberLongPress(int value) {
     if (!_state.isVotingActive &&

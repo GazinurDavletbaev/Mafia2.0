@@ -214,17 +214,21 @@ class GameViewModel extends StateNotifier<GameState> {
   void submitBestMoveNumber(int value) {
     if (state.currentSubPhase != SubPhase.bestMove) return;
 
-    // Не добавляем повторно уже выбранного игрока
-    if (state.partialBestMove.contains(value)) return;
-    if (state.partialBestMove.length >= 3) return;
-
     final newPartial = List<int>.from(state.partialBestMove)..add(value);
-    _history.push(state);
 
-    state = state.copyWith(partialBestMove: newPartial);
-    AppLogger.d('Best move partial: $newPartial');
+    if (newPartial.length == 3) {
+      // Три числа собраны - сохраняем и переходим дальше
+      state = state.copyWith(partialBestMove: newPartial);
+      // TODO: сохранить лучший ход в историю при необходимости
+      AppLogger.d('Best move recorded: $newPartial');
 
-    // Перехода нет, судья сам нажмёт "вперёд"
+      // Переходим к следующей фазе (finalWordKill)
+      onPhaseForward();
+    } else {
+      // Ещё не все числа введены
+      state = state.copyWith(partialBestMove: newPartial);
+      AppLogger.d('Best move partial: $newPartial');
+    }
   }
 
   String currentPhaseString() => _phase.currentPhaseString();

@@ -3,7 +3,6 @@ import '../../core/logger/app_logger.dart';
 import '../../data/local/models/player_model.dart';
 import '../../data/local/models/sub_phase.dart';
 import '../../domain/helpers/vote_controller.dart';
-import '../state/game_state.dart';
 import 'player_card.dart';
 import 'player_timer_type.dart';
 
@@ -11,12 +10,11 @@ class PlayerGrid extends StatelessWidget {
   final List<PlayerModel> players;
   final int? currentSpeaker;
   final PlayerTimerType timerType;
-  final SubPhase? currentSubPhase;
+  final SubPhase? currentSubPhase; // добавляем текущую фазу
   final Function(int) onTap;
   final Function(int) onLongPress;
   final bool isVotingActive;
   final VoteController? voteController;
-  final List<int> partialBestMove; // ← добавить
 
   const PlayerGrid({
     super.key,
@@ -28,7 +26,6 @@ class PlayerGrid extends StatelessWidget {
     required this.onLongPress,
     required this.isVotingActive,
     this.voteController,
-    required this.partialBestMove, // ← добавить
   });
 
   int? _secondsFromType() {
@@ -80,10 +77,6 @@ class PlayerGrid extends StatelessWidget {
               final isCurrentCandidate =
                   isVotingActive &&
                   voteController?.currentSeat == player.seatNumber;
-              
-              // ← добавить подсветку для bestMove
-              final isSelectedForBestMove = currentSubPhase == SubPhase.bestMove &&
-                  partialBestMove.contains(player.seatNumber);
 
               return Expanded(
                 child: Padding(
@@ -94,7 +87,6 @@ class PlayerGrid extends StatelessWidget {
                     isBlackTeam: isBlackTeam,
                     isSheriff: isSheriff,
                     isCurrentCandidate: isCurrentCandidate,
-                    isSelectedForBestMove: isSelectedForBestMove, // ← добавить
                     isLeftColumn: true,
                     timerSeconds: timerValue,
                     onTap: () => onTap(player.seatNumber),
@@ -123,11 +115,8 @@ class PlayerGrid extends StatelessWidget {
               final isCurrentCandidate =
                   isVotingActive &&
                   voteController?.currentSeat == player.seatNumber;
-              
-              // ← добавить подсветку для bestMove
-              final isSelectedForBestMove = currentSubPhase == SubPhase.bestMove &&
-                  partialBestMove.contains(player.seatNumber);
-
+final isSelectedForBestMove = currentSubPhase == SubPhase.bestMove && 
+    partialBestMove.contains(player.seatNumber);
               return Expanded(
                 child: Padding(
                   padding: const EdgeInsets.only(bottom: 8),
@@ -137,7 +126,6 @@ class PlayerGrid extends StatelessWidget {
                     isBlackTeam: isBlackTeam,
                     isSheriff: isSheriff,
                     isCurrentCandidate: isCurrentCandidate,
-                    isSelectedForBestMove: isSelectedForBestMove, // ← добавить
                     isLeftColumn: false,
                     timerSeconds: timerValue,
                     onTap: () => onTap(player.seatNumber),
