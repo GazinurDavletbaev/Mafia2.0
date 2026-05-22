@@ -202,18 +202,21 @@ class PhaseActions {
     // FinalWord - устанавливаем победителя голосования
     if (nextPhase == SubPhase.finalWord) {
       print('hhh');
-      final winner = currentState.votes.entries
-          .reduce((a, b) => a.value > b.value ? a : b)
-          .key;
-      return currentState.copyWith(
-        phaseHistory: newPhaseHistory,
-        currentSubPhase: nextPhase,
-        currentDay: newPhaseHistory
-            .where((p) => p == SubPhase.mafiaShoot)
-            .length,
-        currentPhase: Phase.night,
-        currentSpeakerSeat: winner,
-      );
+  
+        final winner = currentState.votes.entries
+            .reduce((a, b) => a.value > b.value ? a : b)
+            .key;
+        return currentState.copyWith(
+          phaseHistory: newPhaseHistory,
+          currentSubPhase: nextPhase,
+          currentDay: newPhaseHistory
+              .where((p) => p == SubPhase.mafiaShoot)
+              .length,
+          currentPhase: Phase.night,
+          currentSpeakerSeat: winner,
+        );
+
+      
     }
 
     // Переход из finalWord в ночь

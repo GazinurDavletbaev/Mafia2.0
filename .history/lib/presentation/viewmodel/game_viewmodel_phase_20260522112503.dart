@@ -202,6 +202,7 @@ class PhaseActions {
     // FinalWord - устанавливаем победителя голосования
     if (nextPhase == SubPhase.finalWord) {
       print('hhh');
+
       final winner = currentState.votes.entries
           .reduce((a, b) => a.value > b.value ? a : b)
           .key;
