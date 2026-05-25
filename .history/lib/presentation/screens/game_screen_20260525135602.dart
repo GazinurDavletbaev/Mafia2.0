@@ -106,36 +106,17 @@ class _GameScreenState extends ConsumerState<GameScreen> {
 
   // В GameScreen, когда isGameEnded == true, показываем диалог
   void _showVictoryDialog(String winner) {
-    final winnerText = winner == 'red'
-        ? '🔴 ПОБЕДА КРАСНЫХ'
-        : '⚫ ПОБЕДА ЧЁРНЫХ';
-
     showDialog(
       context: context,
       barrierDismissible: false,
       builder: (context) => AlertDialog(
-        backgroundColor: Colors.grey.shade900,
-        title: Text(
-          winnerText,
-          style: const TextStyle(color: Colors.white, fontSize: 24),
-          textAlign: TextAlign.center,
-        ),
+        // ... содержимое
         actions: [
           TextButton(
             onPressed: () {
               Navigator.pop(context);
-              _dialogShown = false;
-              _vm.onPhaseBack();
-            },
-            child: const Text(
-              '◀️ ОТМЕНА',
-              style: TextStyle(color: Colors.grey),
-            ),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-              _dialogShown = false;
+              _dialogShown = false; // ← сбросить флаг
+              // Переход на экран протокола
               Navigator.push(
                 context,
                 MaterialPageRoute(
@@ -146,10 +127,15 @@ class _GameScreenState extends ConsumerState<GameScreen> {
                 ),
               );
             },
-            child: const Text(
-              '📋 ПРОТОКОЛ ИГРЫ',
-              style: TextStyle(color: Colors.orange),
-            ),
+            child: const Text('📋 ПРОТОКОЛ ИГРЫ'),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              _dialogShown = false; // ← сбросить флаг
+              _vm.onPhaseBack();
+            },
+            child: const Text('◀️ ОТМЕНА'),
           ),
         ],
       ),

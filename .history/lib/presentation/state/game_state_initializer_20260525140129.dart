@@ -89,7 +89,10 @@ class GameStateInitializer {
     for (int i = 0; i < result.length; i++) {
       final role = shuffled[i];
       final team = _getTeamByRole(role);
-      result[i] = result[i].copyWith(role: role, team: team);
+      result[i] = result[i].copyWith(
+        role: role,
+        team: team,
+      );
     }
     return result;
   }

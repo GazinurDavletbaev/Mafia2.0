@@ -14,7 +14,6 @@ import '../widgets/role_card.dart';
 import '../widgets/player_timer_type.dart';
 import '../widgets/floating_calculator.dart';
 import '../../data/local/models/sub_phase.dart';
-import 'game_protocol_screen.dart';
 
 class GameScreen extends ConsumerStatefulWidget {
   final String gameId;
@@ -27,7 +26,6 @@ class GameScreen extends ConsumerStatefulWidget {
 
 class _GameScreenState extends ConsumerState<GameScreen> {
   late GameViewModel _vm;
-  bool _dialogShown = false; // ← добавить
 
   @override
   void initState() {
@@ -38,13 +36,6 @@ class _GameScreenState extends ConsumerState<GameScreen> {
   @override
   void didUpdateWidget(covariant GameScreen oldWidget) {
     super.didUpdateWidget(oldWidget);
-
-    if (_vm.state.isGameEnded && !_dialogShown) {
-      _dialogShown = true;
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        _showVictoryDialog(_vm.state.winner!);
-      });
-    }
   }
 
   PlayerTimerType _getTimerType(GameState state) {
@@ -106,41 +97,26 @@ class _GameScreenState extends ConsumerState<GameScreen> {
 
   // В GameScreen, когда isGameEnded == true, показываем диалог
   void _showVictoryDialog(String winner) {
-    final winnerText = winner == 'red'
-        ? '🔴 ПОБЕДА КРАСНЫХ'
-        : '⚫ ПОБЕДА ЧЁРНЫХ';
-
     showDialog(
       context: context,
-      barrierDismissible: false,
+      barrierDismissible: false, // нельзя закрыть тыком мимо
       builder: (context) => AlertDialog(
         backgroundColor: Colors.grey.shade900,
         title: Text(
-          winnerText,
+          winner == 'red' ? '🔴 ПОБЕДА КРАСНЫХ' : '⚫ ПОБЕДА ЧЁРНЫХ',
           style: const TextStyle(color: Colors.white, fontSize: 24),
           textAlign: TextAlign.center,
         ),
         actions: [
           TextButton(
             onPressed: () {
-              Navigator.pop(context);
-              _dialogShown = false;
-              _vm.onPhaseBack();
-            },
-            child: const Text(
-              '◀️ ОТМЕНА',
-              style: TextStyle(color: Colors.grey),
-            ),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-              _dialogShown = false;
+              Navigator.pop(context); // закрыть диалог
+              // Переход на экран протокола
               Navigator.push(
                 context,
                 MaterialPageRoute(
                   builder: (context) => GameProtocolScreen(
-                    gameHistory: _vm.getHistory(),
+                    gameHistory: _vm.getHistory(), // передаём историю
                     gameState: _vm.state,
                   ),
                 ),
@@ -149,6 +125,16 @@ class _GameScreenState extends ConsumerState<GameScreen> {
             child: const Text(
               '📋 ПРОТОКОЛ ИГРЫ',
               style: TextStyle(color: Colors.orange),
+            ),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context); // закрыть диалог
+              _vm.onPhaseBack(); // отмена - назад
+            },
+            child: const Text(
+              '◀️ ОТМЕНА',
+              style: TextStyle(color: Colors.grey),
             ),
           ),
         ],
@@ -163,13 +149,6 @@ class _GameScreenState extends ConsumerState<GameScreen> {
     print(
       'BUILD gameScreen: subPhase=${gameState.currentSubPhase}, day=${gameState.currentDay}',
     );
-
-    if (gameState.isGameEnded && !_dialogShown) {
-      _dialogShown = true;
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        _showVictoryDialog(gameState.winner!);
-      });
-    }
 
     if (gameState.showingRoleForSeat != null) {
       AppLogger.d('Showing role card for seat ${gameState.showingRoleForSeat}');

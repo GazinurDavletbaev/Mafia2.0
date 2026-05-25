@@ -69,48 +69,42 @@ class PlayerActions {
   }
 
   Future<void> _killPlayer(int seatNumber) async {
-    AppLogger.d('_killPlayer: seat=$seatNumber');
-
-    // Выводим текущее состояние игроков
-    print('=== BEFORE KILL ===');
-    for (var p in _vm.state.players) {
-      print(
-        'seat ${p.seatNumber}: role=${p.role}, team=${p.team}, isAlive=${p.isAlive}',
-      );
-    }
-
-    final usecase = _ref.read(killPlayerUsecaseProvider);
-    final (newPlayers, winner) = usecase.execute(_vm.state.players, seatNumber);
-
-    // Выводим результат
-    print('=== AFTER KILL ===');
-    for (var p in newPlayers) {
-      print(
-        'seat ${p.seatNumber}: role=${p.role}, team=${p.team}, isAlive=${p.isAlive}',
-      );
-    }
-    print('winner = $winner');
-
-    GameState newState = _vm.state.copyWith(players: newPlayers);
-
-    if (winner != null) {
-      print(
-        'GAME ENDED! Setting isGameEnded=true, winner=${winner ? "red" : "black"}',
-      );
-      newState = newState.copyWith(
-        isGameEnded: true,
-        winner: winner ? 'red' : 'black',
-      );
-    }
-
-    _vm.state = newState;
+  AppLogger.d('_killPlayer: seat=$seatNumber');
+  
+  // Выводим текущее состояние игроков
+  print('=== BEFORE KILL ===');
+  for (var p in _vm.state.players) {
+    print('seat ${p.seatNumber}: role=${p.role}, team=${p.team}, isAlive=${p.isAlive}');
   }
+  
+  final usecase = _ref.read(killPlayerUsecaseProvider);
+  final (newPlayers, winner) = usecase.execute(_vm.state.players, seatNumber);
+  
+  // Выводим результат
+  print('=== AFTER KILL ===');
+  for (var p in newPlayers) {
+    print('seat ${p.seatNumber}: role=${p.role}, team=${p.team}, isAlive=${p.isAlive}');
+  }
+  print('winner = $winner');
+  
+  GameState newState = _vm.state.copyWith(players: newPlayers);
+  
+  if (winner != null) {
+    print('GAME ENDED! Setting isGameEnded=true, winner=${winner ? "red" : "black"}');
+    newState = newState.copyWith(
+      isGameEnded: true,
+      winner: winner ? 'red' : 'black',
+    );
+  }
+  
+  _vm.state = newState;
+}
 
   Future<void> _revivePlayer(int seatNumber) async {
     AppLogger.d('_revivePlayer: seat=$seatNumber');
     final usecase = _ref.read(revivePlayerUsecaseProvider);
     final newPlayers = usecase.execute(_vm.state.players, seatNumber);
-
+    
     _vm.state = _vm.state.copyWith(players: newPlayers);
   }
 
@@ -122,7 +116,7 @@ class PlayerActions {
       _vm.state.nominatedSeats,
       seatNumber,
     );
-
+    
     _vm.state = _vm.state.copyWith(
       players: newPlayers,
       nominatedSeats: newNominatedSeats,
@@ -136,7 +130,7 @@ class PlayerActions {
       _vm.state.nominatedSeats,
       seatNumber,
     );
-
+    
     _vm.state = _vm.state.copyWith(nominatedSeats: newNominatedSeats);
   }
 }
