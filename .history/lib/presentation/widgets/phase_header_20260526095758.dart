@@ -41,9 +41,8 @@ class PhaseHeader extends StatelessWidget {
               ),
             ),
           ),
-        ),
-      ],
-    );
+        )
+    )
   }
 
   String _getTitle() {

@@ -89,7 +89,7 @@ class PlayerGrid extends StatelessWidget {
                   return Container(
                     margin: const EdgeInsets.only(bottom: 8),
                     padding: const EdgeInsets.symmetric(
-                      horizontal: 8,
+                      horizontal: 4,
                       vertical: 4,
                     ),
                     decoration: BoxDecoration(

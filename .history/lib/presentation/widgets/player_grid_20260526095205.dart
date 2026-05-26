@@ -67,85 +67,76 @@ class PlayerGrid extends StatelessWidget {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Expanded(child: _buildColumn(leftColumn, true, timerSeconds)),
-        Container(
-          width: 30,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              // Иконка всегда сверху
-              Padding(
-                padding: const EdgeInsets.only(top: 5),
-                child: Icon(
-                  Icons.thumb_up,
-                  color: Colors.grey.shade600,
-                  size: 20,
-                ),
-              ),
-              // Список выставленных игроков (под иконкой)
-              if (nominatedSeats.isNotEmpty) ...[
-                const SizedBox(height: 8),
-                ...nominatedSeats.map((seat) {
-                  return Container(
-                    margin: const EdgeInsets.only(bottom: 8),
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 8,
-                      vertical: 4,
-                    ),
-                    decoration: BoxDecoration(
-                      color: Colors.blue.shade800,
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Text(
-                      '$seat',
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                  );
-                }).toList(),
-              ],
-            ],
-          ),
+        Expanded(
+          child: _buildColumn(leftColumn, true, timerSeconds),
         ),
-
-        Expanded(child: _buildColumn(rightColumn, false, timerSeconds)),
+        
+        // Фиксированная колонка для кандидатов (всегда 40px)
+        // Фиксированная колонка для кандидатов (всегда 40px)
+Container(
+  width: 40,
+  child: Column(
+    mainAxisAlignment: MainAxisAlignment.start, // ← вверх, а не центр
+    children: nominatedSeats.isEmpty
+        ? [
+            Padding(
+              padding: const EdgeInsets.only(top: 20), // небольшой отступ сверху
+              child: Icon(
+                Icons.thumb_up,
+                color: Colors.grey.shade600,
+                size: 32,
+              ),
+            ),
+          ]
+        : nominatedSeats.map((seat) {
+            return Container(
+              margin: const EdgeInsets.only(bottom: 8),
+              padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+              decoration: BoxDecoration(
+                color: Colors.orange.shade800,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Text(
+                '$seat',
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            );
+          }).toList(),
+  ),
+),
+        
+        Expanded(
+          child: _buildColumn(rightColumn, false, timerSeconds),
+        ),
       ],
     );
   }
 
-  Widget _buildColumn(
-    List<PlayerModel> playersList,
-    bool isLeftColumn,
-    int? timerSeconds,
-  ) {
+  Widget _buildColumn(List<PlayerModel> playersList, bool isLeftColumn, int? timerSeconds) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: playersList.map((player) {
         final isSpeaking = currentSpeaker == player.seatNumber;
         final timerValue = isSpeaking ? timerSeconds : null;
-        final isBlackTeam =
-            currentSubPhase == SubPhase.contract &&
+        final isBlackTeam = currentSubPhase == SubPhase.contract &&
             (player.role == 'don' || player.role == 'mafia');
-        final isSheriff =
-            (currentSubPhase == SubPhase.sheriffLook ||
-                currentSubPhase == SubPhase.sheriffCheck) &&
+        final isSheriff = (currentSubPhase == SubPhase.sheriffLook ||
+            currentSubPhase == SubPhase.sheriffCheck) &&
             player.role == 'sheriff';
-        final isCurrentCandidate =
-            isVotingActive &&
-                voteController?.currentSeat == player.seatNumber ||
+        final isCurrentCandidate = isVotingActive &&
+            voteController?.currentSeat == player.seatNumber ||
             currentSubPhase == SubPhase.tieBreak &&
-                currentSpeaker == player.seatNumber ||
+            currentSpeaker == player.seatNumber ||
             currentSubPhase == SubPhase.finalWordKill &&
-                currentSpeaker == player.seatNumber;
-        final isSelectedForBestMove =
-            currentSubPhase == SubPhase.bestMove &&
+            currentSpeaker == player.seatNumber;
+        final isSelectedForBestMove = currentSubPhase == SubPhase.bestMove &&
             partialBestMove.contains(player.seatNumber);
-        final isEliminationCandidate =
-            currentSubPhase == SubPhase.eliminationVote &&
+        final isEliminationCandidate = currentSubPhase == SubPhase.eliminationVote &&
             tiedSeats.contains(player.seatNumber);
 
         return Expanded(

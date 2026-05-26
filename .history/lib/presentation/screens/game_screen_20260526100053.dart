@@ -230,7 +230,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
                       voteController: gameState.voteController,
                       partialBestMove: gameState.partialBestMove, // ← добавить
                       tiedSeats: gameState.tiedSeats,
-                      nominatedSeats: gameState.nominatedSeats,
+                      nominatedSeats: [],
                     ),
                   ),
                   const SizedBox(height: 20),

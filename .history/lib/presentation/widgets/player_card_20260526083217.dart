@@ -6,8 +6,8 @@ import 'timer/timer_overlay.dart';
 class PlayerCard extends StatelessWidget {
   final PlayerModel player;
   final bool isSpeaking;
-  final bool isBlackTeam;
-  final bool isSheriff;
+  final bool isBlackTeam; // для подсветки чёрных в фазе contract
+  final bool isSheriff; // для подсветки шерифа в фазе sheriffLook/sheriffCheck
   final bool isLeftColumn;
   final int? timerSeconds;
   final VoidCallback? onTimerComplete;
@@ -45,14 +45,10 @@ class PlayerCard extends StatelessWidget {
   Widget _buildCard() {
     // Определяем цвет фона
     Color backgroundColor;
-
-    // Если игрок мёртв - чёрный фон
-    if (!player.isAlive) {
-      backgroundColor = Colors.black54;
-    } else if (isSelectedForBestMove) {
-      backgroundColor = Colors.blue.shade800;
+    if (isSelectedForBestMove) {
+      backgroundColor = Colors.blue.shade800; // синий для bestMove
     } else if (isCurrentCandidate) {
-      backgroundColor = Colors.blue.shade800;
+      backgroundColor = Colors.blue.shade800; // синий для голосования
     } else if (isEliminationCandidate) {
       backgroundColor = Colors.blue.shade800;
     } else if (isBlackTeam) {
@@ -75,28 +71,34 @@ class PlayerCard extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          // Контейнер для аватарки и меток (номер, фолы)
-          SizedBox(
-            height: 56,
-            child: Stack(
-              clipBehavior: Clip.none,
-              children: [
-                // Аватарка по центру (без креста)
-                Center(
-                  child: CircleAvatar(
-                    radius: 28,
-                    backgroundColor: Colors.grey.shade600,
-                    backgroundImage: const AssetImage('assets/mafia_logo.png'),
-                  ),
-                ),
-                // Номер места на фоне
+          Stack(
+            alignment: Alignment.center,
+            children: [
+              CircleAvatar(
+                radius: 28,
+                backgroundColor: Colors.grey.shade600,
+                backgroundImage: const AssetImage('assets/mafia_logo.png'),
+                child: player.isAlive
+                    ? null
+                    : Container(
+                        decoration: BoxDecoration(
+                          color: Colors.black.withOpacity(0.7),
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Center(
+                          child: Icon(Icons.close, color: Colors.red, size: 30),
+                        ),
+                      ),
+              ),
+              // Номер места
+              if (player.isAlive)
                 Positioned(
                   top: 0,
                   left: isLeftColumn ? 0 : null,
                   right: isLeftColumn ? null : 0,
                   child: Container(
-                    width: 24,
-                    height: 24,
+                    width: 20,
+                    height: 20,
                     decoration: BoxDecoration(
                       color: Colors.black.withOpacity(0.7),
                       shape: BoxShape.circle,
@@ -113,42 +115,41 @@ class PlayerCard extends StatelessWidget {
                     ),
                   ),
                 ),
-                // Фолы под номером (на фоне)
-                if (player.fouls > 0)
-                  Positioned(
-                    top: 28,
-                    left: isLeftColumn ? 0 : null,
-                    right: isLeftColumn ? null : 0,
-                    child: Container(
-                      width: 24,
-                      height: 24,
-                      decoration: const BoxDecoration(
-                        color: Colors.red,
-                        shape: BoxShape.circle,
-                      ),
-                      child: Center(
-                        child: Text(
-                          '${player.fouls}',
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 10,
-                            fontWeight: FontWeight.bold,
-                          ),
+              // Фолы (рядом с номером места)
+              if (player.fouls > 0)
+                Positioned(
+                  top: 0,
+                  left: isLeftColumn ? 28 : null,
+                  right: isLeftColumn ? null : 28,
+                  child: Container(
+                    width: 20,
+                    height: 20,
+                    decoration: const BoxDecoration(
+                      color: Colors.red,
+                      shape: BoxShape.circle,
+                    ),
+                    child: Center(
+                      child: Text(
+                        '${player.fouls}',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 10,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
                     ),
                   ),
-                // Таймер поверх аватарки
-                if (isSpeaking && timerSeconds != null)
-                  Positioned.fill(
-                    child: TimerOverlay(
-                      seconds: timerSeconds!,
-                      onComplete: onTimerComplete,
-                      radius: 28,
-                    ),
+                ),
+              // Таймер поверх аватарки
+              if (isSpeaking && timerSeconds != null)
+                Positioned.fill(
+                  child: TimerOverlay(
+                    seconds: timerSeconds!,
+                    onComplete: onTimerComplete,
+                    radius: 28,
                   ),
-              ],
-            ),
+                ),
+            ],
           ),
           const SizedBox(height: 8),
           Text(

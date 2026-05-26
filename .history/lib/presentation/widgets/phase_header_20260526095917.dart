@@ -25,10 +25,7 @@ class PhaseHeader extends StatelessWidget {
       'PhaseHeader: phase=$phase, subPhase=$subPhase, day=$currentDay, title=$title',
     );
 
-    return Column(
-      children: [
-        // Основной хедер
-        Container(
+    return Container(
           height: 50, // уменьшил с 60 до 50
           color: Colors.grey.shade900,
           child: Center(
@@ -41,9 +38,7 @@ class PhaseHeader extends StatelessWidget {
               ),
             ),
           ),
-        ),
-      ],
-    );
+        
   }
 
   String _getTitle() {

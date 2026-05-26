@@ -45,7 +45,7 @@ class PlayerCard extends StatelessWidget {
   Widget _buildCard() {
     // Определяем цвет фона
     Color backgroundColor;
-
+    
     // Если игрок мёртв - чёрный фон
     if (!player.isAlive) {
       backgroundColor = Colors.black54;
@@ -81,12 +81,23 @@ class PlayerCard extends StatelessWidget {
             child: Stack(
               clipBehavior: Clip.none,
               children: [
-                // Аватарка по центру (без креста)
+                // Аватарка по центру
                 Center(
                   child: CircleAvatar(
                     radius: 28,
                     backgroundColor: Colors.grey.shade600,
                     backgroundImage: const AssetImage('assets/mafia_logo.png'),
+                    child: player.isAlive
+                        ? null
+                        : Container(
+                            decoration: BoxDecoration(
+                              color: Colors.black.withOpacity(0.7),
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Center(
+                              child: Icon(Icons.close, color: Colors.red, size: 30),
+                            ),
+                          ),
                   ),
                 ),
                 // Номер места на фоне

@@ -79,7 +79,7 @@ class PlayerGrid extends StatelessWidget {
                 child: Icon(
                   Icons.thumb_up,
                   color: Colors.grey.shade600,
-                  size: 20,
+                  size: 30,
                 ),
               ),
               // Список выставленных игроков (под иконкой)
@@ -89,8 +89,8 @@ class PlayerGrid extends StatelessWidget {
                   return Container(
                     margin: const EdgeInsets.only(bottom: 8),
                     padding: const EdgeInsets.symmetric(
-                      horizontal: 8,
-                      vertical: 4,
+                      horizontal: 4,
+                      vertical: 2,
                     ),
                     decoration: BoxDecoration(
                       color: Colors.blue.shade800,

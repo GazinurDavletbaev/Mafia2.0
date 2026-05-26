@@ -26,7 +26,6 @@ class PhaseHeader extends StatelessWidget {
     );
 
     return Column(
-      children: [
         // Основной хедер
         Container(
           height: 50, // уменьшил с 60 до 50
@@ -42,8 +41,8 @@ class PhaseHeader extends StatelessWidget {
             ),
           ),
         ),
-      ],
-    );
+
+    )
   }
 
   String _getTitle() {

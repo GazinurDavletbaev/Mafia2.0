@@ -215,6 +215,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
                     subPhase: gameState.currentSubPhase,
                     currentDay: gameState.currentDay,
                     currentSpeaker: gameState.currentSpeakerSeat,
+                    nominatedSeats: gameState.nominatedSeats, // ← добавить
                   ),
                   const SizedBox(height: 20),
                   Expanded(
@@ -230,7 +231,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
                       voteController: gameState.voteController,
                       partialBestMove: gameState.partialBestMove, // ← добавить
                       tiedSeats: gameState.tiedSeats,
-                      nominatedSeats: gameState.nominatedSeats,
+                      nominatedSeats: nom],
                     ),
                   ),
                   const SizedBox(height: 20),

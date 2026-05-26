@@ -8,6 +8,7 @@ class PhaseHeader extends StatelessWidget {
   final SubPhase subPhase;
   final int currentDay;
   final int? currentSpeaker;
+  final List<int> nominatedSeats; // ← добавить
 
   const PhaseHeader({
     super.key,
@@ -15,6 +16,7 @@ class PhaseHeader extends StatelessWidget {
     required this.subPhase,
     required this.currentDay,
     required this.currentSpeaker,
+    this.nominatedSeats = const [], // ← добавить
   });
 
   @override
@@ -42,6 +44,35 @@ class PhaseHeader extends StatelessWidget {
             ),
           ),
         ),
+        // Блок с кандидатами (если есть)
+          Container(
+            padding: const EdgeInsets.symmetric(vertical: 4),
+            color: Colors.grey.shade900,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: nominatedSeats.map((seat) {
+                return Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 4),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 2,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.blue.shade800,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Text(
+                    '$seat',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                );
+              }).toList(),
+            ),
+          ),
       ],
     );
   }

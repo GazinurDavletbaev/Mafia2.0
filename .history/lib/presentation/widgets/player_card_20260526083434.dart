@@ -45,11 +45,7 @@ class PlayerCard extends StatelessWidget {
   Widget _buildCard() {
     // Определяем цвет фона
     Color backgroundColor;
-
-    // Если игрок мёртв - чёрный фон
-    if (!player.isAlive) {
-      backgroundColor = Colors.black54;
-    } else if (isSelectedForBestMove) {
+    if (isSelectedForBestMove) {
       backgroundColor = Colors.blue.shade800;
     } else if (isCurrentCandidate) {
       backgroundColor = Colors.blue.shade800;
@@ -77,16 +73,27 @@ class PlayerCard extends StatelessWidget {
         children: [
           // Контейнер для аватарки и меток (номер, фолы)
           SizedBox(
-            height: 56,
+            height: 56, // 28*2 (радиус аватарки)
             child: Stack(
               clipBehavior: Clip.none,
               children: [
-                // Аватарка по центру (без креста)
+                // Аватарка по центру
                 Center(
                   child: CircleAvatar(
                     radius: 28,
                     backgroundColor: Colors.grey.shade600,
                     backgroundImage: const AssetImage('assets/mafia_logo.png'),
+                    child: player.isAlive
+                        ? null
+                        : Container(
+                            decoration: BoxDecoration(
+                              color: Colors.black.withOpacity(0.7),
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Center(
+                              child: Icon(Icons.close, color: Colors.red, size: 30),
+                            ),
+                          ),
                   ),
                 ),
                 // Номер места на фоне
@@ -116,7 +123,7 @@ class PlayerCard extends StatelessWidget {
                 // Фолы под номером (на фоне)
                 if (player.fouls > 0)
                   Positioned(
-                    top: 28,
+                    top: 28, // ниже номера
                     left: isLeftColumn ? 0 : null,
                     right: isLeftColumn ? null : 0,
                     child: Container(

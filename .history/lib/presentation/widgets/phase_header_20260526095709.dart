@@ -42,6 +42,10 @@ class PhaseHeader extends StatelessWidget {
             ),
           ),
         ),
+        
+            }).toList(),
+          ),
+        ),
       ],
     );
   }

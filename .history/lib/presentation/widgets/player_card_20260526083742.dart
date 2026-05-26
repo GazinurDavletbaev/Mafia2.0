@@ -45,7 +45,7 @@ class PlayerCard extends StatelessWidget {
   Widget _buildCard() {
     // Определяем цвет фона
     Color backgroundColor;
-
+    
     // Если игрок мёртв - чёрный фон
     if (!player.isAlive) {
       backgroundColor = Colors.black54;
