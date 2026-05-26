@@ -184,10 +184,8 @@ class GameViewModel extends StateNotifier<GameState> {
             );
           }
         } else {
-          // Все сказали → переходим в ночь
-          final newPhaseHistory = List<SubPhase>.from(state.phaseHistory)
-            ..add(SubPhase.mafiaShoot);
-
+          print(state.phaseHistory)
+          // Все сказали → переходим в ночь (один copyWith!)
           state = state.copyWith(
             players: newPlayers,
             currentPhase: Phase.night,
@@ -197,8 +195,6 @@ class GameViewModel extends StateNotifier<GameState> {
             votes: {},
             tiedSeats: [],
             currentSpeakerSeat: null,
-            phaseHistory: newPhaseHistory, // ← добавляем mafiaShoot в конец
-            speechHistory: [], // ← очищаем
           );
           if (winner != null) {
             state = state.copyWith(
@@ -207,6 +203,7 @@ class GameViewModel extends StateNotifier<GameState> {
             );
           }
         }
+        break;
       case SubPhase.bestMove:
         print("bestmove gameviewmodel onfhaseforward");
         _history.push(state);
