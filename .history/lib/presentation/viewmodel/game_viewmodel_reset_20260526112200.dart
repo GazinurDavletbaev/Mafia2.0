@@ -1,7 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mafia_help/application/providers/providers.dart';
 import '../../core/logger/app_logger.dart';
-import '../../presentation/state/game_state_initializer.dart';
 import 'game_viewmodel.dart';
 
 class ResetActions {
@@ -19,9 +18,26 @@ class ResetActions {
 
   Future<void> dealRoles() async {
     AppLogger.d('dealRoles() called');
-    
-    // Используем метод assignRoles из GameStateInitializer
-    final newPlayers = GameStateInitializer.assignRoles(_vm.state.players);
+
+    const roles = [
+      'don',
+      'mafia',
+      'mafia',
+      'sheriff',
+      'citizen',
+      'citizen',
+      'citizen',
+      'citizen',
+      'citizen',
+      'citizen',
+    ];
+
+    final dealRolesUsecase = _ref.read(dealRolesUsecaseProvider);
+    final newPlayers = dealRolesUsecase.execute(
+      players: _vm.state.players,
+      roles: roles,
+    );
+
     _vm.state = _vm.state.copyWith(players: newPlayers);
   }
 }

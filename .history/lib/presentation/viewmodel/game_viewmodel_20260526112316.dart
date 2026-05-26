@@ -28,13 +28,11 @@ class GameViewModel extends StateNotifier<GameState> {
   bool _skipNextBack = false;
 
   GameViewModel(this._ref, this.gameId) : super(GameState.initial()) {
-    _loadSavedGame().then((_) {
-      // Если после загрузки роли не заданы (новая игра) - раздаём
-      if (state.players.first.role == 'unknown') {
-        dealRoles();
-      }
-      _history.push(state);
-    });
+    _loadSavedGame();
+    if (state.players.first.role == 'unknown') {
+      dealRoles();
+    }
+    _history.push(state);
   }
 
   // ========== Делегирование ==========

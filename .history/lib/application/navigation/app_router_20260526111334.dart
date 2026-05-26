@@ -27,7 +27,7 @@ final GoRouter router = GoRouter(
     GoRoute(
       path: '/club-page',
       name: 'club-page',
-      builder: (context, state) => const ClubScreen(),
+      builder: (context, state) => const ClubPageScreen(),
     ),
     GoRoute(
       path: '/new-game',
