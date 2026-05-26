@@ -128,46 +128,7 @@ class PlayerGrid extends StatelessWidget {
     );
   }
 
-  Widget _buildBestMoveColumn() {
-    return Container(
-      width: 30,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          Padding(
-            padding: const EdgeInsets.only(top: 5),
-            child: Icon(
-              Icons.emoji_events, // значок лучший ход (трофей)
-              color: Colors.grey.shade600,
-              size: 20,
-            ),
-          ),
-          if (partialBestMove.isNotEmpty) ...[
-            const SizedBox(height: 8),
-            ...partialBestMove.map((seat) {
-              return Container(
-                margin: const EdgeInsets.only(bottom: 8),
-                padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-                decoration: BoxDecoration(
-                  color: Colors.orange.shade800,
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Text(
-                  '$seat',
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-              );
-            }).toList(),
-          ],
-        ],
-      ),
-    );
-  }
+
 
   // Вертикальная колонка для ночных действий
   Widget _buildNightActionsColumn() {
@@ -302,20 +263,11 @@ class PlayerGrid extends StatelessWidget {
         currentSubPhase == SubPhase.donCheck ||
         currentSubPhase == SubPhase.sheriffCheck;
 
-    final isBestMove = currentSubPhase == SubPhase.bestMove;
-
     return Row(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Expanded(child: _buildColumn(leftColumn, true, timerSeconds)),
-
-        if (isBestMove)
-          _buildBestMoveColumn()
-        else if (isNight)
-          _buildNightActionsColumn()
-        else
-          _buildCandidatesColumn(),
-
+        if (isNight) _buildNightActionsColumn() else _buildCandidatesColumn(),
         Expanded(child: _buildColumn(rightColumn, false, timerSeconds)),
       ],
     );

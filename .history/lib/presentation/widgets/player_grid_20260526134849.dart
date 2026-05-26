@@ -302,20 +302,11 @@ class PlayerGrid extends StatelessWidget {
         currentSubPhase == SubPhase.donCheck ||
         currentSubPhase == SubPhase.sheriffCheck;
 
-    final isBestMove = currentSubPhase == SubPhase.bestMove;
-
     return Row(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Expanded(child: _buildColumn(leftColumn, true, timerSeconds)),
-
-        if (isBestMove)
-          _buildBestMoveColumn()
-        else if (isNight)
-          _buildNightActionsColumn()
-        else
-          _buildCandidatesColumn(),
-
+        if (isNight) _buildNightActionsColumn() else _buildCandidatesColumn(),
         Expanded(child: _buildColumn(rightColumn, false, timerSeconds)),
       ],
     );

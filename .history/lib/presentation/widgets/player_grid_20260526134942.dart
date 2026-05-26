@@ -297,28 +297,27 @@ class PlayerGrid extends StatelessWidget {
 
     final timerSeconds = _secondsFromType();
 
-    final isNight =
-        currentSubPhase == SubPhase.mafiaShoot ||
-        currentSubPhase == SubPhase.donCheck ||
-        currentSubPhase == SubPhase.sheriffCheck;
+    final isNight = currentSubPhase == SubPhase.mafiaShoot ||
+    currentSubPhase == SubPhase.donCheck ||
+    currentSubPhase == SubPhase.sheriffCheck;
 
-    final isBestMove = currentSubPhase == SubPhase.bestMove;
+final isBestMove = currentSubPhase == SubPhase.bestMove;
 
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        Expanded(child: _buildColumn(leftColumn, true, timerSeconds)),
-
-        if (isBestMove)
-          _buildBestMoveColumn()
-        else if (isNight)
-          _buildNightActionsColumn()
-        else
-          _buildCandidatesColumn(),
-
-        Expanded(child: _buildColumn(rightColumn, false, timerSeconds)),
-      ],
-    );
+return Row(
+  crossAxisAlignment: CrossAxisAlignment.stretch,
+  children: [
+    Expanded(child: _buildColumn(leftColumn, true, timerSeconds)),
+    
+    if (isBestMove)
+      _buildBestMoveColumn()
+    else if (isNight)
+      _buildNightActionsColumn()
+    else
+      _buildCandidatesColumn(),
+    
+    Expanded(child: _buildColumn(rightColumn, false, timerSeconds)),
+  ],
+);
   }
 
   Widget _buildColumn(
