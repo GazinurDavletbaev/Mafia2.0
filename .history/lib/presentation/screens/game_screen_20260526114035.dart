@@ -231,7 +231,8 @@ class _GameScreenState extends ConsumerState<GameScreen> {
                       partialBestMove: gameState.partialBestMove, // ← добавить
                       tiedSeats: gameState.tiedSeats,
                       nominatedSeats: gameState.nominatedSeats,
-                      nightActions: gameState.nightActions ?? [], // ← добавить
+                        nightActions: gameState.nightActions ?? [], // ← добавить
+
                     ),
                   ),
                   const SizedBox(height: 20),

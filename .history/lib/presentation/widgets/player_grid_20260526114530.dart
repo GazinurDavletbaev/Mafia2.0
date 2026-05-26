@@ -66,148 +66,130 @@ class PlayerGrid extends StatelessWidget {
 
   // Вертикальная колонка для ночных действий
   Widget _buildNightActionsColumn() {
-    final isMafiaActive = currentSubPhase == SubPhase.mafiaShoot;
-    final isDonActive = currentSubPhase == SubPhase.donCheck;
-    final isSheriffActive = currentSubPhase == SubPhase.sheriffCheck;
-
-    // Получаем значения из nightActions
-    int? mafiaValue;
-    int? donValue;
-    int? sheriffValue;
-
-    if (nightActions.isNotEmpty) {
-      final length = nightActions.length;
-      final nightIndex = (length - 1) ~/ 3; // текущая ночь
-
-      for (int i = 0; i < length; i++) {
-        final actionNightIndex = i ~/ 3;
-        if (actionNightIndex == nightIndex) {
-          final actionType = i % 3;
-          final value = nightActions[i];
-          if (value != 0) {
-            switch (actionType) {
-              case 0:
-                mafiaValue = value;
-                break;
-              case 1:
-                donValue = value;
-                break;
-              case 2:
-                sheriffValue = value;
-                break;
-            }
+  final isMafiaActive = currentSubPhase == SubPhase.mafiaShoot;
+  final isDonActive = currentSubPhase == SubPhase.donCheck;
+  final isSheriffActive = currentSubPhase == SubPhase.sheriffCheck;
+  
+  // Получаем значения из nightActions
+  int? mafiaValue;
+  int? donValue;
+  int? sheriffValue;
+  
+  if (nightActions.isNotEmpty) {
+    final length = nightActions.length;
+    final nightIndex = (length - 1) ~/ 3; // текущая ночь
+    
+    for (int i = 0; i < length; i++) {
+      final actionNightIndex = i ~/ 3;
+      if (actionNightIndex == nightIndex) {
+        final actionType = i % 3;
+        final value = nightActions[i];
+        if (value != 0) {
+          switch (actionType) {
+            case 0: mafiaValue = value; break;
+            case 1: donValue = value; break;
+            case 2: sheriffValue = value; break;
           }
         }
       }
     }
-
-    return Container(
-      width: 40,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          // Стрельба мафии
-          Padding(
-            padding: const EdgeInsets.only(top: 5),
-            child: Icon(
-              Icons.sports_mma,
-              color: isMafiaActive
-                  ? Colors.orange.shade400
-                  : Colors.grey.shade600,
-              size: 20,
-            ),
-          ),
-          if (mafiaValue != null) ...[
-            const SizedBox(height: 4),
-            Container(
-              width: 24,
-              height: 24,
-              decoration: BoxDecoration(
-                color: isMafiaActive
-                    ? Colors.orange.shade800
-                    : Colors.grey.shade800,
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Center(
-                child: Text(
-                  '$mafiaValue',
-                  style: const TextStyle(color: Colors.white, fontSize: 12),
-                ),
-              ),
-            ),
-          ] else ...[
-            const SizedBox(height: 28),
-          ],
-
-          // Проверка дона
-          Padding(
-            padding: const EdgeInsets.only(top: 16),
-            child: Icon(
-              Icons.emoji_people,
-              color: isDonActive
-                  ? Colors.orange.shade400
-                  : Colors.grey.shade600,
-              size: 20,
-            ),
-          ),
-          if (donValue != null) ...[
-            const SizedBox(height: 4),
-            Container(
-              width: 24,
-              height: 24,
-              decoration: BoxDecoration(
-                color: isDonActive
-                    ? Colors.orange.shade800
-                    : Colors.grey.shade800,
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Center(
-                child: Text(
-                  '$donValue',
-                  style: const TextStyle(color: Colors.white, fontSize: 12),
-                ),
-              ),
-            ),
-          ] else ...[
-            const SizedBox(height: 28),
-          ],
-
-          // Проверка шерифа
-          Padding(
-            padding: const EdgeInsets.only(top: 16),
-            child: Icon(
-              Icons.search,
-              color: isSheriffActive
-                  ? Colors.orange.shade400
-                  : Colors.grey.shade600,
-              size: 20,
-            ),
-          ),
-          if (sheriffValue != null) ...[
-            const SizedBox(height: 4),
-            Container(
-              width: 24,
-              height: 24,
-              decoration: BoxDecoration(
-                color: isSheriffActive
-                    ? Colors.orange.shade800
-                    : Colors.grey.shade800,
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Center(
-                child: Text(
-                  '$sheriffValue',
-                  style: const TextStyle(color: Colors.white, fontSize: 12),
-                ),
-              ),
-            ),
-          ] else ...[
-            const SizedBox(height: 28),
-          ],
-        ],
-      ),
-    );
   }
+  
+  return Container(
+    width: 40,
+    child: Column(
+      mainAxisAlignment: MainAxisAlignment.start,
+      children: [
+        // Стрельба мафии
+        Padding(
+          padding: const EdgeInsets.only(top: 5),
+          child: Icon(
+            Icons.sports_mma,
+            color: isMafiaActive ? Colors.orange.shade400 : Colors.grey.shade600,
+            size: 20,
+          ),
+        ),
+        if (mafiaValue != null) ...[
+          const SizedBox(height: 4),
+          Container(
+            width: 24,
+            height: 24,
+            decoration: BoxDecoration(
+              color: isMafiaActive ? Colors.orange.shade800 : Colors.grey.shade800,
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Center(
+              child: Text(
+                '$mafiaValue',
+                style: const TextStyle(color: Colors.white, fontSize: 12),
+              ),
+            ),
+          ),
+        ] else ...[
+          const SizedBox(height: 28),
+        ],
+        
+        // Проверка дона
+        Padding(
+          padding: const EdgeInsets.only(top: 16),
+          child: Icon(
+            Icons.emoji_people,
+            color: isDonActive ? Colors.orange.shade400 : Colors.grey.shade600,
+            size: 20,
+          ),
+        ),
+        if (donValue != null) ...[
+          const SizedBox(height: 4),
+          Container(
+            width: 24,
+            height: 24,
+            decoration: BoxDecoration(
+              color: isDonActive ? Colors.orange.shade800 : Colors.grey.shade800,
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Center(
+              child: Text(
+                '$donValue',
+                style: const TextStyle(color: Colors.white, fontSize: 12),
+              ),
+            ),
+          ),
+        ] else ...[
+          const SizedBox(height: 28),
+        ],
+        
+        // Проверка шерифа
+        Padding(
+          padding: const EdgeInsets.only(top: 16),
+          child: Icon(
+            Icons.search,
+            color: isSheriffActive ? Colors.orange.shade400 : Colors.grey.shade600,
+            size: 20,
+          ),
+        ),
+        if (sheriffValue != null) ...[
+          const SizedBox(height: 4),
+          Container(
+            width: 24,
+            height: 24,
+            decoration: BoxDecoration(
+              color: isSheriffActive ? Colors.orange.shade800 : Colors.grey.shade800,
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Center(
+              child: Text(
+                '$sheriffValue',
+                style: const TextStyle(color: Colors.white, fontSize: 12),
+              ),
+            ),
+          ),
+        ] else ...[
+          const SizedBox(height: 28),
+        ],
+      ],
+    ),
+  );
+}
 
   // Колонка для кандидатов (днём)
   Widget _buildCandidatesColumn() {

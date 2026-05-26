@@ -259,6 +259,7 @@ class GameViewModel extends StateNotifier<GameState> {
     } else if (subPhase == SubPhase.sheriffCheck) {
       AppLogger.d('Sheriff check: игрок $newActions');
     }
+
   }
 
   void submitBestMoveNumber(int value) {

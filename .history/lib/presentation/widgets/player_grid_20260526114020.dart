@@ -19,7 +19,7 @@ class PlayerGrid extends StatelessWidget {
   final List<int> partialBestMove;
   final List<int> tiedSeats;
   final List<int> nominatedSeats;
-  final List<int> nightActions;
+  final List<int> nightActions; // ← добавить
 
   const PlayerGrid({
     super.key,
@@ -34,7 +34,7 @@ class PlayerGrid extends StatelessWidget {
     required this.partialBestMove,
     required this.tiedSeats,
     required this.nominatedSeats,
-    required this.nightActions,
+    required this.nightActions, // ← добавить
   });
 
   int? _secondsFromType() {
@@ -55,154 +55,55 @@ class PlayerGrid extends StatelessWidget {
   // Получить значение из nightActions по индексу в текущей ночи
   int? _getNightActionValue(int index) {
     if (nightActions.isEmpty) return null;
-
+    
+    // Находим последнюю ночь (последние 3 элемента)
     final startIndex = nightActions.length - 3;
     if (startIndex + index >= 0 && startIndex + index < nightActions.length) {
       final value = nightActions[startIndex + index];
-      return value == 0 ? null : value;
+      return value == 0 ? null : value; // 0 = промах, не показываем
     }
     return null;
   }
 
-  // Вертикальная колонка для ночных действий
-  Widget _buildNightActionsColumn() {
-    final isMafiaActive = currentSubPhase == SubPhase.mafiaShoot;
-    final isDonActive = currentSubPhase == SubPhase.donCheck;
-    final isSheriffActive = currentSubPhase == SubPhase.sheriffCheck;
-
-    // Получаем значения из nightActions
-    int? mafiaValue;
-    int? donValue;
-    int? sheriffValue;
-
-    if (nightActions.isNotEmpty) {
-      final length = nightActions.length;
-      final nightIndex = (length - 1) ~/ 3; // текущая ночь
-
-      for (int i = 0; i < length; i++) {
-        final actionNightIndex = i ~/ 3;
-        if (actionNightIndex == nightIndex) {
-          final actionType = i % 3;
-          final value = nightActions[i];
-          if (value != 0) {
-            switch (actionType) {
-              case 0:
-                mafiaValue = value;
-                break;
-              case 1:
-                donValue = value;
-                break;
-              case 2:
-                sheriffValue = value;
-                break;
-            }
-          }
-        }
-      }
-    }
-
+  // Колонка для ночного действия
+  Widget _buildNightActionColumn({
+    required IconData icon,
+    int? value,
+    required bool isActive,
+  }) {
     return Container(
-      width: 40,
+      width: 30,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
-          // Стрельба мафии
           Padding(
             padding: const EdgeInsets.only(top: 5),
             child: Icon(
-              Icons.sports_mma,
-              color: isMafiaActive
-                  ? Colors.orange.shade400
-                  : Colors.grey.shade600,
+              icon,
+              color: isActive ? Colors.orange.shade400 : Colors.grey.shade600,
               size: 20,
             ),
           ),
-          if (mafiaValue != null) ...[
+          if (value != null) ...[
             const SizedBox(height: 4),
             Container(
               width: 24,
               height: 24,
               decoration: BoxDecoration(
-                color: isMafiaActive
-                    ? Colors.orange.shade800
-                    : Colors.grey.shade800,
+                color: isActive ? Colors.orange.shade800 : Colors.grey.shade800,
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Center(
                 child: Text(
-                  '$mafiaValue',
-                  style: const TextStyle(color: Colors.white, fontSize: 12),
+                  '$value',
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
             ),
-          ] else ...[
-            const SizedBox(height: 28),
-          ],
-
-          // Проверка дона
-          Padding(
-            padding: const EdgeInsets.only(top: 16),
-            child: Icon(
-              Icons.emoji_people,
-              color: isDonActive
-                  ? Colors.orange.shade400
-                  : Colors.grey.shade600,
-              size: 20,
-            ),
-          ),
-          if (donValue != null) ...[
-            const SizedBox(height: 4),
-            Container(
-              width: 24,
-              height: 24,
-              decoration: BoxDecoration(
-                color: isDonActive
-                    ? Colors.orange.shade800
-                    : Colors.grey.shade800,
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Center(
-                child: Text(
-                  '$donValue',
-                  style: const TextStyle(color: Colors.white, fontSize: 12),
-                ),
-              ),
-            ),
-          ] else ...[
-            const SizedBox(height: 28),
-          ],
-
-          // Проверка шерифа
-          Padding(
-            padding: const EdgeInsets.only(top: 16),
-            child: Icon(
-              Icons.search,
-              color: isSheriffActive
-                  ? Colors.orange.shade400
-                  : Colors.grey.shade600,
-              size: 20,
-            ),
-          ),
-          if (sheriffValue != null) ...[
-            const SizedBox(height: 4),
-            Container(
-              width: 24,
-              height: 24,
-              decoration: BoxDecoration(
-                color: isSheriffActive
-                    ? Colors.orange.shade800
-                    : Colors.grey.shade800,
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Center(
-                child: Text(
-                  '$sheriffValue',
-                  style: const TextStyle(color: Colors.white, fontSize: 12),
-                ),
-              ),
-            ),
-          ] else ...[
-            const SizedBox(height: 28),
           ],
         ],
       ),
@@ -212,13 +113,17 @@ class PlayerGrid extends StatelessWidget {
   // Колонка для кандидатов (днём)
   Widget _buildCandidatesColumn() {
     return Container(
-      width: 30,
+      width: 20,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
           Padding(
             padding: const EdgeInsets.only(top: 5),
-            child: Icon(Icons.thumb_up, color: Colors.grey.shade600, size: 20),
+            child: Icon(
+              Icons.thumb_up,
+              color: Colors.grey.shade600,
+              size: 16,
+            ),
           ),
           if (nominatedSeats.isNotEmpty) ...[
             const SizedBox(height: 8),
@@ -260,9 +165,9 @@ class PlayerGrid extends StatelessWidget {
     final rightColumn = sortedPlayers.where((p) => p.seatNumber >= 6).toList();
 
     final timerSeconds = _secondsFromType();
-
-    final isNight =
-        currentSubPhase == SubPhase.mafiaShoot ||
+    
+    // Проверяем, ночь ли сейчас
+    final isNight = currentSubPhase == SubPhase.mafiaShoot ||
         currentSubPhase == SubPhase.donCheck ||
         currentSubPhase == SubPhase.sheriffCheck;
 
@@ -270,9 +175,30 @@ class PlayerGrid extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Expanded(child: _buildColumn(leftColumn, true, timerSeconds)),
-
-        if (isNight) _buildNightActionsColumn() else _buildCandidatesColumn(),
-
+        
+        if (isNight) ...[
+          // Колонка для стрельбы мафии
+          _buildNightActionColumn(
+            icon: Icons.sports_mma,
+            value: _getNightActionValue(0),
+            isActive: currentSubPhase == SubPhase.mafiaShoot,
+          ),
+          // Колонка для проверки дона
+          _buildNightActionColumn(
+            icon: Icons.emoji_people,
+            value: _getNightActionValue(1),
+            isActive: currentSubPhase == SubPhase.donCheck,
+          ),
+          // Колонка для проверки шерифа
+          _buildNightActionColumn(
+            icon: Icons.search,
+            value: _getNightActionValue(2),
+            isActive: currentSubPhase == SubPhase.sheriffCheck,
+          ),
+        ] else ...[
+          _buildCandidatesColumn(),
+        ],
+        
         Expanded(child: _buildColumn(rightColumn, false, timerSeconds)),
       ],
     );

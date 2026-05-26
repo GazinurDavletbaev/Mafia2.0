@@ -70,36 +70,9 @@ class PlayerGrid extends StatelessWidget {
     final isDonActive = currentSubPhase == SubPhase.donCheck;
     final isSheriffActive = currentSubPhase == SubPhase.sheriffCheck;
 
-    // Получаем значения из nightActions
-    int? mafiaValue;
-    int? donValue;
-    int? sheriffValue;
-
-    if (nightActions.isNotEmpty) {
-      final length = nightActions.length;
-      final nightIndex = (length - 1) ~/ 3; // текущая ночь
-
-      for (int i = 0; i < length; i++) {
-        final actionNightIndex = i ~/ 3;
-        if (actionNightIndex == nightIndex) {
-          final actionType = i % 3;
-          final value = nightActions[i];
-          if (value != 0) {
-            switch (actionType) {
-              case 0:
-                mafiaValue = value;
-                break;
-              case 1:
-                donValue = value;
-                break;
-              case 2:
-                sheriffValue = value;
-                break;
-            }
-          }
-        }
-      }
-    }
+    final mafiaValue = _getNightActionValue(0);
+    final donValue = _getNightActionValue(1);
+    final sheriffValue = _getNightActionValue(2);
 
     return Container(
       width: 40,
@@ -131,12 +104,16 @@ class PlayerGrid extends StatelessWidget {
               child: Center(
                 child: Text(
                   '$mafiaValue',
-                  style: const TextStyle(color: Colors.white, fontSize: 12),
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
             ),
           ] else ...[
-            const SizedBox(height: 28),
+            const SizedBox(height: 28), // пустое место, чтобы не смещалось
           ],
 
           // Проверка дона
@@ -164,7 +141,11 @@ class PlayerGrid extends StatelessWidget {
               child: Center(
                 child: Text(
                   '$donValue',
-                  style: const TextStyle(color: Colors.white, fontSize: 12),
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
             ),
@@ -197,7 +178,11 @@ class PlayerGrid extends StatelessWidget {
               child: Center(
                 child: Text(
                   '$sheriffValue',
-                  style: const TextStyle(color: Colors.white, fontSize: 12),
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
             ),

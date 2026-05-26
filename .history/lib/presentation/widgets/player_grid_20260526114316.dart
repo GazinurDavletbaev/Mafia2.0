@@ -55,7 +55,7 @@ class PlayerGrid extends StatelessWidget {
   // Получить значение из nightActions по индексу в текущей ночи
   int? _getNightActionValue(int index) {
     if (nightActions.isEmpty) return null;
-
+    
     final startIndex = nightActions.length - 3;
     if (startIndex + index >= 0 && startIndex + index < nightActions.length) {
       final value = nightActions[startIndex + index];
@@ -69,37 +69,10 @@ class PlayerGrid extends StatelessWidget {
     final isMafiaActive = currentSubPhase == SubPhase.mafiaShoot;
     final isDonActive = currentSubPhase == SubPhase.donCheck;
     final isSheriffActive = currentSubPhase == SubPhase.sheriffCheck;
-
-    // Получаем значения из nightActions
-    int? mafiaValue;
-    int? donValue;
-    int? sheriffValue;
-
-    if (nightActions.isNotEmpty) {
-      final length = nightActions.length;
-      final nightIndex = (length - 1) ~/ 3; // текущая ночь
-
-      for (int i = 0; i < length; i++) {
-        final actionNightIndex = i ~/ 3;
-        if (actionNightIndex == nightIndex) {
-          final actionType = i % 3;
-          final value = nightActions[i];
-          if (value != 0) {
-            switch (actionType) {
-              case 0:
-                mafiaValue = value;
-                break;
-              case 1:
-                donValue = value;
-                break;
-              case 2:
-                sheriffValue = value;
-                break;
-            }
-          }
-        }
-      }
-    }
+    
+    final mafiaValue = _getNightActionValue(0);
+    final donValue = _getNightActionValue(1);
+    final sheriffValue = _getNightActionValue(2);
 
     return Container(
       width: 40,
@@ -111,9 +84,7 @@ class PlayerGrid extends StatelessWidget {
             padding: const EdgeInsets.only(top: 5),
             child: Icon(
               Icons.sports_mma,
-              color: isMafiaActive
-                  ? Colors.orange.shade400
-                  : Colors.grey.shade600,
+              color: isMafiaActive ? Colors.orange.shade400 : Colors.grey.shade600,
               size: 20,
             ),
           ),
@@ -123,30 +94,30 @@ class PlayerGrid extends StatelessWidget {
               width: 24,
               height: 24,
               decoration: BoxDecoration(
-                color: isMafiaActive
-                    ? Colors.orange.shade800
-                    : Colors.grey.shade800,
+                color: isMafiaActive ? Colors.orange.shade800 : Colors.grey.shade800,
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Center(
                 child: Text(
                   '$mafiaValue',
-                  style: const TextStyle(color: Colors.white, fontSize: 12),
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
             ),
           ] else ...[
-            const SizedBox(height: 28),
+            const SizedBox(height: 28), // пустое место, чтобы не смещалось
           ],
-
+          
           // Проверка дона
           Padding(
             padding: const EdgeInsets.only(top: 16),
             child: Icon(
               Icons.emoji_people,
-              color: isDonActive
-                  ? Colors.orange.shade400
-                  : Colors.grey.shade600,
+              color: isDonActive ? Colors.orange.shade400 : Colors.grey.shade600,
               size: 20,
             ),
           ),
@@ -156,30 +127,30 @@ class PlayerGrid extends StatelessWidget {
               width: 24,
               height: 24,
               decoration: BoxDecoration(
-                color: isDonActive
-                    ? Colors.orange.shade800
-                    : Colors.grey.shade800,
+                color: isDonActive ? Colors.orange.shade800 : Colors.grey.shade800,
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Center(
                 child: Text(
                   '$donValue',
-                  style: const TextStyle(color: Colors.white, fontSize: 12),
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
             ),
           ] else ...[
             const SizedBox(height: 28),
           ],
-
+          
           // Проверка шерифа
           Padding(
             padding: const EdgeInsets.only(top: 16),
             child: Icon(
               Icons.search,
-              color: isSheriffActive
-                  ? Colors.orange.shade400
-                  : Colors.grey.shade600,
+              color: isSheriffActive ? Colors.orange.shade400 : Colors.grey.shade600,
               size: 20,
             ),
           ),
@@ -189,15 +160,17 @@ class PlayerGrid extends StatelessWidget {
               width: 24,
               height: 24,
               decoration: BoxDecoration(
-                color: isSheriffActive
-                    ? Colors.orange.shade800
-                    : Colors.grey.shade800,
+                color: isSheriffActive ? Colors.orange.shade800 : Colors.grey.shade800,
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Center(
                 child: Text(
                   '$sheriffValue',
-                  style: const TextStyle(color: Colors.white, fontSize: 12),
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
             ),
@@ -218,7 +191,11 @@ class PlayerGrid extends StatelessWidget {
         children: [
           Padding(
             padding: const EdgeInsets.only(top: 5),
-            child: Icon(Icons.thumb_up, color: Colors.grey.shade600, size: 20),
+            child: Icon(
+              Icons.thumb_up,
+              color: Colors.grey.shade600,
+              size: 20,
+            ),
           ),
           if (nominatedSeats.isNotEmpty) ...[
             const SizedBox(height: 8),
@@ -260,9 +237,8 @@ class PlayerGrid extends StatelessWidget {
     final rightColumn = sortedPlayers.where((p) => p.seatNumber >= 6).toList();
 
     final timerSeconds = _secondsFromType();
-
-    final isNight =
-        currentSubPhase == SubPhase.mafiaShoot ||
+    
+    final isNight = currentSubPhase == SubPhase.mafiaShoot ||
         currentSubPhase == SubPhase.donCheck ||
         currentSubPhase == SubPhase.sheriffCheck;
 
@@ -270,9 +246,12 @@ class PlayerGrid extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Expanded(child: _buildColumn(leftColumn, true, timerSeconds)),
-
-        if (isNight) _buildNightActionsColumn() else _buildCandidatesColumn(),
-
+        
+        if (isNight)
+          _buildNightActionsColumn()
+        else
+          _buildCandidatesColumn(),
+        
         Expanded(child: _buildColumn(rightColumn, false, timerSeconds)),
       ],
     );
