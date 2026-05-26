@@ -134,19 +134,23 @@ class PlayerGrid extends StatelessWidget {
     final isDonActive = currentSubPhase == SubPhase.donCheck;
     final isSheriffActive = currentSubPhase == SubPhase.sheriffCheck;
 
-    // Индекс начала текущей ночи = (currentDay - 1) * 3, но для ночи 0 это 0
-    final startIndex = currentDay == 0 ? 0 : (currentDay - 1) * 3;
+    // Индекс начала текущей ночи
+    final startIndex = currentDay * 3;
 
     int? mafiaValue;
     int? donValue;
     int? sheriffValue;
 
-    if (nightActions.length > startIndex + 0)
+    if (nightActions.length > startIndex + 0) {
       mafiaValue = nightActions[startIndex + 0];
-    if (nightActions.length > startIndex + 1)
+    }
+    if (nightActions.length > startIndex + 1) {
       donValue = nightActions[startIndex + 1];
-    if (nightActions.length > startIndex + 2)
+    }
+    if (nightActions.length > startIndex + 2) {
       sheriffValue = nightActions[startIndex + 2];
+    }
+
     return Container(
       width: 30,
       child: Column(

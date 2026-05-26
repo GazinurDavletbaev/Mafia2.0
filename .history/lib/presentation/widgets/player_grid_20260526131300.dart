@@ -20,7 +20,6 @@ class PlayerGrid extends StatelessWidget {
   final List<int> tiedSeats;
   final List<int> nominatedSeats;
   final List<int> nightActions;
-  final int currentDay;
 
   const PlayerGrid({
     super.key,
@@ -36,7 +35,6 @@ class PlayerGrid extends StatelessWidget {
     required this.tiedSeats,
     required this.nominatedSeats,
     required this.nightActions,
-    required this.currentDay,
   });
 
   int? _secondsFromType() {
@@ -134,19 +132,8 @@ class PlayerGrid extends StatelessWidget {
     final isDonActive = currentSubPhase == SubPhase.donCheck;
     final isSheriffActive = currentSubPhase == SubPhase.sheriffCheck;
 
-    // Индекс начала текущей ночи = (currentDay - 1) * 3, но для ночи 0 это 0
-    final startIndex = currentDay == 0 ? 0 : (currentDay - 1) * 3;
+    final lastValue = nightActions.isNotEmpty ? nightActions.last : null;
 
-    int? mafiaValue;
-    int? donValue;
-    int? sheriffValue;
-
-    if (nightActions.length > startIndex + 0)
-      mafiaValue = nightActions[startIndex + 0];
-    if (nightActions.length > startIndex + 1)
-      donValue = nightActions[startIndex + 1];
-    if (nightActions.length > startIndex + 2)
-      sheriffValue = nightActions[startIndex + 2];
     return Container(
       width: 30,
       child: Column(
@@ -163,8 +150,8 @@ class PlayerGrid extends StatelessWidget {
               size: 20,
             ),
           ),
-          if (mafiaValue != null)
-            _buildMafiaValue(mafiaValue, isMafiaActive)
+          if (isMafiaActive && lastValue != null)
+            _buildMafiaValue(lastValue, true)
           else
             const SizedBox(height: 28),
 
@@ -179,8 +166,8 @@ class PlayerGrid extends StatelessWidget {
               size: 20,
             ),
           ),
-          if (donValue != null)
-            _buildNightActionValue(donValue, isDonActive)
+          if (isDonActive && lastValue != null)
+            _buildNightActionValue(lastValue, true)
           else
             const SizedBox(height: 28),
 
@@ -195,8 +182,8 @@ class PlayerGrid extends StatelessWidget {
               size: 20,
             ),
           ),
-          if (sheriffValue != null)
-            _buildNightActionValue(sheriffValue, isSheriffActive)
+          if (isSheriffActive && lastValue != null)
+            _buildNightActionValue(lastValue, true)
           else
             const SizedBox(height: 28),
         ],

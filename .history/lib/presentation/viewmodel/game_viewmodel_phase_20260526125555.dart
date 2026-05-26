@@ -89,14 +89,7 @@ class PhaseActions {
           newPhaseHistory = List.from(phaseHistory)..add(nextPhase);
         } else {
           final nightAction = currentState.nightActions ?? [];
-          final lastKill = nightAction.length >= 3
-              ? nightAction[nightAction.length - 3]
-              : null;
-
-          // Промах - если значение -1 или 0
-          final isMiss = lastKill == null || lastKill == 0 || lastKill == -1;
-
-          if (isMiss) {
+          if (nightAction[nightAction.length - 3] == 0) {
             nextPhase = SubPhase.speeches;
             newPhaseHistory = List.from(phaseHistory)..add(nextPhase);
           } else {
@@ -186,9 +179,9 @@ class PhaseActions {
       return currentState.copyWith(
         phaseHistory: newPhaseHistory,
         currentSubPhase: nextPhase,
-        currentDay: currentState.currentDay + 1,
+        currentDay: currentState.currentDay + 1, // день увеличивается
         currentPhase: Phase.day,
-        currentSpeakerSeat: killedSeat,
+        currentSpeakerSeat: killedSeat, // ← убитый игрок
       );
     }
 
@@ -203,12 +196,11 @@ class PhaseActions {
       return currentState.copyWith(
         phaseHistory: newPhaseHistory,
         currentSubPhase: nextPhase,
-        currentDay: currentState.currentDay,
+        currentDay: currentState.currentDay, // день не увеличивается
         currentPhase: Phase.day,
         currentSpeakerSeat: killedSeat,
       );
     }
-
     // Речи
     if (nextPhase == SubPhase.speeches) {
       final allAlive =

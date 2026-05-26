@@ -79,41 +79,39 @@ class PhaseActions {
           }
         }
       } else if (_nightOrder.contains(currentPhase)) {
-        AppLogger.d('currentPhase in _nightOrder: $currentPhase');
+  AppLogger.d('currentPhase in _nightOrder: $currentPhase');
 
-        final next = _getNextInOrder(currentPhase, _nightOrder);
-        AppLogger.d('next = $next');
+  final next = _getNextInOrder(currentPhase, _nightOrder);
+  AppLogger.d('next = $next');
 
-        if (next != null) {
-          nextPhase = next;
-          newPhaseHistory = List.from(phaseHistory)..add(nextPhase);
-        } else {
-          final nightAction = currentState.nightActions ?? [];
-          final lastKill = nightAction.length >= 3
-              ? nightAction[nightAction.length - 3]
-              : null;
-
-          // Промах - если значение -1 или 0
-          final isMiss = lastKill == null || lastKill == 0 || lastKill == -1;
-
-          if (isMiss) {
-            nextPhase = SubPhase.speeches;
-            newPhaseHistory = List.from(phaseHistory)..add(nextPhase);
-          } else {
-            if (currentState.currentDay == 1) {
-              print("besss");
-              nextPhase = SubPhase.bestMove;
-              newPhaseHistory = List.from(phaseHistory)..add(nextPhase);
-            } else {
-              nextPhase = SubPhase.finalWordKill;
-              newPhaseHistory = List.from(phaseHistory)..add(nextPhase);
-            }
-          }
-        }
+  if (next != null) {
+    nextPhase = next;
+    newPhaseHistory = List.from(phaseHistory)..add(nextPhase);
+  } else {
+    // Ночь закончилась
+    final nightAction = currentState.nightActions ?? [];
+    final lastKill = nightAction.length >= 3 ? nightAction[nightAction.length - 3] : null;
+    
+    // Промах - если значение -1 или 0
+    final isMiss = lastKill == null || lastKill == 0 || lastKill == -1;
+    
+    if (isMiss) {
+      // Промах - сразу речи, без bestMove и finalWordKill
+      nextPhase = SubPhase.speeches;
+      newPhaseHistory = List.from(phaseHistory)..add(nextPhase);
+    } else {
+      // Было убийство
+      if (currentState.currentDay == 1) {
+        print("besss");
+        nextPhase = SubPhase.bestMove;
+        newPhaseHistory = List.from(phaseHistory)..add(nextPhase);
       } else {
-        return currentState;
+        nextPhase = SubPhase.finalWordKill;
+        newPhaseHistory = List.from(phaseHistory)..add(nextPhase);
       }
     }
+  }
+}
 
     if (nextPhase == null) return currentState;
 
@@ -186,9 +184,9 @@ class PhaseActions {
       return currentState.copyWith(
         phaseHistory: newPhaseHistory,
         currentSubPhase: nextPhase,
-        currentDay: currentState.currentDay + 1,
+        currentDay: currentState.currentDay + 1, // день увеличивается
         currentPhase: Phase.day,
-        currentSpeakerSeat: killedSeat,
+        currentSpeakerSeat: killedSeat, // ← убитый игрок
       );
     }
 
@@ -203,12 +201,11 @@ class PhaseActions {
       return currentState.copyWith(
         phaseHistory: newPhaseHistory,
         currentSubPhase: nextPhase,
-        currentDay: currentState.currentDay,
+        currentDay: currentState.currentDay, // день не увеличивается
         currentPhase: Phase.day,
         currentSpeakerSeat: killedSeat,
       );
     }
-
     // Речи
     if (nextPhase == SubPhase.speeches) {
       final allAlive =

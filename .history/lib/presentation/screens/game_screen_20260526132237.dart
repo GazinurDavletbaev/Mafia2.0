@@ -232,7 +232,8 @@ class _GameScreenState extends ConsumerState<GameScreen> {
                       tiedSeats: gameState.tiedSeats,
                       nominatedSeats: gameState.nominatedSeats,
                       nightActions: gameState.nightActions ?? [], // ← добавить
-                      currentDay: gameState.currentDay,
+                        currentDay: gameState.currentDay,
+
                     ),
                   ),
                   const SizedBox(height: 20),

@@ -20,7 +20,6 @@ class PlayerGrid extends StatelessWidget {
   final List<int> tiedSeats;
   final List<int> nominatedSeats;
   final List<int> nightActions;
-  final int currentDay;
 
   const PlayerGrid({
     super.key,
@@ -36,7 +35,6 @@ class PlayerGrid extends StatelessWidget {
     required this.tiedSeats,
     required this.nominatedSeats,
     required this.nightActions,
-    required this.currentDay,
   });
 
   int? _secondsFromType() {
@@ -60,7 +58,8 @@ class PlayerGrid extends StatelessWidget {
 
     final startIndex = nightActions.length - 3;
     if (startIndex + index >= 0 && startIndex + index < nightActions.length) {
-      return nightActions[startIndex + index]; // возвращаем как есть
+      final value = nightActions[startIndex + index];
+      return value; // возвращаем как есть, включая 0
     }
     return null;
   }
@@ -68,9 +67,6 @@ class PlayerGrid extends StatelessWidget {
   // Виджет для значения мафии (с поддержкой промаха)
   Widget _buildMafiaValue(int? value, bool isActive) {
     if (value == null) return const SizedBox(height: 28);
-
-    // Промах - если значение 0 или -1
-    final isMiss = value == 0 || value == -1;
 
     return Column(
       children: [
@@ -83,8 +79,8 @@ class PlayerGrid extends StatelessWidget {
             borderRadius: BorderRadius.circular(8),
           ),
           child: Center(
-            child: isMiss
-                ? const Icon(Icons.broken_image, color: Colors.white, size: 16)
+            child: value == 0
+                ? const Icon(Icons.clear, color: Colors.white, size: 16)
                 : Text(
                     '$value',
                     style: const TextStyle(
@@ -134,19 +130,35 @@ class PlayerGrid extends StatelessWidget {
     final isDonActive = currentSubPhase == SubPhase.donCheck;
     final isSheriffActive = currentSubPhase == SubPhase.sheriffCheck;
 
-    // Индекс начала текущей ночи = (currentDay - 1) * 3, но для ночи 0 это 0
-    final startIndex = currentDay == 0 ? 0 : (currentDay - 1) * 3;
-
+    // Получаем значения из nightActions
     int? mafiaValue;
     int? donValue;
     int? sheriffValue;
 
-    if (nightActions.length > startIndex + 0)
-      mafiaValue = nightActions[startIndex + 0];
-    if (nightActions.length > startIndex + 1)
-      donValue = nightActions[startIndex + 1];
-    if (nightActions.length > startIndex + 2)
-      sheriffValue = nightActions[startIndex + 2];
+    if (nightActions.isNotEmpty) {
+      final length = nightActions.length;
+      final nightIndex = (length - 1) ~/ 3; // текущая ночь
+
+      for (int i = 0; i < length; i++) {
+        final actionNightIndex = i ~/ 3;
+        if (actionNightIndex == nightIndex) {
+          final actionType = i % 3;
+          final value = nightActions[i];
+          switch (actionType) {
+            case 0:
+              mafiaValue = value;
+              break;
+            case 1:
+              donValue = value;
+              break;
+            case 2:
+              sheriffValue = value;
+              break;
+          }
+        }
+      }
+    }
+
     return Container(
       width: 30,
       child: Column(
@@ -163,10 +175,7 @@ class PlayerGrid extends StatelessWidget {
               size: 20,
             ),
           ),
-          if (mafiaValue != null)
-            _buildMafiaValue(mafiaValue, isMafiaActive)
-          else
-            const SizedBox(height: 28),
+          _buildMafiaValue(mafiaValue, isMafiaActive),
 
           // Проверка дона
           Padding(
@@ -179,10 +188,7 @@ class PlayerGrid extends StatelessWidget {
               size: 20,
             ),
           ),
-          if (donValue != null)
-            _buildNightActionValue(donValue, isDonActive)
-          else
-            const SizedBox(height: 28),
+          _buildNightActionValue(donValue, isDonActive),
 
           // Проверка шерифа
           Padding(
@@ -195,10 +201,7 @@ class PlayerGrid extends StatelessWidget {
               size: 20,
             ),
           ),
-          if (sheriffValue != null)
-            _buildNightActionValue(sheriffValue, isSheriffActive)
-          else
-            const SizedBox(height: 28),
+          _buildNightActionValue(sheriffValue, isSheriffActive),
         ],
       ),
     );

@@ -88,6 +88,7 @@ class PhaseActions {
           nextPhase = next;
           newPhaseHistory = List.from(phaseHistory)..add(nextPhase);
         } else {
+          // Ночь закончилась
           final nightAction = currentState.nightActions ?? [];
           final lastKill = nightAction.length >= 3
               ? nightAction[nightAction.length - 3]
@@ -97,9 +98,11 @@ class PhaseActions {
           final isMiss = lastKill == null || lastKill == 0 || lastKill == -1;
 
           if (isMiss) {
+            // Промах - сразу речи, без bestMove и finalWordKill
             nextPhase = SubPhase.speeches;
             newPhaseHistory = List.from(phaseHistory)..add(nextPhase);
           } else {
+            // Было убийство
             if (currentState.currentDay == 1) {
               print("besss");
               nextPhase = SubPhase.bestMove;
@@ -110,8 +113,6 @@ class PhaseActions {
             }
           }
         }
-      } else {
-        return currentState;
       }
     }
 
@@ -186,9 +187,9 @@ class PhaseActions {
       return currentState.copyWith(
         phaseHistory: newPhaseHistory,
         currentSubPhase: nextPhase,
-        currentDay: currentState.currentDay + 1,
+        currentDay: currentState.currentDay + 1, // день увеличивается
         currentPhase: Phase.day,
-        currentSpeakerSeat: killedSeat,
+        currentSpeakerSeat: killedSeat, // ← убитый игрок
       );
     }
 
@@ -203,12 +204,11 @@ class PhaseActions {
       return currentState.copyWith(
         phaseHistory: newPhaseHistory,
         currentSubPhase: nextPhase,
-        currentDay: currentState.currentDay,
+        currentDay: currentState.currentDay, // день не увеличивается
         currentPhase: Phase.day,
         currentSpeakerSeat: killedSeat,
       );
     }
-
     // Речи
     if (nextPhase == SubPhase.speeches) {
       final allAlive =

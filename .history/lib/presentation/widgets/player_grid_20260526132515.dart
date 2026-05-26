@@ -130,23 +130,32 @@ class PlayerGrid extends StatelessWidget {
 
   // Вертикальная колонка для ночных действий
   Widget _buildNightActionsColumn() {
-    final isMafiaActive = currentSubPhase == SubPhase.mafiaShoot;
-    final isDonActive = currentSubPhase == SubPhase.donCheck;
-    final isSheriffActive = currentSubPhase == SubPhase.sheriffCheck;
+  final isMafiaActive = currentSubPhase == SubPhase.mafiaShoot;
+  final isDonActive = currentSubPhase == SubPhase.donCheck;
+  final isSheriffActive = currentSubPhase == SubPhase.sheriffCheck;
 
-    // Индекс начала текущей ночи = (currentDay - 1) * 3, но для ночи 0 это 0
-    final startIndex = currentDay == 0 ? 0 : (currentDay - 1) * 3;
+  final startIndex = currentDay * 3;
+  
+  print('currentDay = $currentDay, startIndex = $startIndex');
+  print('nightActions = $nightActions');
+  
+  int? mafiaValue;
+  int? donValue;
+  int? sheriffValue;
+  
+  if (nightActions.length > startIndex + 0) {
+    mafiaValue = nightActions[startIndex + 0];
+    print('mafiaValue = $mafiaValue');
+  }
+  if (nightActions.length > startIndex + 1) {
+    donValue = nightActions[startIndex + 1];
+    print('donValue = $donValue');
+  }
+  if (nightActions.length > startIndex + 2) {
+    sheriffValue = nightActions[startIndex + 2];
+    print('sheriffValue = $sheriffValue');
+  }
 
-    int? mafiaValue;
-    int? donValue;
-    int? sheriffValue;
-
-    if (nightActions.length > startIndex + 0)
-      mafiaValue = nightActions[startIndex + 0];
-    if (nightActions.length > startIndex + 1)
-      donValue = nightActions[startIndex + 1];
-    if (nightActions.length > startIndex + 2)
-      sheriffValue = nightActions[startIndex + 2];
     return Container(
       width: 30,
       child: Column(

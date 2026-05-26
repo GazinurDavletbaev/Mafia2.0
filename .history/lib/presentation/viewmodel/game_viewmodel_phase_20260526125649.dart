@@ -89,13 +89,11 @@ class PhaseActions {
           newPhaseHistory = List.from(phaseHistory)..add(nextPhase);
         } else {
           final nightAction = currentState.nightActions ?? [];
-          final lastKill = nightAction.length >= 3
-              ? nightAction[nightAction.length - 3]
-              : null;
-
+          final lastKill = nightAction.length >= 3 ? nightAction[nightAction.length - 3] : null;
+          
           // Промах - если значение -1 или 0
           final isMiss = lastKill == null || lastKill == 0 || lastKill == -1;
-
+          
           if (isMiss) {
             nextPhase = SubPhase.speeches;
             newPhaseHistory = List.from(phaseHistory)..add(nextPhase);
@@ -208,7 +206,7 @@ class PhaseActions {
         currentSpeakerSeat: killedSeat,
       );
     }
-
+    
     // Речи
     if (nextPhase == SubPhase.speeches) {
       final allAlive =
