@@ -227,13 +227,10 @@ class GameViewModel extends StateNotifier<GameState> {
   Future<void> onPlayerTap(int seatNumber) => _player.onPlayerTap(seatNumber);
   Future<void> onPlayerLongPress(int seatNumber, int actionType) =>
       _player.onPlayerLongPress(seatNumber, actionType);
-  Future<void> onSwipeUp(int seatNumber) =>
-      _player.onNominatePlayer(seatNumber);
-  Future<void> onSwipeDown(int seatNumber) =>
-      _player.onRemoveNomination(seatNumber);
-  Future<void> onSwipeLeft(int seatNumber) =>
-      _player.onRevivePlayer(seatNumber);
-  Future<void> onSwipeRight(int seatNumber) => _player.onKillPlayer(seatNumber);
+      Future<void> onSwipeUp(int seatNumber) => _player.onNominatePlayer(seatNumber);
+Future<void> onSwipeDown(int seatNumber) => _player.onRemoveNomination(seatNumber);
+Future<void> onSwipeLeft(int seatNumber) => _player.onRevivePlayer(seatNumber);
+Future<void> onSwipeRight(int seatNumber) => _player.onKillPlayer(seatNumber);
   void toggleRoleCard(int seatNumber) => _player.toggleRoleCard(seatNumber);
   void closeRoleCard() => _player.closeRoleCard();
 

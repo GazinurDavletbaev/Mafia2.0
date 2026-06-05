@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mafia_help/data/local/models/player_model.dart';
+import 'package:percent_indicator/percent_indicator.dart';
 import '../../core/logger/app_logger.dart';
 import 'timer/timer_overlay.dart';
 
@@ -8,16 +9,12 @@ class PlayerCard extends StatelessWidget {
   final bool isSpeaking;
   final bool isBlackTeam;
   final bool isSheriff;
-  final bool isDon;
   final bool isLeftColumn;
   final int? timerSeconds;
+  final int? maxTimerSeconds; // ← добавить: максимальное время для этой фазы
   final VoidCallback? onTimerComplete;
   final VoidCallback onTap;
   final VoidCallback onLongPress;
-  final VoidCallback onSwipeUp;     // ← выставление
-  final VoidCallback onSwipeDown;   // ← снятие
-  final VoidCallback onSwipeLeft;   // ← оживление
-  final VoidCallback onSwipeRight;  // ← убийство
   final bool isCurrentCandidate;
   final bool isSelectedForBestMove;
   final bool isEliminationCandidate;
@@ -28,16 +25,12 @@ class PlayerCard extends StatelessWidget {
     required this.isSpeaking,
     this.isBlackTeam = false,
     this.isSheriff = false,
-    this.isDon = false,
     required this.isLeftColumn,
     this.timerSeconds,
+    this.maxTimerSeconds,
     this.onTimerComplete,
     required this.onTap,
     required this.onLongPress,
-    required this.onSwipeUp,
-    required this.onSwipeDown,
-    required this.onSwipeLeft,
-    required this.onSwipeRight,
     this.isCurrentCandidate = false,
     this.isSelectedForBestMove = false,
     this.isEliminationCandidate = false,
@@ -48,31 +41,12 @@ class PlayerCard extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       onLongPress: onLongPress,
-      onHorizontalDragEnd: _handleHorizontalSwipe,
-      onVerticalDragEnd: _handleVerticalSwipe,
       child: _buildCard(),
     );
   }
 
-  void _handleHorizontalSwipe(DragEndDetails details) {
-    final velocity = details.velocity.pixelsPerSecond.dx;
-    if (velocity > 500) {
-      onSwipeRight(); // убить
-    } else if (velocity < -500) {
-      onSwipeLeft(); // оживить
-    }
-  }
-
-  void _handleVerticalSwipe(DragEndDetails details) {
-    final velocity = details.velocity.pixelsPerSecond.dy;
-    if (velocity > 500) {
-      onSwipeDown(); // снять с голосования
-    } else if (velocity < -500) {
-      onSwipeUp(); // выставить на голосование
-    }
-  }
-
   Widget _buildCard() {
+    // Определяем цвет фона
     Color backgroundColor;
     
     if (!player.isAlive) {
@@ -87,14 +61,35 @@ class PlayerCard extends StatelessWidget {
       backgroundColor = Colors.purple.shade800;
     } else if (isSheriff) {
       backgroundColor = Colors.orange.shade800;
-    } else if (isDon) {
-      backgroundColor = Colors.teal.shade800;
-    } else if (isSpeaking) {
-      backgroundColor = Colors.green.shade800;
     } else {
       backgroundColor = Colors.grey.shade800;
     }
 
+    // Рассчитываем процент для прогресс-бара
+    double percent = 1.0;
+    if (isSpeaking && timerSeconds != null && maxTimerSeconds != null && maxTimerSeconds! > 0) {
+      percent = (timerSeconds! / maxTimerSeconds!).clamp(0.0, 1.0);
+    }
+
+    // Если игрок говорит — оборачиваем в круговой прогресс
+    if (isSpeaking && timerSeconds != null && maxTimerSeconds != null) {
+      return CircularPercentIndicator(
+        radius: 70.0,
+        lineWidth: 4.0,
+        percent: percent,
+        center: _buildCardContent(backgroundColor),
+        progressColor: Colors.orange.shade400,
+        backgroundColor: Colors.grey.shade700,
+        circularStrokeCap: CircularStrokeCap.round,
+        animation: true,
+        animationDuration: 1000,
+      );
+    }
+
+    return _buildCardContent(backgroundColor);
+  }
+
+  Widget _buildCardContent(Color backgroundColor) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(8.0),
@@ -105,11 +100,13 @@ class PlayerCard extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
+          // Контейнер для аватарки и меток (номер, фолы)
           SizedBox(
             height: 56,
             child: Stack(
               clipBehavior: Clip.none,
               children: [
+                // Аватарка по центру
                 Center(
                   child: CircleAvatar(
                     radius: 28,
@@ -117,6 +114,7 @@ class PlayerCard extends StatelessWidget {
                     backgroundImage: const AssetImage('assets/mafia_logo.png'),
                   ),
                 ),
+                // Номер места на фоне
                 Positioned(
                   top: 0,
                   left: isLeftColumn ? 0 : null,
@@ -140,6 +138,7 @@ class PlayerCard extends StatelessWidget {
                     ),
                   ),
                 ),
+                // Фолы под номером (на фоне)
                 if (player.fouls > 0)
                   Positioned(
                     top: 28,
@@ -164,6 +163,7 @@ class PlayerCard extends StatelessWidget {
                       ),
                     ),
                   ),
+                // Таймер поверх аватарки
                 if (isSpeaking && timerSeconds != null)
                   Positioned.fill(
                     child: TimerOverlay(

@@ -21,10 +21,6 @@ class PlayerGrid extends StatelessWidget {
   final List<int> nominatedSeats;
   final List<int> nightActions;
   final int currentDay;
-  final Function(int) onSwipeUp;     // ← добавить
-  final Function(int) onSwipeDown;   // ← добавить
-  final Function(int) onSwipeLeft;   // ← добавить
-  final Function(int) onSwipeRight;  // ← добавить
 
   const PlayerGrid({
     super.key,
@@ -41,10 +37,6 @@ class PlayerGrid extends StatelessWidget {
     required this.nominatedSeats,
     required this.nightActions,
     required this.currentDay,
-    required this.onSwipeUp,      // ← добавить
-    required this.onSwipeDown,    // ← добавить
-    required this.onSwipeLeft,    // ← добавить
-    required this.onSwipeRight,   // ← добавить
   });
 
   int? _secondsFromType() {

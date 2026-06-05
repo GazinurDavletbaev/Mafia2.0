@@ -3,7 +3,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mafia_help/application/providers/providers.dart';
 import '../../core/logger/app_logger.dart';
-import '../../data/local/models/phase.dart';
 import '../../data/local/models/sub_phase.dart';
 import '../state/game_state.dart';
 import 'game_viewmodel.dart';
@@ -141,20 +140,5 @@ class PlayerActions {
     _vm.state = _vm.state.copyWith(nominatedSeats: newNominatedSeats);
   }
 
-  Future<void> onNominatePlayer(int seatNumber) async {
-  if (_vm.state.currentPhase == Phase.night) return; // ночью нельзя
-  await _nominatePlayer(seatNumber);
-}
-
-Future<void> onRemoveNomination(int seatNumber) async {
-  await _removeNomination(seatNumber);
-}
-
-Future<void> onKillPlayer(int seatNumber) async {
-  await _killPlayer(seatNumber);
-}
-
-Future<void> onRevivePlayer(int seatNumber) async {
-  await _revivePlayer(seatNumber);
-}
+  
 }

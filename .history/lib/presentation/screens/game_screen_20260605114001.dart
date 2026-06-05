@@ -233,10 +233,10 @@ class _GameScreenState extends ConsumerState<GameScreen> {
                       nominatedSeats: gameState.nominatedSeats,
                       nightActions: gameState.nightActions ?? [], // ← добавить
                       currentDay: gameState.currentDay,
-                      onSwipeUp: _vm.onSwipeUp, // ← исправить
-                      onSwipeDown: _vm.onSwipeDown, // ← исправить
-                      onSwipeLeft: _vm.onSwipeLeft, // ← исправить
-                      onSwipeRight: _vm.onSwipeRight, //
+                      onSwipeUp: _vm.onNominatePlayer,
+  onSwipeDown: _vm.onRemoveNomination,
+  onSwipeLeft: _vm.onRevivePlayer,
+  onSwipeRight: _vm.onKillPlayer,
                     ),
                   ),
                   const SizedBox(height: 20),

@@ -8,19 +8,16 @@ class PlayerCard extends StatelessWidget {
   final bool isSpeaking;
   final bool isBlackTeam;
   final bool isSheriff;
-  final bool isDon;
   final bool isLeftColumn;
   final int? timerSeconds;
   final VoidCallback? onTimerComplete;
   final VoidCallback onTap;
   final VoidCallback onLongPress;
-  final VoidCallback onSwipeUp;     // ← выставление
-  final VoidCallback onSwipeDown;   // ← снятие
-  final VoidCallback onSwipeLeft;   // ← оживление
-  final VoidCallback onSwipeRight;  // ← убийство
   final bool isCurrentCandidate;
   final bool isSelectedForBestMove;
   final bool isEliminationCandidate;
+  final bool isDon;
+
 
   const PlayerCard({
     super.key,
@@ -28,19 +25,15 @@ class PlayerCard extends StatelessWidget {
     required this.isSpeaking,
     this.isBlackTeam = false,
     this.isSheriff = false,
-    this.isDon = false,
     required this.isLeftColumn,
     this.timerSeconds,
     this.onTimerComplete,
     required this.onTap,
     required this.onLongPress,
-    required this.onSwipeUp,
-    required this.onSwipeDown,
-    required this.onSwipeLeft,
-    required this.onSwipeRight,
     this.isCurrentCandidate = false,
     this.isSelectedForBestMove = false,
     this.isEliminationCandidate = false,
+    this.isDon = ,
   });
 
   @override
@@ -48,33 +41,15 @@ class PlayerCard extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       onLongPress: onLongPress,
-      onHorizontalDragEnd: _handleHorizontalSwipe,
-      onVerticalDragEnd: _handleVerticalSwipe,
       child: _buildCard(),
     );
   }
 
-  void _handleHorizontalSwipe(DragEndDetails details) {
-    final velocity = details.velocity.pixelsPerSecond.dx;
-    if (velocity > 500) {
-      onSwipeRight(); // убить
-    } else if (velocity < -500) {
-      onSwipeLeft(); // оживить
-    }
-  }
-
-  void _handleVerticalSwipe(DragEndDetails details) {
-    final velocity = details.velocity.pixelsPerSecond.dy;
-    if (velocity > 500) {
-      onSwipeDown(); // снять с голосования
-    } else if (velocity < -500) {
-      onSwipeUp(); // выставить на голосование
-    }
-  }
-
   Widget _buildCard() {
+    // Определяем цвет фона
     Color backgroundColor;
-    
+
+    // Если игрок мёртв - чёрный фон
     if (!player.isAlive) {
       backgroundColor = Colors.black54;
     } else if (isSelectedForBestMove) {
@@ -87,8 +62,6 @@ class PlayerCard extends StatelessWidget {
       backgroundColor = Colors.purple.shade800;
     } else if (isSheriff) {
       backgroundColor = Colors.orange.shade800;
-    } else if (isDon) {
-      backgroundColor = Colors.teal.shade800;
     } else if (isSpeaking) {
       backgroundColor = Colors.green.shade800;
     } else {
@@ -105,11 +78,13 @@ class PlayerCard extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
+          // Контейнер для аватарки и меток (номер, фолы)
           SizedBox(
             height: 56,
             child: Stack(
               clipBehavior: Clip.none,
               children: [
+                // Аватарка по центру (без креста)
                 Center(
                   child: CircleAvatar(
                     radius: 28,
@@ -117,6 +92,7 @@ class PlayerCard extends StatelessWidget {
                     backgroundImage: const AssetImage('assets/mafia_logo.png'),
                   ),
                 ),
+                // Номер места на фоне
                 Positioned(
                   top: 0,
                   left: isLeftColumn ? 0 : null,
@@ -140,6 +116,7 @@ class PlayerCard extends StatelessWidget {
                     ),
                   ),
                 ),
+                // Фолы под номером (на фоне)
                 if (player.fouls > 0)
                   Positioned(
                     top: 28,
@@ -164,6 +141,7 @@ class PlayerCard extends StatelessWidget {
                       ),
                     ),
                   ),
+                // Таймер поверх аватарки
                 if (isSpeaking && timerSeconds != null)
                   Positioned.fill(
                     child: TimerOverlay(

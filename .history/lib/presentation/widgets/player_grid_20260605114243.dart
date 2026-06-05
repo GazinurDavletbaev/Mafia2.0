@@ -41,10 +41,6 @@ class PlayerGrid extends StatelessWidget {
     required this.nominatedSeats,
     required this.nightActions,
     required this.currentDay,
-    required this.onSwipeUp,      // ← добавить
-    required this.onSwipeDown,    // ← добавить
-    required this.onSwipeLeft,    // ← добавить
-    required this.onSwipeRight,   // ← добавить
   });
 
   int? _secondsFromType() {

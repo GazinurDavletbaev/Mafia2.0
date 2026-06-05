@@ -21,10 +21,6 @@ class PlayerGrid extends StatelessWidget {
   final List<int> nominatedSeats;
   final List<int> nightActions;
   final int currentDay;
-  final Function(int) onSwipeUp;     // ← добавить
-  final Function(int) onSwipeDown;   // ← добавить
-  final Function(int) onSwipeLeft;   // ← добавить
-  final Function(int) onSwipeRight;  // ← добавить
 
   const PlayerGrid({
     super.key,
@@ -41,10 +37,6 @@ class PlayerGrid extends StatelessWidget {
     required this.nominatedSeats,
     required this.nightActions,
     required this.currentDay,
-    required this.onSwipeUp,      // ← добавить
-    required this.onSwipeDown,    // ← добавить
-    required this.onSwipeLeft,    // ← добавить
-    required this.onSwipeRight,   // ← добавить
   });
 
   int? _secondsFromType() {
@@ -347,8 +339,7 @@ class PlayerGrid extends StatelessWidget {
             (currentSubPhase == SubPhase.sheriffLook ||
                 currentSubPhase == SubPhase.sheriffCheck) &&
             player.role == 'sheriff';
-        final isDon = currentSubPhase == SubPhase.donCheck && player.role == 'don';
-        final isCurrentCandidate =
+            final isDon = currentSubPhase == SubPhase.donCheck && player.role == 'don';       final isCurrentCandidate =
             isVotingActive &&
                 voteController?.currentSeat == player.seatNumber ||
             currentSubPhase == SubPhase.tieBreak &&
@@ -375,13 +366,8 @@ class PlayerGrid extends StatelessWidget {
               isEliminationCandidate: isEliminationCandidate,
               isLeftColumn: isLeftColumn,
               timerSeconds: timerValue,
-              isDon: isDon,
               onTap: () => onTap(player.seatNumber),
               onLongPress: () => onLongPress(player.seatNumber),
-              onSwipeUp: () => onSwipeUp(player.seatNumber),
-  onSwipeDown: () => onSwipeDown(player.seatNumber),
-  onSwipeLeft: () => onSwipeLeft(player.seatNumber),
-  onSwipeRight: () => onSwipeRight(player.seatNumber),
             ),
           ),
         );
