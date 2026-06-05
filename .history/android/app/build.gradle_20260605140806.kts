@@ -30,7 +30,7 @@ android {
     defaultConfig {
         applicationId = "com.example.mafia_help"
         minSdk = flutter.minSdkVersion
-        targetSdk = 36
+        targetSdk = 3
         versionCode = 1
         versionName = "1.0"
     }
