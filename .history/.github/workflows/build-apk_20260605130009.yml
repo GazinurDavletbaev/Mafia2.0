@@ -40,17 +40,7 @@ jobs:
       - name: Build APK
         run: flutter build apk --release
       
-      - name: Upload to AppCenter
-        uses: wzieba/AppCenter-Github-Action@v1
-        with:
-          appName: ${{ secrets.APPCENTER_APP }}
-          ownerName: ${{ secrets.APPCENTER_OWNER }}
-          appToken: ${{ secrets.APPCENTER_TOKEN }}
-          file: build/app/outputs/flutter-apk/app-release.apk
-          releaseNotes: "Новая версия (${{ github.ref_name }})\n${{ github.event.head_commit.message }}"
-          destinations: "Collaborators"  # или "Groups/testers" если создашь группу
-      
-      - name: Upload APK to Artifacts (backup)
+      - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: mafia-help-apk-${{ github.ref_name }}

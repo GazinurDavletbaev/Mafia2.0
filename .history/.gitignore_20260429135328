@@ -4,7 +4,6 @@
 .flutter-plugins
 .flutter-plugins-dependencies
 .packages
-.keys
 pubspec.lock
 build/
 
