@@ -82,12 +82,12 @@ class _ClubScreenState extends ConsumerState<ClubScreen> {
                 ),
               ),
             ),
-            const SizedBox(height: 20),
+                        const SizedBox(height: 20),
 
             ElevatedButton(
-              onPressed: () => UpdateService.checkForUpdate(context),
-              child: const Text('Проверить обновления'),
-            ),
+  onPressed: () => UpdateService.checkForUpdate(context),
+  child: const Text('Проверить обновления'),
+),
           ],
         ),
       ),

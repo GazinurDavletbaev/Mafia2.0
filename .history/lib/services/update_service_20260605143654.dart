@@ -20,8 +20,7 @@ class UpdateService {
       
       final data = jsonDecode(response.body);
       final latestVersion = data['latest_version'];
-      print('Current version: $currentVersion, Latest: $latestVersion');
-
+      
       if (currentVersion != latestVersion) {
         _showUpdateDialog(context);
       }

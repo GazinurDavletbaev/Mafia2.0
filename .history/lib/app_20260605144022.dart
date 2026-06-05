@@ -16,7 +16,8 @@ class _MyAppState extends State<MyApp> {
   void initState() {
     super.initState();
     // Проверяем обновления после сборки виджета
-    
+    print('Current version: $currentVersion, Latest: $latestVersion');
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       UpdateService.checkForUpdate(context);
       

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../services/update_service.dart';
 import 'game_screen.dart';
 
 class ClubScreen extends ConsumerStatefulWidget {
@@ -82,12 +81,10 @@ class _ClubScreenState extends ConsumerState<ClubScreen> {
                 ),
               ),
             ),
-            const SizedBox(height: 20),
-
             ElevatedButton(
-              onPressed: () => UpdateService.checkForUpdate(context),
-              child: const Text('Проверить обновления'),
-            ),
+  onPressed: () => UpdateService.checkForUpdate(context),
+  child: const Text('Проверить обновления'),
+),
           ],
         ),
       ),
