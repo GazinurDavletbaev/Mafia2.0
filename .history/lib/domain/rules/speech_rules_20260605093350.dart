@@ -1,4 +1,5 @@
 class SpeechRules {
+  /// Формирует очередь говорящих на текущий день
   List<int> buildSpeechQueue({
     required List<int> aliveSeats,
     required int? lastSpeakerOfPreviousDay,
@@ -20,6 +21,7 @@ class SpeechRules {
     return queue;
   }
 
+  /// Найти следующего живого, которого ещё не было в истории
   int? findNextSpeaker({
     required int currentSpeaker,
     required List<int> aliveSeats,

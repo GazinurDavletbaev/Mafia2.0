@@ -8,6 +8,7 @@ import '../../domain/rules/game_history.dart';
 import '../../domain/rules/phase_rules.dart';
 import '../state/game_state.dart';
 import 'game_viewmodel_state.dart';
+import 'game_viewmodel_persistence.dart';
 import 'game_viewmodel_speeches.dart';
 import 'game_viewmodel_actions.dart';
 import 'game_viewmodel_reset.dart';

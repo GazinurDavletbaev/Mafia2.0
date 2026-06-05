@@ -8,6 +8,7 @@ import '../../domain/rules/game_history.dart';
 import '../../domain/rules/phase_rules.dart';
 import '../state/game_state.dart';
 import 'game_viewmodel_state.dart';
+import 'game_viewmodel_persistence.dart';
 import 'game_viewmodel_speeches.dart';
 import 'game_viewmodel_actions.dart';
 import 'game_viewmodel_reset.dart';
@@ -38,6 +39,7 @@ class GameViewModel extends StateNotifier<GameState> {
 
   // ========== Делегирование ==========
   late final GameViewModelState _stateActions = GameViewModelState(this, _ref);
+  late final PersistenceActions _persistence = PersistenceActions(this, _ref);
   late final PhaseRules _phaseRules = PhaseRules();
   late final SpeechesActions _speeches = SpeechesActions(this, _ref);
   late final PlayerActions _player = PlayerActions(this, _ref);

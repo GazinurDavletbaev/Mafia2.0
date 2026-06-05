@@ -11,14 +11,14 @@ import 'hive_registrar.g.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
+  
   // Только для десктопа (Linux/Windows/macOS)
   if (Platform.isLinux || Platform.isWindows || Platform.isMacOS) {
     await windowManager.ensureInitialized();
-
+    
     const windowWidth = 400.0;
     const windowHeight = 800.0;
-
+    
     const windowOptions = WindowOptions(
       size: Size(windowWidth, windowHeight),
       center: false,
@@ -26,12 +26,12 @@ void main() async {
       skipTaskbar: false,
       titleBarStyle: TitleBarStyle.normal,
     );
-
+    
     await windowManager.waitUntilReadyToShow(windowOptions, () async {
       await windowManager.show();
       await windowManager.focus();
     });
-
+    
     await windowManager.setPosition(Offset(1500, 100));
   }
 
@@ -39,13 +39,15 @@ void main() async {
   Hive.init(appDocumentDir.path);
 
   Hive.registerAdapters();
-
+  
   final gameLocalSource = GameLocalSource();
   await gameLocalSource.init();
 
   runApp(
     ProviderScope(
-      overrides: [gameLocalSourceProvider.overrideWithValue(gameLocalSource)],
+      overrides: [
+        gameLocalSourceProvider.overrideWithValue(gameLocalSource),
+      ],
       child: const MyApp(),
     ),
   );

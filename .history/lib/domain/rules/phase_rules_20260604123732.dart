@@ -38,13 +38,14 @@ class PhaseRules {
       if (currentPhase == SubPhase.eliminationVote) {
         final totalAlive = currentState.players.where((p) => p.isAlive).length;
         final majority = (totalAlive ~/ 2) + 1;
-
+        
         if (currentState.eliminationVotes >= majority) {
           nextPhase = SubPhase.finalWord;
         } else {
           nextPhase = SubPhase.mafiaShoot;
         }
-      } else if (currentPhase == _dayOrder.last) {
+      }
+      else if (currentPhase == _dayOrder.last) {
         final candidates = currentState.nominatedSeats;
         final isDay0 = currentDay == 0;
         print("hi1");
@@ -65,9 +66,7 @@ class PhaseRules {
         final next = _getNextInOrder(currentPhase, _dayOrder);
         if (next != null) {
           print("jj");
-          print(
-            'calculateNextState: currentPhase = ${currentState.currentSubPhase}',
-          );
+          print('calculateNextState: currentPhase = ${currentState.currentSubPhase}');
           nextPhase = next;
         } else {
           nextPhase = SubPhase.mafiaShoot;
@@ -112,42 +111,28 @@ class PhaseRules {
     // Определяем новый день
     final shouldIncrementDay = nextPhase == SubPhase.mafiaShoot;
     final newDay = shouldIncrementDay ? currentDay + 1 : currentDay;
-
+    
     // Определяем currentSpeaker для фаз с таймерами
     int? newSpeaker = currentState.currentSpeakerSeat;
-
+    
     if (nextPhase == SubPhase.contract || nextPhase == SubPhase.donCheck) {
       final don = currentState.players.firstWhere((p) => p.role == 'don');
       newSpeaker = don.seatNumber;
-    } else if (nextPhase == SubPhase.sheriffLook ||
-        nextPhase == SubPhase.sheriffCheck) {
-      final sheriff = currentState.players.firstWhere(
-        (p) => p.role == 'sheriff',
-      );
+    } else if (nextPhase == SubPhase.sheriffLook || nextPhase == SubPhase.sheriffCheck) {
+      final sheriff = currentState.players.firstWhere((p) => p.role == 'sheriff');
       newSpeaker = sheriff.seatNumber;
     } else if (nextPhase == SubPhase.bestMove) {
       final nightActions = currentState.nightActions ?? [];
-      newSpeaker = nightActions.length >= 3
-          ? nightActions[nightActions.length - 3]
-          : null;
+      newSpeaker = nightActions.length >= 3 ? nightActions[nightActions.length - 3] : null;
     } else if (nextPhase == SubPhase.finalWordKill) {
       final nightActions = currentState.nightActions ?? [];
-      newSpeaker = nightActions.length >= 3
-          ? nightActions[nightActions.length - 3]
-          : null;
+      newSpeaker = nightActions.length >= 3 ? nightActions[nightActions.length - 3] : null;
     } else if (nextPhase == SubPhase.finalWord) {
       if (currentState.votes.isNotEmpty) {
-        newSpeaker = currentState.votes.entries
-            .reduce((a, b) => a.value > b.value ? a : b)
-            .key;
+        newSpeaker = currentState.votes.entries.reduce((a, b) => a.value > b.value ? a : b).key;
       }
     } else if (nextPhase == SubPhase.speeches) {
-      final allAlive =
-          currentState.players
-              .where((p) => p.isAlive)
-              .map((p) => p.seatNumber)
-              .toList()
-            ..sort();
+      final allAlive = currentState.players.where((p) => p.isAlive).map((p) => p.seatNumber).toList()..sort();
       if (allAlive.isNotEmpty) {
         final speechRules = SpeechRules();
         final queue = speechRules.buildSpeechQueue(
@@ -166,12 +151,8 @@ class PhaseRules {
       currentDay: newDay,
       currentPhase: nightPhases.contains(nextPhase) ? Phase.night : Phase.day,
       currentSpeakerSeat: newSpeaker,
-      dayStarterSeat: nextPhase == SubPhase.speeches
-          ? newSpeaker
-          : currentState.dayStarterSeat,
-      speechHistory: nextPhase == SubPhase.speeches
-          ? [?newSpeaker]
-          : currentState.speechHistory,
+      dayStarterSeat: nextPhase == SubPhase.speeches ? newSpeaker : currentState.dayStarterSeat,
+      speechHistory: nextPhase == SubPhase.speeches ? [newSpeaker] : currentState.speechHistory,
       nominatedSeats: shouldClear ? [] : currentState.nominatedSeats,
       votes: shouldClear ? {} : currentState.votes,
     );

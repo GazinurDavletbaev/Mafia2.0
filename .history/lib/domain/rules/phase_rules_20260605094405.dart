@@ -5,6 +5,8 @@ import 'package:mafia_help/presentation/state/game_state.dart';
 import '../../core/logger/app_logger.dart';
 
 class PhaseRules {
+  final SpeechRules _speechRules = SpeechRules();
+
   static const List<SubPhase> nightPhases = [
     SubPhase.roleDistribution,
     SubPhase.contract,
@@ -21,24 +23,43 @@ class PhaseRules {
     final currentPhase = currentState.currentSubPhase;
     final currentDay = currentState.currentDay;
 
+    // СПЕЦИАЛЬНАЯ ОБРАБОТКА ДЛЯ speeches
+    if (currentPhase == SubPhase.speeches) {
+      final allAlive =
+          currentState.players
+              .where((p) => p.isAlive)
+              .map((p) => p.seatNumber)
+              .toList()
+            ..sort();
+      final nextSpeaker = _speechRules.findNextSpeaker(
+        currentSpeaker: currentState.currentSpeakerSeat ?? 0,
+        aliveSeats: allAlive,
+        speechHistory: currentState.speechHistory,
+      );
+
+      if (nextSpeaker != null) {
+        // Есть следующий говорящий
+        return currentState.copyWith(
+          currentSpeakerSeat: nextSpeaker,
+          speechHistory: [...currentState.speechHistory, nextSpeaker],
+        );
+      }
+      // Нет следующего — продолжаем, день закончен
+    }
+
     SubPhase? nextPhase;
 
     // Ночь 0
     if (_night0Order.contains(currentPhase)) {
       final next = _getNextInOrder(currentPhase, _night0Order);
-      if (next != null) {
-        nextPhase = next;
-      } else {
-        nextPhase = SubPhase.speeches;
-      }
+      nextPhase = next ?? SubPhase.speeches;
     }
     // День
     else if (_dayOrder.contains(currentPhase)) {
-      // СПЕЦИАЛЬНАЯ ОБРАБОТКА ДЛЯ eliminationVote
+      // eliminationVote
       if (currentPhase == SubPhase.eliminationVote) {
         final totalAlive = currentState.players.where((p) => p.isAlive).length;
         final majority = (totalAlive ~/ 2) + 1;
-
         if (currentState.eliminationVotes >= majority) {
           nextPhase = SubPhase.finalWord;
         } else {
@@ -47,40 +68,23 @@ class PhaseRules {
       } else if (currentPhase == _dayOrder.last) {
         final candidates = currentState.nominatedSeats;
         final isDay0 = currentDay == 0;
-        print("hi1");
         if (candidates.isEmpty) {
           nextPhase = SubPhase.mafiaShoot;
-          AppLogger.d('No candidates -> mafiaShoot');
         } else if (candidates.length == 1 && isDay0) {
           nextPhase = SubPhase.mafiaShoot;
-          AppLogger.d('Day0, 1 candidate -> mafiaShoot');
         } else if (candidates.length == 1 && !isDay0) {
           nextPhase = SubPhase.finalWord;
-          AppLogger.d('Day1+, 1 candidate -> finalWord');
         } else {
           nextPhase = SubPhase.voting;
-          AppLogger.d('${candidates.length} candidates -> voting');
         }
       } else {
-        final next = _getNextInOrder(currentPhase, _dayOrder);
-        if (next != null) {
-          print("jj");
-          print(
-            'calculateNextState: currentPhase = ${currentState.currentSubPhase}',
-          );
-          nextPhase = next;
-        } else {
-          nextPhase = SubPhase.mafiaShoot;
-        }
+        nextPhase =
+            _getNextInOrder(currentPhase, _dayOrder) ?? SubPhase.mafiaShoot;
       }
     }
     // Ночь 1+
     else if (_nightOrder.contains(currentPhase)) {
-      AppLogger.d('currentPhase in _nightOrder: $currentPhase');
-
       final next = _getNextInOrder(currentPhase, _nightOrder);
-      AppLogger.d('next = $next');
-
       if (next != null) {
         nextPhase = next;
       } else {
@@ -88,19 +92,14 @@ class PhaseRules {
         final lastKill = nightAction.length >= 3
             ? nightAction[nightAction.length - 3]
             : null;
-
-        // Промах - если значение -1 или 0
         final isMiss = lastKill == null || lastKill == 0 || lastKill == -1;
 
         if (isMiss) {
           nextPhase = SubPhase.speeches;
         } else {
-          if (currentDay == 1) {
-            print("besss");
-            nextPhase = SubPhase.bestMove;
-          } else {
-            nextPhase = SubPhase.finalWordKill;
-          }
+          nextPhase = (currentDay == 1)
+              ? SubPhase.bestMove
+              : SubPhase.finalWordKill;
         }
       }
     } else {
@@ -108,12 +107,17 @@ class PhaseRules {
     }
 
     if (nextPhase == null) return currentState;
+    return _buildNewState(currentState, nextPhase, currentDay);
+  }
 
-    // Определяем новый день
+  GameState _buildNewState(
+    GameState currentState,
+    SubPhase nextPhase,
+    int currentDay,
+  ) {
     final shouldIncrementDay = nextPhase == SubPhase.mafiaShoot;
     final newDay = shouldIncrementDay ? currentDay + 1 : currentDay;
 
-    // Определяем currentSpeaker для фаз с таймерами
     int? newSpeaker = currentState.currentSpeakerSeat;
 
     if (nextPhase == SubPhase.contract || nextPhase == SubPhase.donCheck) {
@@ -125,22 +129,17 @@ class PhaseRules {
         (p) => p.role == 'sheriff',
       );
       newSpeaker = sheriff.seatNumber;
-    } else if (nextPhase == SubPhase.bestMove) {
+    } else if (nextPhase == SubPhase.bestMove ||
+        nextPhase == SubPhase.finalWordKill) {
       final nightActions = currentState.nightActions ?? [];
       newSpeaker = nightActions.length >= 3
           ? nightActions[nightActions.length - 3]
           : null;
-    } else if (nextPhase == SubPhase.finalWordKill) {
-      final nightActions = currentState.nightActions ?? [];
-      newSpeaker = nightActions.length >= 3
-          ? nightActions[nightActions.length - 3]
-          : null;
-    } else if (nextPhase == SubPhase.finalWord) {
-      if (currentState.votes.isNotEmpty) {
-        newSpeaker = currentState.votes.entries
-            .reduce((a, b) => a.value > b.value ? a : b)
-            .key;
-      }
+    } else if (nextPhase == SubPhase.finalWord &&
+        currentState.votes.isNotEmpty) {
+      newSpeaker = currentState.votes.entries
+          .reduce((a, b) => a.value > b.value ? a : b)
+          .key;
     } else if (nextPhase == SubPhase.speeches) {
       final allAlive =
           currentState.players
@@ -149,8 +148,7 @@ class PhaseRules {
               .toList()
             ..sort();
       if (allAlive.isNotEmpty) {
-        final speechRules = SpeechRules();
-        final queue = speechRules.buildSpeechQueue(
+        final queue = _speechRules.buildSpeechQueue(
           aliveSeats: allAlive,
           lastSpeakerOfPreviousDay: currentState.dayStarterSeat,
         );
@@ -158,7 +156,6 @@ class PhaseRules {
       }
     }
 
-    // Очищаем кандидатов и голоса при переходе в ночь
     final shouldClear = nextPhase == SubPhase.mafiaShoot;
 
     return currentState.copyWith(
