@@ -170,7 +170,7 @@ class PhaseRules {
           ? newSpeaker
           : currentState.dayStarterSeat,
       speechHistory: nextPhase == SubPhase.speeches
-          ? [newSpeaker!]
+          ? [newSpeaker]
           : currentState.speechHistory,
       nominatedSeats: shouldClear ? [] : currentState.nominatedSeats,
       votes: shouldClear ? {} : currentState.votes,
