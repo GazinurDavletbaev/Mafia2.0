@@ -12,17 +12,6 @@ class ClubScreen extends ConsumerStatefulWidget {
 
 class _ClubScreenState extends ConsumerState<ClubScreen> {
   @override
-  void initState() {
-    super.initState();
-    // Даём время на загрузку MaterialApp
-    Future.delayed(const Duration(milliseconds: 500), () {
-      if (mounted) {
-        UpdateService.checkForUpdate(context);
-      }
-    });
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.black87,
@@ -95,7 +84,6 @@ class _ClubScreenState extends ConsumerState<ClubScreen> {
             ),
             const SizedBox(height: 20),
 
-            // Кнопка ручной проверки
             ElevatedButton(
               onPressed: () => UpdateService.checkForUpdate(context),
               child: const Text('Проверить обновления'),
