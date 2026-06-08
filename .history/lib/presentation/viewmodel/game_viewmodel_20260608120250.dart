@@ -181,7 +181,7 @@ class GameViewModel extends StateNotifier<GameState> {
           state = state.copyWith(
             players: newPlayers,
             currentPhase: Phase.night,
-            currentSubPhase: SubPhase.mafiaShoot,
+            currentSubPhase: SubPhase.sheriffCheck,
             currentDay: state.currentDay + 1,
             nominatedSeats: [],
             votes: {},
