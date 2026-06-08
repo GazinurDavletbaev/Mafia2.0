@@ -21,17 +21,15 @@ class UpdateService {
       final data = jsonDecode(response.body);
       final latestTag = data['tag_name'] as String;
       final latestVersion = latestTag.replaceFirst(RegExp(r'^v'), '');
-
-      final assets = data['assets'] as List;
-      final apkAsset = assets.firstWhere(
-        (asset) => (asset as Map)['name'].toString().endsWith('.apk'),
+      final apkUrl = data['assets'].firstWhere(
+        (asset) => asset['name'].endsWith('.apk'),
         orElse: () => null,
-      );
-      final apkUrl =
-          apkAsset != null ? apkAsset['browser_download_url'] as String : null;
+      )?['browser_download_url'];
 
       print('Current version: $currentVersion, Latest: $latestVersion');
-
+      print('DEBUG: currentVersion = "$currentVersion"');
+      print('DEBUG: latestVersion = "$latestVersion"');
+      print('DEBUG: equal? ${currentVersion == latestVersion}');
       if (currentVersion != latestVersion && apkUrl != null) {
         _showUpdateDialog(context, apkUrl);
       }
