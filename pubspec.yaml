@@ -2,7 +2,7 @@ name: mafia_help
 description: "A new Flutter project."
 publish_to: 'none'
 
-version: 1.0.1
+version: 1.5
 
 environment:
   sdk: '>=3.0.0 <4.0.0'
@@ -43,6 +43,14 @@ dev_dependencies:
   # Генерация кода для Hive
   hive_ce_generator: ^1.8.2
   build_runner: ^2.4.14
+
+  flutter_launcher_icons: ^0.13.0
+
+flutter_launcher_icons:
+  android: true
+  image_path: "assets/mafia_logo.png"
+  adaptive_icon_background: "#1a1a1a"
+  adaptive_icon_foreground: "assets/mafia_logo.png"
 
 flutter:
   uses-material-design: true

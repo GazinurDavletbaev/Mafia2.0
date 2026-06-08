@@ -1,11 +1,19 @@
 import java.io.FileInputStream
 import java.util.Properties
+import org.yaml.snakeyaml.Yaml
 
 val keystorePropertiesFile = rootProject.file("key.properties")
 val keystoreProperties = Properties()
 if (keystorePropertiesFile.exists()) {
     keystoreProperties.load(FileInputStream(keystorePropertiesFile))
 }
+
+val flutterVersion = {
+    val yaml = Yaml()
+    val inputStream = FileInputStream("../pubspec.yaml")
+    val data = yaml.load<Map<String, Any>>(inputStream)
+    data["version"] as String
+}()
 
 plugins {
     id("com.android.application")
@@ -32,7 +40,7 @@ android {
         minSdk = flutter.minSdkVersion
         targetSdk = 36
         versionCode = 1
-        versionName = "1.5"
+        versionName = flutterVersion
     }
 
     signingConfigs {
