@@ -2,7 +2,7 @@ name: Build APK
 
 on:
   push:
-    branches: [ main, develop ]
+    branches: [ main ]
   workflow_dispatch:
 
 jobs:
@@ -49,8 +49,8 @@ jobs:
       - name: Create Release and Upload APK
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v${{ steps.get_version.outputs.version }}-${{ github.ref_name }}
-          name: v${{ steps.get_version.outputs.version }} (${{ github.ref_name }})
+          tag_name: v${{ steps.get_version.outputs.version }}
+          name: v${{ steps.get_version.outputs.version }}
           files: build/app/outputs/flutter-apk/app-release.apk
           generate_release_notes: true
         env:
