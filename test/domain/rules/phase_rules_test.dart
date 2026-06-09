@@ -97,4 +97,44 @@ void main() {
       expect(next.currentSubPhase, SubPhase.finalWord);
     });
   });
+  // добавить в существующий phase_rules_test.dart
+
+  group('bestMove и finalWordKill', () {
+    test('bestMove → finalWordKill', () async {
+      final state = _withRoles(GameState.initial().copyWith(
+        currentDay: 1,
+        currentSubPhase: SubPhase.bestMove,
+        partialBestMove: [1, 2, 3],
+      ));
+      final next = await phaseRules.calculateNextState(state);
+
+      expect(next.currentSubPhase, SubPhase.finalWordKill);
+    });
+
+    test('finalWordKill → speeches (после убийства)', () async {
+      final state = _withRoles(GameState.initial().copyWith(
+        currentDay: 1,
+        currentSubPhase: SubPhase.finalWordKill,
+        currentSpeakerSeat: 5,
+      ));
+      final next = await phaseRules.calculateNextState(state);
+
+      expect(next.currentSubPhase, SubPhase.speeches);
+    });
+  });
+
+  group('finalWord после голосования', () {
+    test('finalWord → mafiaShoot (если один игрок)', () async {
+      final state = _withRoles(GameState.initial().copyWith(
+        currentDay: 1,
+        currentSubPhase: SubPhase.finalWord,
+        currentSpeakerSeat: 5,
+        tiedSeats: [], // один игрок
+      ));
+      final next = await phaseRules.calculateNextState(state);
+
+      expect(next.currentSubPhase, SubPhase.mafiaShoot);
+      expect(next.currentDay, 2);
+    });
+  });
 }
