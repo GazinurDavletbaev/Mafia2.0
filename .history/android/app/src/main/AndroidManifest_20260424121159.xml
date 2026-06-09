@@ -1,8 +1,4 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
-    
-    <!-- Разрешение на доступ в интернет (нужно для проверки обновлений) -->
-    <uses-permission android:name="android.permission.INTERNET" />
-    
     <application
         android:label="mafia_help"
         android:name="${applicationName}"
@@ -35,10 +31,10 @@
             android:name="flutterEmbedding"
             android:value="2" />
     </application>
-    
     <!-- Required to query activities that can process text, see:
          https://developer.android.com/training/package-visibility and
          https://developer.android.com/reference/android/content/Intent#ACTION_PROCESS_TEXT.
+
          In particular, this is used by the Flutter engine in io.flutter.plugin.text.ProcessTextPlugin. -->
     <queries>
         <intent>
