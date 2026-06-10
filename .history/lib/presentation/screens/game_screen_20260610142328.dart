@@ -59,7 +59,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
       return PlayerTimerType.seconds30; // 30 секунд на кандидата
     }
     if (subPhase == SubPhase.freeSeating) {
-      return PlayerTimerType.seconds40;
+      return PlayerTimerType.seconds40; // таймер на всех игроках
     }
     if (subPhase == SubPhase.finalWord && currentSpeaker != null) {
       return PlayerTimerType.seconds60;

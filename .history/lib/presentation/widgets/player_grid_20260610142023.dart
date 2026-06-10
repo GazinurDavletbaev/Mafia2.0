@@ -220,22 +220,6 @@ class PlayerGrid extends StatelessWidget {
     String tooltip;
 
     switch (currentSubPhase) {
-      case SubPhase.roleDistribution:
-        icon = Icons.assignment;
-        tooltip = 'Раздача ролей';
-        break;
-      case SubPhase.contract:
-        icon = Icons.handshake;
-        tooltip = 'Договорка';
-        break;
-      case SubPhase.sheriffLook:
-        icon = Icons.visibility;
-        tooltip = 'Шериф осматривает город';
-        break;
-      case SubPhase.freeSeating:
-        icon = Icons.chair;
-        tooltip = 'Свободная посадка';
-        break;
       case SubPhase.speeches:
         icon = Icons.mic;
         tooltip = 'Речи';

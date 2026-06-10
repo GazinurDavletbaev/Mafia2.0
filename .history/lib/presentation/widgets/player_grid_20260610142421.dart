@@ -220,22 +220,6 @@ class PlayerGrid extends StatelessWidget {
     String tooltip;
 
     switch (currentSubPhase) {
-      case SubPhase.roleDistribution:
-        icon = Icons.assignment;
-        tooltip = 'Раздача ролей';
-        break;
-      case SubPhase.contract:
-        icon = Icons.handshake;
-        tooltip = 'Договорка';
-        break;
-      case SubPhase.sheriffLook:
-        icon = Icons.visibility;
-        tooltip = 'Шериф осматривает город';
-        break;
-      case SubPhase.freeSeating:
-        icon = Icons.chair;
-        tooltip = 'Свободная посадка';
-        break;
       case SubPhase.speeches:
         icon = Icons.mic;
         tooltip = 'Речи';
@@ -588,7 +572,10 @@ class PlayerGrid extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: playersList.map((player) {
         final isSpeaking = currentSpeaker == player.seatNumber;
-        final timerValue = isSpeaking ? timerSeconds : null;
+        final timerValue =
+            (currentSubPhase == SubPhase.freeSeating && timerSeconds != null)
+                ? timerSeconds
+                : (isSpeaking ? timerSeconds : null);
         final isBlackTeam = (currentSubPhase == SubPhase.contract ||
                 currentSubPhase == SubPhase.mafiaShoot) &&
             (player.role == 'don' || player.role == 'mafia');
