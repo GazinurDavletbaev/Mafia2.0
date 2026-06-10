@@ -5,7 +5,7 @@ import '../../core/logger/app_logger.dart';
 import '../state/game_state.dart';
 import '../viewmodel/game_viewmodel.dart';
 import '../widgets/phase_header.dart';
-import '../widgets/player_grid.dart';
+import '../widgets/player_grid/player_grid.dart';
 import '../widgets/settings_menu.dart';
 import '../widgets/pie_menu_dialog.dart';
 import '../widgets/role_card.dart';

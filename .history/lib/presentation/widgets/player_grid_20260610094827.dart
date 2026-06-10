@@ -21,11 +21,10 @@ class PlayerGrid extends StatelessWidget {
   final List<int> nominatedSeats;
   final List<int> nightActions;
   final int currentDay;
-  final int eliminationVotes;
-  final Function(int) onSwipeUp;
-  final Function(int) onSwipeDown;
-  final Function(int) onSwipeLeft;
-  final Function(int) onSwipeRight;
+  final Function(int) onSwipeUp; // ← добавить
+  final Function(int) onSwipeDown; // ← добавить
+  final Function(int) onSwipeLeft; // ← добавить
+  final Function(int) onSwipeRight; // ← добавить
 
   const PlayerGrid({
     super.key,
@@ -42,11 +41,10 @@ class PlayerGrid extends StatelessWidget {
     required this.nominatedSeats,
     required this.nightActions,
     required this.currentDay,
-    required this.eliminationVotes,
-    required this.onSwipeUp,
-    required this.onSwipeDown,
-    required this.onSwipeLeft,
-    required this.onSwipeRight,
+    required this.onSwipeUp, // ← добавить
+    required this.onSwipeDown, // ← добавить
+    required this.onSwipeLeft, // ← добавить
+    required this.onSwipeRight, // ← добавить
   });
 
   int? _secondsFromType() {
@@ -70,7 +68,7 @@ class PlayerGrid extends StatelessWidget {
 
     final startIndex = nightActions.length - 3;
     if (startIndex + index >= 0 && startIndex + index < nightActions.length) {
-      return nightActions[startIndex + index];
+      return nightActions[startIndex + index]; // возвращаем как есть
     }
     return null;
   }
@@ -79,6 +77,7 @@ class PlayerGrid extends StatelessWidget {
   Widget _buildMafiaValue(int? value, bool isActive) {
     if (value == null) return const SizedBox(height: 28);
 
+    // Промах - если значение 0 или -1
     final isMiss = value == 0 || value == -1;
 
     return Column(
@@ -137,12 +136,54 @@ class PlayerGrid extends StatelessWidget {
     );
   }
 
+  Widget _buildBestMoveColumn() {
+    return Container(
+      width: 30,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(top: 5),
+            child: Icon(
+              Icons.emoji_events, // значок лучший ход (трофей)
+              color: Colors.grey.shade600,
+              size: 20,
+            ),
+          ),
+          if (partialBestMove.isNotEmpty) ...[
+            const SizedBox(height: 8),
+            ...partialBestMove.map((seat) {
+              return Container(
+                margin: const EdgeInsets.only(bottom: 8),
+                padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                decoration: BoxDecoration(
+                  color: Colors.orange.shade800,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Text(
+                  '$seat',
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              );
+            }).toList(),
+          ],
+        ],
+      ),
+    );
+  }
+
   // Вертикальная колонка для ночных действий
   Widget _buildNightActionsColumn() {
     final isMafiaActive = currentSubPhase == SubPhase.mafiaShoot;
     final isDonActive = currentSubPhase == SubPhase.donCheck;
     final isSheriffActive = currentSubPhase == SubPhase.sheriffCheck;
 
+    // Индекс начала текущей ночи = (currentDay - 1) * 3, но для ночи 0 это 0
     final startIndex = currentDay == 0 ? 0 : (currentDay - 1) * 3;
 
     int? mafiaValue;
@@ -155,7 +196,6 @@ class PlayerGrid extends StatelessWidget {
       donValue = nightActions[startIndex + 1];
     if (nightActions.length > startIndex + 2)
       sheriffValue = nightActions[startIndex + 2];
-
     return Container(
       width: 30,
       child: Column(
@@ -211,270 +251,8 @@ class PlayerGrid extends StatelessWidget {
     );
   }
 
-  // Колонка для кандидатов (днём) - общая для всех дневных фаз
-  Widget _buildDayColumn() {
-    // Определяем какую иконку показывать
-    IconData icon;
-    String tooltip;
-
-    switch (currentSubPhase) {
-      case SubPhase.speeches:
-        icon = Icons.mic;
-        tooltip = 'Речи';
-        break;
-      case SubPhase.voting:
-        icon = Icons.how_to_vote;
-        tooltip = 'Голосование';
-        break;
-      case SubPhase.revote:
-        icon = Icons.how_to_vote;
-        tooltip = 'Переголосование';
-        break;
-      case SubPhase.tieBreak:
-        icon = Icons.gavel;
-        tooltip = 'Перестрелка';
-        break;
-      case SubPhase.eliminationVote:
-        icon = Icons.warning;
-        tooltip = 'Голосование за подъём';
-        break;
-      case SubPhase.finalWord:
-        icon = Icons.hourglass_empty;
-        tooltip = 'Заключительная минута';
-        break;
-      case SubPhase.finalWordKill:
-        icon = Icons.speaker;
-        tooltip = 'Заключительная минута убитого';
-        break;
-      case SubPhase.bestMove:
-        icon = Icons.emoji_events;
-        tooltip = 'Лучший ход';
-        break;
-      default:
-        icon = Icons.thumb_up;
-        tooltip = 'Кандидаты';
-    }
-
-    // Для bestMove показываем partialBestMove
-    if (currentSubPhase == SubPhase.bestMove) {
-      return Container(
-        width: 30,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            Padding(
-              padding: const EdgeInsets.only(top: 5),
-              child: Tooltip(
-                message: tooltip,
-                child: Icon(icon, color: Colors.grey.shade600, size: 20),
-              ),
-            ),
-            if (partialBestMove.isNotEmpty) ...[
-              const SizedBox(height: 8),
-              ...partialBestMove.map((seat) {
-                return Container(
-                  margin: const EdgeInsets.only(bottom: 8),
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-                  decoration: BoxDecoration(
-                    color: Colors.orange.shade800,
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Text(
-                    '$seat',
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                );
-              }).toList(),
-            ],
-          ],
-        ),
-      );
-    }
-
-    // Для eliminationVote показываем tiedSeats и eliminationVotes
-    if (currentSubPhase == SubPhase.eliminationVote) {
-      return Container(
-        width: 30,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            Padding(
-              padding: const EdgeInsets.only(top: 5),
-              child: Tooltip(
-                message: tooltip,
-                child: Icon(icon, color: Colors.grey.shade600, size: 20),
-              ),
-            ),
-            if (tiedSeats.isNotEmpty) ...[
-              const SizedBox(height: 8),
-              ...tiedSeats.map((seat) {
-                return Container(
-                  margin: const EdgeInsets.only(bottom: 8),
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-                  decoration: BoxDecoration(
-                    color: Colors.orange.shade800,
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Text(
-                    '$seat',
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                );
-              }).toList(),
-            ],
-            if (eliminationVotes > 0)
-              Container(
-                margin: const EdgeInsets.only(top: 8),
-                padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-                decoration: BoxDecoration(
-                  color: Colors.red.shade800,
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Text(
-                  '$eliminationVotes',
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-              ),
-          ],
-        ),
-      );
-    }
-
-    // Для tieBreak и finalWord показываем tiedSeats или текущего спикера
-    if (currentSubPhase == SubPhase.tieBreak ||
-        currentSubPhase == SubPhase.finalWord ||
-        currentSubPhase == SubPhase.finalWordKill) {
-      final speakers = currentSubPhase == SubPhase.finalWordKill
-          ? [currentSpeaker].whereType<int>().toList()
-          : (tiedSeats.isNotEmpty
-              ? tiedSeats
-              : [currentSpeaker].whereType<int>().toList());
-
-      return Container(
-        width: 30,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            Padding(
-              padding: const EdgeInsets.only(top: 5),
-              child: Tooltip(
-                message: tooltip,
-                child: Icon(icon, color: Colors.grey.shade600, size: 20),
-              ),
-            ),
-            if (speakers.isNotEmpty) ...[
-              const SizedBox(height: 8),
-              ...speakers.map((seat) {
-                final isCurrent = currentSpeaker == seat;
-                return Container(
-                  margin: const EdgeInsets.only(bottom: 8),
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-                  decoration: BoxDecoration(
-                    color: isCurrent
-                        ? Colors.green.shade800
-                        : Colors.orange.shade800,
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Text(
-                    '$seat',
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                );
-              }).toList(),
-            ],
-          ],
-        ),
-      );
-    }
-
-    // Для voting и revote показываем nominatedSeats + голоса
-    if (currentSubPhase == SubPhase.voting ||
-        currentSubPhase == SubPhase.revote) {
-      final candidates =
-          currentSubPhase == SubPhase.revote && tiedSeats.isNotEmpty
-              ? tiedSeats
-              : nominatedSeats;
-
-      return Container(
-        width: 30,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            Padding(
-              padding: const EdgeInsets.only(top: 5),
-              child: Tooltip(
-                message: tooltip,
-                child: Icon(icon, color: Colors.grey.shade600, size: 20),
-              ),
-            ),
-            if (candidates.isNotEmpty) ...[
-              const SizedBox(height: 8),
-              ...candidates.map((seat) {
-                final isCurrent = voteController?.currentSeat == seat;
-                final voteCount = voteController?.results[seat];
-                return Container(
-                  margin: const EdgeInsets.only(bottom: 8),
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-                  decoration: BoxDecoration(
-                    color: isCurrent
-                        ? Colors.green.shade800
-                        : Colors.orange.shade800,
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Column(
-                    children: [
-                      Text(
-                        '$seat',
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                      if (voteCount != null && voteCount > 0)
-                        Text(
-                          '$voteCount',
-                          style: const TextStyle(
-                            color: Colors.white70,
-                            fontSize: 10,
-                          ),
-                        ),
-                    ],
-                  ),
-                );
-              }).toList(),
-            ],
-          ],
-        ),
-      );
-    }
-
-    // Стандартная колонка с кандидатами (speeches, и другие)
+  // Колонка для кандидатов (днём)
+  Widget _buildCandidatesColumn() {
     return Container(
       width: 30,
       child: Column(
@@ -482,10 +260,7 @@ class PlayerGrid extends StatelessWidget {
         children: [
           Padding(
             padding: const EdgeInsets.only(top: 5),
-            child: Tooltip(
-              message: tooltip,
-              child: Icon(icon, color: Colors.grey.shade600, size: 20),
-            ),
+            child: Icon(Icons.thumb_up, color: Colors.grey.shade600, size: 20),
           ),
           if (nominatedSeats.isNotEmpty) ...[
             const SizedBox(height: 8),
@@ -532,11 +307,18 @@ class PlayerGrid extends StatelessWidget {
         currentSubPhase == SubPhase.donCheck ||
         currentSubPhase == SubPhase.sheriffCheck;
 
+    final isBestMove = currentSubPhase == SubPhase.bestMove;
+
     return Row(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Expanded(child: _buildColumn(leftColumn, true, timerSeconds)),
-        isNight ? _buildNightActionsColumn() : _buildDayColumn(),
+        if (isBestMove)
+          _buildBestMoveColumn()
+        else if (isNight)
+          _buildNightActionsColumn()
+        else
+          _buildCandidatesColumn(),
         Expanded(child: _buildColumn(rightColumn, false, timerSeconds)),
       ],
     );
@@ -565,8 +347,6 @@ class PlayerGrid extends StatelessWidget {
             currentSubPhase == SubPhase.tieBreak &&
                 currentSpeaker == player.seatNumber ||
             currentSubPhase == SubPhase.finalWordKill &&
-                currentSpeaker == player.seatNumber ||
-            currentSubPhase == SubPhase.finalWord &&
                 currentSpeaker == player.seatNumber;
         final isSelectedForBestMove = currentSubPhase == SubPhase.bestMove &&
             partialBestMove.contains(player.seatNumber);

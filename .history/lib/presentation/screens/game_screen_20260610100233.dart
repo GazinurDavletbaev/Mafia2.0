@@ -4,8 +4,8 @@ import 'package:pie_menu/pie_menu.dart';
 import '../../core/logger/app_logger.dart';
 import '../state/game_state.dart';
 import '../viewmodel/game_viewmodel.dart';
-import '../widgets/phase_header.dart';
 import '../widgets/player_grid.dart';
+import '../widgets/phase_header.dart';
 import '../widgets/settings_menu.dart';
 import '../widgets/pie_menu_dialog.dart';
 import '../widgets/role_card.dart';
@@ -225,16 +225,18 @@ class _GameScreenState extends ConsumerState<GameScreen> {
                       currentSubPhase: gameState.currentSubPhase,
                       isVotingActive: gameState.isVotingActive,
                       voteController: gameState.voteController,
-                      partialBestMove: gameState.partialBestMove,
+                      partialBestMove: gameState.partialBestMove, // ← добавить
                       tiedSeats: gameState.tiedSeats,
                       nominatedSeats: gameState.nominatedSeats,
-                      nightActions: gameState.nightActions ?? [],
+                      nightActions: gameState.nightActions ?? [], // ← добавить
                       currentDay: gameState.currentDay,
-                      eliminationVotes: gameState.eliminationVotes,
-                      onSwipeUp: _vm.onSwipeUp,
-                      onSwipeDown: _vm.onSwipeDown,
-                      onSwipeLeft: _vm.onSwipeLeft,
-                      onSwipeRight: _vm.onSwipeRight,
+                      eliminationVotes:
+                          gameState.eliminationVotes, // ← ДОБАВИТЬ ЭТУ СТРОКУ
+
+                      onSwipeUp: _vm.onSwipeUp, // ← исправить
+                      onSwipeDown: _vm.onSwipeDown, // ← исправить
+                      onSwipeLeft: _vm.onSwipeLeft, // ← исправить
+                      onSwipeRight: _vm.onSwipeRight, //
                     ),
                   ),
                   const SizedBox(height: 20),

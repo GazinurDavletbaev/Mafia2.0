@@ -433,6 +433,8 @@ class PlayerGrid extends StatelessWidget {
             if (candidates.isNotEmpty) ...[
               const SizedBox(height: 8),
               ...candidates.map((seat) {
+                if (seat == 5) return const SizedBox.shrink();
+
                 final isCurrent = voteController?.currentSeat == seat;
                 final voteCount = voteController?.results[seat];
                 return Container(

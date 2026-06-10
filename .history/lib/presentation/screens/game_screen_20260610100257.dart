@@ -4,8 +4,8 @@ import 'package:pie_menu/pie_menu.dart';
 import '../../core/logger/app_logger.dart';
 import '../state/game_state.dart';
 import '../viewmodel/game_viewmodel.dart';
-import '../widgets/phase_header.dart';
 import '../widgets/player_grid.dart';
+import '../widgets/phase_header.dart';
 import '../widgets/settings_menu.dart';
 import '../widgets/pie_menu_dialog.dart';
 import '../widgets/role_card.dart';
@@ -230,7 +230,8 @@ class _GameScreenState extends ConsumerState<GameScreen> {
                       nominatedSeats: gameState.nominatedSeats,
                       nightActions: gameState.nightActions ?? [],
                       currentDay: gameState.currentDay,
-                      eliminationVotes: gameState.eliminationVotes,
+                      eliminationVotes:
+                          gameState.eliminationVotes, // ← ДОБАВИТЬ ЭТУ СТРОКУ
                       onSwipeUp: _vm.onSwipeUp,
                       onSwipeDown: _vm.onSwipeDown,
                       onSwipeLeft: _vm.onSwipeLeft,

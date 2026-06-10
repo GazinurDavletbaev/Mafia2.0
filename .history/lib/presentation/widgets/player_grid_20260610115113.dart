@@ -413,65 +413,7 @@ class PlayerGrid extends StatelessWidget {
     // Для voting и revote показываем nominatedSeats + голоса
     if (currentSubPhase == SubPhase.voting ||
         currentSubPhase == SubPhase.revote) {
-      final candidates =
-          currentSubPhase == SubPhase.revote && tiedSeats.isNotEmpty
-              ? tiedSeats
-              : nominatedSeats;
-
-      return Container(
-        width: 30,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            Padding(
-              padding: const EdgeInsets.only(top: 5),
-              child: Tooltip(
-                message: tooltip,
-                child: Icon(icon, color: Colors.grey.shade600, size: 20),
-              ),
-            ),
-            if (candidates.isNotEmpty) ...[
-              const SizedBox(height: 8),
-              ...candidates.map((seat) {
-                final isCurrent = voteController?.currentSeat == seat;
-                final voteCount = voteController?.results[seat];
-                return Container(
-                  margin: const EdgeInsets.only(bottom: 8),
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-                  decoration: BoxDecoration(
-                    color: isCurrent
-                        ? Colors.green.shade800
-                        : Colors.orange.shade800,
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Column(
-                    children: [
-                      Text(
-                        '$seat',
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                      if (voteCount != null && voteCount > 0)
-                        Text(
-                          '$voteCount',
-                          style: const TextStyle(
-                            color: Colors.white70,
-                            fontSize: 10,
-                          ),
-                        ),
-                    ],
-                  ),
-                );
-              }).toList(),
-            ],
-          ],
-        ),
-      );
+      return const SizedBox(width: 30);
     }
 
     // Стандартная колонка с кандидатами (speeches, и другие)

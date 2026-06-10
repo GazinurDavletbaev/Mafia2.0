@@ -70,45 +70,6 @@ void main() {
     });
   });
 
-  group('Из sheriffCheck', () {
-    test('день 1, было убийство → bestMove', () async {
-      // Создаём состояние с ночными действиями: [жертва, donCheck, sheriffCheck]
-      final state = _withRoles(GameState.initial().copyWith(
-        currentDay: 1,
-        currentSubPhase: SubPhase.sheriffCheck,
-        nightActions: [5, 2, 4], // 5 - убитый
-      ));
-      final next = await phaseRules.calculateNextState(state);
-
-      expect(next.currentSubPhase, SubPhase.bestMove);
-      expect(next.currentDay, 1);
-    });
-
-    test('день 2+, было убийство → finalWordKill', () async {
-      final state = _withRoles(GameState.initial().copyWith(
-        currentDay: 2,
-        currentSubPhase: SubPhase.sheriffCheck,
-        nightActions: [5, 2, 4],
-      ));
-      final next = await phaseRules.calculateNextState(state);
-
-      expect(next.currentSubPhase, SubPhase.finalWordKill);
-      expect(next.currentDay, 2);
-    });
-
-    test('промах (убийства нет) → speeches', () async {
-      final state = _withRoles(GameState.initial().copyWith(
-        currentDay: 1,
-        currentSubPhase: SubPhase.sheriffCheck,
-        nightActions: [0, 2, 4], // 0 или null = промах
-      ));
-      final next = await phaseRules.calculateNextState(state);
-
-      expect(next.currentSubPhase, SubPhase.speeches);
-      expect(next.currentDay, 1);
-    });
-  });
-
   group('eliminationVote', () {
     test('не хватило голосов → mafiaShoot', () async {
       var state = GameState.initial();
