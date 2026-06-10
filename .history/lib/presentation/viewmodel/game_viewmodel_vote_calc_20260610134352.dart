@@ -97,14 +97,6 @@ class VoteCalculatorActions {
 
     AppLogger.d('_finalizeVoting: result=${result.type}');
 
-    // Сначала показываем последний введённый голос (обновляем состояние с голосами)
-    // Сохраняем результаты голосования, но пока не переходим
-    final stateWithVotes = _vm.state.copyWith(
-      voteController: _vm.state.voteController,
-      isVotingActive: false,
-    );
-    _vm.updateState(stateWithVotes);
-
     // Задержка 2 секунды перед переходом
     Future.delayed(const Duration(seconds: 2), () {
       GameState newState;

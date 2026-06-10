@@ -41,8 +41,14 @@ class VoteCalculatorActions {
     controller.setVotes(votes);
 
     if (controller.isComplete) {
-      AppLogger.d('submitVote: all votes collected, finalizing');
-      _finalizeVoting(controller.results);
+      AppLogger.d(
+          'submitVote: all votes collected, waiting for manual forward');
+      // Просто сохраняем состояние с заполненными голосами, но не завершаем
+      _vm.updateState(_vm.state.copyWith(
+        voteController: controller,
+        isVotingActive: false,
+      ));
+      return;
     } else {
       controller.nextCandidate();
       final newState = _vm.state.copyWith(voteController: controller);
@@ -85,84 +91,70 @@ class VoteCalculatorActions {
     AppLogger.d('_finalizeVoting: votes=$votes');
     final aliveCount = _vm.state.players.where((p) => p.isAlive).length;
     final isRevote = _vm.state.currentSubPhase == SubPhase.revote;
-    final previousTiedCount = _vm.state.tiedSeats.length;
+    final previousTiedCount = _vm.state.tiedSeats.length; // ← добавить
     print(previousTiedCount);
 
     final result = VoteController.determineResult(
       votes,
       aliveCount,
       isRevote: isRevote,
-      previousTiedCount: previousTiedCount,
+      previousTiedCount: previousTiedCount, // ← добавить
     );
 
     AppLogger.d('_finalizeVoting: result=${result.type}');
 
-    // Сначала показываем последний введённый голос (обновляем состояние с голосами)
-    // Сохраняем результаты голосования, но пока не переходим
-    final stateWithVotes = _vm.state.copyWith(
-      voteController: _vm.state.voteController,
-      isVotingActive: false,
+    GameState newState;
+
+    switch (result.type) {
+      case VoteResultType.winner:
+        newState = _vm.state.copyWith(
+          currentSubPhase: SubPhase.finalWord,
+          currentSpeakerSeat: result.winnerSeat,
+          tiedSeats: [], // ← ОЧИСТИТЬ tiedSeats!
+          voteController: null,
+          isVotingActive: false,
+        );
+        break;
+
+      case VoteResultType.tieBreak:
+        // Всегда перестрелка (determineResult уже решил, что нужно именно это)
+        newState = _vm.state.copyWith(
+          currentSubPhase: SubPhase.tieBreak,
+          tiedSeats: result.seats,
+          currentTieIndex: 0,
+          currentSpeakerSeat: result.seats.isNotEmpty ? result.seats[0] : null,
+          voteController: null,
+          isVotingActive: false,
+        );
+        break;
+      case VoteResultType.eliminationVote:
+        newState = _vm.state.copyWith(
+          currentSubPhase: SubPhase.eliminationVote, // ← а не revote
+          tiedSeats: result.seats,
+          voteController: null,
+          isVotingActive: false,
+        );
+        break;
+      case VoteResultType.noCandidates:
+        final nextDay = _vm.state.currentDay + 1;
+        newState = _vm.state.copyWith(
+          currentPhase: Phase.night,
+          currentSubPhase: SubPhase.mafiaShoot,
+          currentDay: nextDay,
+          voteController: null,
+          isVotingActive: false,
+          nominatedSeats: [],
+          votes: {},
+        );
+        break;
+      default:
+        newState = _vm.state.copyWith();
+        break;
+    }
+    print(
+      'tieBreak: seats=${result.seats}, currentSubPhase=${newState.currentSubPhase}',
     );
-    _vm.updateState(stateWithVotes);
-
-    // Задержка 2 секунды перед переходом
-    Future.delayed(const Duration(seconds: 2), () {
-      GameState newState;
-
-      switch (result.type) {
-        case VoteResultType.winner:
-          newState = _vm.state.copyWith(
-            currentSubPhase: SubPhase.finalWord,
-            currentSpeakerSeat: result.winnerSeat,
-            tiedSeats: [],
-            voteController: null,
-            isVotingActive: false,
-          );
-          break;
-
-        case VoteResultType.tieBreak:
-          newState = _vm.state.copyWith(
-            currentSubPhase: SubPhase.tieBreak,
-            tiedSeats: result.seats,
-            currentTieIndex: 0,
-            currentSpeakerSeat:
-                result.seats.isNotEmpty ? result.seats[0] : null,
-            voteController: null,
-            isVotingActive: false,
-          );
-          break;
-
-        case VoteResultType.eliminationVote:
-          newState = _vm.state.copyWith(
-            currentSubPhase: SubPhase.eliminationVote,
-            tiedSeats: result.seats,
-            voteController: null,
-            isVotingActive: false,
-          );
-          break;
-
-        case VoteResultType.noCandidates:
-          final nextDay = _vm.state.currentDay + 1;
-          newState = _vm.state.copyWith(
-            currentPhase: Phase.night,
-            currentSubPhase: SubPhase.mafiaShoot,
-            currentDay: nextDay,
-            voteController: null,
-            isVotingActive: false,
-            nominatedSeats: [],
-            votes: {},
-          );
-          break;
-
-        default:
-          newState = _vm.state.copyWith();
-          break;
-      }
-
-      print(
-          'tieBreak: seats=${result.seats}, currentSubPhase=${newState.currentSubPhase}');
-      _vm.updateState(newState);
-    });
+    _vm.updateState(newState);
   }
 
   void hideVoteCalculator() {

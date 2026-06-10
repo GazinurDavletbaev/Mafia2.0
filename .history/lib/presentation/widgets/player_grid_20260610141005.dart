@@ -448,9 +448,9 @@ class PlayerGrid extends StatelessWidget {
                 Color backgroundColor;
                 if (isLeader) {
                   backgroundColor = Colors.blue.shade700; // синий для лидеров
-                } else if (isCurrent && isVotingActive) {
-                  backgroundColor = Colors.green
-                      .shade800; // изумрудный только во время активного голосования
+                } else if (isCurrent) {
+                  backgroundColor =
+                      Colors.green.shade800; // изумрудный для текущего
                 } else {
                   backgroundColor =
                       Colors.orange.shade800; // оранжевый для обычных
