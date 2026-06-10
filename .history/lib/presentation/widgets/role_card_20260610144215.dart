@@ -2,14 +2,9 @@ import 'package:flutter/material.dart';
 
 class RoleCard extends StatelessWidget {
   final String role;
-  final int seatNumber;
   final VoidCallback onClose;
 
-  const RoleCard(
-      {super.key,
-      required this.role,
-      required this.seatNumber,
-      required this.onClose});
+  const RoleCard({super.key, required this.role, required this.onClose});
 
   @override
   Widget build(BuildContext context) {
@@ -30,33 +25,11 @@ class RoleCard extends StatelessWidget {
         ),
         child: Stack(
           children: [
-            // Номер игрока сверху по центру
-            Positioned(
-              top: 24,
-              left: 0,
-              right: 0,
-              child: Container(
-                width: 50,
-                height: 50,
-                decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.2),
-                  shape: BoxShape.circle,
-                  border: Border.all(color: Colors.white, width: 2),
-                ),
-                child: Center(
-                  child: Text(
-                    '$seatNumber',
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 22,
-                      fontWeight: FontWeight.bold,
-                      decoration: TextDecoration.none,
-                    ),
-                  ),
-                ),
-              ),
+            // Центральная иконка
+            Center(
+              child: _buildIcon(),
             ),
-            // Кнопка закрытия в правом верхнем углу
+            // Кнопка закрытия
             Positioned(
               top: 16,
               right: 16,
@@ -64,10 +37,6 @@ class RoleCard extends StatelessWidget {
                 icon: const Icon(Icons.close, color: Colors.white, size: 30),
                 onPressed: onClose,
               ),
-            ),
-            // Центральная иконка
-            Center(
-              child: _buildIcon(),
             ),
             // Тап по любой области для закрытия
             Positioned.fill(
@@ -84,21 +53,6 @@ class RoleCard extends StatelessWidget {
         ),
       ),
     );
-  }
-
-  String _getRoleName() {
-    switch (role) {
-      case 'citizen':
-        return 'Мирный';
-      case 'sheriff':
-        return 'Шериф';
-      case 'mafia':
-        return 'Мафия';
-      case 'don':
-        return 'Дон';
-      default:
-        return role;
-    }
   }
 
   Color _getBackgroundColor() {
@@ -126,14 +80,14 @@ class RoleCard extends StatelessWidget {
         );
       case 'don':
         return const Icon(
-          Icons.emoji_events,
+          Icons.emoji_events, // пока нет шляпы
           color: Colors.white,
           size: 80,
         );
       case 'citizen':
       case 'mafia':
       default:
-        return null;
+        return null; // без иконки, только цвет
     }
   }
 }

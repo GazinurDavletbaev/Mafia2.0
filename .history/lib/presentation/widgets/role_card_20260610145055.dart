@@ -69,6 +69,22 @@ class RoleCard extends StatelessWidget {
             Center(
               child: _buildIcon(),
             ),
+            // Название роли снизу по центру
+            Positioned(
+              bottom: 40,
+              left: 0,
+              right: 0,
+              child: Text(
+                _getRoleName().toUpperCase(),
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 2,
+                ),
+              ),
+            ),
             // Тап по любой области для закрытия
             Positioned.fill(
               child: GestureDetector(

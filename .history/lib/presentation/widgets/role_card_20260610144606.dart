@@ -30,29 +30,16 @@ class RoleCard extends StatelessWidget {
         ),
         child: Stack(
           children: [
-            // Номер игрока сверху по центру
+            // Номер игрока в левом верхнем углу
             Positioned(
-              top: 24,
-              left: 0,
-              right: 0,
-              child: Container(
-                width: 50,
-                height: 50,
-                decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.2),
-                  shape: BoxShape.circle,
-                  border: Border.all(color: Colors.white, width: 2),
-                ),
-                child: Center(
-                  child: Text(
-                    '$seatNumber',
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 22,
-                      fontWeight: FontWeight.bold,
-                      decoration: TextDecoration.none,
-                    ),
-                  ),
+              top: 16,
+              left: 16,
+              child: Text(
+                '$seatNumber',
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 50,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
             ),
@@ -84,21 +71,6 @@ class RoleCard extends StatelessWidget {
         ),
       ),
     );
-  }
-
-  String _getRoleName() {
-    switch (role) {
-      case 'citizen':
-        return 'Мирный';
-      case 'sheriff':
-        return 'Шериф';
-      case 'mafia':
-        return 'Мафия';
-      case 'don':
-        return 'Дон';
-      default:
-        return role;
-    }
   }
 
   Color _getBackgroundColor() {
