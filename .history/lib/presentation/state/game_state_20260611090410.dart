@@ -103,7 +103,7 @@ class GameState {
     List<SubPhase>? phaseHistory,
     List<int>? speechHistory,
     List<Map<int, int>>? voteHistory,
-    bool isBestMove = true, // ← добавить
+    bool? isBestMove, // ← добавить
   }) {
     return GameState(
       game: game ?? this.game,

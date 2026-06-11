@@ -118,17 +118,25 @@ class PhaseRules {
         final killedCount = nightActions
             .where((action) => action != null && action != 0 && action != -1)
             .length;
-        print('=== BESTMOVE CHECK ===');
-        print('currentDay = $currentDay');
-        print('isBestMove = ${currentState.isBestMove}');
+
         if (isMiss) {
           nextPhase = SubPhase.speeches;
         } else {
-          if (currentDay == 1 && currentState.isBestMove) {
+          print('=== BESTMOVE CHECK ===');
+          print('currentDay = $currentDay');
+          print('killedCount = $killedCount');
+          print('isBestMove = ${currentState.isBestMove}');
+
+          // В день 1: если убито 2+ игроков — сразу finalWordKill, иначе bestMove
+          if (currentDay == 1 && killedCount >= 2) {
+            print("no bestMove because killedCount=$killedCount");
+            nextPhase = SubPhase.finalWordKill;
+          } else if (currentDay == 1 && !currentState.isBestMove) {
+            print("no bestMove because isBestMove=false");
+            nextPhase = SubPhase.finalWordKill;
+          } else if (currentDay == 1) {
             print("besss");
             nextPhase = SubPhase.bestMove;
-          } else if (currentDay == 1) {
-            nextPhase = SubPhase.finalWordKill;
           } else {
             nextPhase = SubPhase.finalWordKill;
           }
@@ -204,7 +212,6 @@ class PhaseRules {
           : currentState.speechHistory,
       nominatedSeats: shouldClear ? [] : currentState.nominatedSeats,
       votes: shouldClear ? {} : currentState.votes,
-      isBestMove: currentState.isBestMove, // явно передаём
     );
   }
 

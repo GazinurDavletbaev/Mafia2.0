@@ -149,14 +149,9 @@ class VoteCalculatorActions {
           break;
 
         case VoteResultType.eliminationVote:
-          print('=== ELIMINATION VOTE ===');
-          print('aliveCount before = $aliveCount');
-          print('result.seats = ${result.seats}');
-          print('result.seats.length = ${result.seats.length}');
+          // Уходит N игроков, вычисляем isBestMove
           final aliveAfter = aliveCount - result.seats.length;
-          print('aliveAfter = $aliveAfter');
           final canHaveBestMove = aliveAfter >= 9;
-          print('canHaveBestMove = $canHaveBestMove');
 
           newState = _vm.state.copyWith(
             currentSubPhase: SubPhase.eliminationVote,

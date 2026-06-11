@@ -118,9 +118,7 @@ class PhaseRules {
         final killedCount = nightActions
             .where((action) => action != null && action != 0 && action != -1)
             .length;
-        print('=== BESTMOVE CHECK ===');
-        print('currentDay = $currentDay');
-        print('isBestMove = ${currentState.isBestMove}');
+
         if (isMiss) {
           nextPhase = SubPhase.speeches;
         } else {
@@ -204,7 +202,6 @@ class PhaseRules {
           : currentState.speechHistory,
       nominatedSeats: shouldClear ? [] : currentState.nominatedSeats,
       votes: shouldClear ? {} : currentState.votes,
-      isBestMove: currentState.isBestMove, // явно передаём
     );
   }
 

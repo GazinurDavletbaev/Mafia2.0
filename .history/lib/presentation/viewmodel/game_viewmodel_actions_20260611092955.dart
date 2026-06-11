@@ -31,7 +31,7 @@ class PlayerActions {
 
     GameState newState = _vm.state.copyWith(
       players: newPlayers,
-      // НЕ МЕНЯЕМ isBestMove
+      isBestMove: hasDied ? true : _vm.state.isBestMove,
     );
 
     if (winner != null) {
@@ -101,7 +101,8 @@ class PlayerActions {
 
     GameState newState = _vm.state.copyWith(
       players: newPlayers,
-      // НЕ МЕНЯЕМ isBestMove
+      isBestMove:
+          true, // ← судья удалил игрока (свайп вправо или долгое нажатие)
     );
 
     if (winner != null) {
@@ -122,10 +123,7 @@ class PlayerActions {
     final usecase = _ref.read(revivePlayerUsecaseProvider);
     final newPlayers = usecase.execute(_vm.state.players, seatNumber);
 
-    _vm.state = _vm.state.copyWith(
-      players: newPlayers,
-      // НЕ МЕНЯЕМ isBestMove
-    );
+    _vm.state = _vm.state.copyWith(players: newPlayers);
   }
 
   Future<void> _nominatePlayer(int seatNumber) async {

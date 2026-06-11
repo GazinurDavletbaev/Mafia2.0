@@ -49,33 +49,11 @@ class PhaseRules {
         final isDay0 = currentDay == 0;
         print("hi1");
         if (candidates.isEmpty) {
-          final aliveCount =
-              currentState.players.where((p) => p.isAlive).length;
           nextPhase = SubPhase.mafiaShoot;
           AppLogger.d('No candidates -> mafiaShoot');
-
-          return currentState.copyWith(
-            currentSubPhase: SubPhase.mafiaShoot,
-            currentDay: currentDay + 1,
-            currentPhase: Phase.night,
-            nominatedSeats: [],
-            votes: {},
-            isBestMove: aliveCount >= 9,
-          );
         } else if (candidates.length == 1 && isDay0) {
-          final aliveCount =
-              currentState.players.where((p) => p.isAlive).length;
           nextPhase = SubPhase.mafiaShoot;
           AppLogger.d('Day0, 1 candidate -> mafiaShoot');
-
-          return currentState.copyWith(
-            currentSubPhase: SubPhase.mafiaShoot,
-            currentDay: currentDay + 1,
-            currentPhase: Phase.night,
-            nominatedSeats: [],
-            votes: {},
-            isBestMove: aliveCount >= 9,
-          );
         } else if (candidates.length == 1 && !isDay0) {
           nextPhase = SubPhase.finalWord;
           AppLogger.d('Day1+, 1 candidate -> finalWord');
@@ -118,17 +96,17 @@ class PhaseRules {
         final killedCount = nightActions
             .where((action) => action != null && action != 0 && action != -1)
             .length;
-        print('=== BESTMOVE CHECK ===');
-        print('currentDay = $currentDay');
-        print('isBestMove = ${currentState.isBestMove}');
+
         if (isMiss) {
           nextPhase = SubPhase.speeches;
         } else {
-          if (currentDay == 1 && currentState.isBestMove) {
+          // В день 1: если убито 2+ игроков — сразу finalWordKill, иначе bestMove
+          if (currentDay == 1 && killedCount >= 2) {
+            print("no bestMove because killedCount=$killedCount");
+            nextPhase = SubPhase.finalWordKill;
+          } else if (currentDay == 1) {
             print("besss");
             nextPhase = SubPhase.bestMove;
-          } else if (currentDay == 1) {
-            nextPhase = SubPhase.finalWordKill;
           } else {
             nextPhase = SubPhase.finalWordKill;
           }
@@ -204,7 +182,6 @@ class PhaseRules {
           : currentState.speechHistory,
       nominatedSeats: shouldClear ? [] : currentState.nominatedSeats,
       votes: shouldClear ? {} : currentState.votes,
-      isBestMove: currentState.isBestMove, // явно передаём
     );
   }
 

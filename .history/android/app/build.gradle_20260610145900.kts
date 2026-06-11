@@ -31,7 +31,7 @@ android {
         applicationId = "com.example.mafia_help"
         minSdk = flutter.minSdkVersion
         targetSdk = 36
-        versionCode = 2
+        versionCode = 1
         versionName = "1.6.10"
     }
 

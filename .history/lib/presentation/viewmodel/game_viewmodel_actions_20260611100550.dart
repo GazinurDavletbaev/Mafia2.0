@@ -29,9 +29,13 @@ class PlayerActions {
     final newPlayer = newPlayers.firstWhere((p) => p.seatNumber == seatNumber);
     final hasDied = oldPlayer.isAlive && !newPlayer.isAlive;
 
+    // Пересчитываем isBestMove
+    final aliveCount = newPlayers.where((p) => p.isAlive).length;
+    final newIsBestMove = aliveCount >= 9;
+
     GameState newState = _vm.state.copyWith(
       players: newPlayers,
-      // НЕ МЕНЯЕМ isBestMove
+      isBestMove: newIsBestMove,
     );
 
     if (winner != null) {
@@ -99,9 +103,13 @@ class PlayerActions {
     }
     print('winner = $winner');
 
+    // Пересчитываем isBestMove
+    final aliveCount = newPlayers.where((p) => p.isAlive).length;
+    final newIsBestMove = aliveCount >= 9;
+
     GameState newState = _vm.state.copyWith(
       players: newPlayers,
-      // НЕ МЕНЯЕМ isBestMove
+      isBestMove: newIsBestMove,
     );
 
     if (winner != null) {
@@ -122,9 +130,13 @@ class PlayerActions {
     final usecase = _ref.read(revivePlayerUsecaseProvider);
     final newPlayers = usecase.execute(_vm.state.players, seatNumber);
 
+    // Пересчитываем isBestMove
+    final aliveCount = newPlayers.where((p) => p.isAlive).length;
+    final newIsBestMove = aliveCount >= 9;
+
     _vm.state = _vm.state.copyWith(
       players: newPlayers,
-      // НЕ МЕНЯЕМ isBestMove
+      isBestMove: newIsBestMove,
     );
   }
 

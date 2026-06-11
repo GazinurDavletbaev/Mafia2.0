@@ -204,7 +204,6 @@ class PhaseRules {
           : currentState.speechHistory,
       nominatedSeats: shouldClear ? [] : currentState.nominatedSeats,
       votes: shouldClear ? {} : currentState.votes,
-      isBestMove: currentState.isBestMove, // явно передаём
     );
   }
 
