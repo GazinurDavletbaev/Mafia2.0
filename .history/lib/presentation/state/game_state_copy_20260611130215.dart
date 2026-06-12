@@ -1,82 +1,13 @@
-// lib/presentation/state/game_state.dart
+// lib/presentation/state/game_state_copywith.dart
 
 import 'package:mafia_help/data/local/models/phase.dart';
 import 'package:mafia_help/data/local/models/player_model.dart';
 import '../../data/local/models/game.dart';
 import '../../data/local/models/sub_phase.dart';
 import '../../domain/helpers/vote_controller.dart';
-import 'game_state_initializer.dart';
-import 'game_state_serialization.dart';
+import 'game_state.dart';
 
-class GameState {
-  final Game? game;
-  final List<PlayerModel> players;
-  final Phase currentPhase;
-  final SubPhase currentSubPhase;
-  final int currentSubPhaseIndex;
-  final int currentDay;
-  final int? currentSpeakerSeat;
-  final List<int> nominatedSeats;
-  final Map<int, int> votes;
-  final List<int> partialBestMove;
-  final bool isGameEnded;
-  final String? winner;
-  final int currentRound;
-  final int? showingRoleForSeat;
-  final bool hasKillInLastNight;
-  final int eliminationVotes;
-  final List<int> tiedSeats;
-  final int currentTieIndex;
-  final int? dayStarterSeat;
-  final VoteController? voteController;
-  final bool isVotingActive;
-  final bool isBestMove;
-
-  // Ночные действия: [kill, donCheck, sheriffCheck, kill, donCheck, sheriffCheck, ...]
-  final List<int>? nightActions;
-
-  // История вместо стеков
-  final List<SubPhase> phaseHistory;
-  final List<int> speechHistory;
-  final List<Map<int, int>> voteHistory;
-
-  const GameState({
-    required this.game,
-    required this.players,
-    required this.currentPhase,
-    required this.currentSubPhase,
-    required this.currentSubPhaseIndex,
-    required this.currentDay,
-    this.currentSpeakerSeat,
-    required this.nominatedSeats,
-    required this.votes,
-    required this.partialBestMove,
-    required this.isGameEnded,
-    this.winner,
-    required this.currentRound,
-    this.showingRoleForSeat,
-    this.hasKillInLastNight = false,
-    this.eliminationVotes = 0,
-    this.tiedSeats = const [],
-    this.currentTieIndex = 0,
-    this.dayStarterSeat,
-    this.voteController,
-    this.isVotingActive = false,
-    this.nightActions = const [],
-    required this.phaseHistory,
-    required this.speechHistory,
-    required this.voteHistory,
-    required this.isBestMove,
-  });
-
-  factory GameState.initial() {
-    return GameStateInitializer.initial();
-  }
-
-  static GameState fromJson(Map<String, dynamic> json) {
-    return GameStateSerialization.fromJson(json);
-  }
-
+extension GameStateCopyWith on GameState {
   GameState copyWith({
     Game? game,
     List<PlayerModel>? players,
@@ -103,8 +34,16 @@ class GameState {
     List<SubPhase>? phaseHistory,
     List<int>? speechHistory,
     List<Map<int, int>>? voteHistory,
-    bool? isBestMove, // ← добавить
+    bool? isBestMove,
   }) {
+    print('=== COPYWITH ===');
+    print('this.isBestMove (old) = ${this.isBestMove}');
+    print('incoming isBestMove = $isBestMove');
+
+    final newIsBestMove =
+        (this.isBestMove == false) ? false : (isBestMove ?? this.isBestMove);
+
+    print('newIsBestMove = $newIsBestMove');
     return GameState(
       game: game ?? this.game,
       players: players ?? this.players,
@@ -131,15 +70,7 @@ class GameState {
       phaseHistory: phaseHistory ?? this.phaseHistory,
       speechHistory: speechHistory ?? this.speechHistory,
       voteHistory: voteHistory ?? this.voteHistory,
-      isBestMove: isBestMove ?? this.isBestMove,
+      isBestMove: newIsBestMove,
     );
-  }
-
-  PlayerModel? getPlayerBySeat(int seatNumber) {
-    try {
-      return players.firstWhere((p) => p.seatNumber == seatNumber);
-    } catch (e) {
-      return null;
-    }
   }
 }

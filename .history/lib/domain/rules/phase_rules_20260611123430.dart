@@ -17,10 +17,7 @@ class PhaseRules {
 
   Future<GameState> calculateNextState(GameState currentState) async {
     AppLogger.d('calculateNextState called');
-    print('=== CALCULATE NEXT STATE ===');
-    print('currentSubPhase = ${currentState.currentSubPhase}');
-    print('currentDay = ${currentState.currentDay}');
-    print('isBestMove = ${currentState.isBestMove}');
+
     final currentPhase = currentState.currentSubPhase;
     final currentDay = currentState.currentDay;
 
@@ -41,29 +38,28 @@ class PhaseRules {
       if (currentPhase == SubPhase.eliminationVote) {
         final totalAlive = currentState.players.where((p) => p.isAlive).length;
         final majority = (totalAlive ~/ 2) + 1;
-        print('=== PHASE RULES ELIMINATION VOTE ===');
-        print('eliminationVotes = ${currentState.eliminationVotes}');
-        print('majority = $majority');
-        print('isBestMove before = ${currentState.isBestMove}');
 
         if (currentState.eliminationVotes >= majority) {
-          print('Переход в finalWord, isBestMove = ${currentState.isBestMove}');
+          nextPhase = SubPhase.finalWord;
           return currentState.copyWith(
             currentSubPhase: SubPhase.finalWord,
+            isBestMove: currentState.isBestMove,
           );
         } else {
-          print('Переход в ночь, isBestMove = ${currentState.isBestMove}');
+          nextPhase = SubPhase.mafiaShoot;
           return currentState.copyWith(
             currentSubPhase: SubPhase.mafiaShoot,
             currentDay: currentState.currentDay + 1,
             currentPhase: Phase.night,
             nominatedSeats: [],
             votes: {},
+            isBestMove: currentState.isBestMove,
           );
         }
       } else if (currentPhase == _dayOrder.last) {
         final candidates = currentState.nominatedSeats;
         final isDay0 = currentDay == 0;
+        print("hi1");
         if (candidates.isEmpty) {
           final aliveCount =
               currentState.players.where((p) => p.isAlive).length;
@@ -76,6 +72,7 @@ class PhaseRules {
             currentPhase: Phase.night,
             nominatedSeats: [],
             votes: {},
+            isBestMove: aliveCount >= 9,
           );
         } else if (candidates.length == 1 && isDay0) {
           final aliveCount =
@@ -89,6 +86,7 @@ class PhaseRules {
             currentPhase: Phase.night,
             nominatedSeats: [],
             votes: {},
+            isBestMove: aliveCount >= 9,
           );
         } else if (candidates.length == 1 && !isDay0) {
           nextPhase = SubPhase.finalWord;
@@ -128,10 +126,9 @@ class PhaseRules {
         // Промах - если значение -1 или 0
         final isMiss = lastKill == null || lastKill == 0 || lastKill == -1;
 
-        print('=== BESTMOVE CHECK IN PHASE_RULES ===');
+        print('=== BESTMOVE CHECK ===');
         print('currentDay = $currentDay');
-        print('isMiss = $isMiss');
-        print('currentState.isBestMove = ${currentState.isBestMove}');
+        print('isBestMove = ${currentState.isBestMove}');
 
         if (isMiss) {
           nextPhase = SubPhase.speeches;
@@ -202,8 +199,7 @@ class PhaseRules {
 
     // Очищаем кандидатов и голоса при переходе в ночь
     final shouldClear = nextPhase == SubPhase.mafiaShoot;
-    print('=== FINAL COPYWITH ===');
-    print('isBestMove = ${currentState.isBestMove}');
+
     return currentState.copyWith(
       currentSubPhase: nextPhase,
       currentDay: newDay,
@@ -217,6 +213,7 @@ class PhaseRules {
           : currentState.speechHistory,
       nominatedSeats: shouldClear ? [] : currentState.nominatedSeats,
       votes: shouldClear ? {} : currentState.votes,
+      isBestMove: currentState.isBestMove,
     );
   }
 

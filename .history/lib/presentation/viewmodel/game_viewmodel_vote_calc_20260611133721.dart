@@ -81,8 +81,7 @@ class VoteCalculatorActions {
     } else {
       final canHaveBestMove = aliveCount >= 9;
       final nextDay = _vm.state.currentDay + 1;
-      print('=== else FINALIZE ELIMINATION VOTE ===');
-      print('canHaveBestMove = $canHaveBestMove');
+      print(canHaveBestMove);
       final newState = _vm.state.copyWith(
         currentPhase: Phase.night,
         currentSubPhase: SubPhase.mafiaShoot,

@@ -14,8 +14,6 @@ class VoteCalculatorActions {
 
   void startVoting(List<int> candidates) {
     AppLogger.d('startVoting: candidates=$candidates');
-    print('=== START VOTING ===');
-    print('isBestMove before voting = ${_vm.state.isBestMove}');
     final controller = VoteController(candidates);
     final newState = _vm.state.copyWith(
       voteController: controller,
@@ -25,10 +23,6 @@ class VoteCalculatorActions {
   }
 
   void submitVote(int votes) {
-    print('=== SUBMIT VOTE ===');
-    print('votes = $votes');
-    print('currentSubPhase = ${_vm.state.currentSubPhase}');
-    print('isBestMove before = ${_vm.state.isBestMove}');
     // Если eliminationVote - сохраняем голоса и завершаем
     if (_vm.state.currentSubPhase == SubPhase.eliminationVote) {
       _vm.state = _vm.state.copyWith(eliminationVotes: votes);
@@ -61,13 +55,11 @@ class VoteCalculatorActions {
     final majority = aliveCount ~/ 2 + 1;
 
     if (_vm.state.eliminationVotes >= majority) {
+      // Переход в finalWord для всех лидеров
       final tiedSeats = _vm.state.tiedSeats;
+      // Вычисляем isBestMove: сколько останется живых после удаления лидеров
       final aliveAfter = aliveCount - tiedSeats.length;
       final canHaveBestMove = aliveAfter >= 9;
-
-      print('=== FINALIZE ELIMINATION VOTE ===');
-      print('aliveAfter = $aliveAfter');
-      print('canHaveBestMove = $canHaveBestMove');
 
       final newState = _vm.state.copyWith(
         currentSubPhase: SubPhase.finalWord,
@@ -79,10 +71,9 @@ class VoteCalculatorActions {
       );
       _vm.updateState(newState);
     } else {
+      // Ночь - никто не уходит, проверяем сколько живых
       final canHaveBestMove = aliveCount >= 9;
       final nextDay = _vm.state.currentDay + 1;
-      print('=== else FINALIZE ELIMINATION VOTE ===');
-      print('canHaveBestMove = $canHaveBestMove');
       final newState = _vm.state.copyWith(
         currentPhase: Phase.night,
         currentSubPhase: SubPhase.mafiaShoot,
@@ -128,17 +119,23 @@ class VoteCalculatorActions {
       switch (result.type) {
         case VoteResultType.winner:
           // Уходит 1 игрок, вычисляем isBestMove
+          final aliveAfter = aliveCount - 1;
+          final canHaveBestMove = aliveAfter >= 9;
+
           newState = _vm.state.copyWith(
             currentSubPhase: SubPhase.finalWord,
             currentSpeakerSeat: result.winnerSeat,
             tiedSeats: [],
             voteController: null,
             isVotingActive: false,
+            isBestMove: canHaveBestMove,
           );
           break;
 
         case VoteResultType.tieBreak:
           // Никто не уходит, проверяем сколько живых
+          final canHaveBestMove = aliveCount >= 9;
+
           newState = _vm.state.copyWith(
             currentSubPhase: SubPhase.tieBreak,
             tiedSeats: result.seats,
@@ -147,20 +144,32 @@ class VoteCalculatorActions {
                 result.seats.isNotEmpty ? result.seats[0] : null,
             voteController: null,
             isVotingActive: false,
+            isBestMove: canHaveBestMove,
           );
           break;
 
         case VoteResultType.eliminationVote:
+          print('=== ELIMINATION VOTE ===');
+          print('aliveCount before = $aliveCount');
+          print('result.seats = ${result.seats}');
+          print('result.seats.length = ${result.seats.length}');
+          final aliveAfter = aliveCount - result.seats.length;
+          print('aliveAfter = $aliveAfter');
+          final canHaveBestMove = aliveAfter >= 9;
+          print('canHaveBestMove = $canHaveBestMove');
+
           newState = _vm.state.copyWith(
             currentSubPhase: SubPhase.eliminationVote,
             tiedSeats: result.seats,
             voteController: null,
             isVotingActive: false,
+            isBestMove: canHaveBestMove,
           );
           break;
 
         case VoteResultType.noCandidates:
           // Нет кандидатов, проверяем сколько живых
+          final canHaveBestMove = aliveCount >= 9;
           final nextDay = _vm.state.currentDay + 1;
 
           newState = _vm.state.copyWith(
@@ -171,8 +180,10 @@ class VoteCalculatorActions {
             isVotingActive: false,
             nominatedSeats: [],
             votes: {},
+            isBestMove: canHaveBestMove,
           );
           break;
+
         default:
           newState = _vm.state.copyWith();
           break;

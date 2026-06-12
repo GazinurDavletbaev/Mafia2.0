@@ -65,24 +65,17 @@ class VoteCalculatorActions {
       final aliveAfter = aliveCount - tiedSeats.length;
       final canHaveBestMove = aliveAfter >= 9;
 
-      print('=== FINALIZE ELIMINATION VOTE ===');
-      print('aliveAfter = $aliveAfter');
-      print('canHaveBestMove = $canHaveBestMove');
-
       final newState = _vm.state.copyWith(
         currentSubPhase: SubPhase.finalWord,
         currentSpeakerSeat: tiedSeats.isNotEmpty ? tiedSeats[0] : null,
         tiedSeats: tiedSeats,
         voteController: null,
         isVotingActive: false,
-        isBestMove: canHaveBestMove,
       );
       _vm.updateState(newState);
     } else {
       final canHaveBestMove = aliveCount >= 9;
       final nextDay = _vm.state.currentDay + 1;
-      print('=== else FINALIZE ELIMINATION VOTE ===');
-      print('canHaveBestMove = $canHaveBestMove');
       final newState = _vm.state.copyWith(
         currentPhase: Phase.night,
         currentSubPhase: SubPhase.mafiaShoot,
@@ -91,7 +84,6 @@ class VoteCalculatorActions {
         isVotingActive: false,
         nominatedSeats: [],
         votes: {},
-        isBestMove: canHaveBestMove,
       );
       _vm.updateState(newState);
     }

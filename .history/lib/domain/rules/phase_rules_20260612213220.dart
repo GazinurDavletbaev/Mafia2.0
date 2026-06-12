@@ -50,6 +50,7 @@ class PhaseRules {
           print('Переход в finalWord, isBestMove = ${currentState.isBestMove}');
           return currentState.copyWith(
             currentSubPhase: SubPhase.finalWord,
+            isBestMove: currentState.isBestMove,
           );
         } else {
           print('Переход в ночь, isBestMove = ${currentState.isBestMove}');
@@ -59,11 +60,13 @@ class PhaseRules {
             currentPhase: Phase.night,
             nominatedSeats: [],
             votes: {},
+            isBestMove: currentState.isBestMove,
           );
         }
       } else if (currentPhase == _dayOrder.last) {
         final candidates = currentState.nominatedSeats;
         final isDay0 = currentDay == 0;
+        print("hi1");
         if (candidates.isEmpty) {
           final aliveCount =
               currentState.players.where((p) => p.isAlive).length;
@@ -76,6 +79,7 @@ class PhaseRules {
             currentPhase: Phase.night,
             nominatedSeats: [],
             votes: {},
+            isBestMove: aliveCount >= 9,
           );
         } else if (candidates.length == 1 && isDay0) {
           final aliveCount =
@@ -89,6 +93,7 @@ class PhaseRules {
             currentPhase: Phase.night,
             nominatedSeats: [],
             votes: {},
+            isBestMove: aliveCount >= 9,
           );
         } else if (candidates.length == 1 && !isDay0) {
           nextPhase = SubPhase.finalWord;
@@ -217,6 +222,7 @@ class PhaseRules {
           : currentState.speechHistory,
       nominatedSeats: shouldClear ? [] : currentState.nominatedSeats,
       votes: shouldClear ? {} : currentState.votes,
+      isBestMove: currentState.isBestMove,
     );
   }
 
