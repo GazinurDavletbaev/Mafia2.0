@@ -28,12 +28,10 @@ class PlayerActions {
         _vm.state.players.firstWhere((p) => p.seatNumber == seatNumber);
     final newPlayer = newPlayers.firstWhere((p) => p.seatNumber == seatNumber);
     final hasDied = oldPlayer.isAlive && !newPlayer.isAlive;
-    final newNominatedSeats = hasDied
-        ? _vm.state.nominatedSeats.where((seat) => seat != seatNumber).toList()
-        : _vm.state.nominatedSeats;
+
     GameState newState = _vm.state.copyWith(
       players: newPlayers,
-      nominatedSeats: newNominatedSeats,
+      // НЕ МЕНЯЕМ isBestMove
     );
 
     if (winner != null) {
