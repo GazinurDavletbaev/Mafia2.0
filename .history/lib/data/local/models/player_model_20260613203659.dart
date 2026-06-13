@@ -84,7 +84,6 @@ class PlayerModel {
       'fouls': fouls,
       'isSpeaking': isSpeaking,
       'gameId': gameId,
-      'hasSkippedSpeech': hasSkippedSpeech,
     };
   }
 
@@ -99,7 +98,6 @@ class PlayerModel {
       fouls: json['fouls'],
       isSpeaking: json['isSpeaking'],
       gameId: json['gameId'],
-      hasSkippedSpeech: json['hasSkippedSpeech'] ?? false,
     );
   }
 }

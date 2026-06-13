@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mafia_help/data/local/models/player_model.dart';
 import 'package:pie_menu/pie_menu.dart';
 import '../../core/logger/app_logger.dart';
 import '../state/game_state.dart';
@@ -54,23 +53,9 @@ class _GameScreenState extends ConsumerState<GameScreen> {
       final player =
           state.players.firstWhere((p) => p.seatNumber == currentSpeaker);
 
-      // Если игрок ещё не пропускал речь И у него ровно 3 фола
-      if (!player.hasSkippedSpeech && player.fouls == 3) {
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          final currentPlayers = _vm.state.players;
-          final idx =
-              currentPlayers.indexWhere((p) => p.seatNumber == currentSpeaker);
-          if (idx != -1) {
-            final updated =
-                currentPlayers[idx].copyWith(hasSkippedSpeech: true);
-            final newList = List<PlayerModel>.from(currentPlayers);
-            newList[idx] = updated;
-            _vm.state = _vm.state.copyWith(players: newList);
-          }
-        });
+      if (player.fouls >= 3) {
         return PlayerTimerType.seconds5;
       }
-
       return PlayerTimerType.seconds60;
     }
     if (subPhase == SubPhase.finalWordKill && currentSpeaker != null) {

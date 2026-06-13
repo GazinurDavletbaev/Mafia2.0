@@ -26,13 +26,14 @@ class PlayerModelAdapter extends TypeAdapter<PlayerModel> {
       fouls: (fields[6] as num).toInt(),
       isSpeaking: fields[7] as bool,
       gameId: fields[8] as String,
+      hasSkippedSpeech: fields[9] as bool,
     );
   }
 
   @override
   void write(BinaryWriter writer, PlayerModel obj) {
     writer
-      ..writeByte(9)
+      ..writeByte(10)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -50,7 +51,9 @@ class PlayerModelAdapter extends TypeAdapter<PlayerModel> {
       ..writeByte(7)
       ..write(obj.isSpeaking)
       ..writeByte(8)
-      ..write(obj.gameId);
+      ..write(obj.gameId)
+      ..writeByte(9)
+      ..write(obj.hasSkippedSpeech);
   }
 
   @override
