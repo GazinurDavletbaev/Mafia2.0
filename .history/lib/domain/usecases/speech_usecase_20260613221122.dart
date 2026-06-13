@@ -12,12 +12,12 @@ class SpeechUsecase {
   /// Обработать нажатие "дальше" в фазе speeches
   /// Возвращает: (новое состояние, нужно ли обновить UI)
   (GameState, bool) processNextSpeaker(GameState state) {
-    // Обработка текущего говорящего после его речи
     final currentSpeaker = state.currentSpeakerSeat;
     if (currentSpeaker != null) {
       final player =
           state.players.firstWhere((p) => p.seatNumber == currentSpeaker);
       if (player.fouls == 3 && !player.hasSkippedSpeech) {
+        // Меняем флаг у текущего говорящего ПОСЛЕ его речи
         final updatedPlayer = player.copyWith(hasSkippedSpeech: true);
         final newPlayers = List<PlayerModel>.from(state.players);
         final index =

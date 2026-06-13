@@ -53,12 +53,10 @@ class _GameScreenState extends ConsumerState<GameScreen> {
     if (subPhase == SubPhase.speeches && currentSpeaker != null) {
       final player =
           state.players.firstWhere((p) => p.seatNumber == currentSpeaker);
-      // Если игрок ещё не пропускал речь И у него ровно 3 фола
-      if (!player.hasSkippedSpeech && player.fouls == 3) {
-        return PlayerTimerType.seconds5;
+      if (player.hasSkippedSpeech) {
+        return PlayerTimerType.seconds60;
       }
-
-      return PlayerTimerType.seconds60;
+      return PlayerTimerType.seconds5;
     }
     if (subPhase == SubPhase.finalWordKill && currentSpeaker != null) {
       return PlayerTimerType.seconds60;

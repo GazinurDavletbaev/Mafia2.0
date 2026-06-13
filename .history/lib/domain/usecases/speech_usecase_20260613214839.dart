@@ -1,4 +1,3 @@
-import 'package:mafia_help/data/local/models/player_model.dart';
 import 'package:mafia_help/data/local/models/sub_phase.dart';
 import 'package:mafia_help/domain/rules/speech_rules.dart';
 import 'package:mafia_help/presentation/state/game_state.dart';
@@ -12,20 +11,6 @@ class SpeechUsecase {
   /// Обработать нажатие "дальше" в фазе speeches
   /// Возвращает: (новое состояние, нужно ли обновить UI)
   (GameState, bool) processNextSpeaker(GameState state) {
-    // Обработка текущего говорящего после его речи
-    final currentSpeaker = state.currentSpeakerSeat;
-    if (currentSpeaker != null) {
-      final player =
-          state.players.firstWhere((p) => p.seatNumber == currentSpeaker);
-      if (player.fouls == 3 && !player.hasSkippedSpeech) {
-        final updatedPlayer = player.copyWith(hasSkippedSpeech: true);
-        final newPlayers = List<PlayerModel>.from(state.players);
-        final index =
-            newPlayers.indexWhere((p) => p.seatNumber == currentSpeaker);
-        newPlayers[index] = updatedPlayer;
-        state = state.copyWith(players: newPlayers);
-      }
-    }
     final allAlive = state.players
         .where((p) => p.isAlive)
         .map((p) => p.seatNumber)

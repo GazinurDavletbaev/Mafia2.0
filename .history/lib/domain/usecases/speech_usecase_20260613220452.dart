@@ -12,20 +12,6 @@ class SpeechUsecase {
   /// Обработать нажатие "дальше" в фазе speeches
   /// Возвращает: (новое состояние, нужно ли обновить UI)
   (GameState, bool) processNextSpeaker(GameState state) {
-    // Обработка текущего говорящего после его речи
-    final currentSpeaker = state.currentSpeakerSeat;
-    if (currentSpeaker != null) {
-      final player =
-          state.players.firstWhere((p) => p.seatNumber == currentSpeaker);
-      if (player.fouls == 3 && !player.hasSkippedSpeech) {
-        final updatedPlayer = player.copyWith(hasSkippedSpeech: true);
-        final newPlayers = List<PlayerModel>.from(state.players);
-        final index =
-            newPlayers.indexWhere((p) => p.seatNumber == currentSpeaker);
-        newPlayers[index] = updatedPlayer;
-        state = state.copyWith(players: newPlayers);
-      }
-    }
     final allAlive = state.players
         .where((p) => p.isAlive)
         .map((p) => p.seatNumber)
@@ -38,6 +24,17 @@ class SpeechUsecase {
     );
     if (nextSpeaker != null) {
       // Есть следующий говорящий
+      final player =
+          state.players.firstWhere((p) => p.seatNumber == nextSpeaker);
+      List<PlayerModel> newPlayers = state.players;
+
+      if (player.fouls == 3 && !player.hasSkippedSpeech) {
+        // Меняем флаг
+        final updatedPlayer = player.copyWith(hasSkippedSpeech: true);
+        newPlayers = List<PlayerModel>.from(state.players);
+        final index = newPlayers.indexWhere((p) => p.seatNumber == nextSpeaker);
+        newPlayers[index] = updatedPlayer;
+      }
       return (
         state.copyWith(
           currentSpeakerSeat: nextSpeaker,
