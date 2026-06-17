@@ -66,12 +66,11 @@ class SpeechUsecase {
         true,
       );
     }
-    if ((candidates.length == 1 && !isDay0) || !isVotingDay) {
+    if (candidates.length == 1 && !isDay0) {
       return (
         state.copyWith(
           currentSubPhase: SubPhase.finalWord,
           currentSpeakerSeat: candidates.first,
-          isVotingDay: true,
         ),
         true,
       );
@@ -101,20 +100,7 @@ class SpeechUsecase {
         true,
       );
     }
-    final isVotingDay = state.isVotingDay;
-    if (!isVotingDay) {
-      return (
-        state.copyWith(
-          currentPhase: Phase.night,
-          currentSubPhase: SubPhase.mafiaShoot,
-          currentSpeakerSeat: null,
-          nominatedSeats: [],
-          currentDay: state.currentDay + 1,
-          isVotingDay: true,
-        ),
-        true,
-      );
-    }
+
     return (
       state.copyWith(
         currentSubPhase: SubPhase.revote,

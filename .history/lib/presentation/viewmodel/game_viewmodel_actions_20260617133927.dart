@@ -23,18 +23,19 @@ class PlayerActions {
     final usecase = _ref.read(addFoulUsecaseProvider);
     final (newPlayers, winner) = usecase.execute(_vm.state.players, seatNumber);
 
+    // Проверяем, умер ли игрок после добавления фола
     final oldPlayer =
         _vm.state.players.firstWhere((p) => p.seatNumber == seatNumber);
     final newPlayer = newPlayers.firstWhere((p) => p.seatNumber == seatNumber);
     final hasDied = oldPlayer.isAlive && !newPlayer.isAlive;
-
-    if (hasDied) {
-      // Если игрок умер от фолов — вызываем _killPlayer
-      await _killPlayer(seatNumber);
-      return;
-    }
-
-    GameState newState = _vm.state.copyWith(players: newPlayers);
+    final newNominatedSeats = hasDied
+        ? _vm.state.nominatedSeats.where((seat) => seat != seatNumber).toList()
+        : _vm.state.nominatedSeats;
+    GameState newState = _vm.state.copyWith(
+      players: newPlayers,
+      nominatedSeats: newNominatedSeats,
+      isVotingDay: hasDied ? false : _vm.state.isVotingDay, // ← добавить
+    );
 
     if (winner != null) {
       newState = newState.copyWith(
@@ -105,7 +106,7 @@ class PlayerActions {
         votes: {},
         isVotingActive: false,
         voteController: null,
-        isVotingDay: true,
+        isVotingDay: false,
         isBestMove: aliveCount >= 9,
       );
     } else {
