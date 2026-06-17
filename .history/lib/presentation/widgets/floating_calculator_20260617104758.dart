@@ -41,20 +41,6 @@ class _FloatingCalculatorState extends ConsumerState<FloatingCalculator> {
         final currentTotal = controller.totalVotes;
         final remaining = aliveCount - currentTotal;
 
-        if (value == remaining) {
-          final remainingCandidates = controller.remainingCandidates;
-          print('Осталось 0 голосов');
-          print('Осталось кандидатов: ${remainingCandidates.length}');
-          print('Номера кандидатов: $remainingCandidates');
-          // Ставим 0 всем оставшимся кандидатам
-          _vm.submitVote(value);
-
-          for (var seat in remainingCandidates) {
-            _vm.submitVote(0);
-          }
-          return;
-        }
-
         // Проверка: если вводим больше чем осталось голосов
         if (value > remaining) {
           ScaffoldMessenger.of(context).showSnackBar(

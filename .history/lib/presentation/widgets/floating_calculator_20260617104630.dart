@@ -41,20 +41,6 @@ class _FloatingCalculatorState extends ConsumerState<FloatingCalculator> {
         final currentTotal = controller.totalVotes;
         final remaining = aliveCount - currentTotal;
 
-        if (value == remaining) {
-          final remainingCandidates = controller.remainingCandidates;
-          print('Осталось 0 голосов');
-          print('Осталось кандидатов: ${remainingCandidates.length}');
-          print('Номера кандидатов: $remainingCandidates');
-          // Ставим 0 всем оставшимся кандидатам
-          _vm.submitVote(value);
-
-          for (var seat in remainingCandidates) {
-            _vm.submitVote(0);
-          }
-          return;
-        }
-
         // Проверка: если вводим больше чем осталось голосов
         if (value > remaining) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -67,23 +53,32 @@ class _FloatingCalculatorState extends ConsumerState<FloatingCalculator> {
           return;
         }
 
-        // Если это предпоследний кандидат, а не последний
-        if (controller.currentIndex == controller.totalCandidates - 2) {
-          // Сохраняем голоса для предпоследнего
-          _vm.submitVote(value);
-          // Переходим к последнему
-          controller.nextCandidate();
-          // Автоматически ставим оставшиеся голоса последнему
+        // Сохраняем голоса для текущего кандидата
+        _vm.submitVote(value);
+
+        // Если голоса закончились — остальным ставим 0
+        if (controller.totalVotes >= aliveCount) {
+          // Перебираем оставшихся кандидатов и ставим им 0
+          while (controller.currentIndex < controller.totalCandidates - 1) {
+            controller.nextCandidate();
+            _vm.submitVote(0);
+          }
+          return;
+        }
+
+        // Если это последний кандидат после ввода голосов, проверяем остаток
+        if (controller.currentIndex == controller.totalCandidates - 1) {
           final newTotal = controller.totalVotes;
           final newRemaining = aliveCount - newTotal;
           if (newRemaining > 0) {
+            // Автоматически добавляем оставшиеся голоса последнему
             _vm.submitVote(newRemaining);
           }
           return;
         }
 
-        // Обычный ввод
-        _vm.submitVote(value);
+        // Переходим к следующему кандидату
+        controller.nextCandidate();
       }
     } else if (_state.currentSubPhase == SubPhase.bestMove) {
       _vm.submitBestMoveNumber(value);

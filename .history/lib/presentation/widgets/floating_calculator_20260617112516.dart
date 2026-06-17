@@ -41,49 +41,47 @@ class _FloatingCalculatorState extends ConsumerState<FloatingCalculator> {
         final currentTotal = controller.totalVotes;
         final remaining = aliveCount - currentTotal;
 
-        if (value == remaining) {
+        if (remaining == 0) {
           final remainingCandidates = controller.remainingCandidates;
           print('Осталось 0 голосов');
           print('Осталось кандидатов: ${remainingCandidates.length}');
           print('Номера кандидатов: $remainingCandidates');
           // Ставим 0 всем оставшимся кандидатам
-          _vm.submitVote(value);
-
           for (var seat in remainingCandidates) {
             _vm.submitVote(0);
           }
           return;
-        }
-
-        // Проверка: если вводим больше чем осталось голосов
-        if (value > remaining) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Осталось только $remaining голосов'),
-              backgroundColor: Colors.red,
-              duration: const Duration(seconds: 2),
-            ),
-          );
-          return;
-        }
-
-        // Если это предпоследний кандидат, а не последний
-        if (controller.currentIndex == controller.totalCandidates - 2) {
-          // Сохраняем голоса для предпоследнего
-          _vm.submitVote(value);
-          // Переходим к последнему
-          controller.nextCandidate();
-          // Автоматически ставим оставшиеся голоса последнему
-          final newTotal = controller.totalVotes;
-          final newRemaining = aliveCount - newTotal;
-          if (newRemaining > 0) {
-            _vm.submitVote(newRemaining);
+        } else {
+          // Проверка: если вводим больше чем осталось голосов
+          if (value > remaining) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('Осталось только $remaining голосов'),
+                backgroundColor: Colors.red,
+                duration: const Duration(seconds: 2),
+              ),
+            );
+            return;
           }
-          return;
-        }
 
-        // Обычный ввод
-        _vm.submitVote(value);
+          // Если это предпоследний кандидат, а не последний
+          if (controller.currentIndex == controller.totalCandidates - 2) {
+            // Сохраняем голоса для предпоследнего
+            _vm.submitVote(value);
+            // Переходим к последнему
+            controller.nextCandidate();
+            // Автоматически ставим оставшиеся голоса последнему
+            final newTotal = controller.totalVotes;
+            final newRemaining = aliveCount - newTotal;
+            if (newRemaining > 0) {
+              _vm.submitVote(newRemaining);
+            }
+            return;
+          }
+
+          // Обычный ввод
+          _vm.submitVote(value);
+        }
       }
     } else if (_state.currentSubPhase == SubPhase.bestMove) {
       _vm.submitBestMoveNumber(value);

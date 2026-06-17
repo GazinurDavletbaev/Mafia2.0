@@ -14,9 +14,6 @@ class VoteCalculatorActions {
 
   void startVoting(List<int> candidates) {
     // Проверяем, разрешено ли голосование в этот день
-    final a = _vm.state.isVotingDay;
-    print('Voting is disabled for today = $a');
-
     if (!_vm.state.isVotingDay) {
       AppLogger.d('Voting is disabled for today');
 

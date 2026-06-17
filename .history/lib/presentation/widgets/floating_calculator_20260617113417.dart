@@ -47,9 +47,8 @@ class _FloatingCalculatorState extends ConsumerState<FloatingCalculator> {
           print('Осталось кандидатов: ${remainingCandidates.length}');
           print('Номера кандидатов: $remainingCandidates');
           // Ставим 0 всем оставшимся кандидатам
-          _vm.submitVote(value);
-
-          for (var seat in remainingCandidates) {
+          for (int i = 1; i < remainingCandidates.length; i++) {
+            controller.nextCandidate();
             _vm.submitVote(0);
           }
           return;
