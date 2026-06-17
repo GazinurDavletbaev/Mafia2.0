@@ -29,6 +29,7 @@ class _FloatingCalculatorState extends ConsumerState<FloatingCalculator> {
   GameState get _state => ref.read(gameViewModelFamily(widget.gameId));
 
   void _onNumberTap(int value) {
+    // eliminationVote - самое первое условие
     if (_state.currentSubPhase == SubPhase.eliminationVote) {
       _vm.submitVote(value);
       return;
@@ -41,8 +42,8 @@ class _FloatingCalculatorState extends ConsumerState<FloatingCalculator> {
         final currentTotal = controller.totalVotes;
         final remaining = aliveCount - currentTotal;
 
-        // Проверка: если вводим больше чем осталось голосов
         if (value > remaining) {
+          // Показываем SnackBar
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text('Осталось только $remaining голосов'),
@@ -52,25 +53,8 @@ class _FloatingCalculatorState extends ConsumerState<FloatingCalculator> {
           );
           return;
         }
-
-        // Если это предпоследний кандидат, а не последний
-        if (controller.currentIndex == controller.totalCandidates - 2) {
-          // Сохраняем голоса для предпоследнего
-          _vm.submitVote(value);
-          // Переходим к последнему
-          controller.nextCandidate();
-          // Автоматически ставим оставшиеся голоса последнему
-          final newTotal = controller.totalVotes;
-          final newRemaining = aliveCount - newTotal;
-          if (newRemaining > 0) {
-            _vm.submitVote(newRemaining);
-          }
-          return;
-        }
-
-        // Обычный ввод
-        _vm.submitVote(value);
       }
+      _vm.submitVote(value);
     } else if (_state.currentSubPhase == SubPhase.bestMove) {
       _vm.submitBestMoveNumber(value);
     } else if (_state.currentSubPhase == SubPhase.mafiaShoot ||

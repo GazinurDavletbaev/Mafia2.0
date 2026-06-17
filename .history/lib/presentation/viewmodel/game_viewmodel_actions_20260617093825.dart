@@ -34,7 +34,6 @@ class PlayerActions {
     GameState newState = _vm.state.copyWith(
       players: newPlayers,
       nominatedSeats: newNominatedSeats,
-      isVotingDay: hasDied ? false : _vm.state.isVotingDay, // ← добавить
     );
 
     if (winner != null) {
