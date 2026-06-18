@@ -27,13 +27,14 @@ class PlayerModelAdapter extends TypeAdapter<PlayerModel> {
       isSpeaking: fields[7] as bool,
       gameId: fields[8] as String,
       hasSkippedSpeech: fields[9] as bool,
+      gotThirdFoulDuringSpeech: fields[10] as bool,
     );
   }
 
   @override
   void write(BinaryWriter writer, PlayerModel obj) {
     writer
-      ..writeByte(10)
+      ..writeByte(11)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -53,7 +54,9 @@ class PlayerModelAdapter extends TypeAdapter<PlayerModel> {
       ..writeByte(8)
       ..write(obj.gameId)
       ..writeByte(9)
-      ..write(obj.hasSkippedSpeech);
+      ..write(obj.hasSkippedSpeech)
+      ..writeByte(10)
+      ..write(obj.gotThirdFoulDuringSpeech);
   }
 
   @override
