@@ -548,7 +548,6 @@ class _GameProtocolScreenState extends State<GameProtocolScreen> {
                       }
 
                       // ============ ГОЛОСОВАНИЕ ЗА ПОДЪЁМ ============
-                      // ============ ГОЛОСОВАНИЕ ЗА ПОДЪЁМ ============
                       if (roundIndex == 2) {
                         return Padding(
                           padding: const EdgeInsets.only(bottom: 8),
@@ -575,38 +574,23 @@ class _GameProtocolScreenState extends State<GameProtocolScreen> {
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    const Center(
-                                      child: Text(
-                                        'Результат',
-                                        style: TextStyle(
-                                          color: Colors.orange,
-                                          fontSize: 13,
-                                          fontWeight: FontWeight.bold,
-                                        ),
+                                    const Text(
+                                      'Результат',
+                                      style: TextStyle(
+                                        color: Colors.orange,
+                                        fontSize: 13,
+                                        fontWeight: FontWeight.bold,
                                       ),
                                     ),
                                     const SizedBox(height: 4),
-                                    Container(
-                                      width: double.infinity,
-                                      padding: const EdgeInsets.symmetric(
-                                          vertical: 4, horizontal: 8),
-                                      decoration: BoxDecoration(
-                                        color: Colors.grey.shade700,
-                                        borderRadius: BorderRadius.circular(4),
-                                      ),
-                                      child: Center(
-                                        child: Text(
-                                          winners.isEmpty
-                                              ? '0'
-                                              : winners.join(', '),
-                                          style: TextStyle(
-                                            color: winners.isEmpty
-                                                ? Colors.red
-                                                : Colors.green,
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
+                                    Text(
+                                      winners.isEmpty
+                                          ? '0'
+                                          : winners.join(', '),
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.bold,
                                       ),
                                     ),
                                   ],

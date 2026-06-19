@@ -478,6 +478,7 @@ class _GameProtocolScreenState extends State<GameProtocolScreen> {
       );
     }
 
+    // Группируем по дням (ключ 11)
     final Map<int, List<Map<int, int>>> groupedVotes = {};
     for (var record in voteHistory) {
       final day = record[11] ?? 0;
@@ -487,6 +488,7 @@ class _GameProtocolScreenState extends State<GameProtocolScreen> {
       groupedVotes[day]!.add(record);
     }
 
+    // Сортируем по дням
     final sortedDays = groupedVotes.keys.toList()..sort();
 
     return Card(
@@ -525,6 +527,7 @@ class _GameProtocolScreenState extends State<GameProtocolScreen> {
                       final roundIndex = entry.key;
                       final record = entry.value;
 
+                      // Извлекаем голоса кандидатов (все ключи кроме 11 и 12-15)
                       final votes = <int, int>{};
                       final winners = <int>[];
                       for (var key in record.keys) {
@@ -537,6 +540,9 @@ class _GameProtocolScreenState extends State<GameProtocolScreen> {
                       }
 
                       final candidates = votes.keys.toList()..sort();
+                      final maxVotes = votes.isNotEmpty
+                          ? votes.values.reduce((a, b) => a > b ? a : b)
+                          : 0;
 
                       String roundTitle;
                       if (roundIndex == 0) {
@@ -547,77 +553,6 @@ class _GameProtocolScreenState extends State<GameProtocolScreen> {
                         roundTitle = 'Голосование за подъём';
                       }
 
-                      // ============ ГОЛОСОВАНИЕ ЗА ПОДЪЁМ ============
-                      // ============ ГОЛОСОВАНИЕ ЗА ПОДЪЁМ ============
-                      if (roundIndex == 2) {
-                        return Padding(
-                          padding: const EdgeInsets.only(bottom: 8),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                roundTitle,
-                                style: const TextStyle(
-                                  color: Colors.white70,
-                                  fontSize: 12,
-                                  fontStyle: FontStyle.italic,
-                                ),
-                              ),
-                              const SizedBox(height: 4),
-                              Container(
-                                width: double.infinity,
-                                padding: const EdgeInsets.all(8),
-                                decoration: BoxDecoration(
-                                  border:
-                                      Border.all(color: Colors.grey.shade600),
-                                  borderRadius: BorderRadius.circular(4),
-                                ),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    const Center(
-                                      child: Text(
-                                        'Результат',
-                                        style: TextStyle(
-                                          color: Colors.orange,
-                                          fontSize: 13,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                    ),
-                                    const SizedBox(height: 4),
-                                    Container(
-                                      width: double.infinity,
-                                      padding: const EdgeInsets.symmetric(
-                                          vertical: 4, horizontal: 8),
-                                      decoration: BoxDecoration(
-                                        color: Colors.grey.shade700,
-                                        borderRadius: BorderRadius.circular(4),
-                                      ),
-                                      child: Center(
-                                        child: Text(
-                                          winners.isEmpty
-                                              ? '0'
-                                              : winners.join(', '),
-                                          style: TextStyle(
-                                            color: winners.isEmpty
-                                                ? Colors.red
-                                                : Colors.green,
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-                        );
-                      }
-
-                      // ============ ГОЛОСОВАНИЕ И ПЕРЕГОЛОСОВАНИЕ ============
                       return Padding(
                         padding: const EdgeInsets.only(bottom: 8),
                         child: Column(
@@ -633,7 +568,6 @@ class _GameProtocolScreenState extends State<GameProtocolScreen> {
                             ),
                             const SizedBox(height: 4),
                             Container(
-                              width: double.infinity,
                               padding: const EdgeInsets.all(8),
                               decoration: BoxDecoration(
                                 border: Border.all(color: Colors.grey.shade600),
@@ -644,7 +578,7 @@ class _GameProtocolScreenState extends State<GameProtocolScreen> {
                                     color: Colors.grey.shade600),
                                 columnWidths: const {
                                   0: FixedColumnWidth(50),
-                                  1: FixedColumnWidth(60),
+                                  1: FixedColumnWidth(50),
                                   2: FixedColumnWidth(70),
                                 },
                                 children: [

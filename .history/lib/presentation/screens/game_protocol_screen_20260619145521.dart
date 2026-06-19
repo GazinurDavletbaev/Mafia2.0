@@ -206,74 +206,207 @@ class _GameProtocolScreenState extends State<GameProtocolScreen> {
     return '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}';
   }
 
-  Widget _buildPlayersTable() {
+  Widget _buildVotingTable() {
+    final voteHistory = widget.gameState.voteHistory;
+
+    if (voteHistory.isEmpty) {
+      return Card(
+        color: Colors.grey.shade800,
+        child: const Padding(
+          padding: EdgeInsets.all(16),
+          child: Text(
+            'Голосования не проводились',
+            style: TextStyle(color: Colors.white),
+          ),
+        ),
+      );
+    }
+
+    final Map<int, List<Map<int, int>>> groupedVotes = {};
+    for (var record in voteHistory) {
+      final day = record[11] ?? 0;
+      if (!groupedVotes.containsKey(day)) {
+        groupedVotes[day] = [];
+      }
+      groupedVotes[day]!.add(record);
+    }
+
+    final sortedDays = groupedVotes.keys.toList()..sort();
+
     return Card(
       color: Colors.grey.shade800,
       child: Padding(
-        padding: const EdgeInsets.all(12),
+        padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text(
-              'ИГРОКИ',
+              'Голосования',
               style: TextStyle(
                 color: Colors.orange,
-                fontSize: 16,
+                fontSize: 18,
                 fontWeight: FontWeight.bold,
               ),
             ),
-            const SizedBox(height: 6),
-            LayoutBuilder(
-              builder: (context, constraints) {
-                // Общая ширина таблицы = ширина экрана - отступы
-                final totalWidth = constraints.maxWidth;
-                final fixedWidths =
-                    28 + 32 + 36 + 40 + 50; // № + Роль + Фолы + Баллы + Доп.
-                final nameWidth = totalWidth -
-                    fixedWidths -
-                    10; // -10 на отступы между ячейками
-
-                return Table(
-                  border:
-                      TableBorder.all(color: Colors.grey.shade600, width: 0.5),
-                  columnWidths: {
-                    0: const FixedColumnWidth(28),
-                    1: FixedColumnWidth(nameWidth > 80 ? nameWidth : 80),
-                    2: const FixedColumnWidth(32),
-                    3: const FixedColumnWidth(36),
-                    4: const FixedColumnWidth(40),
-                    5: const FixedColumnWidth(50),
-                  },
+            const SizedBox(height: 8),
+            ...sortedDays.map((day) {
+              final records = groupedVotes[day]!;
+              return Padding(
+                padding: const EdgeInsets.only(bottom: 16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    TableRow(
-                      decoration: BoxDecoration(color: Colors.grey.shade700),
-                      children: [
-                        _tableCell('№', isHeader: true),
-                        _tableCell('Игрок', isHeader: true),
-                        _tableCell('Роль', isHeader: true),
-                        _tableCell('Фолы', isHeader: true),
-                        _tableCell('Баллы', isHeader: true),
-                        _tableCell('Доп.', isHeader: true),
-                      ],
+                    Text(
+                      'День $day',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
-                    ...widget.gameState.players.asMap().entries.map((entry) {
-                      final index = entry.key;
-                      final p = entry.value;
-                      return TableRow(
-                        children: [
-                          _tableCell('${p.seatNumber}'),
-                          _tableCell(p.name),
-                          _tableCell(_getRoleShort(p.role)),
-                          _tableCell('${p.fouls}'),
-                          _buildPointsCell(index),
-                          _buildBonusPointsCell(index),
-                        ],
+                    const SizedBox(height: 4),
+                    ...records.asMap().entries.map((entry) {
+                      final roundIndex = entry.key;
+                      final record = entry.value;
+
+                      final votes = <int, int>{};
+                      final winners = <int>[];
+                      for (var key in record.keys) {
+                        if (key != 11 && (key < 12 || key > 15)) {
+                          votes[key] = record[key]!;
+                        }
+                        if (key >= 12 && key <= 15) {
+                          winners.add(record[key]!);
+                        }
+                      }
+
+                      final candidates = votes.keys.toList()..sort();
+
+                      String roundTitle;
+                      if (roundIndex == 0) {
+                        roundTitle = 'Голосование';
+                      } else if (roundIndex == 1) {
+                        roundTitle = 'Переголосование';
+                      } else {
+                        roundTitle = 'Голосование за подъём';
+                      }
+
+                      // ============ ГОЛОСОВАНИЕ ЗА ПОДЪЁМ ============
+                      if (roundIndex == 2) {
+                        return Padding(
+                          padding: const EdgeInsets.only(bottom: 8),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                roundTitle,
+                                style: const TextStyle(
+                                  color: Colors.white70,
+                                  fontSize: 12,
+                                  fontStyle: FontStyle.italic,
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              Container(
+                                padding: const EdgeInsets.all(8),
+                                decoration: BoxDecoration(
+                                  border:
+                                      Border.all(color: Colors.grey.shade600),
+                                  borderRadius: BorderRadius.circular(4),
+                                ),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    const Text(
+                                      'Результат:',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 13,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 8),
+                                    Text(
+                                      winners.isEmpty ? '0' : winners.join(','),
+                                      style: TextStyle(
+                                        color: winners.isEmpty
+                                            ? Colors.red
+                                            : Colors.green,
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      }
+
+                      // ============ ГОЛОСОВАНИЕ И ПЕРЕГОЛОСОВАНИЕ ============
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 8),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              roundTitle,
+                              style: const TextStyle(
+                                color: Colors.white70,
+                                fontSize: 12,
+                                fontStyle: FontStyle.italic,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Container(
+                              padding: const EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                border: Border.all(color: Colors.grey.shade600),
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                              child: Table(
+                                border: TableBorder.all(
+                                    color: Colors.grey.shade600),
+                                columnWidths: const {
+                                  0: FixedColumnWidth(50),
+                                  1: FixedColumnWidth(50),
+                                  2: FixedColumnWidth(70),
+                                },
+                                children: [
+                                  TableRow(
+                                    decoration: BoxDecoration(
+                                        color: Colors.grey.shade700),
+                                    children: [
+                                      _tableCell('Игрок', isHeader: true),
+                                      _tableCell('Голоса', isHeader: true),
+                                      _tableCell('Результат', isHeader: true),
+                                    ],
+                                  ),
+                                  ...candidates.map((seat) {
+                                    final voteCount = votes[seat] ?? 0;
+                                    final isWinner = winners.contains(seat);
+                                    return TableRow(
+                                      children: [
+                                        _tableCell('$seat'),
+                                        _tableCell('$voteCount'),
+                                        _tableCell(
+                                          isWinner ? '$seat' : '0',
+                                          isWinner: isWinner,
+                                        ),
+                                      ],
+                                    );
+                                  }).toList(),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
                       );
-                    }).toList(),
+                    }),
                   ],
-                );
-              },
-            ),
+                ),
+              );
+            }),
           ],
         ),
       ),
@@ -478,6 +611,7 @@ class _GameProtocolScreenState extends State<GameProtocolScreen> {
       );
     }
 
+    // Группируем по дням (ключ 11)
     final Map<int, List<Map<int, int>>> groupedVotes = {};
     for (var record in voteHistory) {
       final day = record[11] ?? 0;
@@ -487,6 +621,7 @@ class _GameProtocolScreenState extends State<GameProtocolScreen> {
       groupedVotes[day]!.add(record);
     }
 
+    // Сортируем по дням
     final sortedDays = groupedVotes.keys.toList()..sort();
 
     return Card(
@@ -525,6 +660,7 @@ class _GameProtocolScreenState extends State<GameProtocolScreen> {
                       final roundIndex = entry.key;
                       final record = entry.value;
 
+                      // Извлекаем голоса кандидатов (все ключи кроме 11 и 12-15)
                       final votes = <int, int>{};
                       final winners = <int>[];
                       for (var key in record.keys) {
@@ -537,6 +673,9 @@ class _GameProtocolScreenState extends State<GameProtocolScreen> {
                       }
 
                       final candidates = votes.keys.toList()..sort();
+                      final maxVotes = votes.isNotEmpty
+                          ? votes.values.reduce((a, b) => a > b ? a : b)
+                          : 0;
 
                       String roundTitle;
                       if (roundIndex == 0) {
@@ -547,77 +686,6 @@ class _GameProtocolScreenState extends State<GameProtocolScreen> {
                         roundTitle = 'Голосование за подъём';
                       }
 
-                      // ============ ГОЛОСОВАНИЕ ЗА ПОДЪЁМ ============
-                      // ============ ГОЛОСОВАНИЕ ЗА ПОДЪЁМ ============
-                      if (roundIndex == 2) {
-                        return Padding(
-                          padding: const EdgeInsets.only(bottom: 8),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                roundTitle,
-                                style: const TextStyle(
-                                  color: Colors.white70,
-                                  fontSize: 12,
-                                  fontStyle: FontStyle.italic,
-                                ),
-                              ),
-                              const SizedBox(height: 4),
-                              Container(
-                                width: double.infinity,
-                                padding: const EdgeInsets.all(8),
-                                decoration: BoxDecoration(
-                                  border:
-                                      Border.all(color: Colors.grey.shade600),
-                                  borderRadius: BorderRadius.circular(4),
-                                ),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    const Center(
-                                      child: Text(
-                                        'Результат',
-                                        style: TextStyle(
-                                          color: Colors.orange,
-                                          fontSize: 13,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                    ),
-                                    const SizedBox(height: 4),
-                                    Container(
-                                      width: double.infinity,
-                                      padding: const EdgeInsets.symmetric(
-                                          vertical: 4, horizontal: 8),
-                                      decoration: BoxDecoration(
-                                        color: Colors.grey.shade700,
-                                        borderRadius: BorderRadius.circular(4),
-                                      ),
-                                      child: Center(
-                                        child: Text(
-                                          winners.isEmpty
-                                              ? '0'
-                                              : winners.join(', '),
-                                          style: TextStyle(
-                                            color: winners.isEmpty
-                                                ? Colors.red
-                                                : Colors.green,
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-                        );
-                      }
-
-                      // ============ ГОЛОСОВАНИЕ И ПЕРЕГОЛОСОВАНИЕ ============
                       return Padding(
                         padding: const EdgeInsets.only(bottom: 8),
                         child: Column(
@@ -633,7 +701,6 @@ class _GameProtocolScreenState extends State<GameProtocolScreen> {
                             ),
                             const SizedBox(height: 4),
                             Container(
-                              width: double.infinity,
                               padding: const EdgeInsets.all(8),
                               decoration: BoxDecoration(
                                 border: Border.all(color: Colors.grey.shade600),
@@ -644,7 +711,7 @@ class _GameProtocolScreenState extends State<GameProtocolScreen> {
                                     color: Colors.grey.shade600),
                                 columnWidths: const {
                                   0: FixedColumnWidth(50),
-                                  1: FixedColumnWidth(60),
+                                  1: FixedColumnWidth(50),
                                   2: FixedColumnWidth(70),
                                 },
                                 children: [

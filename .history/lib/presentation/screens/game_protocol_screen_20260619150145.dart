@@ -575,14 +575,12 @@ class _GameProtocolScreenState extends State<GameProtocolScreen> {
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    const Center(
-                                      child: Text(
-                                        'Результат',
-                                        style: TextStyle(
-                                          color: Colors.orange,
-                                          fontSize: 13,
-                                          fontWeight: FontWeight.bold,
-                                        ),
+                                    const Text(
+                                      'Результат',
+                                      style: TextStyle(
+                                        color: Colors.orange,
+                                        fontSize: 13,
+                                        fontWeight: FontWeight.bold,
                                       ),
                                     ),
                                     const SizedBox(height: 4),
@@ -594,18 +592,14 @@ class _GameProtocolScreenState extends State<GameProtocolScreen> {
                                         color: Colors.grey.shade700,
                                         borderRadius: BorderRadius.circular(4),
                                       ),
-                                      child: Center(
-                                        child: Text(
-                                          winners.isEmpty
-                                              ? '0'
-                                              : winners.join(', '),
-                                          style: TextStyle(
-                                            color: winners.isEmpty
-                                                ? Colors.red
-                                                : Colors.green,
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.bold,
-                                          ),
+                                      child: Text(
+                                        winners.isEmpty
+                                            ? '0'
+                                            : winners.join(', '),
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.bold,
                                         ),
                                       ),
                                     ),

@@ -49,11 +49,6 @@ class VoteCalculatorActions {
     final aliveCount = _vm.state.players.where((p) => p.isAlive).length;
     final majority = aliveCount ~/ 2 + 1;
 
-    // Сохраняем eliminationVote в историю
-    final day = _vm.state.currentDay;
-    final votes = _vm.state.voteController?.results ?? {};
-    Map<int, int> record = {11: day, ...votes};
-
     if (_vm.state.eliminationVotes >= majority) {
       final tiedSeats = _vm.state.tiedSeats;
       final aliveAfter = aliveCount - tiedSeats.length;
@@ -65,11 +60,6 @@ class VoteCalculatorActions {
       print('canHaveBestMove = $canHaveBestMove');
       print('isvonitgday = $isVotingDay');
 
-      // Добавляем ушедших игроков
-      for (int i = 0; i < tiedSeats.length && i < 4; i++) {
-        record[12 + i] = tiedSeats[i];
-      }
-
       final newState = _vm.state.copyWith(
         currentSubPhase: SubPhase.finalWord,
         currentSpeakerSeat: tiedSeats.isNotEmpty ? tiedSeats[0] : -1,
@@ -77,7 +67,6 @@ class VoteCalculatorActions {
         voteController: null,
         isVotingActive: false,
         isBestMove: canHaveBestMove,
-        voteHistory: [..._vm.state.voteHistory, record],
       );
       _vm.updateState(newState);
     } else {
@@ -85,8 +74,6 @@ class VoteCalculatorActions {
       final nextDay = _vm.state.currentDay + 1;
       print('=== else FINALIZE ELIMINATION VOTE ===');
       print('canHaveBestMove = $canHaveBestMove');
-
-      // Никто не ушёл — без ключей 12-15
       final newState = _vm.state.copyWith(
         currentPhase: Phase.night,
         currentSubPhase: SubPhase.mafiaShoot,
@@ -97,7 +84,6 @@ class VoteCalculatorActions {
         nominatedSeats: [],
         votes: {},
         isBestMove: canHaveBestMove,
-        voteHistory: [..._vm.state.voteHistory, record],
       );
       _vm.updateState(newState);
     }

@@ -548,7 +548,6 @@ class _GameProtocolScreenState extends State<GameProtocolScreen> {
                       }
 
                       // ============ ГОЛОСОВАНИЕ ЗА ПОДЪЁМ ============
-                      // ============ ГОЛОСОВАНИЕ ЗА ПОДЪЁМ ============
                       if (roundIndex == 2) {
                         return Padding(
                           padding: const EdgeInsets.only(bottom: 8),
@@ -565,48 +564,31 @@ class _GameProtocolScreenState extends State<GameProtocolScreen> {
                               ),
                               const SizedBox(height: 4),
                               Container(
-                                width: double.infinity,
                                 padding: const EdgeInsets.all(8),
                                 decoration: BoxDecoration(
                                   border:
                                       Border.all(color: Colors.grey.shade600),
                                   borderRadius: BorderRadius.circular(4),
                                 ),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
-                                    const Center(
-                                      child: Text(
-                                        'Результат',
-                                        style: TextStyle(
-                                          color: Colors.orange,
-                                          fontSize: 13,
-                                          fontWeight: FontWeight.bold,
-                                        ),
+                                    const Text(
+                                      'Результат:',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 13,
                                       ),
                                     ),
-                                    const SizedBox(height: 4),
-                                    Container(
-                                      width: double.infinity,
-                                      padding: const EdgeInsets.symmetric(
-                                          vertical: 4, horizontal: 8),
-                                      decoration: BoxDecoration(
-                                        color: Colors.grey.shade700,
-                                        borderRadius: BorderRadius.circular(4),
-                                      ),
-                                      child: Center(
-                                        child: Text(
-                                          winners.isEmpty
-                                              ? '0'
-                                              : winners.join(', '),
-                                          style: TextStyle(
-                                            color: winners.isEmpty
-                                                ? Colors.red
-                                                : Colors.green,
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
+                                    const SizedBox(width: 8),
+                                    Text(
+                                      winners.isEmpty ? '0' : winners.join(','),
+                                      style: TextStyle(
+                                        color: winners.isEmpty
+                                            ? Colors.red
+                                            : Colors.green,
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.bold,
                                       ),
                                     ),
                                   ],
@@ -633,7 +615,6 @@ class _GameProtocolScreenState extends State<GameProtocolScreen> {
                             ),
                             const SizedBox(height: 4),
                             Container(
-                              width: double.infinity,
                               padding: const EdgeInsets.all(8),
                               decoration: BoxDecoration(
                                 border: Border.all(color: Colors.grey.shade600),
@@ -644,7 +625,7 @@ class _GameProtocolScreenState extends State<GameProtocolScreen> {
                                     color: Colors.grey.shade600),
                                 columnWidths: const {
                                   0: FixedColumnWidth(50),
-                                  1: FixedColumnWidth(60),
+                                  1: FixedColumnWidth(50),
                                   2: FixedColumnWidth(70),
                                 },
                                 children: [

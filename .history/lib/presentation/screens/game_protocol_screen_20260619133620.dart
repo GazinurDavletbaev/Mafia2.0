@@ -72,6 +72,8 @@ class _GameProtocolScreenState extends State<GameProtocolScreen> {
           const SizedBox(height: 16),
           _buildVotingTable(),
           const SizedBox(height: 16),
+          _buildJudge(),
+          const SizedBox(height: 16),
           _buildNotes(),
         ],
       ),
@@ -79,97 +81,41 @@ class _GameProtocolScreenState extends State<GameProtocolScreen> {
   }
 
   Widget _buildHeader() {
-    final startTime = widget.gameState.gameDate;
-    final endTime = DateTime.now();
-
     return Card(
       color: Colors.grey.shade800,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-        side: BorderSide(color: Colors.grey.shade700, width: 0.5),
-      ),
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        padding: const EdgeInsets.all(16),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            // Первая строка: ТУРНИР и СТАДИЯ
-            Row(
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _buildLabel('ТУРНИР'),
-                const SizedBox(width: 6),
-                Expanded(
-                  child: _buildValue(
-                    widget.gameState.tournamentName ?? '__________',
+                const Text(
+                  'ТУРНИР СТАДИЯ',
+                  style: TextStyle(
+                    color: Colors.orange,
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
-                const SizedBox(width: 20),
-                _buildLabel('СТАДИЯ'),
-                const SizedBox(width: 6),
-                Expanded(
-                  child: _buildValue(
-                    widget.gameState.stageName ?? '__________',
-                  ),
+                const SizedBox(height: 4),
+                Text(
+                  'ДАТА: ${widget.gameState.gameDate?.toString().substring(0, 10) ?? DateTime.now().toString().substring(0, 10)}',
+                  style: const TextStyle(color: Colors.white, fontSize: 14),
                 ),
               ],
             ),
-            const SizedBox(height: 12),
-            // Разделитель
-            Divider(color: Colors.grey.shade700, height: 1),
-            const SizedBox(height: 12),
-            // Вторая строка: ДАТА и СТОЛ №
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                Row(
-                  children: [
-                    _buildLabel('ДАТА:'),
-                    const SizedBox(width: 6),
-                    _buildValue(
-                      widget.gameState.gameDate?.toString().substring(0, 10) ??
-                          DateTime.now().toString().substring(0, 10),
-                    ),
-                  ],
+                Text(
+                  'СТОЛ № ${widget.gameState.tableNumber ?? 1}',
+                  style: const TextStyle(color: Colors.white, fontSize: 14),
                 ),
-                Row(
-                  children: [
-                    _buildLabel('СТОЛ №'),
-                    const SizedBox(width: 4),
-                    _buildValue('${widget.gameState.tableNumber ?? 1}'),
-                  ],
-                ),
-              ],
-            ),
-            const SizedBox(height: 8),
-            // Третья строка: ВРЕМЯ и ИГРА №
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Row(
-                  children: [
-                    _buildLabel('ВРЕМЯ:'),
-                    const SizedBox(width: 6),
-                    _buildValue(
-                      startTime != null ? _formatTime(startTime) : '--:--',
-                    ),
-                    const SizedBox(width: 8),
-                    Text(
-                      '—',
-                      style: TextStyle(
-                        color: Colors.grey.shade500,
-                        fontSize: 14,
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    _buildValue(_formatTime(endTime)),
-                  ],
-                ),
-                Row(
-                  children: [
-                    _buildLabel('ИГРА №'),
-                    const SizedBox(width: 4),
-                    _buildValue('${widget.gameState.gameNumber ?? 1}'),
-                  ],
+                Text(
+                  'ИГРА № ${widget.gameState.gameNumber ?? 1}',
+                  style: const TextStyle(color: Colors.white, fontSize: 14),
                 ),
               ],
             ),
@@ -177,33 +123,6 @@ class _GameProtocolScreenState extends State<GameProtocolScreen> {
         ),
       ),
     );
-  }
-
-  Widget _buildLabel(String text) {
-    return Text(
-      text,
-      style: const TextStyle(
-        color: Colors.orange,
-        fontSize: 14,
-        fontWeight: FontWeight.bold,
-        letterSpacing: 0.5,
-      ),
-    );
-  }
-
-  Widget _buildValue(String text) {
-    return Text(
-      text,
-      style: const TextStyle(
-        color: Colors.white,
-        fontSize: 14,
-        fontWeight: FontWeight.w500,
-      ),
-    );
-  }
-
-  String _formatTime(DateTime time) {
-    return '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}';
   }
 
   Widget _buildPlayersTable() {
@@ -223,56 +142,47 @@ class _GameProtocolScreenState extends State<GameProtocolScreen> {
               ),
             ),
             const SizedBox(height: 6),
-            LayoutBuilder(
-              builder: (context, constraints) {
-                // Общая ширина таблицы = ширина экрана - отступы
-                final totalWidth = constraints.maxWidth;
-                final fixedWidths =
-                    28 + 32 + 36 + 40 + 50; // № + Роль + Фолы + Баллы + Доп.
-                final nameWidth = totalWidth -
-                    fixedWidths -
-                    10; // -10 на отступы между ячейками
-
-                return Table(
-                  border:
-                      TableBorder.all(color: Colors.grey.shade600, width: 0.5),
-                  columnWidths: {
-                    0: const FixedColumnWidth(28),
-                    1: FixedColumnWidth(nameWidth > 80 ? nameWidth : 80),
-                    2: const FixedColumnWidth(32),
-                    3: const FixedColumnWidth(36),
-                    4: const FixedColumnWidth(40),
-                    5: const FixedColumnWidth(50),
-                  },
-                  children: [
-                    TableRow(
-                      decoration: BoxDecoration(color: Colors.grey.shade700),
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Table(
+                border:
+                    TableBorder.all(color: Colors.grey.shade600, width: 0.5),
+                columnWidths: const {
+                  0: FixedColumnWidth(28),
+                  1: FixedColumnWidth(80),
+                  2: FixedColumnWidth(32),
+                  3: FixedColumnWidth(36),
+                  4: FixedColumnWidth(40),
+                  5: FixedColumnWidth(50),
+                },
+                children: [
+                  TableRow(
+                    decoration: BoxDecoration(color: Colors.grey.shade700),
+                    children: [
+                      _tableCell('№', isHeader: true),
+                      _tableCell('Игрок', isHeader: true),
+                      _tableCell('Роль', isHeader: true),
+                      _tableCell('Фолы', isHeader: true),
+                      _tableCell('Баллы', isHeader: true),
+                      _tableCell('Доп.', isHeader: true),
+                    ],
+                  ),
+                  ...widget.gameState.players.asMap().entries.map((entry) {
+                    final index = entry.key;
+                    final p = entry.value;
+                    return TableRow(
                       children: [
-                        _tableCell('№', isHeader: true),
-                        _tableCell('Игрок', isHeader: true),
-                        _tableCell('Роль', isHeader: true),
-                        _tableCell('Фолы', isHeader: true),
-                        _tableCell('Баллы', isHeader: true),
-                        _tableCell('Доп.', isHeader: true),
+                        _tableCell('${p.seatNumber}'),
+                        _tableCell(p.name),
+                        _tableCell(_getRoleShort(p.role)),
+                        _tableCell('${p.fouls}'),
+                        _buildPointsCell(index),
+                        _buildBonusPointsCell(index),
                       ],
-                    ),
-                    ...widget.gameState.players.asMap().entries.map((entry) {
-                      final index = entry.key;
-                      final p = entry.value;
-                      return TableRow(
-                        children: [
-                          _tableCell('${p.seatNumber}'),
-                          _tableCell(p.name),
-                          _tableCell(_getRoleShort(p.role)),
-                          _tableCell('${p.fouls}'),
-                          _buildPointsCell(index),
-                          _buildBonusPointsCell(index),
-                        ],
-                      );
-                    }).toList(),
-                  ],
-                );
-              },
+                    );
+                  }).toList(),
+                ],
+              ),
             ),
           ],
         ),
@@ -358,8 +268,7 @@ class _GameProtocolScreenState extends State<GameProtocolScreen> {
 
     final nightActions = widget.gameState.nightActions ?? [];
     final shoots = <String>[];
-    final fullNights = (nightActions.length ~/ 3) * 3;
-    for (int i = 0; i < fullNights; i += 3) {
+    for (int i = 0; i < nightActions.length; i += 3) {
       final kill = nightActions[i];
       shoots.add('${kill == 0 || kill == -1 ? '0' : kill}');
     }
@@ -376,8 +285,6 @@ class _GameProtocolScreenState extends State<GameProtocolScreen> {
       bestPlayer = '0';
     }
 
-    final judgeName = widget.gameState.judgeName ?? '___________________';
-
     return Card(
       color: Colors.grey.shade800,
       child: Padding(
@@ -392,8 +299,6 @@ class _GameProtocolScreenState extends State<GameProtocolScreen> {
             Divider(color: Colors.grey.shade600, height: 8),
             _infoRow('ЛУЧШИЙ ХОД', '$bestMoveText',
                 suffix: '  Игрок № $bestPlayer'),
-            Divider(color: Colors.grey.shade600, height: 8),
-            _infoRow('СУДЬЯ', judgeName),
           ],
         ),
       ),
@@ -478,6 +383,7 @@ class _GameProtocolScreenState extends State<GameProtocolScreen> {
       );
     }
 
+    // Группируем по дням (ключ 11)
     final Map<int, List<Map<int, int>>> groupedVotes = {};
     for (var record in voteHistory) {
       final day = record[11] ?? 0;
@@ -487,6 +393,7 @@ class _GameProtocolScreenState extends State<GameProtocolScreen> {
       groupedVotes[day]!.add(record);
     }
 
+    // Сортируем по дням
     final sortedDays = groupedVotes.keys.toList()..sort();
 
     return Card(
@@ -525,6 +432,7 @@ class _GameProtocolScreenState extends State<GameProtocolScreen> {
                       final roundIndex = entry.key;
                       final record = entry.value;
 
+                      // Извлекаем голоса кандидатов (все ключи кроме 11 и 12-15)
                       final votes = <int, int>{};
                       final winners = <int>[];
                       for (var key in record.keys) {
@@ -537,6 +445,9 @@ class _GameProtocolScreenState extends State<GameProtocolScreen> {
                       }
 
                       final candidates = votes.keys.toList()..sort();
+                      final maxVotes = votes.isNotEmpty
+                          ? votes.values.reduce((a, b) => a > b ? a : b)
+                          : 0;
 
                       String roundTitle;
                       if (roundIndex == 0) {
@@ -547,77 +458,6 @@ class _GameProtocolScreenState extends State<GameProtocolScreen> {
                         roundTitle = 'Голосование за подъём';
                       }
 
-                      // ============ ГОЛОСОВАНИЕ ЗА ПОДЪЁМ ============
-                      // ============ ГОЛОСОВАНИЕ ЗА ПОДЪЁМ ============
-                      if (roundIndex == 2) {
-                        return Padding(
-                          padding: const EdgeInsets.only(bottom: 8),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                roundTitle,
-                                style: const TextStyle(
-                                  color: Colors.white70,
-                                  fontSize: 12,
-                                  fontStyle: FontStyle.italic,
-                                ),
-                              ),
-                              const SizedBox(height: 4),
-                              Container(
-                                width: double.infinity,
-                                padding: const EdgeInsets.all(8),
-                                decoration: BoxDecoration(
-                                  border:
-                                      Border.all(color: Colors.grey.shade600),
-                                  borderRadius: BorderRadius.circular(4),
-                                ),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    const Center(
-                                      child: Text(
-                                        'Результат',
-                                        style: TextStyle(
-                                          color: Colors.orange,
-                                          fontSize: 13,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                    ),
-                                    const SizedBox(height: 4),
-                                    Container(
-                                      width: double.infinity,
-                                      padding: const EdgeInsets.symmetric(
-                                          vertical: 4, horizontal: 8),
-                                      decoration: BoxDecoration(
-                                        color: Colors.grey.shade700,
-                                        borderRadius: BorderRadius.circular(4),
-                                      ),
-                                      child: Center(
-                                        child: Text(
-                                          winners.isEmpty
-                                              ? '0'
-                                              : winners.join(', '),
-                                          style: TextStyle(
-                                            color: winners.isEmpty
-                                                ? Colors.red
-                                                : Colors.green,
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-                        );
-                      }
-
-                      // ============ ГОЛОСОВАНИЕ И ПЕРЕГОЛОСОВАНИЕ ============
                       return Padding(
                         padding: const EdgeInsets.only(bottom: 8),
                         child: Column(
@@ -633,7 +473,6 @@ class _GameProtocolScreenState extends State<GameProtocolScreen> {
                             ),
                             const SizedBox(height: 4),
                             Container(
-                              width: double.infinity,
                               padding: const EdgeInsets.all(8),
                               decoration: BoxDecoration(
                                 border: Border.all(color: Colors.grey.shade600),
@@ -644,8 +483,8 @@ class _GameProtocolScreenState extends State<GameProtocolScreen> {
                                     color: Colors.grey.shade600),
                                 columnWidths: const {
                                   0: FixedColumnWidth(50),
-                                  1: FixedColumnWidth(60),
-                                  2: FixedColumnWidth(70),
+                                  1: FixedColumnWidth(50),
+                                  2: FixedColumnWidth(60),
                                 },
                                 children: [
                                   TableRow(
@@ -665,8 +504,8 @@ class _GameProtocolScreenState extends State<GameProtocolScreen> {
                                         _tableCell('$seat'),
                                         _tableCell('$voteCount'),
                                         _tableCell(
-                                          isWinner ? '$seat' : '0',
-                                          isWinner: isWinner,
+                                          isWinner ? '$seat' : '',
+                                          isWinner: true,
                                         ),
                                       ],
                                     );
@@ -682,6 +521,28 @@ class _GameProtocolScreenState extends State<GameProtocolScreen> {
                 ),
               );
             }),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildJudge() {
+    return Card(
+      color: Colors.grey.shade800,
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            const Text(
+              'СУДЬЯ:',
+              style: TextStyle(color: Colors.orange, fontSize: 16),
+            ),
+            Text(
+              widget.gameState.judgeName ?? '___________________',
+              style: const TextStyle(color: Colors.white, fontSize: 16),
+            ),
           ],
         ),
       ),

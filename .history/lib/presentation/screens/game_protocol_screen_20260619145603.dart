@@ -223,56 +223,47 @@ class _GameProtocolScreenState extends State<GameProtocolScreen> {
               ),
             ),
             const SizedBox(height: 6),
-            LayoutBuilder(
-              builder: (context, constraints) {
-                // Общая ширина таблицы = ширина экрана - отступы
-                final totalWidth = constraints.maxWidth;
-                final fixedWidths =
-                    28 + 32 + 36 + 40 + 50; // № + Роль + Фолы + Баллы + Доп.
-                final nameWidth = totalWidth -
-                    fixedWidths -
-                    10; // -10 на отступы между ячейками
-
-                return Table(
-                  border:
-                      TableBorder.all(color: Colors.grey.shade600, width: 0.5),
-                  columnWidths: {
-                    0: const FixedColumnWidth(28),
-                    1: FixedColumnWidth(nameWidth > 80 ? nameWidth : 80),
-                    2: const FixedColumnWidth(32),
-                    3: const FixedColumnWidth(36),
-                    4: const FixedColumnWidth(40),
-                    5: const FixedColumnWidth(50),
-                  },
-                  children: [
-                    TableRow(
-                      decoration: BoxDecoration(color: Colors.grey.shade700),
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Table(
+                border:
+                    TableBorder.all(color: Colors.grey.shade600, width: 0.5),
+                columnWidths: const {
+                  0: FixedColumnWidth(28),
+                  1: IntrinsicColumnWidth(), // ← Игрок — растягивается
+                  2: FixedColumnWidth(32),
+                  3: FixedColumnWidth(36),
+                  4: FixedColumnWidth(40),
+                  5: FixedColumnWidth(50),
+                },
+                children: [
+                  TableRow(
+                    decoration: BoxDecoration(color: Colors.grey.shade700),
+                    children: [
+                      _tableCell('№', isHeader: true),
+                      _tableCell('Игрок', isHeader: true),
+                      _tableCell('Роль', isHeader: true),
+                      _tableCell('Фолы', isHeader: true),
+                      _tableCell('Баллы', isHeader: true),
+                      _tableCell('Доп.', isHeader: true),
+                    ],
+                  ),
+                  ...widget.gameState.players.asMap().entries.map((entry) {
+                    final index = entry.key;
+                    final p = entry.value;
+                    return TableRow(
                       children: [
-                        _tableCell('№', isHeader: true),
-                        _tableCell('Игрок', isHeader: true),
-                        _tableCell('Роль', isHeader: true),
-                        _tableCell('Фолы', isHeader: true),
-                        _tableCell('Баллы', isHeader: true),
-                        _tableCell('Доп.', isHeader: true),
+                        _tableCell('${p.seatNumber}'),
+                        _tableCell(p.name),
+                        _tableCell(_getRoleShort(p.role)),
+                        _tableCell('${p.fouls}'),
+                        _buildPointsCell(index),
+                        _buildBonusPointsCell(index),
                       ],
-                    ),
-                    ...widget.gameState.players.asMap().entries.map((entry) {
-                      final index = entry.key;
-                      final p = entry.value;
-                      return TableRow(
-                        children: [
-                          _tableCell('${p.seatNumber}'),
-                          _tableCell(p.name),
-                          _tableCell(_getRoleShort(p.role)),
-                          _tableCell('${p.fouls}'),
-                          _buildPointsCell(index),
-                          _buildBonusPointsCell(index),
-                        ],
-                      );
-                    }).toList(),
-                  ],
-                );
-              },
+                    );
+                  }).toList(),
+                ],
+              ),
             ),
           ],
         ),
@@ -548,7 +539,6 @@ class _GameProtocolScreenState extends State<GameProtocolScreen> {
                       }
 
                       // ============ ГОЛОСОВАНИЕ ЗА ПОДЪЁМ ============
-                      // ============ ГОЛОСОВАНИЕ ЗА ПОДЪЁМ ============
                       if (roundIndex == 2) {
                         return Padding(
                           padding: const EdgeInsets.only(bottom: 8),
@@ -565,48 +555,31 @@ class _GameProtocolScreenState extends State<GameProtocolScreen> {
                               ),
                               const SizedBox(height: 4),
                               Container(
-                                width: double.infinity,
                                 padding: const EdgeInsets.all(8),
                                 decoration: BoxDecoration(
                                   border:
                                       Border.all(color: Colors.grey.shade600),
                                   borderRadius: BorderRadius.circular(4),
                                 ),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
-                                    const Center(
-                                      child: Text(
-                                        'Результат',
-                                        style: TextStyle(
-                                          color: Colors.orange,
-                                          fontSize: 13,
-                                          fontWeight: FontWeight.bold,
-                                        ),
+                                    const Text(
+                                      'Результат:',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 13,
                                       ),
                                     ),
-                                    const SizedBox(height: 4),
-                                    Container(
-                                      width: double.infinity,
-                                      padding: const EdgeInsets.symmetric(
-                                          vertical: 4, horizontal: 8),
-                                      decoration: BoxDecoration(
-                                        color: Colors.grey.shade700,
-                                        borderRadius: BorderRadius.circular(4),
-                                      ),
-                                      child: Center(
-                                        child: Text(
-                                          winners.isEmpty
-                                              ? '0'
-                                              : winners.join(', '),
-                                          style: TextStyle(
-                                            color: winners.isEmpty
-                                                ? Colors.red
-                                                : Colors.green,
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
+                                    const SizedBox(width: 8),
+                                    Text(
+                                      winners.isEmpty ? '0' : winners.join(','),
+                                      style: TextStyle(
+                                        color: winners.isEmpty
+                                            ? Colors.red
+                                            : Colors.green,
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.bold,
                                       ),
                                     ),
                                   ],
@@ -633,7 +606,6 @@ class _GameProtocolScreenState extends State<GameProtocolScreen> {
                             ),
                             const SizedBox(height: 4),
                             Container(
-                              width: double.infinity,
                               padding: const EdgeInsets.all(8),
                               decoration: BoxDecoration(
                                 border: Border.all(color: Colors.grey.shade600),
@@ -644,7 +616,7 @@ class _GameProtocolScreenState extends State<GameProtocolScreen> {
                                     color: Colors.grey.shade600),
                                 columnWidths: const {
                                   0: FixedColumnWidth(50),
-                                  1: FixedColumnWidth(60),
+                                  1: FixedColumnWidth(50),
                                   2: FixedColumnWidth(70),
                                 },
                                 children: [
