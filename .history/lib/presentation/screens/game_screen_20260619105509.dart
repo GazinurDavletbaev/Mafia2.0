@@ -18,7 +18,6 @@ import 'game_protocol_screen.dart';
 class GameScreen extends ConsumerStatefulWidget {
   final String gameId;
   final List<String?>? playerNames;
-  final bool isTestGame;
   final int? tableNumber;
   final int? gameNumber;
   final DateTime? date;
@@ -28,7 +27,6 @@ class GameScreen extends ConsumerStatefulWidget {
     super.key,
     required this.gameId,
     this.playerNames,
-    this.isTestGame = false,
     this.tableNumber,
     this.gameNumber,
     this.date,
@@ -48,22 +46,19 @@ class _GameScreenState extends ConsumerState<GameScreen> {
     super.initState();
     _vm = ref.read(gameViewModelFamily(widget.gameId).notifier);
 
+    if (widget.playerNames != null && widget.playerNames!.isNotEmpty) {
+      _vm.setPlayerNames(widget.playerNames!);
+    }
+
+    _vm.setGameSettings(
+      tableNumber: widget.tableNumber,
+      gameNumber: widget.gameNumber,
+      gameDate: widget.date,
+      judgeName: widget.judgeName,
+    );
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      // Сначала имена
-      print('=== PLAYER NAMES ===');
-      print('playerNames = ${widget.playerNames}');
-      if (widget.playerNames != null && widget.playerNames!.isNotEmpty) {
-        _vm.setPlayerNames(widget.playerNames!);
-      }
-      // Потом настройки
-      if (!widget.isTestGame) {
-        _vm.setGameSettings(
-          tableNumber: widget.tableNumber,
-          gameNumber: widget.gameNumber,
-          gameDate: widget.date,
-          judgeName: widget.judgeName,
-        );
-      }
+      _vm.dealRoles();
     });
   }
 
@@ -155,7 +150,6 @@ class _GameScreenState extends ConsumerState<GameScreen> {
   }
 
   Widget _buildMainScaffold(GameState gameState) {
-    // Используем таймер из состояния
     final timerType = gameState.currentSpeakerTimer ?? PlayerTimerType.none;
     print('=== BUILD MAIN SCAFFOLD ===');
     print('currentSpeakerTimer = ${gameState.currentSpeakerTimer}');
@@ -176,7 +170,6 @@ class _GameScreenState extends ConsumerState<GameScreen> {
         ),
         body: Stack(
           children: [
-            // Основной контент
             Padding(
               padding: const EdgeInsets.all(16.0),
               child: Column(
@@ -216,7 +209,6 @@ class _GameScreenState extends ConsumerState<GameScreen> {
                 ],
               ),
             ),
-            // Плавающий калькулятор
             FloatingCalculator(gameId: widget.gameId),
           ],
         ),

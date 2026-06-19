@@ -661,6 +661,21 @@ class _GameProtocolScreenState extends State<GameProtocolScreen> {
     );
   }
 
+  Widget _tableCell(String text, {bool isHeader = false}) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 2),
+      child: Text(
+        text,
+        style: TextStyle(
+          color: isHeader ? Colors.orange : Colors.white,
+          fontWeight: isHeader ? FontWeight.bold : FontWeight.normal,
+          fontSize: 11,
+        ),
+        textAlign: TextAlign.center,
+      ),
+    );
+  }
+
   String _getRoleShort(String role) {
     switch (role) {
       case 'don':

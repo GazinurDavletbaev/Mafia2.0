@@ -28,7 +28,7 @@ class GameScreen extends ConsumerStatefulWidget {
     super.key,
     required this.gameId,
     this.playerNames,
-    this.isTestGame = false,
+    this.isTestGame = true,
     this.tableNumber,
     this.gameNumber,
     this.date,
@@ -48,23 +48,12 @@ class _GameScreenState extends ConsumerState<GameScreen> {
     super.initState();
     _vm = ref.read(gameViewModelFamily(widget.gameId).notifier);
 
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      // Сначала имена
-      print('=== PLAYER NAMES ===');
-      print('playerNames = ${widget.playerNames}');
-      if (widget.playerNames != null && widget.playerNames!.isNotEmpty) {
+    // Если переданы имена игроков - применяем их
+    if (widget.playerNames != null && widget.playerNames!.isNotEmpty) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
         _vm.setPlayerNames(widget.playerNames!);
-      }
-      // Потом настройки
-      if (!widget.isTestGame) {
-        _vm.setGameSettings(
-          tableNumber: widget.tableNumber,
-          gameNumber: widget.gameNumber,
-          gameDate: widget.date,
-          judgeName: widget.judgeName,
-        );
-      }
-    });
+      });
+    }
   }
 
   @override

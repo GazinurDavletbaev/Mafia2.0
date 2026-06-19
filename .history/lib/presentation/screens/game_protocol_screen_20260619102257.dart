@@ -21,8 +21,8 @@ class _GameProtocolScreenState extends State<GameProtocolScreen> {
       List.generate(5, (_) => TextEditingController());
   String _protestText = 'Нет';
 
-  List<int> _points = [];
-  List<double> _bonusPoints = [];
+  late List<int> _points;
+  late List<double> _bonusPoints;
 
   @override
   void initState() {
@@ -130,31 +130,30 @@ class _GameProtocolScreenState extends State<GameProtocolScreen> {
     return Card(
       color: Colors.grey.shade800,
       child: Padding(
-        padding: const EdgeInsets.all(12),
+        padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text(
-              'ИГРОКИ',
+              'Игроки',
               style: TextStyle(
                 color: Colors.orange,
-                fontSize: 16,
+                fontSize: 18,
                 fontWeight: FontWeight.bold,
               ),
             ),
-            const SizedBox(height: 6),
+            const SizedBox(height: 8),
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               child: Table(
-                border:
-                    TableBorder.all(color: Colors.grey.shade600, width: 0.5),
+                border: TableBorder.all(color: Colors.grey.shade600),
                 columnWidths: const {
-                  0: FixedColumnWidth(28),
+                  0: FixedColumnWidth(30),
                   1: FixedColumnWidth(80),
-                  2: FixedColumnWidth(32),
-                  3: FixedColumnWidth(36),
-                  4: FixedColumnWidth(40),
-                  5: FixedColumnWidth(50),
+                  2: FixedColumnWidth(30),
+                  3: FixedColumnWidth(40),
+                  4: FixedColumnWidth(50),
+                  5: FixedColumnWidth(70),
                 },
                 children: [
                   TableRow(
@@ -191,69 +190,47 @@ class _GameProtocolScreenState extends State<GameProtocolScreen> {
     );
   }
 
-  Widget _buildBonusPointsCell(int index) {
-    final bonusValues = [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7];
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 0),
-      child: SizedBox(
-        height: 24,
-        width: 44,
-        child: DropdownButtonHideUnderline(
-          child: DropdownButton<double>(
-            value: _bonusPoints[index],
-            dropdownColor: Colors.grey.shade800,
-            style: const TextStyle(color: Colors.white, fontSize: 11),
-            isExpanded: true,
-            icon: const SizedBox.shrink(),
-            items: bonusValues.map((value) {
-              return DropdownMenuItem<double>(
-                value: value,
-                child: Center(
-                  child: Text(
-                    value == 0 ? '0' : value.toStringAsFixed(1),
-                    style: const TextStyle(fontSize: 11, color: Colors.white),
-                    textAlign: TextAlign.center,
-                  ),
-                ),
-              );
-            }).toList(),
-            onChanged: (newValue) {
-              setState(() {
-                _bonusPoints[index] = newValue!;
-              });
-            },
-          ),
-        ),
-      ),
-    );
-  }
-
   Widget _buildPointsCell(int index) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 0),
+      padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 4),
       child: Container(
-        height: 24,
+        width: 40,
         alignment: Alignment.center,
         child: Text(
           '${_points[index]}',
-          style: const TextStyle(color: Colors.white, fontSize: 11),
-          textAlign: TextAlign.center,
+          style: const TextStyle(color: Colors.white, fontSize: 12),
         ),
       ),
     );
   }
 
-  Widget _tableCell(String text, {bool isHeader = false}) {
+  Widget _buildBonusPointsCell(int index) {
+    final bonusValues = [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7];
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 2),
-      child: Text(
-        text,
-        style: TextStyle(
-          color: isHeader ? Colors.orange : Colors.white,
-          fontWeight: isHeader ? FontWeight.bold : FontWeight.normal,
-          fontSize: 11,
+      padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 4),
+      child: SizedBox(
+        width: 50,
+        child: DropdownButton<double>(
+          value: _bonusPoints[index],
+          dropdownColor: Colors.grey.shade800,
+          style: const TextStyle(color: Colors.white, fontSize: 12),
+          underline: Container(height: 1, color: Colors.grey.shade600),
+          isExpanded: true,
+          items: bonusValues.map((value) {
+            return DropdownMenuItem<double>(
+              value: value,
+              child: Text(
+                value == 0 ? '0' : value.toStringAsFixed(1),
+                textAlign: TextAlign.center,
+              ),
+            );
+          }).toList(),
+          onChanged: (newValue) {
+            setState(() {
+              _bonusPoints[index] = newValue!;
+            });
+          },
         ),
-        textAlign: TextAlign.center,
       ),
     );
   }
@@ -285,15 +262,15 @@ class _GameProtocolScreenState extends State<GameProtocolScreen> {
     return Card(
       color: Colors.grey.shade800,
       child: Padding(
-        padding: const EdgeInsets.all(12),
+        padding: const EdgeInsets.all(16),
         child: Column(
           children: [
             _infoRow('ПОБЕДИВШАЯ КОМАНДА', winner, color: winnerColor),
-            Divider(color: Colors.grey.shade600, height: 8),
+            const Divider(color: Colors.grey.shade600),
             _infoRow('СТРЕЛЬБА', shoots.isEmpty ? 'Нет' : shoots.join(' → ')),
-            Divider(color: Colors.grey.shade600, height: 8),
+            const Divider(color: Colors.grey.shade600),
             _infoRow('ПРОТЕСТ', _protestText, isEditable: true),
-            Divider(color: Colors.grey.shade600, height: 8),
+            const Divider(color: Colors.grey.shade600),
             _infoRow('ЛУЧШИЙ ХОД', '$bestMoveText',
                 suffix: '  Игрок № $bestPlayer'),
           ],
@@ -305,16 +282,16 @@ class _GameProtocolScreenState extends State<GameProtocolScreen> {
   Widget _infoRow(String label, String value,
       {Color? color, bool isEditable = false, String? suffix}) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 2),
+      padding: const EdgeInsets.symmetric(vertical: 4),
       child: Row(
         children: [
           SizedBox(
-            width: 110,
+            width: 120,
             child: Text(
               label,
               style: const TextStyle(
                 color: Colors.orange,
-                fontSize: 13,
+                fontSize: 14,
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -322,7 +299,7 @@ class _GameProtocolScreenState extends State<GameProtocolScreen> {
           Expanded(
             child: isEditable
                 ? TextField(
-                    style: const TextStyle(color: Colors.white, fontSize: 13),
+                    style: const TextStyle(color: Colors.white, fontSize: 14),
                     decoration: InputDecoration(
                       hintText: 'Нет',
                       hintStyle: TextStyle(color: Colors.grey.shade600),
@@ -340,19 +317,19 @@ class _GameProtocolScreenState extends State<GameProtocolScreen> {
                         value,
                         style: TextStyle(
                           color: color ?? Colors.white,
-                          fontSize: 13,
+                          fontSize: 14,
                           fontWeight: color != null
                               ? FontWeight.bold
                               : FontWeight.normal,
                         ),
                       ),
                       if (suffix != null) ...[
-                        const SizedBox(width: 12),
+                        const SizedBox(width: 16),
                         Text(
                           suffix,
                           style: const TextStyle(
                             color: Colors.white70,
-                            fontSize: 13,
+                            fontSize: 14,
                           ),
                         ),
                       ],
@@ -657,6 +634,21 @@ class _GameProtocolScreenState extends State<GameProtocolScreen> {
             }),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _tableCell(String text, {bool isHeader = false}) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 4),
+      child: Text(
+        text,
+        style: TextStyle(
+          color: isHeader ? Colors.orange : Colors.white,
+          fontWeight: isHeader ? FontWeight.bold : FontWeight.normal,
+          fontSize: 12,
+        ),
+        textAlign: TextAlign.center,
       ),
     );
   }

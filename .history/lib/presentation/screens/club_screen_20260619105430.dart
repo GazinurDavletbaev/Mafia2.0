@@ -139,7 +139,6 @@ class _ClubScreenState extends ConsumerState<ClubScreen> {
       MaterialPageRoute(
         builder: (context) => GameScreen(
           gameId: gameId,
-          isTestGame: true,
         ),
       ),
     );

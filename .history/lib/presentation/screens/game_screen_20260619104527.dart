@@ -28,7 +28,7 @@ class GameScreen extends ConsumerStatefulWidget {
     super.key,
     required this.gameId,
     this.playerNames,
-    this.isTestGame = false,
+    this.isTestGame = true,
     this.tableNumber,
     this.gameNumber,
     this.date,

@@ -150,11 +150,11 @@ class _GameProtocolScreenState extends State<GameProtocolScreen> {
                     TableBorder.all(color: Colors.grey.shade600, width: 0.5),
                 columnWidths: const {
                   0: FixedColumnWidth(28),
-                  1: FixedColumnWidth(80),
-                  2: FixedColumnWidth(32),
-                  3: FixedColumnWidth(36),
+                  1: FixedColumnWidth(70),
+                  2: FixedColumnWidth(28),
+                  3: FixedColumnWidth(32),
                   4: FixedColumnWidth(40),
-                  5: FixedColumnWidth(50),
+                  5: FixedColumnWidth(55),
                 },
                 children: [
                   TableRow(
@@ -191,69 +191,47 @@ class _GameProtocolScreenState extends State<GameProtocolScreen> {
     );
   }
 
-  Widget _buildBonusPointsCell(int index) {
-    final bonusValues = [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7];
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 0),
-      child: SizedBox(
-        height: 24,
-        width: 44,
-        child: DropdownButtonHideUnderline(
-          child: DropdownButton<double>(
-            value: _bonusPoints[index],
-            dropdownColor: Colors.grey.shade800,
-            style: const TextStyle(color: Colors.white, fontSize: 11),
-            isExpanded: true,
-            icon: const SizedBox.shrink(),
-            items: bonusValues.map((value) {
-              return DropdownMenuItem<double>(
-                value: value,
-                child: Center(
-                  child: Text(
-                    value == 0 ? '0' : value.toStringAsFixed(1),
-                    style: const TextStyle(fontSize: 11, color: Colors.white),
-                    textAlign: TextAlign.center,
-                  ),
-                ),
-              );
-            }).toList(),
-            onChanged: (newValue) {
-              setState(() {
-                _bonusPoints[index] = newValue!;
-              });
-            },
-          ),
-        ),
-      ),
-    );
-  }
-
   Widget _buildPointsCell(int index) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 0),
+      padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 2),
       child: Container(
-        height: 24,
         alignment: Alignment.center,
         child: Text(
           '${_points[index]}',
           style: const TextStyle(color: Colors.white, fontSize: 11),
-          textAlign: TextAlign.center,
         ),
       ),
     );
   }
 
-  Widget _tableCell(String text, {bool isHeader = false}) {
+  Widget _buildBonusPointsCell(int index) {
+    final bonusValues = [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7];
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 2),
-      child: Text(
-        text,
-        style: TextStyle(
-          color: isHeader ? Colors.orange : Colors.white,
-          fontWeight: isHeader ? FontWeight.bold : FontWeight.normal,
-          fontSize: 11,
+      padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 2),
+      child: SizedBox(
+        width: 45,
+        child: DropdownButton<double>(
+          value: _bonusPoints[index],
+          dropdownColor: Colors.grey.shade800,
+          style: const TextStyle(color: Colors.white, fontSize: 11),
+          underline: Container(height: 0.5, color: Colors.grey.shade600),
+          isExpanded: true,
+          items: bonusValues.map((value) {
+            return DropdownMenuItem<double>(
+              value: value,
+              child: Text(
+                value == 0 ? '0' : value.toStringAsFixed(1),
+                textAlign: TextAlign.center,
+                style: const TextStyle(fontSize: 11),
+              ),
+            );
+          }).toList(),
+          onChanged: (newValue) {
+            setState(() {
+              _bonusPoints[index] = newValue!;
+            });
+          },
         ),
-        textAlign: TextAlign.center,
       ),
     );
   }
@@ -657,6 +635,21 @@ class _GameProtocolScreenState extends State<GameProtocolScreen> {
             }),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _tableCell(String text, {bool isHeader = false}) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 2),
+      child: Text(
+        text,
+        style: TextStyle(
+          color: isHeader ? Colors.orange : Colors.white,
+          fontWeight: isHeader ? FontWeight.bold : FontWeight.normal,
+          fontSize: 11,
+        ),
+        textAlign: TextAlign.center,
       ),
     );
   }

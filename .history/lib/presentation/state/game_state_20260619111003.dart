@@ -81,8 +81,8 @@ class GameState {
     this.judgeName,
   });
 
-  factory GameState.initial() {
-    return GameStateInitializer.initial();
+  factory GameState.initial({required List<String> playerNames}) {
+    return GameStateInitializer.initial(playerNames: playerNames);
   }
 
   static GameState fromJson(Map<String, dynamic> json) {

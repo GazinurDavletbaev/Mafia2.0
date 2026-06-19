@@ -328,20 +328,6 @@ class GameViewModel extends StateNotifier<GameState> {
     state = state.copyWith(players: newPlayers);
   }
 
-  void setGameSettings({
-    int? tableNumber,
-    int? gameNumber,
-    DateTime? gameDate,
-    String? judgeName,
-  }) {
-    state = state.copyWith(
-      tableNumber: tableNumber,
-      gameNumber: gameNumber,
-      gameDate: gameDate,
-      judgeName: judgeName,
-    );
-  }
-
   void updateState(GameState newState) {
     state = newState;
   }

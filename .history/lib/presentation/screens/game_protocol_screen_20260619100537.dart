@@ -21,25 +21,6 @@ class _GameProtocolScreenState extends State<GameProtocolScreen> {
       List.generate(5, (_) => TextEditingController());
   String _protestText = 'Нет';
 
-  List<int> _points = [];
-  List<double> _bonusPoints = [];
-
-  @override
-  void initState() {
-    super.initState();
-    _bonusPoints = List.generate(10, (_) => 0.0);
-
-    final isRedWon = widget.gameState.winner == 'red';
-    _points = widget.gameState.players.map((p) {
-      if (!p.isAlive) return 0;
-      if (isRedWon) {
-        return p.team == 'red' ? 1 : 0;
-      } else {
-        return p.team == 'black' ? 1 : 0;
-      }
-    }).toList();
-  }
-
   @override
   void dispose() {
     for (var c in _noteControllers) {
@@ -69,7 +50,11 @@ class _GameProtocolScreenState extends State<GameProtocolScreen> {
           const SizedBox(height: 16),
           _buildPlayersTable(),
           const SizedBox(height: 16),
-          _buildInfoRow(),
+          _buildWinner(),
+          const SizedBox(height: 8),
+          _buildShoot(),
+          const SizedBox(height: 8),
+          _buildProtest(),
           const SizedBox(height: 16),
           _buildVotingTable(),
           const SizedBox(height: 16),
@@ -130,59 +115,80 @@ class _GameProtocolScreenState extends State<GameProtocolScreen> {
     return Card(
       color: Colors.grey.shade800,
       child: Padding(
-        padding: const EdgeInsets.all(12),
+        padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text(
-              'ИГРОКИ',
+              'Игроки',
               style: TextStyle(
                 color: Colors.orange,
-                fontSize: 16,
+                fontSize: 18,
                 fontWeight: FontWeight.bold,
               ),
             ),
-            const SizedBox(height: 6),
-            SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Table(
-                border:
-                    TableBorder.all(color: Colors.grey.shade600, width: 0.5),
-                columnWidths: const {
-                  0: FixedColumnWidth(28),
-                  1: FixedColumnWidth(80),
-                  2: FixedColumnWidth(32),
-                  3: FixedColumnWidth(36),
-                  4: FixedColumnWidth(40),
-                  5: FixedColumnWidth(50),
-                },
-                children: [
-                  TableRow(
-                    decoration: BoxDecoration(color: Colors.grey.shade700),
-                    children: [
-                      _tableCell('№', isHeader: true),
-                      _tableCell('Игрок', isHeader: true),
-                      _tableCell('Роль', isHeader: true),
-                      _tableCell('Фолы', isHeader: true),
-                      _tableCell('Баллы', isHeader: true),
-                      _tableCell('Доп.', isHeader: true),
-                    ],
-                  ),
-                  ...widget.gameState.players.asMap().entries.map((entry) {
-                    final index = entry.key;
-                    final p = entry.value;
-                    return TableRow(
+            const SizedBox(height: 8),
+            Table(
+              border: TableBorder.all(color: Colors.grey.shade600),
+              columnWidths: const {
+                0: FixedColumnWidth(30),
+                1: FixedColumnWidth(80),
+                2: FixedColumnWidth(60),
+                3: FixedColumnWidth(40),
+                4: FixedColumnWidth(50),
+                5: FixedColumnWidth(50),
+              },
+              children: [
+                TableRow(
+                  decoration: BoxDecoration(color: Colors.grey.shade700),
+                  children: [
+                    _tableCell('№', isHeader: true),
+                    _tableCell('Игрок', isHeader: true),
+                    _tableCell('Роль', isHeader: true),
+                    _tableCell('Фолы', isHeader: true),
+                    _tableCell('Баллы', isHeader: true),
+                    _tableCell('Доп.', isHeader: true),
+                  ],
+                ),
+                ...widget.gameState.players.map((p) => TableRow(
                       children: [
                         _tableCell('${p.seatNumber}'),
                         _tableCell(p.name),
-                        _tableCell(_getRoleShort(p.role)),
+                        _tableCell(_getRoleName(p.role)),
                         _tableCell('${p.fouls}'),
-                        _buildPointsCell(index),
-                        _buildBonusPointsCell(index),
+                        _tableCell('0'),
+                        _tableCell('0'),
                       ],
-                    );
-                  }).toList(),
-                ],
+                    )),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildWinner() {
+    final winner = widget.gameState.winner == 'red' ? '🔴 КРАСНЫЕ' : '⚫ ЧЁРНЫЕ';
+    return Card(
+      color: Colors.grey.shade800,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Text(
+              'ПОБЕДИВШАЯ КОМАНДА: ',
+              style: TextStyle(color: Colors.white, fontSize: 14),
+            ),
+            Text(
+              winner,
+              style: TextStyle(
+                color: widget.gameState.winner == 'red'
+                    ? Colors.red
+                    : Colors.black,
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
               ),
             ),
           ],
@@ -191,78 +197,7 @@ class _GameProtocolScreenState extends State<GameProtocolScreen> {
     );
   }
 
-  Widget _buildBonusPointsCell(int index) {
-    final bonusValues = [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7];
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 0),
-      child: SizedBox(
-        height: 24,
-        width: 44,
-        child: DropdownButtonHideUnderline(
-          child: DropdownButton<double>(
-            value: _bonusPoints[index],
-            dropdownColor: Colors.grey.shade800,
-            style: const TextStyle(color: Colors.white, fontSize: 11),
-            isExpanded: true,
-            icon: const SizedBox.shrink(),
-            items: bonusValues.map((value) {
-              return DropdownMenuItem<double>(
-                value: value,
-                child: Center(
-                  child: Text(
-                    value == 0 ? '0' : value.toStringAsFixed(1),
-                    style: const TextStyle(fontSize: 11, color: Colors.white),
-                    textAlign: TextAlign.center,
-                  ),
-                ),
-              );
-            }).toList(),
-            onChanged: (newValue) {
-              setState(() {
-                _bonusPoints[index] = newValue!;
-              });
-            },
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildPointsCell(int index) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 0),
-      child: Container(
-        height: 24,
-        alignment: Alignment.center,
-        child: Text(
-          '${_points[index]}',
-          style: const TextStyle(color: Colors.white, fontSize: 11),
-          textAlign: TextAlign.center,
-        ),
-      ),
-    );
-  }
-
-  Widget _tableCell(String text, {bool isHeader = false}) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 2),
-      child: Text(
-        text,
-        style: TextStyle(
-          color: isHeader ? Colors.orange : Colors.white,
-          fontWeight: isHeader ? FontWeight.bold : FontWeight.normal,
-          fontSize: 11,
-        ),
-        textAlign: TextAlign.center,
-      ),
-    );
-  }
-
-  Widget _buildInfoRow() {
-    final winner = widget.gameState.winner == 'red' ? 'КРАСНЫЕ' : 'ЧЁРНЫЕ';
-    final winnerColor =
-        widget.gameState.winner == 'red' ? Colors.red : Colors.black;
-
+  Widget _buildShoot() {
     final nightActions = widget.gameState.nightActions ?? [];
     final shoots = <String>[];
     for (int i = 0; i < nightActions.length; i += 3) {
@@ -270,174 +205,70 @@ class _GameProtocolScreenState extends State<GameProtocolScreen> {
       shoots.add('${kill == 0 || kill == -1 ? '0' : kill}');
     }
 
-    final bestMove = widget.gameState.partialBestMove;
-    String bestMoveText;
-    String bestPlayer;
-    if (bestMove.isNotEmpty && bestMove.length >= 3) {
-      bestMoveText = bestMove.join('  ');
-      final nightActions2 = widget.gameState.nightActions ?? [];
-      bestPlayer = nightActions2.length >= 3 ? '${nightActions2[0]}' : '0';
-    } else {
-      bestMoveText = '_  _  _';
-      bestPlayer = '0';
-    }
-
     return Card(
       color: Colors.grey.shade800,
       child: Padding(
-        padding: const EdgeInsets.all(12),
-        child: Column(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            _infoRow('ПОБЕДИВШАЯ КОМАНДА', winner, color: winnerColor),
-            Divider(color: Colors.grey.shade600, height: 8),
-            _infoRow('СТРЕЛЬБА', shoots.isEmpty ? 'Нет' : shoots.join(' → ')),
-            Divider(color: Colors.grey.shade600, height: 8),
-            _infoRow('ПРОТЕСТ', _protestText, isEditable: true),
-            Divider(color: Colors.grey.shade600, height: 8),
-            _infoRow('ЛУЧШИЙ ХОД', '$bestMoveText',
-                suffix: '  Игрок № $bestPlayer'),
+            const Text(
+              'СТРЕЛЬБА: ',
+              style: TextStyle(color: Colors.orange, fontSize: 14),
+            ),
+            Text(
+              shoots.isEmpty ? 'Нет' : shoots.join(' → '),
+              style: const TextStyle(color: Colors.white, fontSize: 14),
+            ),
           ],
         ),
       ),
     );
   }
 
-  Widget _infoRow(String label, String value,
-      {Color? color, bool isEditable = false, String? suffix}) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 2),
-      child: Row(
-        children: [
-          SizedBox(
-            width: 110,
-            child: Text(
-              label,
-              style: const TextStyle(
-                color: Colors.orange,
-                fontSize: 13,
-                fontWeight: FontWeight.bold,
+  Widget _buildProtest() {
+    return Card(
+      color: Colors.grey.shade800,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Text(
+              'ПРОТЕСТ: ',
+              style: TextStyle(color: Colors.orange, fontSize: 14),
+            ),
+            Expanded(
+              child: TextField(
+                style: const TextStyle(color: Colors.white, fontSize: 14),
+                decoration: InputDecoration(
+                  hintText: 'Нет',
+                  hintStyle: TextStyle(color: Colors.grey.shade600),
+                  border: InputBorder.none,
+                  isDense: true,
+                  contentPadding: EdgeInsets.zero,
+                ),
+                onChanged: (value) {
+                  _protestText = value.isEmpty ? 'Нет' : value;
+                },
               ),
             ),
-          ),
-          Expanded(
-            child: isEditable
-                ? TextField(
-                    style: const TextStyle(color: Colors.white, fontSize: 13),
-                    decoration: InputDecoration(
-                      hintText: 'Нет',
-                      hintStyle: TextStyle(color: Colors.grey.shade600),
-                      border: InputBorder.none,
-                      isDense: true,
-                      contentPadding: EdgeInsets.zero,
-                    ),
-                    onChanged: (value) {
-                      _protestText = value.isEmpty ? 'Нет' : value;
-                    },
-                  )
-                : Row(
-                    children: [
-                      Text(
-                        value,
-                        style: TextStyle(
-                          color: color ?? Colors.white,
-                          fontSize: 13,
-                          fontWeight: color != null
-                              ? FontWeight.bold
-                              : FontWeight.normal,
-                        ),
-                      ),
-                      if (suffix != null) ...[
-                        const SizedBox(width: 12),
-                        Text(
-                          suffix,
-                          style: const TextStyle(
-                            color: Colors.white70,
-                            fontSize: 13,
-                          ),
-                        ),
-                      ],
-                    ],
-                  ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
 
   Widget _buildVotingTable() {
     final voteHistory = widget.gameState.voteHistory;
-    final totalDays = widget.gameState.currentDay + 1;
-
     if (voteHistory.isEmpty) {
       return Card(
         color: Colors.grey.shade800,
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                'Голосования',
-                style: TextStyle(
-                  color: Colors.orange,
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 8),
-              ...List.generate(totalDays, (index) {
-                return Padding(
-                  padding: const EdgeInsets.only(bottom: 8),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Голосование ${index + 1}',
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.grey.shade600),
-                          borderRadius: BorderRadius.circular(4),
-                        ),
-                        child: Row(
-                          children: [
-                            const Expanded(
-                              flex: 2,
-                              child: Text(
-                                'Нет голосования',
-                                style: TextStyle(
-                                    color: Colors.white70, fontSize: 12),
-                              ),
-                            ),
-                            Expanded(
-                              flex: 1,
-                              child: Container(
-                                alignment: Alignment.centerRight,
-                                child: const Text(
-                                  'Результат: 0',
-                                  style: TextStyle(
-                                    color: Colors.red,
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                );
-              }),
-            ],
+        child: const Padding(
+          padding: EdgeInsets.all(16),
+          child: Text(
+            'Голосования не проводились',
+            style: TextStyle(color: Colors.white),
           ),
         ),
       );
@@ -581,7 +412,7 @@ class _GameProtocolScreenState extends State<GameProtocolScreen> {
                   ],
                 ),
               );
-            }),
+            }).toList(),
           ],
         ),
       ),
@@ -661,22 +492,38 @@ class _GameProtocolScreenState extends State<GameProtocolScreen> {
     );
   }
 
-  String _getRoleShort(String role) {
+  Widget _tableCell(String text, {bool isHeader = false}) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 4),
+      child: Text(
+        text,
+        style: TextStyle(
+          color: isHeader ? Colors.orange : Colors.white,
+          fontWeight: isHeader ? FontWeight.bold : FontWeight.normal,
+          fontSize: 12,
+        ),
+        textAlign: TextAlign.center,
+      ),
+    );
+  }
+
+  String _getRoleName(String role) {
     switch (role) {
       case 'don':
-        return 'Д';
+        return 'Дон';
       case 'mafia':
-        return 'Ч';
+        return 'Мафия';
       case 'sheriff':
-        return 'Ш';
+        return 'Шериф';
       case 'citizen':
-        return 'К';
+        return 'Мирный';
       default:
-        return '?';
+        return role;
     }
   }
 
   void _saveProtocol() {
+    // TODO: сохранить протокол
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('Сохранение протокола в разработке')),
     );

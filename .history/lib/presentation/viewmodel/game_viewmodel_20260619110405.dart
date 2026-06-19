@@ -24,12 +24,10 @@ class GameViewModel extends StateNotifier<GameState> {
   final String gameId;
   final GameHistory _history = GameHistory();
 
-  // Флаг для пропуска первого Back после Forward
   bool _skipNextBack = false;
 
   GameViewModel(this._ref, this.gameId) : super(GameState.initial()) {
     _loadSavedGame().then((_) {
-      // Если после загрузки роли не заданы (новая игра) - раздаём
       if (state.players.first.role == 'unknown') {
         dealRoles();
       }
@@ -37,16 +35,13 @@ class GameViewModel extends StateNotifier<GameState> {
     });
   }
 
-  // ========== Делегирование ==========
   late final GameViewModelState _stateActions = GameViewModelState(this, _ref);
   late final PhaseRules _phaseRules = PhaseRules();
   late final SpeechesActions _speeches = SpeechesActions(this, _ref);
   late final PlayerActions _player = PlayerActions(this, _ref);
   late final ResetActions _reset = ResetActions(this, _ref);
-  late final VoteCalculatorActions _voteCalc = VoteCalculatorActions(
-    this,
-    _ref,
-  );
+  late final VoteCalculatorActions _voteCalc =
+      VoteCalculatorActions(this, _ref);
 
   Future<void> _loadSavedGame() => _stateActions.loadSavedGame();
 
@@ -55,8 +50,6 @@ class GameViewModel extends StateNotifier<GameState> {
       _skipNextBack = false;
       final previousState = _history.last;
       state = previousState;
-      final phaseNames =
-          _history.states.map((s) => s.currentSubPhase.name).toList();
       AppLogger.d(
         'SKIP BACK: players = ${state.players.map((p) => '${p.seatNumber}:${p.role}').toList()}',
       );
@@ -70,8 +63,6 @@ class GameViewModel extends StateNotifier<GameState> {
     _history.pop();
     final previousState = _history.last;
     state = previousState;
-    final phaseNames =
-        _history.states.map((s) => s.currentSubPhase.name).toList();
     AppLogger.d(
       'BACK: players = ${state.players.map((p) => '${p.seatNumber}:${p.role}').toList()}',
     );
@@ -101,9 +92,7 @@ class GameViewModel extends StateNotifier<GameState> {
         await _speeches.nextSpeaker();
         break;
       case SubPhase.voting:
-        // Проверяем, разрешено ли голосование в этот день
         if (!state.isVotingDay) {
-          // Голосование запрещено — пропускаем, переходим в ночь
           _history.push(state);
           final aliveCount = state.players.where((p) => p.isAlive).length;
           state = state.copyWith(
@@ -121,16 +110,13 @@ class GameViewModel extends StateNotifier<GameState> {
           );
           break;
         }
-
         AppLogger.d(
-          'Voting phase started, candidates: ${state.nominatedSeats}',
-        );
+            'Voting phase started, candidates: ${state.nominatedSeats}');
         state = state.copyWith(
           isVotingActive: true,
           voteController: VoteController(state.nominatedSeats),
         );
         break;
-
       case SubPhase.revote:
         final candidates =
             state.tiedSeats.isNotEmpty ? state.tiedSeats : state.nominatedSeats;
@@ -146,38 +132,28 @@ class GameViewModel extends StateNotifier<GameState> {
         state = await _phaseRules.calculateNextState(state);
         break;
       case SubPhase.finalWordKill:
-        print("finalwordkill onphaseforward");
         _history.push(state);
         final playerToKill = state.currentSpeakerSeat;
         if (playerToKill != null) {
           final usecase = _ref.read(killPlayerUsecaseProvider);
-          final (newPlayers, winner) = usecase.execute(
-            state.players,
-            playerToKill,
-          );
+          final (newPlayers, winner) =
+              usecase.execute(state.players, playerToKill);
           state = state.copyWith(players: newPlayers);
           if (winner != null) {
             state = state.copyWith(
-              isGameEnded: true,
-              winner: winner ? 'red' : 'black',
-            );
+                isGameEnded: true, winner: winner ? 'red' : 'black');
           }
         }
         state = await _phaseRules.calculateNextState(state);
         break;
       case SubPhase.finalWord:
         _history.push(state);
-
         final playerToKill = state.currentSpeakerSeat;
-        if (playerToKill == null) {
-          break;
-        }
+        if (playerToKill == null) break;
 
         final usecase = _ref.read(killPlayerUsecaseProvider);
-        final (newPlayers, winner) = usecase.execute(
-          state.players,
-          playerToKill,
-        );
+        final (newPlayers, winner) =
+            usecase.execute(state.players, playerToKill);
 
         final remainingTied =
             state.tiedSeats.where((seat) => seat != playerToKill).toList();
@@ -190,14 +166,11 @@ class GameViewModel extends StateNotifier<GameState> {
           );
           if (winner != null) {
             state = state.copyWith(
-              isGameEnded: true,
-              winner: winner ? 'red' : 'black',
-            );
+                isGameEnded: true, winner: winner ? 'red' : 'black');
           }
         } else {
           final newPhaseHistory = List<SubPhase>.from(state.phaseHistory)
             ..add(SubPhase.mafiaShoot);
-
           state = state.copyWith(
             players: newPlayers,
             currentPhase: Phase.night,
@@ -213,25 +186,17 @@ class GameViewModel extends StateNotifier<GameState> {
           );
           if (winner != null) {
             state = state.copyWith(
-              isGameEnded: true,
-              winner: winner ? 'red' : 'black',
-            );
+                isGameEnded: true, winner: winner ? 'red' : 'black');
           }
         }
         break;
       case SubPhase.bestMove:
-        print("bestmove gameviewmodel onphaseforward");
         _history.push(state);
-        final newState = await _phaseRules.calculateNextState(state);
-        state = newState;
+        state = await _phaseRules.calculateNextState(state);
         break;
       default:
         _history.push(state);
-        final phaseNames =
-            _history.states.map((s) => s.currentSubPhase.name).toList();
-        AppLogger.d('history phases: $phaseNames');
-        final newState = await _phaseRules.calculateNextState(state);
-        state = newState;
+        state = await _phaseRules.calculateNextState(state);
         break;
     }
   }
@@ -264,7 +229,6 @@ class GameViewModel extends StateNotifier<GameState> {
 
   void submitNightAction(int value) {
     final subPhase = state.currentSubPhase;
-
     final currentActions = state.nightActions ?? [];
     final newActions = [...currentActions, value];
     state = state.copyWith(nightActions: newActions);
@@ -298,24 +262,13 @@ class GameViewModel extends StateNotifier<GameState> {
 
   void submitBestMoveNumber(int value) {
     if (state.currentSubPhase != SubPhase.bestMove) return;
-
     if (state.partialBestMove.contains(value)) return;
     if (state.partialBestMove.length >= 3) return;
 
     final newPartial = List<int>.from(state.partialBestMove)..add(value);
     _history.push(state);
-
     state = state.copyWith(partialBestMove: newPartial);
     AppLogger.d('Best move partial: $newPartial');
-  }
-
-  String currentPhaseString() {
-    switch (state.currentPhase) {
-      case Phase.night:
-        return 'night';
-      case Phase.day:
-        return 'day';
-    }
   }
 
   void setPlayerNames(List<String?> names) {
