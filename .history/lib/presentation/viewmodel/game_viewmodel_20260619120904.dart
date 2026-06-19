@@ -26,9 +26,9 @@ class GameViewModel extends StateNotifier<GameState> {
   bool _skipNextBack = false;
 
   GameViewModel(this._ref) : super(GameState.initial()) {
-    // Не загружаем сохранённую игру при создании новой
-    // _loadSavedGame будет вызван только при необходимости
-    _history.push(state);
+    _loadSavedGame().then((_) {
+      _history.push(state);
+    });
   }
 
   late final GameViewModelState _stateActions = GameViewModelState(this, _ref);
@@ -39,6 +39,8 @@ class GameViewModel extends StateNotifier<GameState> {
   late final VoteCalculatorActions _voteCalc =
       VoteCalculatorActions(this, _ref);
 
+  Future<void> _loadSavedGame() => _stateActions.loadSavedGame();
+
   void initializeGame({
     required List<String> playerNames,
     int? tableNumber,
@@ -46,6 +48,10 @@ class GameViewModel extends StateNotifier<GameState> {
     DateTime? gameDate,
     String? judgeName,
   }) {
+    print('=== INITIALIZE GAME ===');
+    print('playerNames: $playerNames');
+
+    // Создаём новых игроков с правильными именами
     final newPlayers = List.generate(10, (index) {
       final seat = index + 1;
       return PlayerModel(
@@ -71,6 +77,7 @@ class GameViewModel extends StateNotifier<GameState> {
       judgeName: judgeName,
     );
 
+    // Своя реализация раздачи ролей
     _dealRolesDirectly();
   }
 
@@ -97,6 +104,8 @@ class GameViewModel extends StateNotifier<GameState> {
     }
 
     state = state.copyWith(players: newPlayers);
+    print('=== ROLES DEALT ===');
+    print(state.players.map((p) => '${p.name}: ${p.role}').toList());
   }
 
   String _getTeamByRole(String role) {
@@ -110,11 +119,6 @@ class GameViewModel extends StateNotifier<GameState> {
       default:
         return 'unknown';
     }
-  }
-
-  Future<void> loadSavedGame() async {
-    await _stateActions.loadSavedGame();
-    _history.push(state);
   }
 
   Future<void> onPhaseBack() async {
@@ -291,6 +295,7 @@ class GameViewModel extends StateNotifier<GameState> {
   void closeRoleCard() => _player.closeRoleCard();
 
   Future<void> onResetGame() => _reset.onResetGame();
+  Future<void> dealRoles() => _reset.dealRoles();
 
   void submitVote(int votes) => _voteCalc.submitVote(votes);
   void hideVoteCalculator() => _voteCalc.hideVoteCalculator();

@@ -8,42 +8,9 @@ import 'game_state.dart';
 
 class GameStateInitializer {
   static GameState initial() {
-    const names = [
-      'Алексей',
-      'Дмитрий',
-      'Максим',
-      'Иван',
-      'Сергей',
-      'Анна',
-      'Елена',
-      'Мария',
-      'Татьяна',
-      'Ольга',
-    ];
-
-    final players = List.generate(10, (index) {
-      final seat = index + 1;
-      return PlayerModel(
-        id: 'player_$seat',
-        seatNumber: seat,
-        name: names[index],
-        team: 'unknown',
-        role: 'unknown',
-        isAlive: true,
-        fouls: 0,
-        isSpeaking: false,
-        gameId: '',
-        hasSkippedSpeech: false,
-        gotThirdFoulDuringSpeech: false,
-      );
-    });
-
-    AppLogger.d('Setting currentSubPhase = SubPhase.roleDistribution');
-    // НЕ вызываем _assignRoles здесь
-
     return GameState(
       game: null,
-      players: players, // ← без ролей
+      players: [], // ← пустой список
       currentPhase: Phase.night,
       currentSubPhase: SubPhase.roleDistribution,
       currentSubPhaseIndex: 0,

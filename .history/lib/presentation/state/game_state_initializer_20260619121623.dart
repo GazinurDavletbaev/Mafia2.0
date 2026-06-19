@@ -8,6 +8,8 @@ import 'game_state.dart';
 
 class GameStateInitializer {
   static GameState initial() {
+    AppLogger.d('GameState.initial() called');
+    AppLogger.d('INIT: phaseHistory = []');
     const names = [
       'Алексей',
       'Дмитрий',

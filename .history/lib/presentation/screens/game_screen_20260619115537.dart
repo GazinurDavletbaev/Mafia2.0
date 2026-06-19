@@ -44,19 +44,15 @@ class _GameScreenState extends ConsumerState<GameScreen> {
     super.initState();
     _vm = ref.read(gameViewModelProvider.notifier);
 
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      print('=== GAME SCREEN POST FRAME ===');
-      print('playerNames: ${widget.playerNames}');
-      if (widget.playerNames != null && widget.playerNames!.isNotEmpty) {
-        _vm.initializeGame(
-          playerNames: widget.playerNames!,
-          tableNumber: widget.tableNumber,
-          gameNumber: widget.gameNumber,
-          gameDate: widget.date,
-          judgeName: widget.judgeName,
-        );
-      }
-    });
+    if (widget.playerNames != null && widget.playerNames!.isNotEmpty) {
+      _vm.initializeGame(
+        playerNames: widget.playerNames!,
+        tableNumber: widget.tableNumber,
+        gameNumber: widget.gameNumber,
+        gameDate: widget.date,
+        judgeName: widget.judgeName,
+      );
+    }
   }
 
   @override
@@ -124,8 +120,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
   @override
   Widget build(BuildContext context) {
     final gameState = ref.watch(gameViewModelProvider);
-    print('=== GAME SCREEN BUILD ===');
-    print('players: ${gameState.players.map((p) => p.name).toList()}');
+
     if (gameState.isGameEnded && !_dialogShown) {
       _dialogShown = true;
       WidgetsBinding.instance.addPostFrameCallback((_) {

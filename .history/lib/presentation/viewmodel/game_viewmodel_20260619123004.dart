@@ -26,9 +26,9 @@ class GameViewModel extends StateNotifier<GameState> {
   bool _skipNextBack = false;
 
   GameViewModel(this._ref) : super(GameState.initial()) {
-    // Не загружаем сохранённую игру при создании новой
-    // _loadSavedGame будет вызван только при необходимости
-    _history.push(state);
+    _loadSavedGame().then((_) {
+      _history.push(state);
+    });
   }
 
   late final GameViewModelState _stateActions = GameViewModelState(this, _ref);
@@ -39,6 +39,8 @@ class GameViewModel extends StateNotifier<GameState> {
   late final VoteCalculatorActions _voteCalc =
       VoteCalculatorActions(this, _ref);
 
+  Future<void> _loadSavedGame() => _stateActions.loadSavedGame();
+
   void initializeGame({
     required List<String> playerNames,
     int? tableNumber,
@@ -46,23 +48,15 @@ class GameViewModel extends StateNotifier<GameState> {
     DateTime? gameDate,
     String? judgeName,
   }) {
-    final newPlayers = List.generate(10, (index) {
-      final seat = index + 1;
-      return PlayerModel(
-        id: 'player_$seat',
-        seatNumber: seat,
-        name: playerNames[index],
-        team: 'unknown',
-        role: 'unknown',
-        isAlive: true,
-        fouls: 0,
-        isSpeaking: false,
-        gameId: '',
-        hasSkippedSpeech: false,
-        gotThirdFoulDuringSpeech: false,
-      );
-    });
-
+    print('=== INITIALIZE GAME ===');
+    print('playerNames: $playerNames');
+    print('players before: ${state.players.map((p) => p.name).toList()}');
+// ... меняем имена
+    print('players after: ${state.players.map((p) => p.name).toList()}');
+    final newPlayers = List<PlayerModel>.from(state.players);
+    for (int i = 0; i < playerNames.length && i < newPlayers.length; i++) {
+      newPlayers[i] = newPlayers[i].copyWith(name: playerNames[i]);
+    }
     state = state.copyWith(
       players: newPlayers,
       tableNumber: tableNumber,
@@ -70,51 +64,7 @@ class GameViewModel extends StateNotifier<GameState> {
       gameDate: gameDate,
       judgeName: judgeName,
     );
-
-    _dealRolesDirectly();
-  }
-
-  void _dealRolesDirectly() {
-    const roles = [
-      'don',
-      'mafia',
-      'mafia',
-      'sheriff',
-      'citizen',
-      'citizen',
-      'citizen',
-      'citizen',
-      'citizen',
-      'citizen',
-    ];
-    final shuffled = List.of(roles)..shuffle();
-
-    final newPlayers = List<PlayerModel>.from(state.players);
-    for (int i = 0; i < newPlayers.length; i++) {
-      final role = shuffled[i];
-      final team = _getTeamByRole(role);
-      newPlayers[i] = newPlayers[i].copyWith(role: role, team: team);
-    }
-
-    state = state.copyWith(players: newPlayers);
-  }
-
-  String _getTeamByRole(String role) {
-    switch (role) {
-      case 'don':
-      case 'mafia':
-        return 'black';
-      case 'sheriff':
-      case 'citizen':
-        return 'red';
-      default:
-        return 'unknown';
-    }
-  }
-
-  Future<void> loadSavedGame() async {
-    await _stateActions.loadSavedGame();
-    _history.push(state);
+    dealRoles();
   }
 
   Future<void> onPhaseBack() async {
@@ -291,6 +241,7 @@ class GameViewModel extends StateNotifier<GameState> {
   void closeRoleCard() => _player.closeRoleCard();
 
   Future<void> onResetGame() => _reset.onResetGame();
+  Future<void> dealRoles() => _reset.dealRoles();
 
   void submitVote(int votes) => _voteCalc.submitVote(votes);
   void hideVoteCalculator() => _voteCalc.hideVoteCalculator();

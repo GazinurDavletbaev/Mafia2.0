@@ -124,8 +124,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
   @override
   Widget build(BuildContext context) {
     final gameState = ref.watch(gameViewModelProvider);
-    print('=== GAME SCREEN BUILD ===');
-    print('players: ${gameState.players.map((p) => p.name).toList()}');
+
     if (gameState.isGameEnded && !_dialogShown) {
       _dialogShown = true;
       WidgetsBinding.instance.addPostFrameCallback((_) {
