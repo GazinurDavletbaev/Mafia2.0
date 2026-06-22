@@ -32,12 +32,6 @@ class VoteCalculatorActions {
       return;
     }
 
-    if (controller.totalCandidates == 1) {
-      final aliveCount = _vm.state.players.where((p) => p.isAlive).length;
-      controller.setVotes(aliveCount);
-      _finalizeVoting(controller.results);
-      return;
-    }
     AppLogger.d('submitVote: seat=${controller.currentSeat}, votes=$votes');
     controller.setVotes(votes);
 

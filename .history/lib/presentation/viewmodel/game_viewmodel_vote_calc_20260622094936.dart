@@ -38,6 +38,7 @@ class VoteCalculatorActions {
       _finalizeVoting(controller.results);
       return;
     }
+
     AppLogger.d('submitVote: seat=${controller.currentSeat}, votes=$votes');
     controller.setVotes(votes);
 

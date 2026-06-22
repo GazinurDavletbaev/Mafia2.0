@@ -97,7 +97,25 @@ class SpeechUsecase {
         true,
       );
     }
+    if ((candidates.length == 1 && !isDay0) || !isVotingDay) {
+      // Сохраняем голосование без голосов (1 кандидат уходит без голосования)
+      final day = state.currentDay;
+      final record = {11: day};
+      if (candidates.isNotEmpty) {
+        record[12] = candidates.first; // уходит единственный кандидат
+      }
 
+      return (
+        state.copyWith(
+          currentSubPhase: SubPhase.finalWord,
+          currentSpeakerSeat: candidates.isNotEmpty ? candidates.first : null,
+          isVotingDay: true,
+          currentSpeakerTimer: PlayerTimerType.seconds60,
+          voteHistory: [...state.voteHistory, record],
+        ),
+        true,
+      );
+    }
     print('=== TRANSITION TO VOTING ===');
     print('currentSpeakerSeat before = ${state.currentSpeakerSeat}');
     print('candidates = $candidates');

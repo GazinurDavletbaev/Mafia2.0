@@ -32,12 +32,6 @@ class VoteCalculatorActions {
       return;
     }
 
-    if (controller.totalCandidates == 1) {
-      final aliveCount = _vm.state.players.where((p) => p.isAlive).length;
-      controller.setVotes(aliveCount);
-      _finalizeVoting(controller.results);
-      return;
-    }
     AppLogger.d('submitVote: seat=${controller.currentSeat}, votes=$votes');
     controller.setVotes(votes);
 
@@ -111,6 +105,8 @@ class VoteCalculatorActions {
 
   void _finalizeVoting(Map<int, int> votes) {
     AppLogger.d('_finalizeVoting: votes=$votes');
+    print('=== SAVING VOTE HISTORY ===');
+    print('day: ${_vm.state.currentDay}');
     final aliveCount = _vm.state.players.where((p) => p.isAlive).length;
     final isRevote = _vm.state.currentSubPhase == SubPhase.revote;
     final previousTiedCount = _vm.state.tiedSeats.length;

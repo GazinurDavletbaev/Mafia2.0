@@ -97,7 +97,19 @@ class SpeechUsecase {
         true,
       );
     }
-
+    if ((candidates.length == 1 && !isDay0) || !isVotingDay) {
+      // Переходим в голосование с одним кандидатом
+      return (
+        state.copyWith(
+          currentSubPhase: SubPhase.voting,
+          currentSpeakerSeat: -1,
+          isVotingActive: true,
+          voteController: VoteController(candidates),
+          currentSpeakerTimer: null,
+        ),
+        true,
+      );
+    }
     print('=== TRANSITION TO VOTING ===');
     print('currentSpeakerSeat before = ${state.currentSpeakerSeat}');
     print('candidates = $candidates');

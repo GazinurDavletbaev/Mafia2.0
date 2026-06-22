@@ -166,19 +166,9 @@ class GameViewModel extends StateNotifier<GameState> {
       case SubPhase.speeches:
         _history.push(state);
         await _speeches.nextSpeaker();
-
-        // Проверяем: если это был последний говорящий и остался 1 кандидат
-        final candidates = state.nominatedSeats;
-        if (state.currentSpeakerSeat == null && candidates.length == 1) {
-          // Создаём голосование и сразу завершаем
-          state = state.copyWith(
-            isVotingActive: true,
-            voteController: VoteController(candidates),
-          );
-          _voteCalc.submitVote(0);
-        }
         break;
       case SubPhase.voting:
+        print("subphase voting");
         if (!state.isVotingDay) {
           _history.push(state);
           final aliveCount = state.players.where((p) => p.isAlive).length;
@@ -197,12 +187,17 @@ class GameViewModel extends StateNotifier<GameState> {
           );
           break;
         }
-        AppLogger.d(
-            'Voting phase started, candidates: ${state.nominatedSeats}');
+        final candidates = state.nominatedSeats;
         state = state.copyWith(
           isVotingActive: true,
-          voteController: VoteController(state.nominatedSeats),
+          voteController: VoteController(candidates),
         );
+        print(candidates);
+        if (candidates.length == 1) {
+          print('hhhhhhh');
+          _voteCalc.submitVote(0);
+          break;
+        }
         break;
       case SubPhase.revote:
         final candidates =
