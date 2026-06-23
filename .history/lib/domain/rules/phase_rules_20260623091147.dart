@@ -144,17 +144,13 @@ class PhaseRules {
       if (next == SubPhase.donCheck) {
         final don = currentState.players.firstWhere((p) => p.role == 'don');
         if (!don.isAlive) {
-          print('hi don');
-
           // Дон мертв — пропускаем donCheck, идём сразу в sheriffCheck
           final nightActions = currentState.nightActions ?? [];
           // Добавляем 0 в nightActions для пропущенной проверки
           final newNightActions = [...nightActions, 0];
           return currentState.copyWith(
             nightActions: newNightActions,
-            currentSubPhase: SubPhase.donCheck,
-            currentSpeakerTimer: PlayerTimerType.seconds10,
-            currentSpeakerSeat: don.seatNumber,
+            currentSubPhase: SubPhase.sheriffCheck,
           );
         }
       }
@@ -167,13 +163,30 @@ class PhaseRules {
           print('hi sherifff');
           // Шериф мертв — пропускаем sheriffCheck, идём на выход из ночи
           final nightActions = currentState.nightActions ?? [];
-          // Добавляем 0 в nightActions для пропущенной проверки
           final newNightActions = [...nightActions, 0];
+          final lastKill = nightActions.length >= 3
+            ? nightActions[nightActions.length - 3]
+            : null;
+
+        // Промах - если значение -1 или 0
+        final isMiss = lastKill == null || lastKill == 0 || lastKill == -1;
+
+        if (isMiss) {
+          nextPhase = SubPhase.speeches;
+        } else {
+          if (currentDay == 1 && currentState.isBestMove) {
+            nextPhase = SubPhase.bestMove;
+          } else if (currentDay == 1) {
+            nextPhase = SubPhase.finalWordKill;
+          } else {
+            nextPhase = SubPhase.finalWordKill;
+          }
+        }
+          }
           return currentState.copyWith(
             nightActions: newNightActions,
-            currentSubPhase: SubPhase.sheriffCheck,
-            currentSpeakerTimer: PlayerTimerType.seconds10,
-            currentSpeakerSeat: sheriff.seatNumber,
+            currentSubPhase: nextPhaseAfterNight,
+            currentDay: currentState.currentDay,
           );
         }
       }

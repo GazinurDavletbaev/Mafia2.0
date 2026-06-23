@@ -144,17 +144,12 @@ class PhaseRules {
       if (next == SubPhase.donCheck) {
         final don = currentState.players.firstWhere((p) => p.role == 'don');
         if (!don.isAlive) {
-          print('hi don');
-
           // Дон мертв — пропускаем donCheck, идём сразу в sheriffCheck
           final nightActions = currentState.nightActions ?? [];
           // Добавляем 0 в nightActions для пропущенной проверки
           final newNightActions = [...nightActions, 0];
-          return currentState.copyWith(
+          currentState.copyWith(
             nightActions: newNightActions,
-            currentSubPhase: SubPhase.donCheck,
-            currentSpeakerTimer: PlayerTimerType.seconds10,
-            currentSpeakerSeat: don.seatNumber,
           );
         }
       }
@@ -164,16 +159,11 @@ class PhaseRules {
         final sheriff =
             currentState.players.firstWhere((p) => p.role == 'sheriff');
         if (!sheriff.isAlive) {
-          print('hi sherifff');
           // Шериф мертв — пропускаем sheriffCheck, идём на выход из ночи
           final nightActions = currentState.nightActions ?? [];
-          // Добавляем 0 в nightActions для пропущенной проверки
           final newNightActions = [...nightActions, 0];
-          return currentState.copyWith(
+          currentState.copyWith(
             nightActions: newNightActions,
-            currentSubPhase: SubPhase.sheriffCheck,
-            currentSpeakerTimer: PlayerTimerType.seconds10,
-            currentSpeakerSeat: sheriff.seatNumber,
           );
         }
       }

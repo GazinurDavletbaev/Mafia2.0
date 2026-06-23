@@ -318,17 +318,23 @@ class GameViewModel extends StateNotifier<GameState> {
     final currentActions = state.nightActions ?? [];
     final newActions = [...currentActions, value];
     state = state.copyWith(nightActions: newActions);
-    print('maf shot');
+
     if (subPhase == SubPhase.mafiaShoot) {
       if (value != 0) {
         state = state.copyWith(hasKillInLastNight: true);
       }
       AppLogger.d('Mafia shoot: цель $newActions');
     } else if (subPhase == SubPhase.donCheck && value != 0) {
-      _showRoleCardForPlayer(value);
+      final don = state.players.firstWhere((p) => p.role == 'don');
+      if (don.isAlive) {
+        _showRoleCardForPlayer(value);
+      }
       AppLogger.d('Don check: игрок $value');
     } else if (subPhase == SubPhase.sheriffCheck && value != 0) {
-      _showRoleCardForPlayer(value);
+      final sheriff = state.players.firstWhere((p) => p.role == 'sheriff');
+      if (sheriff.isAlive) {
+        _showRoleCardForPlayer(value);
+      }
       AppLogger.d('Sheriff check: игрок $value');
     }
   }

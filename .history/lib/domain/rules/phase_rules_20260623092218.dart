@@ -153,8 +153,6 @@ class PhaseRules {
           return currentState.copyWith(
             nightActions: newNightActions,
             currentSubPhase: SubPhase.donCheck,
-            currentSpeakerTimer: PlayerTimerType.seconds10,
-            currentSpeakerSeat: don.seatNumber,
           );
         }
       }
@@ -172,8 +170,6 @@ class PhaseRules {
           return currentState.copyWith(
             nightActions: newNightActions,
             currentSubPhase: SubPhase.sheriffCheck,
-            currentSpeakerTimer: PlayerTimerType.seconds10,
-            currentSpeakerSeat: sheriff.seatNumber,
           );
         }
       }

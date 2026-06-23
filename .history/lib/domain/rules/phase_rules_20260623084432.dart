@@ -139,69 +139,63 @@ class PhaseRules {
     // Ночь 1+
     else if (_nightOrder.contains(currentPhase)) {
       AppLogger.d('currentPhase in _nightOrder: $currentPhase');
-      final next = _getNextInOrder(currentPhase, _nightOrder);
-      AppLogger.d('currentPhase in _nightOrdernext: $next');
-      if (next == SubPhase.donCheck) {
+
+      // Проверка дона
+      if (currentPhase == SubPhase.donCheck) {
         final don = currentState.players.firstWhere((p) => p.role == 'don');
         if (!don.isAlive) {
-          print('hi don');
-
           // Дон мертв — пропускаем donCheck, идём сразу в sheriffCheck
           final nightActions = currentState.nightActions ?? [];
           // Добавляем 0 в nightActions для пропущенной проверки
           final newNightActions = [...nightActions, 0];
           return currentState.copyWith(
             nightActions: newNightActions,
-            currentSubPhase: SubPhase.donCheck,
-            currentSpeakerTimer: PlayerTimerType.seconds10,
-            currentSpeakerSeat: don.seatNumber,
+            currentSubPhase: SubPhase.sheriffCheck,
           );
         }
       }
 
       // Проверка шерифа
-      if (next == SubPhase.sheriffCheck) {
+      if (currentPhase == SubPhase.sheriffCheck) {
         final sheriff =
             currentState.players.firstWhere((p) => p.role == 'sheriff');
         if (!sheriff.isAlive) {
-          print('hi sherifff');
           // Шериф мертв — пропускаем sheriffCheck, идём на выход из ночи
           final nightActions = currentState.nightActions ?? [];
-          // Добавляем 0 в nightActions для пропущенной проверки
           final newNightActions = [...nightActions, 0];
+
+          // Определяем следующую фазу (bestMove/finalWordKill/speeches)
+          final lastKill = newNightActions.length >= 3
+              ? newNightActions[newNightActions.length - 3]
+              : null;
+          final isMiss = lastKill == null || lastKill == 0 || lastKill == -1;
+
+          SubPhase nextPhaseAfterNight;
+          if (isMiss) {
+            nextPhaseAfterNight = SubPhase.speeches;
+          } else {
+            final currentDay = currentState.currentDay;
+            if (currentDay == 1 && currentState.isBestMove) {
+              nextPhaseAfterNight = SubPhase.bestMove;
+            } else if (currentDay == 1) {
+              nextPhaseAfterNight = SubPhase.finalWordKill;
+            } else {
+              nextPhaseAfterNight = SubPhase.finalWordKill;
+            }
+          }
+
           return currentState.copyWith(
             nightActions: newNightActions,
-            currentSubPhase: SubPhase.sheriffCheck,
-            currentSpeakerTimer: PlayerTimerType.seconds10,
-            currentSpeakerSeat: sheriff.seatNumber,
+            currentSubPhase: nextPhaseAfterNight,
+            currentDay: currentState.currentDay,
           );
         }
       }
+
+      final next = _getNextInOrder(currentPhase, _nightOrder);
       if (next != null) {
         nextPhase = next;
-      } else {
-        final nightActions = currentState.nightActions ?? [];
-        final lastKill = nightActions.length >= 3
-            ? nightActions[nightActions.length - 3]
-            : null;
-
-        // Промах - если значение -1 или 0
-        final isMiss = lastKill == null || lastKill == 0 || lastKill == -1;
-
-        if (isMiss) {
-          nextPhase = SubPhase.speeches;
-        } else {
-          if (currentDay == 1 && currentState.isBestMove) {
-            nextPhase = SubPhase.bestMove;
-          } else if (currentDay == 1) {
-            nextPhase = SubPhase.finalWordKill;
-          } else {
-            nextPhase = SubPhase.finalWordKill;
-          }
-        }
       }
-    } else {
-      return currentState;
     }
 
     if (nextPhase == null) return currentState;

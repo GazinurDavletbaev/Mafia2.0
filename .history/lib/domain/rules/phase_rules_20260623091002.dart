@@ -144,17 +144,13 @@ class PhaseRules {
       if (next == SubPhase.donCheck) {
         final don = currentState.players.firstWhere((p) => p.role == 'don');
         if (!don.isAlive) {
-          print('hi don');
-
           // Дон мертв — пропускаем donCheck, идём сразу в sheriffCheck
           final nightActions = currentState.nightActions ?? [];
           // Добавляем 0 в nightActions для пропущенной проверки
           final newNightActions = [...nightActions, 0];
           return currentState.copyWith(
             nightActions: newNightActions,
-            currentSubPhase: SubPhase.donCheck,
-            currentSpeakerTimer: PlayerTimerType.seconds10,
-            currentSpeakerSeat: don.seatNumber,
+            currentSubPhase: SubPhase.sheriffCheck,
           );
         }
       }
@@ -167,13 +163,29 @@ class PhaseRules {
           print('hi sherifff');
           // Шериф мертв — пропускаем sheriffCheck, идём на выход из ночи
           final nightActions = currentState.nightActions ?? [];
-          // Добавляем 0 в nightActions для пропущенной проверки
           final newNightActions = [...nightActions, 0];
+          final lastKill = newNightActions.length >= 3
+              ? newNightActions[newNightActions.length - 3]
+              : null;
+          final isMiss = lastKill == null || lastKill == 0 || lastKill == -1;
+
+          SubPhase nextPhaseAfterNight;
+          if (isMiss) {
+            nextPhaseAfterNight = SubPhase.speeches;
+          } else {
+            final currentDay = currentState.currentDay;
+            if (currentDay == 1 && currentState.isBestMove) {
+              nextPhaseAfterNight = SubPhase.bestMove;
+            } else if (currentDay == 1) {
+              nextPhaseAfterNight = SubPhase.finalWordKill;
+            } else {
+              nextPhaseAfterNight = SubPhase.finalWordKill;
+            }
+          }
           return currentState.copyWith(
             nightActions: newNightActions,
-            currentSubPhase: SubPhase.sheriffCheck,
-            currentSpeakerTimer: PlayerTimerType.seconds10,
-            currentSpeakerSeat: sheriff.seatNumber,
+            currentSubPhase: nextPhaseAfterNight,
+            currentDay: currentState.currentDay,
           );
         }
       }

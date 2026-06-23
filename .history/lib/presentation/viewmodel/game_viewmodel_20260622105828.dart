@@ -318,7 +318,7 @@ class GameViewModel extends StateNotifier<GameState> {
     final currentActions = state.nightActions ?? [];
     final newActions = [...currentActions, value];
     state = state.copyWith(nightActions: newActions);
-    print('maf shot');
+
     if (subPhase == SubPhase.mafiaShoot) {
       if (value != 0) {
         state = state.copyWith(hasKillInLastNight: true);

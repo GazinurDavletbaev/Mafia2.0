@@ -315,10 +315,34 @@ class GameViewModel extends StateNotifier<GameState> {
 
   void submitNightAction(int value) {
     final subPhase = state.currentSubPhase;
+
+    // Проверка на живого дона
+    if (subPhase == SubPhase.donCheck) {
+      final don = state.players.firstWhere((p) => p.role == 'don');
+      if (!don.isAlive) {
+        final currentActions = state.nightActions ?? [];
+        final newActions = [...currentActions, 0];
+        state = state.copyWith(nightActions: newActions);
+        AppLogger.d('Don is dead, auto set 0');
+        return;
+      }
+    }
+
+    // Проверка на живого шерифа
+    if (subPhase == SubPhase.sheriffCheck) {
+      final sheriff = state.players.firstWhere((p) => p.role == 'sheriff');
+      if (!sheriff.isAlive) {
+        final currentActions = state.nightActions ?? [];
+        final newActions = [...currentActions, 0];
+        state = state.copyWith(nightActions: newActions);
+        AppLogger.d('Sheriff is dead, auto set 0');
+        return;
+      }
+    }
     final currentActions = state.nightActions ?? [];
     final newActions = [...currentActions, value];
     state = state.copyWith(nightActions: newActions);
-    print('maf shot');
+
     if (subPhase == SubPhase.mafiaShoot) {
       if (value != 0) {
         state = state.copyWith(hasKillInLastNight: true);

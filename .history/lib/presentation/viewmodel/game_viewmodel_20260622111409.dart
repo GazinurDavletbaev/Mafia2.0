@@ -153,10 +153,35 @@ class GameViewModel extends StateNotifier<GameState> {
         break;
       case SubPhase.contract:
       case SubPhase.mafiaShoot:
-      case SubPhase.donCheck:
       case SubPhase.sheriffLook:
+        _history.push(state);
+        state = await _phaseRules.calculateNextState(state);
+        break;
+      case SubPhase.donCheck:
+        _history.push(state);
+        final don = state.players.firstWhere((p) => p.role == 'don');
+        if (!don.isAlive) {
+          // Дон мертв — ставим 0
+          final nightActions = state.nightActions ?? [];
+          state = state.copyWith(
+            nightActions: [...nightActions, 0],
+          );
+          break;
+        }
+        state = await _phaseRules.calculateNextState(state);
+        break;
+
       case SubPhase.sheriffCheck:
         _history.push(state);
+        final sheriff = state.players.firstWhere((p) => p.role == 'sheriff');
+        if (!sheriff.isAlive) {
+          // Шериф мертв — ставим 0
+          final nightActions = state.nightActions ?? [];
+          state = state.copyWith(
+            nightActions: [...nightActions, 0],
+          );
+          break;
+        }
         state = await _phaseRules.calculateNextState(state);
         break;
       case SubPhase.tieBreak:
@@ -318,7 +343,7 @@ class GameViewModel extends StateNotifier<GameState> {
     final currentActions = state.nightActions ?? [];
     final newActions = [...currentActions, value];
     state = state.copyWith(nightActions: newActions);
-    print('maf shot');
+
     if (subPhase == SubPhase.mafiaShoot) {
       if (value != 0) {
         state = state.copyWith(hasKillInLastNight: true);

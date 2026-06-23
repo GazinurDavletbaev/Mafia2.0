@@ -152,9 +152,6 @@ class PhaseRules {
           final newNightActions = [...nightActions, 0];
           return currentState.copyWith(
             nightActions: newNightActions,
-            currentSubPhase: SubPhase.donCheck,
-            currentSpeakerTimer: PlayerTimerType.seconds10,
-            currentSpeakerSeat: don.seatNumber,
           );
         }
       }
@@ -167,14 +164,30 @@ class PhaseRules {
           print('hi sherifff');
           // Шериф мертв — пропускаем sheriffCheck, идём на выход из ночи
           final nightActions = currentState.nightActions ?? [];
-          // Добавляем 0 в nightActions для пропущенной проверки
           final newNightActions = [...nightActions, 0];
-          return currentState.copyWith(
-            nightActions: newNightActions,
-            currentSubPhase: SubPhase.sheriffCheck,
-            currentSpeakerTimer: PlayerTimerType.seconds10,
-            currentSpeakerSeat: sheriff.seatNumber,
-          );
+          final lastKill = newNightActions.length >= 3
+              ? newNightActions[newNightActions.length - 3]
+              : null;
+
+          // Промах - если значение -1 или 0
+          final isMiss = lastKill == null || lastKill == 0 || lastKill == -1;
+
+          if (isMiss) {
+            nextPhase = SubPhase.speeches;
+          } else {
+            if (currentDay == 1 && currentState.isBestMove) {
+              nextPhase = SubPhase.bestMove;
+            } else if (currentDay == 1) {
+              nextPhase = SubPhase.finalWordKill;
+            } else {
+              nextPhase = SubPhase.finalWordKill;
+            }
+            return currentState.copyWith(
+              nightActions: newNightActions,
+              currentSubPhase: nextPhase,
+              currentDay: currentState.currentDay,
+            );
+          }
         }
       }
       if (next != null) {

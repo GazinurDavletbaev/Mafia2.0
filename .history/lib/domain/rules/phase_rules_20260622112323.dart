@@ -20,6 +20,8 @@ class PhaseRules {
     AppLogger.d('calculateNextState called');
     print('=== CALCULATE NEXT STATE ===');
     print('currentSubPhase = ${currentState.currentSubPhase}');
+    print('currentDay = ${currentState.currentDay}');
+    print('isBestMove = ${currentState.isBestMove}');
     final currentPhase = currentState.currentSubPhase;
     final currentDay = currentState.currentDay;
 
@@ -139,44 +141,15 @@ class PhaseRules {
     // Ночь 1+
     else if (_nightOrder.contains(currentPhase)) {
       AppLogger.d('currentPhase in _nightOrder: $currentPhase');
-      final next = _getNextInOrder(currentPhase, _nightOrder);
-      AppLogger.d('currentPhase in _nightOrdernext: $next');
-      if (next == SubPhase.donCheck) {
+      if (currentPhase == SubPhase.donCheck) {
         final don = currentState.players.firstWhere((p) => p.role == 'don');
         if (!don.isAlive) {
-          print('hi don');
-
           // Дон мертв — пропускаем donCheck, идём сразу в sheriffCheck
-          final nightActions = currentState.nightActions ?? [];
-          // Добавляем 0 в nightActions для пропущенной проверки
-          final newNightActions = [...nightActions, 0];
-          return currentState.copyWith(
-            nightActions: newNightActions,
-            currentSubPhase: SubPhase.donCheck,
-            currentSpeakerTimer: PlayerTimerType.seconds10,
-            currentSpeakerSeat: don.seatNumber,
-          );
         }
+        if (currentPhase == SubPhase.sheriffCheck) {}
       }
+      final next = _getNextInOrder(currentPhase, _nightOrder);
 
-      // Проверка шерифа
-      if (next == SubPhase.sheriffCheck) {
-        final sheriff =
-            currentState.players.firstWhere((p) => p.role == 'sheriff');
-        if (!sheriff.isAlive) {
-          print('hi sherifff');
-          // Шериф мертв — пропускаем sheriffCheck, идём на выход из ночи
-          final nightActions = currentState.nightActions ?? [];
-          // Добавляем 0 в nightActions для пропущенной проверки
-          final newNightActions = [...nightActions, 0];
-          return currentState.copyWith(
-            nightActions: newNightActions,
-            currentSubPhase: SubPhase.sheriffCheck,
-            currentSpeakerTimer: PlayerTimerType.seconds10,
-            currentSpeakerSeat: sheriff.seatNumber,
-          );
-        }
-      }
       if (next != null) {
         nextPhase = next;
       } else {
@@ -265,6 +238,7 @@ class PhaseRules {
       newTimer = PlayerTimerType.seconds60;
       // Для речей таймер устанавливается в SpeechUsecase
     } else if (nextPhase == SubPhase.tieBreak) {
+      print('gadga');
       newTimer = PlayerTimerType.seconds30;
     } else if (nextPhase == SubPhase.freeSeating) {
       final sheriff = currentState.players.firstWhere(
