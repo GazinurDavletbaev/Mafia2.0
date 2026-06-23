@@ -123,23 +123,55 @@ class GameViewModel extends StateNotifier<GameState> {
   }
 
   Future<void> onPhaseBack() async {
+    print(_history.length);
+    print('=== HISTORY STATES ===');
+    for (int i = 0; i < _history.states.length; i++) {
+      final s = _history.states[i];
+      print(
+          '[$i] ${s.currentSubPhase}: ${s.players.map((p) => p.name).toList()}');
+    }
+    if (_history.states.isNotEmpty) {
+      final firstState = _history.states.first;
+      final firstPlayerName =
+          firstState.players.isNotEmpty ? firstState.players.first.name : '';
+
+      if (firstPlayerName == 'Алексей') {
+        // Удаляем первое состояние
+        _history.states.removeAt(0);
+        print('Удалено состояние с дефолтными именами');
+      }
+    }
     if (_skipNextBack) {
       _skipNextBack = false;
       final previousState = _history.last;
+      print('=== ON PHASE BACK (SKIP) ===');
+      print(
+          'players names: ${previousState.players.map((p) => p.name).toList()}');
       state = previousState;
+      AppLogger.d(
+        'SKIP BACK: players = ${state.players.map((p) => '${p.seatNumber}:${p.role}').toList()}',
+      );
       return;
     }
 
-    if (_history.length <= 2) {
+    if (_history.length <= 1) {
       return;
     }
 
     _history.pop();
     final previousState = _history.last;
+    print('=== ON PHASE BACK (POP) ===');
+    print(
+        'players names: ${previousState.players.map((p) => p.name).toList()}');
     state = previousState;
+    AppLogger.d(
+      'BACK: players = ${state.players.map((p) => '${p.seatNumber}:${p.role}').toList()}',
+    );
   }
 
   Future<void> onPhaseForward() async {
+    print(_history.length);
+
     _skipNextBack = true;
     switch (state.currentSubPhase) {
       case SubPhase.roleDistribution:

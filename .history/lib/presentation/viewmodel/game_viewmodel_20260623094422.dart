@@ -123,23 +123,38 @@ class GameViewModel extends StateNotifier<GameState> {
   }
 
   Future<void> onPhaseBack() async {
+    print(_history);
     if (_skipNextBack) {
       _skipNextBack = false;
       final previousState = _history.last;
+      print('=== ON PHASE BACK (SKIP) ===');
+      print(
+          'players names: ${previousState.players.map((p) => p.name).toList()}');
       state = previousState;
+      AppLogger.d(
+        'SKIP BACK: players = ${state.players.map((p) => '${p.seatNumber}:${p.role}').toList()}',
+      );
       return;
     }
 
-    if (_history.length <= 2) {
+    if (_history.length <= 1) {
       return;
     }
 
     _history.pop();
     final previousState = _history.last;
+    print('=== ON PHASE BACK (POP) ===');
+    print(
+        'players names: ${previousState.players.map((p) => p.name).toList()}');
     state = previousState;
+    AppLogger.d(
+      'BACK: players = ${state.players.map((p) => '${p.seatNumber}:${p.role}').toList()}',
+    );
   }
 
   Future<void> onPhaseForward() async {
+    print(_history);
+
     _skipNextBack = true;
     switch (state.currentSubPhase) {
       case SubPhase.roleDistribution:
