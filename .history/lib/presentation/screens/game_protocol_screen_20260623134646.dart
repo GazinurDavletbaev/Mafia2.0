@@ -880,14 +880,11 @@ class _GameProtocolScreenState extends State<GameProtocolScreen> {
           'bonus': _bonusPoints[p.seatNumber - 1],
         };
       }).toList(),
-      'nightActions': widget.gameState.nightActions ?? [],
-      'voteHistory': widget.gameState.voteHistory.map((record) {
-        // Преобразуем Map<int, int> в Map<String, int> для JSON
-        return Map<String, int>.fromEntries(
-            record.entries.map((e) => MapEntry(e.key.toString(), e.value)));
-      }).toList(),
+      'nightActions': widget.gameState.nightActions,
+      'voteHistory': widget.gameState.voteHistory,
     };
 
+    // Выводим JSON в консоль
     print('=== PROTOCOL DATA ===');
     print(jsonEncode(data));
     print('=====================');
