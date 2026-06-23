@@ -425,17 +425,22 @@ class _GameProtocolScreenState extends State<GameProtocolScreen> {
           children: [
             _infoRow('ПОБЕДИВШАЯ КОМАНДА    ', winner, color: winnerColor),
             Divider(color: Colors.grey.shade600, height: 16),
+            _infoRow('ПРОТЕСТ     ', _protestText, isEditable: true),
+            Divider(color: Colors.grey.shade600, height: 8),
             _infoRow(
-              'ПРОТЕСТ     ',
-              _protestText,
+              'ЛУЧШИЙ ХОД    ',
+              _bestMoveController.text,
+              suffix: '  Игрок № $bestPlayer',
               isEditable: true,
-              controller: null,
+              controller: _bestMoveController,
             ),
             Divider(color: Colors.grey.shade600, height: 8),
-            _infoRow('ЛУЧШИЙ ХОД    ', '$bestMoveText',
-                suffix: '  Игрок № $bestPlayer'),
-            Divider(color: Colors.grey.shade600, height: 8),
-            _infoRow('СУДЬЯ      ', judgeName),
+            _infoRow(
+              'СУДЬЯ      ',
+              _judgeController.text,
+              isEditable: true,
+              controller: _judgeController,
+            ),
             Divider(color: Colors.grey.shade600, height: 8),
             const Text(
               'НОЧНЫЕ ДЕЙСТВИЯ',
@@ -528,24 +533,16 @@ class _GameProtocolScreenState extends State<GameProtocolScreen> {
           ),
           const SizedBox(width: 8),
           Expanded(
-            child: isEditable
+            child: isEditable && controller != null
                 ? TextField(
                     controller: controller,
                     style: const TextStyle(color: Colors.white, fontSize: 13),
                     decoration: InputDecoration(
-                      hintText: 'Нет',
-                      hintStyle: TextStyle(color: Colors.grey.shade600),
                       border: InputBorder.none,
                       isDense: true,
                       contentPadding: EdgeInsets.zero,
+                      hintStyle: TextStyle(color: Colors.grey.shade600),
                     ),
-                    onChanged: (value) {
-                      if (controller == null) {
-                        setState(() {
-                          _protestText = value.isEmpty ? 'Нет' : value;
-                        });
-                      }
-                    },
                   )
                 : Row(
                     children: [

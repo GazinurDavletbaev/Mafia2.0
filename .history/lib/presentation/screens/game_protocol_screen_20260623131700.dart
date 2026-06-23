@@ -425,12 +425,7 @@ class _GameProtocolScreenState extends State<GameProtocolScreen> {
           children: [
             _infoRow('ПОБЕДИВШАЯ КОМАНДА    ', winner, color: winnerColor),
             Divider(color: Colors.grey.shade600, height: 16),
-            _infoRow(
-              'ПРОТЕСТ     ',
-              _protestText,
-              isEditable: true,
-              controller: null,
-            ),
+            _infoRow('ПРОТЕСТ     ', _protestText, isEditable: true),
             Divider(color: Colors.grey.shade600, height: 8),
             _infoRow('ЛУЧШИЙ ХОД    ', '$bestMoveText',
                 suffix: '  Игрок № $bestPlayer'),
@@ -528,24 +523,16 @@ class _GameProtocolScreenState extends State<GameProtocolScreen> {
           ),
           const SizedBox(width: 8),
           Expanded(
-            child: isEditable
+            child: isEditable && controller != null
                 ? TextField(
                     controller: controller,
                     style: const TextStyle(color: Colors.white, fontSize: 13),
                     decoration: InputDecoration(
-                      hintText: 'Нет',
-                      hintStyle: TextStyle(color: Colors.grey.shade600),
                       border: InputBorder.none,
                       isDense: true,
                       contentPadding: EdgeInsets.zero,
+                      hintStyle: TextStyle(color: Colors.grey.shade600),
                     ),
-                    onChanged: (value) {
-                      if (controller == null) {
-                        setState(() {
-                          _protestText = value.isEmpty ? 'Нет' : value;
-                        });
-                      }
-                    },
                   )
                 : Row(
                     children: [
@@ -858,18 +845,8 @@ class _GameProtocolScreenState extends State<GameProtocolScreen> {
   }
 
   void _saveProtocol() {
-    final data = {
-      'tournament': _tournamentController.text,
-      'stage': _stageController.text,
-      'table': _tableController.text,
-      'game': _gameController.text,
-      'date': _dateController.text,
-      'judge': _judgeController.text,
-      'bestMove': _bestMoveController.text,
-    };
-
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Сохранение протокола в разработке: $data')),
+      const SnackBar(content: Text('Сохранение протокола в разработке')),
     );
   }
 }

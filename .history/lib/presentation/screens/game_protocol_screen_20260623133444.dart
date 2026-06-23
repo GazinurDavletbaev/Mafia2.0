@@ -528,24 +528,16 @@ class _GameProtocolScreenState extends State<GameProtocolScreen> {
           ),
           const SizedBox(width: 8),
           Expanded(
-            child: isEditable
+            child: isEditable && controller != null
                 ? TextField(
                     controller: controller,
                     style: const TextStyle(color: Colors.white, fontSize: 13),
                     decoration: InputDecoration(
-                      hintText: 'Нет',
-                      hintStyle: TextStyle(color: Colors.grey.shade600),
                       border: InputBorder.none,
                       isDense: true,
                       contentPadding: EdgeInsets.zero,
+                      hintStyle: TextStyle(color: Colors.grey.shade600),
                     ),
-                    onChanged: (value) {
-                      if (controller == null) {
-                        setState(() {
-                          _protestText = value.isEmpty ? 'Нет' : value;
-                        });
-                      }
-                    },
                   )
                 : Row(
                     children: [

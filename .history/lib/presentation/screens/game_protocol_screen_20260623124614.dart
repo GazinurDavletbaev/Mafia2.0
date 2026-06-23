@@ -23,29 +23,11 @@ class _GameProtocolScreenState extends State<GameProtocolScreen> {
 
   List<int> _points = [];
   List<double> _bonusPoints = [];
-  // Контроллеры для редактируемых полей
-  final _tournamentController = TextEditingController();
-  final _stageController = TextEditingController();
-  final _tableController = TextEditingController();
-  final _gameController = TextEditingController();
-  final _dateController = TextEditingController();
-  final _judgeController = TextEditingController();
-  final _bestMoveController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
     _bonusPoints = List.generate(10, (_) => 0.0);
-    // Заполняем контроллеры
-    _tournamentController.text = widget.gameState.tournamentName ?? '';
-    _stageController.text = widget.gameState.stageName ?? '';
-    _tableController.text = '${widget.gameState.tableNumber ?? 1}';
-    _gameController.text = '${widget.gameState.gameNumber ?? 1}';
-    _dateController.text =
-        widget.gameState.gameDate?.toString().substring(0, 10) ??
-            DateTime.now().toString().substring(0, 10);
-    _judgeController.text = widget.gameState.judgeName ?? '';
-    _bestMoveController.text = widget.gameState.partialBestMove.join(', ');
 
     final isRedWon = widget.gameState.winner == 'red';
     _points = widget.gameState.players.map((p) {
@@ -62,34 +44,7 @@ class _GameProtocolScreenState extends State<GameProtocolScreen> {
     for (var c in _noteControllers) {
       c.dispose();
     }
-    _tournamentController.dispose();
-    _stageController.dispose();
-    _tableController.dispose();
-    _gameController.dispose();
-    _dateController.dispose();
-    _judgeController.dispose();
-    _bestMoveController.dispose();
-  }
-
-  Widget _buildEditableField(TextEditingController controller,
-      {double? width}) {
-    return SizedBox(
-      width: width,
-      child: TextField(
-        controller: controller,
-        style: const TextStyle(
-          color: Colors.white,
-          fontSize: 14,
-          fontWeight: FontWeight.w500,
-        ),
-        decoration: InputDecoration(
-          border: InputBorder.none,
-          isDense: true,
-          contentPadding: EdgeInsets.zero,
-          hintStyle: TextStyle(color: Colors.grey.shade600),
-        ),
-      ),
-    );
+    super.dispose();
   }
 
   @override
@@ -143,13 +98,17 @@ class _GameProtocolScreenState extends State<GameProtocolScreen> {
                 _buildLabel('ТУРНИР'),
                 const SizedBox(width: 6),
                 Expanded(
-                  child: _buildEditableField(_tournamentController),
+                  child: _buildValue(
+                    widget.gameState.tournamentName ?? '__________',
+                  ),
                 ),
                 const SizedBox(width: 20),
                 _buildLabel('СТАДИЯ'),
                 const SizedBox(width: 6),
                 Expanded(
-                  child: _buildEditableField(_stageController),
+                  child: _buildValue(
+                    widget.gameState.stageName ?? '__________',
+                  ),
                 ),
               ],
             ),
@@ -163,14 +122,17 @@ class _GameProtocolScreenState extends State<GameProtocolScreen> {
                   children: [
                     _buildLabel('ДАТА:'),
                     const SizedBox(width: 6),
-                    _buildEditableField(_dateController, width: 120),
+                    _buildValue(
+                      widget.gameState.gameDate?.toString().substring(0, 10) ??
+                          DateTime.now().toString().substring(0, 10),
+                    ),
                   ],
                 ),
                 Row(
                   children: [
                     _buildLabel('СТОЛ №'),
                     const SizedBox(width: 4),
-                    _buildEditableField(_tableController, width: 40),
+                    _buildValue('${widget.gameState.tableNumber ?? 1}'),
                   ],
                 ),
               ],
@@ -202,7 +164,7 @@ class _GameProtocolScreenState extends State<GameProtocolScreen> {
                   children: [
                     _buildLabel('ИГРА №'),
                     const SizedBox(width: 4),
-                    _buildEditableField(_gameController, width: 40),
+                    _buildValue('${widget.gameState.gameNumber ?? 1}'),
                   ],
                 ),
               ],
@@ -423,19 +385,14 @@ class _GameProtocolScreenState extends State<GameProtocolScreen> {
         padding: const EdgeInsets.all(12),
         child: Column(
           children: [
-            _infoRow('ПОБЕДИВШАЯ КОМАНДА    ', winner, color: winnerColor),
+            _infoRow('ПОБЕДИВШАЯ КОМАНДА', winner, color: winnerColor),
             Divider(color: Colors.grey.shade600, height: 16),
-            _infoRow(
-              'ПРОТЕСТ     ',
-              _protestText,
-              isEditable: true,
-              controller: null,
-            ),
+            _infoRow('ПРОТЕСТ', _protestText, isEditable: true),
             Divider(color: Colors.grey.shade600, height: 8),
-            _infoRow('ЛУЧШИЙ ХОД    ', '$bestMoveText',
+            _infoRow('ЛУЧШИЙ ХОД', '$bestMoveText',
                 suffix: '  Игрок № $bestPlayer'),
             Divider(color: Colors.grey.shade600, height: 8),
-            _infoRow('СУДЬЯ      ', judgeName),
+            _infoRow('СУДЬЯ', judgeName),
             Divider(color: Colors.grey.shade600, height: 8),
             const Text(
               'НОЧНЫЕ ДЕЙСТВИЯ',
@@ -506,14 +463,8 @@ class _GameProtocolScreenState extends State<GameProtocolScreen> {
     );
   }
 
-  Widget _infoRow(
-    String label,
-    String value, {
-    Color? color,
-    bool isEditable = false,
-    String? suffix,
-    TextEditingController? controller,
-  }) {
+  Widget _infoRow(String label, String value,
+      {Color? color, bool isEditable = false, String? suffix}) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 2),
       child: Row(
@@ -530,7 +481,6 @@ class _GameProtocolScreenState extends State<GameProtocolScreen> {
           Expanded(
             child: isEditable
                 ? TextField(
-                    controller: controller,
                     style: const TextStyle(color: Colors.white, fontSize: 13),
                     decoration: InputDecoration(
                       hintText: 'Нет',
@@ -540,11 +490,7 @@ class _GameProtocolScreenState extends State<GameProtocolScreen> {
                       contentPadding: EdgeInsets.zero,
                     ),
                     onChanged: (value) {
-                      if (controller == null) {
-                        setState(() {
-                          _protestText = value.isEmpty ? 'Нет' : value;
-                        });
-                      }
+                      _protestText = value.isEmpty ? 'Нет' : value;
                     },
                   )
                 : Row(
@@ -858,18 +804,8 @@ class _GameProtocolScreenState extends State<GameProtocolScreen> {
   }
 
   void _saveProtocol() {
-    final data = {
-      'tournament': _tournamentController.text,
-      'stage': _stageController.text,
-      'table': _tableController.text,
-      'game': _gameController.text,
-      'date': _dateController.text,
-      'judge': _judgeController.text,
-      'bestMove': _bestMoveController.text,
-    };
-
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Сохранение протокола в разработке: $data')),
+      const SnackBar(content: Text('Сохранение протокола в разработке')),
     );
   }
 }
