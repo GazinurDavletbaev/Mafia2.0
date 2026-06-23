@@ -585,7 +585,7 @@ class _GameProtocolScreenState extends State<GameProtocolScreen> {
                                       decoration: BoxDecoration(
                                           color: Colors.grey.shade700),
                                       children: [
-                                        _tableCell('Голоса', isHeader: true),
+                                        _tableCell('Голоса ЗА', isHeader: true),
                                         _tableCell('Результат', isHeader: true),
                                       ],
                                     ),

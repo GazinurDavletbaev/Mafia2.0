@@ -58,7 +58,7 @@ class VoteCalculatorActions {
     // Сохраняем eliminationVote в историю
     final day = _vm.state.currentDay;
     final votes = _vm.state.voteController?.results ?? {};
-    Map<int, int> record = {11: day, ...votes, 19: _vm.state.eliminationVotes};
+    Map<int, int> record = {11: day, ...votes};
 
     // Сначала показываем результат
     final stateWithVotes = _vm.state.copyWith(
@@ -92,7 +92,6 @@ class VoteCalculatorActions {
           voteController: null,
           isVotingActive: false,
           isBestMove: canHaveBestMove,
-          eliminationVotes: 0, // ← добавить
           voteHistory: [..._vm.state.voteHistory, record],
         );
         _vm.updateState(newState);
@@ -113,7 +112,6 @@ class VoteCalculatorActions {
           nominatedSeats: [],
           votes: {},
           isBestMove: canHaveBestMove,
-          eliminationVotes: 0, // ← добавить
           voteHistory: [..._vm.state.voteHistory, record],
         );
         _vm.updateState(newState);

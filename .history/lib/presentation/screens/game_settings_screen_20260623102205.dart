@@ -14,7 +14,7 @@ class _GameSettingsScreenState extends ConsumerState<GameSettingsScreen> {
   final _tableController = TextEditingController(text: '1');
   final _gameController = TextEditingController(text: '1');
   final _judgeController = TextEditingController();
-  final _tournamentController = TextEditingController(text: 'РЕЙТИНГ');
+  final _tournamentController = TextEditingController(text: 'РЕЙТИНГОВАЯ');
   final _stageController = TextEditingController(
       text: [
     'ЯНВАРЬ',

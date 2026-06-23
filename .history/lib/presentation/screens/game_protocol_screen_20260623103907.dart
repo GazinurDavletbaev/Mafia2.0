@@ -573,32 +573,54 @@ class _GameProtocolScreenState extends State<GameProtocolScreen> {
                                       Border.all(color: Colors.grey.shade600),
                                   borderRadius: BorderRadius.circular(4),
                                 ),
-                                child: Table(
-                                  border: TableBorder.all(
-                                      color: Colors.grey.shade600),
-                                  columnWidths: const {
-                                    0: FixedColumnWidth(100),
-                                    1: FixedColumnWidth(70),
-                                  },
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    TableRow(
-                                      decoration: BoxDecoration(
-                                          color: Colors.grey.shade700),
-                                      children: [
-                                        _tableCell('Голоса', isHeader: true),
-                                        _tableCell('Результат', isHeader: true),
-                                      ],
-                                    ),
-                                    TableRow(
-                                      children: [
-                                        _tableCell('$eliminationVotes'),
-                                        _tableCell(
-                                          winners.isEmpty
-                                              ? '0'
-                                              : winners.join(', '),
-                                          isWinner: winners.isNotEmpty,
+                                    const Center(
+                                      child: Text(
+                                        'Результат',
+                                        style: TextStyle(
+                                          color: Colors.orange,
+                                          fontSize: 13,
+                                          fontWeight: FontWeight.bold,
                                         ),
-                                      ],
+                                      ),
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Container(
+                                      width: double.infinity,
+                                      padding: const EdgeInsets.symmetric(
+                                          vertical: 4, horizontal: 8),
+                                      decoration: BoxDecoration(
+                                        color: Colors.grey.shade700,
+                                        borderRadius: BorderRadius.circular(4),
+                                      ),
+                                      child: Center(
+                                        child: Column(
+                                          children: [
+                                            Text(
+                                              'Голосов ЗА: $eliminationVotes',
+                                              style: const TextStyle(
+                                                color: Colors.white70,
+                                                fontSize: 12,
+                                              ),
+                                            ),
+                                            const SizedBox(height: 2),
+                                            Text(
+                                              winners.isEmpty
+                                                  ? '0'
+                                                  : winners.join(', '),
+                                              style: TextStyle(
+                                                color: winners.isEmpty
+                                                    ? Colors.red
+                                                    : Colors.green,
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
                                     ),
                                   ],
                                 ),
