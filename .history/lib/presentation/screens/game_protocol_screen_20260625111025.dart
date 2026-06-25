@@ -1,10 +1,6 @@
 import 'dart:convert';
-import 'dart:io';
-import 'package:http/http.dart' as http;
 
 import 'package:flutter/material.dart';
-import 'package:mafia_help/presentation/screens/saved_protocols_screen.dart';
-import 'package:path_provider/path_provider.dart';
 import '../../domain/rules/game_history.dart';
 import '../state/game_state.dart';
 
@@ -106,17 +102,6 @@ class _GameProtocolScreenState extends State<GameProtocolScreen> {
         title: const Text('Протокол игры'),
         backgroundColor: Colors.grey.shade900,
         actions: [
-          IconButton(
-            icon: const Icon(Icons.folder_open),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const SavedProtocolsScreen(),
-                ),
-              );
-            },
-          ),
           IconButton(
             icon: const Icon(Icons.save),
             onPressed: _saveProtocol,
@@ -875,84 +860,82 @@ class _GameProtocolScreenState extends State<GameProtocolScreen> {
   }
 
   void _saveProtocol() async {
-    final data = {
-      'tournament': _tournamentController.text,
-      'stage': _stageController.text,
-      'table': _tableController.text,
-      'game': _gameController.text,
-      'date': _dateController.text,
-      'judge': _judgeController.text,
-      'bestMove': _bestMoveController.text,
-      'protest': _protestText,
-      'winner': widget.gameState.winner,
-      'players': widget.gameState.players.map((p) {
-        return {
-          'seat': p.seatNumber,
-          'name': p.name,
-          'role': p.role,
-          'fouls': p.fouls,
-          'points': _points[p.seatNumber - 1],
-          'bonus': _bonusPoints[p.seatNumber - 1],
-        };
-      }).toList(),
-      'nightActions': widget.gameState.nightActions ?? [],
-      'voteHistory': widget.gameState.voteHistory.map((record) {
-        return Map<String, int>.fromEntries(
-            record.entries.map((e) => MapEntry(e.key.toString(), e.value)));
-      }).toList(),
-    };
+  final data = {
+    'tournament': _tournamentController.text,
+    'stage': _stageController.text,
+    'table': _tableController.text,
+    'game': _gameController.text,
+    'date': _dateController.text,
+    'judge': _judgeController.text,
+    'bestMove': _bestMoveController.text,
+    'protest': _protestText,
+    'winner': widget.gameState.winner,
+    'players': widget.gameState.players.map((p) {
+      return {
+        'seat': p.seatNumber,
+        'name': p.name,
+        'role': p.role,
+        'fouls': p.fouls,
+        'points': _points[p.seatNumber - 1],
+        'bonus': _bonusPoints[p.seatNumber - 1],
+      };
+    }).toList(),
+    'nightActions': widget.gameState.nightActions ?? [],
+    'voteHistory': widget.gameState.voteHistory.map((record) {
+      return Map<String, int>.fromEntries(
+          record.entries.map((e) => MapEntry(e.key.toString(), e.value)));
+    }).toList(),
+  };
 
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) => const Center(
-        child: CircularProgressIndicator(),
-      ),
+  // Показываем индикатор загрузки
+  showDialog(
+    context: context,
+    barrierDismissible: false,
+    builder: (context) => const Center(
+      child: CircularProgressIndicator(),
+    ),
+  );
+
+  try {
+    final url = Uri.parse('http://161.104.46.234:8001/generate-protocol-excel');
+    final response = await http.post(
+      url,
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode(data),
     );
-    print('=== SENDING DATA ===');
-    print(jsonEncode(data));
-    print('====================');
-    try {
-      final url =
-          Uri.parse('http://161.104.46.234:8001/generate-protocol-excel');
-      final response = await http.post(
-        url,
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode(data),
-      );
 
-      Navigator.pop(context);
+    // Закрываем индикатор загрузки
+    Navigator.pop(context);
 
-      if (response.statusCode == 200) {
-        final bytes = response.bodyBytes;
-        final directory = await getApplicationDocumentsDirectory();
-        final path =
-            '${directory.path}/protocol_${_tableController.text}_${_gameController.text}.xlsx';
-        final file = File(path);
-        await file.writeAsBytes(bytes);
+    if (response.statusCode == 200) {
+      // Сохраняем файл на устройство
+      final bytes = response.bodyBytes;
+      final path = '/storage/emulated/0/Download/protocol_${_tableController.text}_${_gameController.text}.xlsx';
+      final file = File(path);
+      await file.writeAsBytes(bytes);
 
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('✅ Протокол сохранён: $path'),
-            backgroundColor: Colors.green,
-          ),
-        );
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('❌ Ошибка: ${response.statusCode}'),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
-    } catch (e) {
-      Navigator.pop(context);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('❌ Ошибка: $e'),
+          content: Text('✅ Протокол сохранён: $path'),
+          backgroundColor: Colors.green,
+        ),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('❌ Ошибка: ${response.statusCode}'),
           backgroundColor: Colors.red,
         ),
       );
     }
+  } catch (e) {
+    Navigator.pop(context);
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('❌ Ошибка подключения: $e'),
+        backgroundColor: Colors.red,
+      ),
+    );
   }
+}
 }

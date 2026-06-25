@@ -107,16 +107,16 @@ class _GameProtocolScreenState extends State<GameProtocolScreen> {
         backgroundColor: Colors.grey.shade900,
         actions: [
           IconButton(
-            icon: const Icon(Icons.folder_open),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const SavedProtocolsScreen(),
-                ),
-              );
-            },
-          ),
+    icon: const Icon(Icons.folder_open),
+    onPressed: () {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const SavedProtocolsScreen(),
+        ),
+      );
+    },
+  ),
           IconButton(
             icon: const Icon(Icons.save),
             onPressed: _saveProtocol,
@@ -909,9 +909,7 @@ class _GameProtocolScreenState extends State<GameProtocolScreen> {
         child: CircularProgressIndicator(),
       ),
     );
-    print('=== SENDING DATA ===');
-    print(jsonEncode(data));
-    print('====================');
+
     try {
       final url =
           Uri.parse('http://161.104.46.234:8001/generate-protocol-excel');

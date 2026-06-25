@@ -909,9 +909,7 @@ class _GameProtocolScreenState extends State<GameProtocolScreen> {
         child: CircularProgressIndicator(),
       ),
     );
-    print('=== SENDING DATA ===');
-    print(jsonEncode(data));
-    print('====================');
+
     try {
       final url =
           Uri.parse('http://161.104.46.234:8001/generate-protocol-excel');

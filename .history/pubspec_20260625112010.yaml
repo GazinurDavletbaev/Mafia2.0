@@ -17,8 +17,6 @@ dependencies:
   hive_ce: ^2.10.1
   hive_ce_flutter: ^2.3.0
   path_provider: ^2.1.5
-  open_file: ^3.3.2
-
 
   # Навигация
   go_router: ^14.8.1

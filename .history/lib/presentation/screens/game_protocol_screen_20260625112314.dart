@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:http/http.dart' as http;
 
 import 'package:flutter/material.dart';
-import 'package:mafia_help/presentation/screens/saved_protocols_screen.dart';
 import 'package:path_provider/path_provider.dart';
 import '../../domain/rules/game_history.dart';
 import '../state/game_state.dart';
@@ -107,16 +106,16 @@ class _GameProtocolScreenState extends State<GameProtocolScreen> {
         backgroundColor: Colors.grey.shade900,
         actions: [
           IconButton(
-            icon: const Icon(Icons.folder_open),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const SavedProtocolsScreen(),
-                ),
-              );
-            },
-          ),
+    icon: const Icon(Icons.folder_open),
+    onPressed: () {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const SavedProtocolsScreen(),
+        ),
+      );
+    },
+  ),
           IconButton(
             icon: const Icon(Icons.save),
             onPressed: _saveProtocol,
@@ -909,9 +908,7 @@ class _GameProtocolScreenState extends State<GameProtocolScreen> {
         child: CircularProgressIndicator(),
       ),
     );
-    print('=== SENDING DATA ===');
-    print(jsonEncode(data));
-    print('====================');
+
     try {
       final url =
           Uri.parse('http://161.104.46.234:8001/generate-protocol-excel');
