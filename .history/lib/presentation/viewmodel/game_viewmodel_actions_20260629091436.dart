@@ -104,28 +104,26 @@ class PlayerActions {
         _vm.state.players.firstWhere((p) => p.seatNumber == seatNumber);
     if (!existingPlayer.isAlive && existingPlayer.fouls == 4) {
       AppLogger.d('_killPlayer: игрок уже мёртв с 4 фолами, проверяем победу');
-
-      final newPlayers = _vm.state.players;
-      final blackAlive =
-          newPlayers.where((p) => p.isAlive && p.team == 'black').length;
-      final redAlive =
-          newPlayers.where((p) => p.isAlive && p.team == 'red').length;
-      final totalAlive = blackAlive + redAlive;
-
-      String? winner;
-      if (blackAlive == 0) {
-        winner = 'red';
-      } else if (redAlive <= blackAlive || totalAlive < 3) {
-        winner = 'black';
-      }
-
-      if (winner != null) {
-        _vm.state = _vm.state.copyWith(
-          isGameEnded: true,
-          winner: winner,
-        );
-      }
-      return;
+    
+    final newPlayers = _vm.state.players;
+    final blackAlive = newPlayers.where((p) => p.isAlive && p.team == 'black').length;
+    final redAlive = newPlayers.where((p) => p.isAlive && p.team == 'red').length;
+    final totalAlive = blackAlive + redAlive;
+    
+    String? winner;
+    if (blackAlive == 0) {
+      winner = 'red';
+    } else if (redAlive <= blackAlive || totalAlive < 3) {
+      winner = 'black';
+    }
+    
+    if (winner != null) {
+      _vm.state = _vm.state.copyWith(
+        isGameEnded: true,
+        winner: winner,
+      );
+    }
+    return;
     }
 
     final usecase = _ref.read(killPlayerUsecaseProvider);
