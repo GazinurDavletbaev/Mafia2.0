@@ -36,8 +36,6 @@ class PhaseRules {
     }
     // День
     else if (_dayOrder.contains(currentPhase)) {
-      print('isBestMove начало = ${currentState.isBestMove}');
-
       // СПЕЦИАЛЬНАЯ ОБРАБОТКА ДЛЯ eliminationVote
       if (currentPhase == SubPhase.eliminationVote) {
         final totalAlive = currentState.players.where((p) => p.isAlive).length;
@@ -137,7 +135,8 @@ class PhaseRules {
           nextPhase = SubPhase.mafiaShoot;
         }
       }
-      print('isBestMove афтер = ${currentState.isBestMove}');
+      print('isBestMove фа = ${currentState.isBestMove}');
+
     }
     // Ночь 1+
     else if (_nightOrder.contains(currentPhase)) {

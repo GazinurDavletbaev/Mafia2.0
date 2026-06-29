@@ -36,7 +36,7 @@ class PhaseRules {
     }
     // День
     else if (_dayOrder.contains(currentPhase)) {
-      print('isBestMove начало = ${currentState.isBestMove}');
+      print('isBestMove началоа = ${currentState.isBestMove}');
 
       // СПЕЦИАЛЬНАЯ ОБРАБОТКА ДЛЯ eliminationVote
       if (currentPhase == SubPhase.eliminationVote) {

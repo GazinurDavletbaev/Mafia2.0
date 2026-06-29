@@ -36,8 +36,6 @@ class PhaseRules {
     }
     // День
     else if (_dayOrder.contains(currentPhase)) {
-      print('isBestMove начало = ${currentState.isBestMove}');
-
       // СПЕЦИАЛЬНАЯ ОБРАБОТКА ДЛЯ eliminationVote
       if (currentPhase == SubPhase.eliminationVote) {
         final totalAlive = currentState.players.where((p) => p.isAlive).length;
@@ -138,6 +136,7 @@ class PhaseRules {
         }
       }
       print('isBestMove афтер = ${currentState.isBestMove}');
+
     }
     // Ночь 1+
     else if (_nightOrder.contains(currentPhase)) {
