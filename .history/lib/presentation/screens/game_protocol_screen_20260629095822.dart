@@ -43,25 +43,24 @@ class _GameProtocolScreenState extends State<GameProtocolScreen> {
   void initState() {
     super.initState();
     // ===== ВЫВОД voteHistory =====
-    print('=== PROTOCOL SCREEN: voteHistory ===');
-    print('voteHistory: ${widget.gameState.voteHistory}');
-    print('voteHistory:');
-    if (widget.gameState.voteHistory.isEmpty) {
-      print('  (пусто)');
-    } else {
-      widget.gameState.voteHistory.forEach((day, voteDay) {
-        print('  День $day:');
-        print('    rounds:');
-        for (var i = 0; i < voteDay.rounds.length; i++) {
-          print('      Раунд ${i + 1}: ${voteDay.rounds[i]}');
-        }
-        print('    eliminated: ${voteDay.eliminated}');
-        print('    eliminationVotes: ${voteDay.eliminationVotes}');
-        print('    result: ${voteDay.result}');
-      });
-    }
-    print('========================================');
-
+  print('=== PROTOCOL SCREEN: voteHistory ===');
+  print('voteHistory:');
+  if (widget.gameState.voteHistory.isEmpty) {
+    print('  (пусто)');
+  } else {
+    widget.gameState.voteHistory.forEach((day, voteDay) {
+      print('  День $day:');
+      print('    rounds:');
+      for (var i = 0; i < voteDay.rounds.length; i++) {
+        print('      Раунд ${i + 1}: ${voteDay.rounds[i]}');
+      }
+      print('    eliminated: ${voteDay.eliminated}');
+      print('    eliminationVotes: ${voteDay.eliminationVotes}');
+      print('    result: ${voteDay.result}');
+    });
+  }
+  print('========================================');
+  
     // ===== КОНЕЦ ЛОГОВ =====
     _bonusPoints = List.generate(10, (_) => 0.0);
     // Заполняем контроллеры

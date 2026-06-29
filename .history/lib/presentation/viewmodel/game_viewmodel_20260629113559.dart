@@ -443,11 +443,7 @@ class GameViewModel extends StateNotifier<GameState> {
       eliminationVotes: eliminationVotes ?? existing.eliminationVotes,
       result: result ?? existing.result,
     );
-    print('=== addRoundToVoteDay ===');
-    print('day: $day');
-    print('round: $round');
-    print('existing rounds: ${existing?.rounds}');
-    print('new rounds: ${updated.rounds}');
+
     state = state.copyWith(
       voteHistory: {
         ...state.voteHistory,
@@ -483,11 +479,6 @@ class GameViewModel extends StateNotifier<GameState> {
   }
 
   void updateState(GameState newState) {
-    print('=== UPDATE STATE ===');
-    print(
-        'newState.voteHistory[${newState.currentDay}]?.rounds: ${newState.voteHistory[newState.currentDay]?.rounds}');
     state = newState;
-    print(
-        'state.voteHistory[${state.currentDay}]?.rounds: ${state.voteHistory[state.currentDay]?.rounds}');
   }
 }

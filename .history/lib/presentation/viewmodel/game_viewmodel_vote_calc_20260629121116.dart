@@ -212,11 +212,6 @@ class VoteCalculatorActions {
               voteHistory: newVoteHistory,
             );
           } else {
-            final existingDay = _vm.state.voteHistory[day];
-            if (existingDay != null && existingDay.rounds.isNotEmpty) {
-              print('❌ Это не первое голосование, пропускаем else');
-              return;
-            }
             print("rere ");
             // Первое голосование — создаём новый день
             final voteDay = VoteDay(

@@ -483,11 +483,9 @@ class GameViewModel extends StateNotifier<GameState> {
   }
 
   void updateState(GameState newState) {
-    print('=== UPDATE STATE ===');
-    print(
-        'newState.voteHistory[${newState.currentDay}]?.rounds: ${newState.voteHistory[newState.currentDay]?.rounds}');
-    state = newState;
-    print(
-        'state.voteHistory[${state.currentDay}]?.rounds: ${state.voteHistory[state.currentDay]?.rounds}');
-  }
+  print('=== UPDATE STATE ===');
+  print('newState.voteHistory[${newState.currentDay}]?.rounds: ${newState.voteHistory[newState.currentDay]?.rounds}');
+  state = newState;
+  print('state.voteHistory[${state.currentDay}]?.rounds: ${state.voteHistory[state.currentDay]?.rounds}');
+}
 }

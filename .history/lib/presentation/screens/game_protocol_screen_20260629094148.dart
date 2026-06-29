@@ -42,26 +42,20 @@ class _GameProtocolScreenState extends State<GameProtocolScreen> {
   @override
   void initState() {
     super.initState();
-    // ===== ВЫВОД voteHistory =====
-    print('=== PROTOCOL SCREEN: voteHistory ===');
-    print('voteHistory: ${widget.gameState.voteHistory}');
+    // ===== ЛОГИ ПРИ ОТКРЫТИИ ПРОТОКОЛА =====
+    print('=== PROTOCOL SCREEN OPENED ===');
     print('voteHistory:');
     if (widget.gameState.voteHistory.isEmpty) {
       print('  (пусто)');
     } else {
       widget.gameState.voteHistory.forEach((day, voteDay) {
         print('  День $day:');
-        print('    rounds:');
-        for (var i = 0; i < voteDay.rounds.length; i++) {
-          print('      Раунд ${i + 1}: ${voteDay.rounds[i]}');
-        }
         print('    eliminated: ${voteDay.eliminated}');
         print('    eliminationVotes: ${voteDay.eliminationVotes}');
         print('    result: ${voteDay.result}');
       });
     }
-    print('========================================');
-
+    print('================================');
     // ===== КОНЕЦ ЛОГОВ =====
     _bonusPoints = List.generate(10, (_) => 0.0);
     // Заполняем контроллеры
@@ -661,167 +655,153 @@ class _GameProtocolScreenState extends State<GameProtocolScreen> {
   }
 
   Widget _buildVoteDayCard(int day, VoteDay dayData, int voteNumber) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 16),
-      child: Container(
-        width: double.infinity,
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          border: Border.all(color: Colors.grey.shade600),
-          borderRadius: BorderRadius.circular(8),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            // Заголовок по центру
+  return Padding(
+    padding: const EdgeInsets.only(bottom: 16),
+    child: Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        border: Border.all(color: Colors.grey.shade600),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          // Заголовок по центру
+          Text(
+            'ГОЛОСОВАНИЕ $voteNumber',
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 8),
+
+          // Все раунды голосования
+          ...dayData.rounds.asMap().entries.map((entry) {
+            final roundIndex = entry.key;
+            final round = entry.value;
+            final label = roundIndex == 0 ? 'Игрок' : 'Переголосование';
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 6),
+              child: _buildVoteRow(label, round, roundIndex),
+            );
+          }),
+
+          const Divider(color: Colors.grey),
+          
+          // Результат
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Text(
+                'Результат: ',
+                style: TextStyle(
+                  color: Colors.white70,
+                  fontSize: 12,
+                ),
+              ),
+              Text(
+                dayData.result.isNotEmpty ? dayData.result.join(', ') : '0',
+                style: TextStyle(
+                  color: dayData.result.isNotEmpty ? Colors.green : Colors.white54,
+                  fontSize: 14,
+                  fontWeight: dayData.result.isNotEmpty ? FontWeight.bold : FontWeight.normal,
+                ),
+              ),
+            ],
+          ),
+
+          // Elimination vote (если был)
+          if (dayData.eliminationVotes > 0)
             Text(
-              'ГОЛОСОВАНИЕ $voteNumber',
+              'Голосование за подъём: ${dayData.eliminationVotes}',
               style: const TextStyle(
-                color: Colors.white,
-                fontSize: 16,
+                color: Colors.orange,
+                fontSize: 12,
+              ),
+            ),
+        ],
+      ),
+    ),
+  );
+}
+
+Widget _buildVoteRow(String label, Map<int, int> votes, int roundIndex) {
+  final sortedKeys = votes.keys.toList()..sort();
+
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.center,
+    children: [
+      // Строка: Игрок / Переголосование
+      Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          SizedBox(
+            width: 100,
+            child: Text(
+              '$label:',
+              style: const TextStyle(
+                color: Colors.white70,
+                fontSize: 12,
                 fontWeight: FontWeight.bold,
               ),
-              textAlign: TextAlign.center,
+              textAlign: TextAlign.right,
             ),
-            const SizedBox(height: 8),
-
-            // Все раунды голосования
-            ...dayData.rounds.asMap().entries.map((entry) {
-              final roundIndex = entry.key;
-              final round = entry.value;
-              final label = roundIndex == 0 ? 'Игрок' : 'Переголосование';
-              return Padding(
-                padding: const EdgeInsets.only(bottom: 6),
-                child: _buildVoteRow(label, round, roundIndex),
+          ),
+          const SizedBox(width: 8),
+          Wrap(
+            spacing: 12,
+            children: sortedKeys.map((player) {
+              return Text(
+                '$player',
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 12,
+                ),
               );
-            }),
-
-            const Divider(color: Colors.grey),
-
-            // Результат
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Text(
-                  'Результат: ',
-                  style: TextStyle(
-                    color: Colors.white70,
-                    fontSize: 12,
-                  ),
-                ),
-                Text(
-                  dayData.result.isNotEmpty ? dayData.result.join(', ') : '0',
-                  style: TextStyle(
-                    color: dayData.result.isNotEmpty
-                        ? Colors.green
-                        : Colors.white54,
-                    fontSize: 14,
-                    fontWeight: dayData.result.isNotEmpty
-                        ? FontWeight.bold
-                        : FontWeight.normal,
-                  ),
-                ),
-              ],
-            ),
-
-            // Elimination vote (если был)
-            if (dayData.eliminationVotes > 0)
-              Text(
-                'Голосование за подъём: ${dayData.eliminationVotes}',
-                style: const TextStyle(
-                  color: Colors.orange,
-                  fontSize: 12,
-                ),
-              ),
-          ],
-        ),
+            }).toList(),
+          ),
+        ],
       ),
-    );
-  }
-
-  Widget _buildVoteRow(String label, Map<int, int> votes, int roundIndex) {
-    final sortedKeys = votes.keys.toList()..sort();
-
-    // Определяем метки для строк
-    final String firstRowLabel;
-    final String secondRowLabel;
-
-    if (roundIndex == 0) {
-      firstRowLabel = 'Игрок';
-      secondRowLabel = 'Голоса';
-    } else {
-      firstRowLabel = 'Пере-';
-      secondRowLabel = 'голос.';
-    }
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // Первая строка: Игрок / Пере-
-        Row(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            SizedBox(
-              width: 60,
-              child: Text(
-                '$firstRowLabel',
+      const SizedBox(height: 2),
+      // Строка: Голоса
+      Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          SizedBox(
+            width: 100,
+            child: Text(
+              'Голоса:',
+              style: const TextStyle(
+                color: Colors.white70,
+                fontSize: 12,
+              ),
+              textAlign: TextAlign.right,
+            ),
+          ),
+          const SizedBox(width: 8),
+          Wrap(
+            spacing: 12,
+            children: sortedKeys.map((player) {
+              return Text(
+                '${votes[player]}',
                 style: const TextStyle(
-                  color: Colors.white70,
+                  color: Colors.white,
                   fontSize: 12,
                 ),
-                textAlign: TextAlign.left,
-              ),
-            ),
-            const SizedBox(width: 8),
-            Wrap(
-              spacing: 12,
-              children: sortedKeys.map((player) {
-                return Text(
-                  '$player',
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 12,
-                  ),
-                );
-              }).toList(),
-            ),
-          ],
-        ),
-        const SizedBox(height: 2),
-        // Вторая строка: Голоса / голос.
-        Row(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            SizedBox(
-              width: 60,
-              child: Text(
-                '$secondRowLabel',
-                style: const TextStyle(
-                  color: Colors.white70,
-                  fontSize: 12,
-                ),
-                textAlign: TextAlign.left,
-              ),
-            ),
-            const SizedBox(width: 8),
-            Wrap(
-              spacing: 12,
-              children: sortedKeys.map((player) {
-                return Text(
-                  '${votes[player]}',
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 12,
-                  ),
-                );
-              }).toList(),
-            ),
-          ],
-        ),
-      ],
-    );
-  }
+              );
+            }).toList(),
+          ),
+        ],
+      ),
+    ],
+  );
+}
 
+  
   Widget _buildNotes() {
     return Card(
       color: Colors.grey.shade800,

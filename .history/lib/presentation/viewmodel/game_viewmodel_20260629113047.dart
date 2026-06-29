@@ -231,55 +231,67 @@ class GameViewModel extends StateNotifier<GameState> {
         state = await _phaseRules.calculateNextState(state);
         break;
       case SubPhase.finalWord:
-        print('ffff');
-        print('=== FULL voteHistory ===');
-        state.voteHistory.forEach((d, v) {
-          print('День $d: rounds=${v.rounds}, result=${v.result}');
-        });
-        print('========================');
-        _history.push(state);
-        final playerToKill = state.currentSpeakerSeat;
-        if (playerToKill == null) break;
+  _history.push(state);
+  final playerToKill = state.currentSpeakerSeat;
+  if (playerToKill == null) break;
 
-        final usecase = _ref.read(killPlayerUsecaseProvider);
-        final (newPlayers, winner) =
-            usecase.execute(state.players, playerToKill);
+  // ✅ Добавляем результат в voteHistory
+  final day = state.currentDay;
+  final existingDay = state.voteHistory[day];
+  
+  if (existingDay != null) {
+    // Обновляем существующий день — добавляем результат
+    final updatedDay = existingDay.copyWith(
+      eliminated: true,
+      result: [playerToKill],
+    );
+    
+    final newVoteHistory = Map<int, VoteDay>.from(state.voteHistory);
+    newVoteHistory[day] = updatedDay;
+    state = state.copyWith(voteHistory: newVoteHistory);
+  }
 
-        final remainingTied =
-            state.tiedSeats.where((seat) => seat != playerToKill).toList();
+  final usecase = _ref.read(killPlayerUsecaseProvider);
+  final (newPlayers, winner) = usecase.execute(state.players, playerToKill);
 
-        if (remainingTied.isNotEmpty) {
-          state = state.copyWith(
-            players: newPlayers,
-            currentSpeakerSeat: remainingTied.first,
-            tiedSeats: remainingTied,
-          );
-          if (winner != null) {
-            state = state.copyWith(
-                isGameEnded: true, winner: winner ? 'red' : 'black');
-          }
-        } else {
-          final newPhaseHistory = List<SubPhase>.from(state.phaseHistory)
-            ..add(SubPhase.mafiaShoot);
-          state = state.copyWith(
-            players: newPlayers,
-            currentPhase: Phase.night,
-            currentSubPhase: SubPhase.mafiaShoot,
-            currentDay: state.currentDay + 1,
-            nominatedSeats: [],
-            votes: {},
-            tiedSeats: [],
-            currentSpeakerSeat: -1,
-            phaseHistory: newPhaseHistory,
-            speechHistory: [],
-            currentSpeakerTimer: null,
-          );
-          if (winner != null) {
-            state = state.copyWith(
-                isGameEnded: true, winner: winner ? 'red' : 'black');
-          }
-        }
-        break;
+  final remainingTied = state.tiedSeats.where((seat) => seat != playerToKill).toList();
+
+  if (remainingTied.isNotEmpty) {
+    state = state.copyWith(
+      players: newPlayers,
+      currentSpeakerSeat: remainingTied.first,
+      tiedSeats: remainingTied,
+    );
+    if (winner != null) {
+      state = state.copyWith(
+        isGameEnded: true,
+        winner: winner ? 'red' : 'black',
+      );
+    }
+  } else {
+    final newPhaseHistory = List<SubPhase>.from(state.phaseHistory)
+      ..add(SubPhase.mafiaShoot);
+    state = state.copyWith(
+      players: newPlayers,
+      currentPhase: Phase.night,
+      currentSubPhase: SubPhase.mafiaShoot,
+      currentDay: state.currentDay + 1,
+      nominatedSeats: [],
+      votes: {},
+      tiedSeats: [],
+      currentSpeakerSeat: -1,
+      phaseHistory: newPhaseHistory,
+      speechHistory: [],
+      currentSpeakerTimer: null,
+    );
+    if (winner != null) {
+      state = state.copyWith(
+        isGameEnded: true,
+        winner: winner ? 'red' : 'black',
+      );
+    }
+  }
+  break;
       case SubPhase.bestMove:
         _history.push(state);
         state = await _phaseRules.calculateNextState(state);
@@ -443,11 +455,7 @@ class GameViewModel extends StateNotifier<GameState> {
       eliminationVotes: eliminationVotes ?? existing.eliminationVotes,
       result: result ?? existing.result,
     );
-    print('=== addRoundToVoteDay ===');
-    print('day: $day');
-    print('round: $round');
-    print('existing rounds: ${existing?.rounds}');
-    print('new rounds: ${updated.rounds}');
+
     state = state.copyWith(
       voteHistory: {
         ...state.voteHistory,
@@ -483,11 +491,6 @@ class GameViewModel extends StateNotifier<GameState> {
   }
 
   void updateState(GameState newState) {
-    print('=== UPDATE STATE ===');
-    print(
-        'newState.voteHistory[${newState.currentDay}]?.rounds: ${newState.voteHistory[newState.currentDay]?.rounds}');
     state = newState;
-    print(
-        'state.voteHistory[${state.currentDay}]?.rounds: ${state.voteHistory[state.currentDay]?.rounds}');
   }
 }

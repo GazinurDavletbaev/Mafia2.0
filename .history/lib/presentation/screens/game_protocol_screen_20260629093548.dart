@@ -42,26 +42,20 @@ class _GameProtocolScreenState extends State<GameProtocolScreen> {
   @override
   void initState() {
     super.initState();
-    // ===== ВЫВОД voteHistory =====
-    print('=== PROTOCOL SCREEN: voteHistory ===');
-    print('voteHistory: ${widget.gameState.voteHistory}');
+    // ===== ЛОГИ ПРИ ОТКРЫТИИ ПРОТОКОЛА =====
+    print('=== PROTOCOL SCREEN OPENED ===');
     print('voteHistory:');
     if (widget.gameState.voteHistory.isEmpty) {
       print('  (пусто)');
     } else {
       widget.gameState.voteHistory.forEach((day, voteDay) {
         print('  День $day:');
-        print('    rounds:');
-        for (var i = 0; i < voteDay.rounds.length; i++) {
-          print('      Раунд ${i + 1}: ${voteDay.rounds[i]}');
-        }
         print('    eliminated: ${voteDay.eliminated}');
         print('    eliminationVotes: ${voteDay.eliminationVotes}');
         print('    result: ${voteDay.result}');
       });
     }
-    print('========================================');
-
+    print('================================');
     // ===== КОНЕЦ ЛОГОВ =====
     _bonusPoints = List.generate(10, (_) => 0.0);
     // Заполняем контроллеры
@@ -671,36 +665,33 @@ class _GameProtocolScreenState extends State<GameProtocolScreen> {
           borderRadius: BorderRadius.circular(8),
         ),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Заголовок по центру
             Text(
-              'ГОЛОСОВАНИЕ $voteNumber',
+              'Голосование $voteNumber',
               style: const TextStyle(
                 color: Colors.white,
-                fontSize: 16,
+                fontSize: 14,
                 fontWeight: FontWeight.bold,
               ),
-              textAlign: TextAlign.center,
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 4),
 
-            // Все раунды голосования
+            // ✅ Все раунды голосования
             ...dayData.rounds.asMap().entries.map((entry) {
               final roundIndex = entry.key;
               final round = entry.value;
-              final label = roundIndex == 0 ? 'Игрок' : 'Переголосование';
+              final label =
+                  roundIndex == 0 ? 'Голосование' : 'Переголосо ${roundIndex + 1}';
               return Padding(
-                padding: const EdgeInsets.only(bottom: 6),
-                child: _buildVoteRow(label, round, roundIndex),
+                padding: const EdgeInsets.only(bottom: 4),
+                child: _buildVoteRow(label, round),
               );
             }),
 
-            const Divider(color: Colors.grey),
-
             // Результат
+            const SizedBox(height: 4),
             Row(
-              mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 const Text(
                   'Результат: ',
@@ -727,7 +718,7 @@ class _GameProtocolScreenState extends State<GameProtocolScreen> {
             // Elimination vote (если был)
             if (dayData.eliminationVotes > 0)
               Text(
-                'Голосование за подъём: ${dayData.eliminationVotes}',
+                'Голосов ЗА: ${dayData.eliminationVotes}',
                 style: const TextStyle(
                   color: Colors.orange,
                   fontSize: 12,
@@ -739,84 +730,38 @@ class _GameProtocolScreenState extends State<GameProtocolScreen> {
     );
   }
 
-  Widget _buildVoteRow(String label, Map<int, int> votes, int roundIndex) {
+  Widget _buildVoteRow(String label, Map<int, int> votes) {
     final sortedKeys = votes.keys.toList()..sort();
 
-    // Определяем метки для строк
-    final String firstRowLabel;
-    final String secondRowLabel;
-
-    if (roundIndex == 0) {
-      firstRowLabel = 'Игрок';
-      secondRowLabel = 'Голоса';
-    } else {
-      firstRowLabel = 'Пере-';
-      secondRowLabel = 'голос.';
-    }
-
-    return Column(
+    return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Первая строка: Игрок / Пере-
-        Row(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            SizedBox(
-              width: 60,
-              child: Text(
-                '$firstRowLabel',
-                style: const TextStyle(
-                  color: Colors.white70,
-                  fontSize: 12,
-                ),
-                textAlign: TextAlign.left,
-              ),
+        SizedBox(
+          width: 100,
+          child: Text(
+            '$label:',
+            style: const TextStyle(
+              color: Colors.white70,
+              fontSize: 12,
             ),
-            const SizedBox(width: 8),
-            Wrap(
-              spacing: 12,
-              children: sortedKeys.map((player) {
-                return Text(
-                  '$player',
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 12,
-                  ),
-                );
-              }).toList(),
-            ),
-          ],
+          ),
         ),
-        const SizedBox(height: 2),
-        // Вторая строка: Голоса / голос.
-        Row(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            SizedBox(
-              width: 60,
-              child: Text(
-                '$secondRowLabel',
-                style: const TextStyle(
-                  color: Colors.white70,
-                  fontSize: 12,
+        Expanded(
+          child: Wrap(
+            spacing: 8,
+            runSpacing: 4,
+            children: sortedKeys.map((player) {
+              return Chip(
+                label: Text(
+                  '$player: ${votes[player]}',
+                  style: const TextStyle(color: Colors.white, fontSize: 11),
                 ),
-                textAlign: TextAlign.left,
-              ),
-            ),
-            const SizedBox(width: 8),
-            Wrap(
-              spacing: 12,
-              children: sortedKeys.map((player) {
-                return Text(
-                  '${votes[player]}',
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 12,
-                  ),
-                );
-              }).toList(),
-            ),
-          ],
+                backgroundColor: Colors.grey.shade700,
+                materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                visualDensity: VisualDensity.compact,
+              );
+            }).toList(),
+          ),
         ),
       ],
     );

@@ -147,193 +147,183 @@ class VoteCalculatorActions {
   }
 
   void _finalizeVoting(Map<int, int> votes) {
-    AppLogger.d('_finalizeVoting: votes=$votes');
-    print('currentSubPhase: ${_vm.state.currentSubPhase}');
+  AppLogger.d('_finalizeVoting: votes=$votes');
+  print('currentSubPhase: ${_vm.state.currentSubPhase}');
 
-    final aliveCount = _vm.state.players.where((p) => p.isAlive).length;
-    final isRevote = _vm.state.currentSubPhase == SubPhase.revote;
-    final previousTiedCount = _vm.state.tiedSeats.length;
+  final aliveCount = _vm.state.players.where((p) => p.isAlive).length;
+  final isRevote = _vm.state.currentSubPhase == SubPhase.revote;
+  final previousTiedCount = _vm.state.tiedSeats.length;
 
-    final result = VoteController.determineResult(
-      votes,
-      aliveCount,
-      isRevote: isRevote,
-      previousTiedCount: previousTiedCount,
-    );
+  final result = VoteController.determineResult(
+    votes,
+    aliveCount,
+    isRevote: isRevote,
+    previousTiedCount: previousTiedCount,
+  );
 
-    AppLogger.d('_finalizeVoting: result=${result.type}');
+  AppLogger.d('_finalizeVoting: result=${result.type}');
 
-    final stateWithVotes = _vm.state.copyWith(
-      voteController: _vm.state.voteController,
-      isVotingActive: false,
-    );
-    _vm.updateState(stateWithVotes);
+  // ✅ СОХРАНЯЕМ ДАННЫЕ ДО ОБНОВЛЕНИЯ
+  final day = _vm.state.currentDay;
+  final resultType = result.type;
+  final winnerSeat = result.winnerSeat;
+  final seats = result.seats;
 
-    Future.delayed(const Duration(seconds: 2), () {
-      GameState newState;
-      final day = _vm.state.currentDay;
+  final stateWithVotes = _vm.state.copyWith(
+    voteController: _vm.state.voteController,
+    isVotingActive: false,
+  );
+  _vm.updateState(stateWithVotes);
 
-      switch (result.type) {
-        case VoteResultType.winner:
-          final isRevote = _vm.state.currentSubPhase == SubPhase.revote;
-          if (isRevote) {
-            // Переголосование — добавляем раунд к существующему дню
-            final existingDay = _vm.state.voteHistory[day];
-            final updatedDay = existingDay?.addRound(votes).copyWith(
-              eliminated: true,
-              result: [result.winnerSeat!],
-            );
+  Future.delayed(const Duration(seconds: 2), () {
+    GameState newState;
 
-            final newVoteHistory =
-                Map<int, VoteDay>.from(_vm.state.voteHistory);
-            print('=== WINNER REVOTE SAVE ===');
-            print('day: $day');
-            print('votes: $votes');
-            print('existingDay: $existingDay');
-            print('existingDay.rounds: ${existingDay?.rounds}');
-            print(
-                'newVoteHistory[day]?.rounds: ${newVoteHistory[day]?.rounds}');
-
-            // ✅ ДОБАВЛЯЕМ updatedDay В newVoteHistory
-            if (updatedDay != null) {
-              newVoteHistory[day] = updatedDay;
-              print('✅ updatedDay добавлен');
-              print(
-                  'newVoteHistory[day]?.rounds после обновления: ${newVoteHistory[day]?.rounds}');
-            }
-
-            newState = _vm.state.copyWith(
-              currentSubPhase: SubPhase.finalWord,
-              currentSpeakerSeat: result.winnerSeat,
-              tiedSeats: [],
-              voteController: null,
-              isVotingActive: false,
-              currentSpeakerTimer: PlayerTimerType.seconds60,
-              voteHistory: newVoteHistory,
-            );
-          } else {
-            final existingDay = _vm.state.voteHistory[day];
-            if (existingDay != null && existingDay.rounds.isNotEmpty) {
-              print('❌ Это не первое голосование, пропускаем else');
-              return;
-            }
-            print("rere ");
-            // Первое голосование — создаём новый день
-            final voteDay = VoteDay(
-              rounds: [votes],
-              eliminated: true,
-              result: [result.winnerSeat!],
-            );
-            newState = _vm.state.copyWith(
-              currentSubPhase: SubPhase.finalWord,
-              currentSpeakerSeat: result.winnerSeat,
-              tiedSeats: [],
-              voteController: null,
-              isVotingActive: false,
-              currentSpeakerTimer: PlayerTimerType.seconds60,
-              voteHistory: {
-                ..._vm.state.voteHistory,
-                day: voteDay,
-              },
-            );
-          }
-          break;
-
-        case VoteResultType.tieBreak:
-          // ПЕРЕСТРЕЛКА (ничья) — добавляем раунд
+    switch (resultType) {
+      case VoteResultType.winner:
+        final isRevote = _vm.state.currentSubPhase == SubPhase.revote;
+        if (isRevote) {
+          // Переголосование — добавляем раунд к существующему дню
           final existingDay = _vm.state.voteHistory[day];
-          final updatedDay = existingDay?.addRound(votes) ??
-              VoteDay(
-                rounds: [votes],
-                eliminated: false,
-                result: [],
-              );
-
-          newState = _vm.state.copyWith(
-            currentSubPhase: SubPhase.tieBreak,
-            tiedSeats: result.seats,
-            currentTieIndex: 0,
-            currentSpeakerSeat:
-                result.seats.isNotEmpty ? result.seats[0] : null,
-            voteController: null,
-            isVotingActive: false,
-            currentSpeakerTimer: PlayerTimerType.seconds30,
-            voteHistory: {
-              ..._vm.state.voteHistory,
-              day: updatedDay,
-            },
+          final updatedDay = existingDay?.addRound(votes).copyWith(
+            eliminated: true,
+            result: [winnerSeat!],
           );
-          print('=== TIE BREAK SAVE ===');
+
+          final newVoteHistory = Map<int, VoteDay>.from(_vm.state.voteHistory);
+          print('=== WINNER REVOTE SAVE ===');
           print('day: $day');
           print('votes: $votes');
           print('existingDay: $existingDay');
-          print('updatedDay.rounds: ${updatedDay.rounds}');
-          break;
+          print('existingDay.rounds: ${existingDay?.rounds}');
+          print('newVoteHistory[day]?.rounds: ${newVoteHistory[day]?.rounds}');
 
-        case VoteResultType.eliminationVote:
-          print('elmvote finalvotes');
-          // Голосование за подъём
-          final existingDay = _vm.state.voteHistory[day];
-          final updatedDay = existingDay?.addRound(votes) ??
-              VoteDay(
-                rounds: [votes],
-                eliminated: false,
-                result: [],
-              );
+          if (updatedDay != null) {
+            newVoteHistory[day] = updatedDay;
+            print('✅ updatedDay добавлен');
+            print('newVoteHistory[day]?.rounds после обновления: ${newVoteHistory[day]?.rounds}');
+          }
 
           newState = _vm.state.copyWith(
-            currentSubPhase: SubPhase.eliminationVote,
-            tiedSeats: result.seats,
+            currentSubPhase: SubPhase.finalWord,
+            currentSpeakerSeat: winnerSeat,
+            tiedSeats: [],
+            voteController: null,
+            isVotingActive: false,
+            currentSpeakerTimer: PlayerTimerType.seconds60,
+            voteHistory: newVoteHistory,
+          );
+        } else {
+          print("rere ");
+          final voteDay = VoteDay(
+            rounds: [votes],
+            eliminated: true,
+            result: [winnerSeat!],
+          );
+          newState = _vm.state.copyWith(
+            currentSubPhase: SubPhase.finalWord,
+            currentSpeakerSeat: winnerSeat,
+            tiedSeats: [],
             voteController: null,
             isVotingActive: false,
             currentSpeakerTimer: PlayerTimerType.seconds60,
             voteHistory: {
               ..._vm.state.voteHistory,
-              day: updatedDay,
-            },
-          );
-          break;
-
-        case VoteResultType.noCandidates:
-          print('no candidats finalaze');
-          final nextDay = _vm.state.currentDay + 1;
-
-          final voteDay = VoteDay(
-            rounds: [votes],
-            eliminated: false,
-            result: [],
-          );
-
-          newState = _vm.state.copyWith(
-            currentPhase: Phase.night,
-            currentSubPhase: SubPhase.mafiaShoot,
-            currentDay: nextDay,
-            voteController: null,
-            isVotingActive: false,
-            nominatedSeats: [],
-            votes: {},
-            voteHistory: {
-              ..._vm.state.voteHistory,
               day: voteDay,
             },
           );
-          break;
-      }
-      final newVoteHistory = Map<int, VoteDay>.from(_vm.state.voteHistory);
-      print('=== FINALIZE VOTING ===');
-      print('day: $day');
-      print('votes: $votes');
-      print('result.type: ${result.type}');
-      print('newVoteHistory[day]?.rounds: ${newVoteHistory[day]?.rounds}');
-      _vm.updateState(newState);
-      final neVoteHistory = Map<int, VoteDay>.from(_vm.state.voteHistory);
-      print('=== FINALIZE VOTING афтер ===');
-      print('day: $day');
-      print('votes: $votes');
-      print('result.type: ${result.type}');
-      print('newVoteHistory[day]?.rounds: ${neVoteHistory[day]?.rounds}');
-    });
-  }
+        }
+        break;
+
+      case VoteResultType.tieBreak:
+        final existingDay = _vm.state.voteHistory[day];
+        final updatedDay = existingDay?.addRound(votes) ??
+            VoteDay(
+              rounds: [votes],
+              eliminated: false,
+              result: [],
+            );
+
+        newState = _vm.state.copyWith(
+          currentSubPhase: SubPhase.tieBreak,
+          tiedSeats: seats,
+          currentTieIndex: 0,
+          currentSpeakerSeat: seats.isNotEmpty ? seats[0] : null,
+          voteController: null,
+          isVotingActive: false,
+          currentSpeakerTimer: PlayerTimerType.seconds30,
+          voteHistory: {
+            ..._vm.state.voteHistory,
+            day: updatedDay,
+          },
+        );
+        print('=== TIE BREAK SAVE ===');
+        print('day: $day');
+        print('votes: $votes');
+        print('existingDay: $existingDay');
+        print('updatedDay.rounds: ${updatedDay.rounds}');
+        break;
+
+      case VoteResultType.eliminationVote:
+        final existingDay = _vm.state.voteHistory[day];
+        final updatedDay = existingDay?.addRound(votes) ??
+            VoteDay(
+              rounds: [votes],
+              eliminated: false,
+              result: [],
+            );
+
+        newState = _vm.state.copyWith(
+          currentSubPhase: SubPhase.eliminationVote,
+          tiedSeats: seats,
+          voteController: null,
+          isVotingActive: false,
+          currentSpeakerTimer: PlayerTimerType.seconds60,
+          voteHistory: {
+            ..._vm.state.voteHistory,
+            day: updatedDay,
+          },
+        );
+        break;
+
+      case VoteResultType.noCandidates:
+        final nextDay = _vm.state.currentDay + 1;
+
+        final voteDay = VoteDay(
+          rounds: [votes],
+          eliminated: false,
+          result: [],
+        );
+
+        newState = _vm.state.copyWith(
+          currentPhase: Phase.night,
+          currentSubPhase: SubPhase.mafiaShoot,
+          currentDay: nextDay,
+          voteController: null,
+          isVotingActive: false,
+          nominatedSeats: [],
+          votes: {},
+          voteHistory: {
+            ..._vm.state.voteHistory,
+            day: voteDay,
+          },
+        );
+        break;
+    }
+    final newVoteHistory = Map<int, VoteDay>.from(_vm.state.voteHistory);
+    print('=== FINALIZE VOTING ===');
+    print('day: $day');
+    print('votes: $votes');
+    print('result.type: ${resultType}');
+    print('newVoteHistory[day]?.rounds: ${newVoteHistory[day]?.rounds}');
+    _vm.updateState(newState);
+    final neVoteHistory = Map<int, VoteDay>.from(_vm.state.voteHistory);
+    print('=== FINALIZE VOTING афтер ===');
+    print('day: $day');
+    print('votes: $votes');
+    print('result.type: ${resultType}');
+    print('newVoteHistory[day]?.rounds: ${neVoteHistory[day]?.rounds}');
+  });
+}
 
   void hideVoteCalculator() {
     final controller = _vm.state.voteController;

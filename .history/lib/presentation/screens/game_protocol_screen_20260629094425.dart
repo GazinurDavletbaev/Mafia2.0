@@ -42,26 +42,20 @@ class _GameProtocolScreenState extends State<GameProtocolScreen> {
   @override
   void initState() {
     super.initState();
-    // ===== ВЫВОД voteHistory =====
-    print('=== PROTOCOL SCREEN: voteHistory ===');
-    print('voteHistory: ${widget.gameState.voteHistory}');
+    // ===== ЛОГИ ПРИ ОТКРЫТИИ ПРОТОКОЛА =====
+    print('=== PROTOCOL SCREEN OPENED ===');
     print('voteHistory:');
     if (widget.gameState.voteHistory.isEmpty) {
       print('  (пусто)');
     } else {
       widget.gameState.voteHistory.forEach((day, voteDay) {
         print('  День $day:');
-        print('    rounds:');
-        for (var i = 0; i < voteDay.rounds.length; i++) {
-          print('      Раунд ${i + 1}: ${voteDay.rounds[i]}');
-        }
         print('    eliminated: ${voteDay.eliminated}');
         print('    eliminationVotes: ${voteDay.eliminationVotes}');
         print('    result: ${voteDay.result}');
       });
     }
-    print('========================================');
-
+    print('================================');
     // ===== КОНЕЦ ЛОГОВ =====
     _bonusPoints = List.generate(10, (_) => 0.0);
     // Заполняем контроллеры
@@ -755,21 +749,22 @@ class _GameProtocolScreenState extends State<GameProtocolScreen> {
     }
 
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         // Первая строка: Игрок / Пере-
         Row(
-          mainAxisAlignment: MainAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             SizedBox(
               width: 60,
               child: Text(
-                '$firstRowLabel',
+                '$firstRowLabel:',
                 style: const TextStyle(
                   color: Colors.white70,
                   fontSize: 12,
+                  fontWeight: FontWeight.bold,
                 ),
-                textAlign: TextAlign.left,
+                textAlign: TextAlign.right,
               ),
             ),
             const SizedBox(width: 8),
@@ -790,17 +785,17 @@ class _GameProtocolScreenState extends State<GameProtocolScreen> {
         const SizedBox(height: 2),
         // Вторая строка: Голоса / голос.
         Row(
-          mainAxisAlignment: MainAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             SizedBox(
               width: 60,
               child: Text(
-                '$secondRowLabel',
+                '$secondRowLabel:',
                 style: const TextStyle(
                   color: Colors.white70,
                   fontSize: 12,
                 ),
-                textAlign: TextAlign.left,
+                textAlign: TextAlign.right,
               ),
             ),
             const SizedBox(width: 8),

@@ -42,26 +42,20 @@ class _GameProtocolScreenState extends State<GameProtocolScreen> {
   @override
   void initState() {
     super.initState();
-    // ===== ВЫВОД voteHistory =====
-    print('=== PROTOCOL SCREEN: voteHistory ===');
-    print('voteHistory: ${widget.gameState.voteHistory}');
+    // ===== ЛОГИ ПРИ ОТКРЫТИИ ПРОТОКОЛА =====
+    print('=== PROTOCOL SCREEN OPENED ===');
     print('voteHistory:');
     if (widget.gameState.voteHistory.isEmpty) {
       print('  (пусто)');
     } else {
       widget.gameState.voteHistory.forEach((day, voteDay) {
         print('  День $day:');
-        print('    rounds:');
-        for (var i = 0; i < voteDay.rounds.length; i++) {
-          print('      Раунд ${i + 1}: ${voteDay.rounds[i]}');
-        }
         print('    eliminated: ${voteDay.eliminated}');
         print('    eliminationVotes: ${voteDay.eliminationVotes}');
         print('    result: ${voteDay.result}');
       });
     }
-    print('========================================');
-
+    print('================================');
     // ===== КОНЕЦ ЛОГОВ =====
     _bonusPoints = List.generate(10, (_) => 0.0);
     // Заполняем контроллеры
@@ -740,87 +734,88 @@ class _GameProtocolScreenState extends State<GameProtocolScreen> {
   }
 
   Widget _buildVoteRow(String label, Map<int, int> votes, int roundIndex) {
-    final sortedKeys = votes.keys.toList()..sort();
+  final sortedKeys = votes.keys.toList()..sort();
 
-    // Определяем метки для строк
-    final String firstRowLabel;
-    final String secondRowLabel;
-
-    if (roundIndex == 0) {
-      firstRowLabel = 'Игрок';
-      secondRowLabel = 'Голоса';
-    } else {
-      firstRowLabel = 'Пере-';
-      secondRowLabel = 'голос.';
-    }
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // Первая строка: Игрок / Пере-
-        Row(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            SizedBox(
-              width: 60,
-              child: Text(
-                '$firstRowLabel',
-                style: const TextStyle(
-                  color: Colors.white70,
-                  fontSize: 12,
-                ),
-                textAlign: TextAlign.left,
-              ),
-            ),
-            const SizedBox(width: 8),
-            Wrap(
-              spacing: 12,
-              children: sortedKeys.map((player) {
-                return Text(
-                  '$player',
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 12,
-                  ),
-                );
-              }).toList(),
-            ),
-          ],
-        ),
-        const SizedBox(height: 2),
-        // Вторая строка: Голоса / голос.
-        Row(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            SizedBox(
-              width: 60,
-              child: Text(
-                '$secondRowLabel',
-                style: const TextStyle(
-                  color: Colors.white70,
-                  fontSize: 12,
-                ),
-                textAlign: TextAlign.left,
-              ),
-            ),
-            const SizedBox(width: 8),
-            Wrap(
-              spacing: 12,
-              children: sortedKeys.map((player) {
-                return Text(
-                  '${votes[player]}',
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 12,
-                  ),
-                );
-              }).toList(),
-            ),
-          ],
-        ),
-      ],
-    );
+  // Определяем метки для строк
+  final String firstRowLabel;
+  final String secondRowLabel;
+  
+  if (roundIndex == 0) {
+    firstRowLabel = 'Игрок';
+    secondRowLabel = 'Голоса';
+  } else {
+    firstRowLabel = 'Пере-';
+    secondRowLabel = 'голос.';
   }
+
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      // Первая строка: Игрок / Пере-
+      Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          SizedBox(
+            width: 60,
+            child: Text(
+              '$firstRowLabel:',
+              style: const TextStyle(
+                color: Colors.white70,
+                fontSize: 12,
+                fontWeight: FontWeight.bold,
+              ),
+              textAlign: TextAlign.left,
+            ),
+          ),
+          const SizedBox(width: 8),
+          Wrap(
+            spacing: 12,
+            children: sortedKeys.map((player) {
+              return Text(
+                '$player',
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 12,
+                ),
+              );
+            }).toList(),
+          ),
+        ],
+      ),
+      const SizedBox(height: 2),
+      // Вторая строка: Голоса / голос.
+      Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          SizedBox(
+            width: 60,
+            child: Text(
+              '$secondRowLabel:',
+              style: const TextStyle(
+                color: Colors.white70,
+                fontSize: 12,
+              ),
+              textAlign: TextAlign.left,
+            ),
+          ),
+          const SizedBox(width: 8),
+          Wrap(
+            spacing: 12,
+            children: sortedKeys.map((player) {
+              return Text(
+                '${votes[player]}',
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 12,
+                ),
+              );
+            }).toList(),
+          ),
+        ],
+      ),
+    ],
+  );
+}
 
   Widget _buildNotes() {
     return Card(

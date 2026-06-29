@@ -44,7 +44,6 @@ class _GameProtocolScreenState extends State<GameProtocolScreen> {
     super.initState();
     // ===== ВЫВОД voteHistory =====
     print('=== PROTOCOL SCREEN: voteHistory ===');
-    print('voteHistory: ${widget.gameState.voteHistory}');
     print('voteHistory:');
     if (widget.gameState.voteHistory.isEmpty) {
       print('  (пусто)');

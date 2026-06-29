@@ -231,12 +231,7 @@ class GameViewModel extends StateNotifier<GameState> {
         state = await _phaseRules.calculateNextState(state);
         break;
       case SubPhase.finalWord:
-        print('ffff');
-        print('=== FULL voteHistory ===');
-        state.voteHistory.forEach((d, v) {
-          print('День $d: rounds=${v.rounds}, result=${v.result}');
-        });
-        print('========================');
+      print('')
         _history.push(state);
         final playerToKill = state.currentSpeakerSeat;
         if (playerToKill == null) break;
@@ -443,11 +438,7 @@ class GameViewModel extends StateNotifier<GameState> {
       eliminationVotes: eliminationVotes ?? existing.eliminationVotes,
       result: result ?? existing.result,
     );
-    print('=== addRoundToVoteDay ===');
-    print('day: $day');
-    print('round: $round');
-    print('existing rounds: ${existing?.rounds}');
-    print('new rounds: ${updated.rounds}');
+
     state = state.copyWith(
       voteHistory: {
         ...state.voteHistory,
@@ -483,11 +474,6 @@ class GameViewModel extends StateNotifier<GameState> {
   }
 
   void updateState(GameState newState) {
-    print('=== UPDATE STATE ===');
-    print(
-        'newState.voteHistory[${newState.currentDay}]?.rounds: ${newState.voteHistory[newState.currentDay]?.rounds}');
     state = newState;
-    print(
-        'state.voteHistory[${state.currentDay}]?.rounds: ${state.voteHistory[state.currentDay]?.rounds}');
   }
 }
