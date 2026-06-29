@@ -890,10 +890,10 @@ class _GameProtocolScreenState extends State<GameProtocolScreen> {
 
   void _saveProtocol() async {
     final startTime = widget.gameState.gameDate;
-    final endTime = DateTime.now();
-    final timeString = startTime != null
-        ? '${_formatTime(startTime)} — ${_formatTime(endTime)}'
-        : '00:00 — 00:00';
+final endTime = DateTime.now();
+final timeString = startTime != null 
+    ? '${_formatTime(startTime)} — ${_formatTime(endTime)}' 
+    : '00:00 — 00:00';
     final data = {
       'tournament': _tournamentController.text,
       'stage': _stageController.text,

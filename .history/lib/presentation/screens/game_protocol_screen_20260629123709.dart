@@ -889,11 +889,6 @@ class _GameProtocolScreenState extends State<GameProtocolScreen> {
   }
 
   void _saveProtocol() async {
-    final startTime = widget.gameState.gameDate;
-    final endTime = DateTime.now();
-    final timeString = startTime != null
-        ? '${_formatTime(startTime)} — ${_formatTime(endTime)}'
-        : '00:00 — 00:00';
     final data = {
       'tournament': _tournamentController.text,
       'stage': _stageController.text,
@@ -904,7 +899,6 @@ class _GameProtocolScreenState extends State<GameProtocolScreen> {
       'bestMove': _bestMoveController.text,
       'protest': _protestText,
       'winner': widget.gameState.winner,
-      'time': timeString,
       'players': widget.gameState.players.map((p) {
         return {
           'seat': p.seatNumber,
@@ -917,18 +911,21 @@ class _GameProtocolScreenState extends State<GameProtocolScreen> {
       }).toList(),
       'nightActions': widget.gameState.nightActions ?? [],
       'voteHistory': widget.gameState.voteHistory.map((day, dayData) {
-        // Преобразуем rounds: Map<int, int> → Map<String, int>
-        final rounds = dayData.rounds.map((round) {
-          return round.map((key, value) => MapEntry(key.toString(), value));
-        }).toList();
-
-        return MapEntry(day.toString(), {
-          'rounds': rounds,
-          'eliminated': dayData.eliminated,
-          'eliminationVotes': dayData.eliminationVotes,
-          'result': dayData.result,
-        });
-      }),
+  // Преобразуем rounds: Map<int, int> → Map<String, int>
+  final rounds = dayData.rounds.map((round) {
+    return round.map((key, value) => MapEntry(key.toString(), value));
+  }).toList();
+  
+  return MapEntry(
+    day.toString(),
+    {
+      'rounds': rounds,
+      'eliminated': dayData.eliminated,
+      'eliminationVotes': dayData.eliminationVotes,
+      'result': dayData.result,
+    }
+  );
+}),
     };
 
     showDialog(
