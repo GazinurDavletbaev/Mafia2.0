@@ -23,9 +23,8 @@ extension GameStateSerialization on GameState {
       'currentDay': currentDay,
       'currentSpeakerSeat': currentSpeakerSeat,
       'nominatedSeats': nominatedSeats,
-      'removedPlayers': removedPlayers
-          .map((p) => p.toJson())
-          .toList(), // ✅ использует removedPlayers
+          'removedPlayers': players.map((p) => p.toJson()).toList(),  // ← добавить
+
       'votes': votes,
       'partialBestMove': partialBestMove,
       'isGameEnded': isGameEnded,
@@ -61,10 +60,7 @@ extension GameStateSerialization on GameState {
       final map = Map<String, dynamic>.from(p as Map<dynamic, dynamic>);
       return PlayerModel.fromJson(map);
     }).toList();
-    final removedPlayers = (json['removedPlayers'] as List<dynamic>?)
-            ?.map((p) => PlayerModel.fromJson(Map<String, dynamic>.from(p)))
-            .toList() ??
-        [];
+
     final phaseHistory = (json['phaseHistory'] as List<dynamic>?)
             ?.map((p) => SubPhase.values[p as int])
             .toList() ??
@@ -106,7 +102,6 @@ extension GameStateSerialization on GameState {
       currentDay: json['currentDay'],
       currentSpeakerSeat: json['currentSpeakerSeat'],
       nominatedSeats: List<int>.from(json['nominatedSeats']),
-      removedPlayers: removedPlayers,
       votes: Map<int, int>.from(json['votes']),
       partialBestMove: List<int>.from(json['partialBestMove']),
       isGameEnded: json['isGameEnded'],

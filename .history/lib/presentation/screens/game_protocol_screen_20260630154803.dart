@@ -355,104 +355,66 @@ class _GameProtocolScreenState extends State<GameProtocolScreen> {
   }
 
   Widget _buildBonusPointsCell(int index) {
-    final player = widget.gameState.players[index];
-    final isRemoved = widget.gameState.removedPlayers
-        .any((p) => p.seatNumber == player.seatNumber);
+  final player = widget.gameState.players[index];
+  final isRemoved = widget.gameState.removedPlayers.any((p) => p.seatNumber == player.seatNumber);
 
-    final ruleOptions = [
-      'п.8.4.1',
-      'п.8.4.2',
-      'п.8.4.3',
-      'п.8.5.1',
-      'п.8.5.2',
-    ];
+  final ruleOptions = [
+    'п.8.4.1',
+    'п.8.4.2',
+    'п.8.4.3',
+    'п.8.5.1',
+    'п.8.5.2',
+  ];
 
-    if (isRemoved) {
-      // currentValue хранится в _removedRuleMap, но не отображается
-      return Padding(
-        padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 0),
+  if (isRemoved) {
+    // currentValue хранится в _removedRuleMap, но не отображается
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 0),
+      child: Container(
+        height: 24,
+        alignment: Alignment.center,
         child: Container(
-          height: 24,
+          width: 52,
           alignment: Alignment.center,
-          child: Container(
-            width: 52,
-            alignment: Alignment.center,
-            child: DropdownButton<String>(
-              value: null, // ← всегда null, чтобы показывать hint (-0.5)
-              dropdownColor: Colors.grey.shade800,
-              style: const TextStyle(
-                color: Colors.white,
+          child: DropdownButton<String>(
+            value: null, // ← всегда null, чтобы показывать hint (-0.5)
+            dropdownColor: Colors.grey.shade800,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 11,
+              fontWeight: FontWeight.bold,
+            ),
+            hint: const Text(
+              '-0.5',
+              style: TextStyle(
+                color: Colors.red,
                 fontSize: 11,
                 fontWeight: FontWeight.bold,
               ),
-              hint: const Text(
-                '-0.5',
-                style: TextStyle(
-                  color: Colors.red,
-                  fontSize: 11,
-                  fontWeight: FontWeight.bold,
-                ),
-                textAlign: TextAlign.center,
-              ),
-              icon: const SizedBox.shrink(),
-              underline: const SizedBox.shrink(),
-              isDense: true,
-              isExpanded: true,
-              alignment: AlignmentDirectional.center,
-              items: ruleOptions.map((rule) {
-                return DropdownMenuItem<String>(
-                  value: rule,
-                  alignment: AlignmentDirectional.center,
-                  child: Text(
-                    rule,
-                    style: const TextStyle(fontSize: 11, color: Colors.white),
-                    textAlign: TextAlign.center,
-                    overflow: TextOverflow.ellipsis,
-                    maxLines: 1,
-                  ),
-                );
-              }).toList(),
-              onChanged: (newValue) {
-                setState(() {
-                  // ✅ Сохраняем выбранный пункт в мапу, но в UI всегда -0.5
-                  _removedRuleMap[player.seatNumber] = newValue ?? '';
-                });
-              },
+              textAlign: TextAlign.center,
             ),
-          ),
-        ),
-      );
-    }
-
-    // Обычный Dropdown для живых игроков
-    final bonusValues = [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7];
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 0),
-      child: SizedBox(
-        height: 24,
-        width: 44,
-        child: DropdownButtonHideUnderline(
-          child: DropdownButton<double>(
-            value: _bonusPoints[index],
-            dropdownColor: Colors.grey.shade800,
-            style: const TextStyle(color: Colors.white, fontSize: 11),
-            isExpanded: true,
             icon: const SizedBox.shrink(),
-            items: bonusValues.map((value) {
-              return DropdownMenuItem<double>(
-                value: value,
-                child: Center(
-                  child: Text(
-                    value == 0 ? '0' : value.toStringAsFixed(1),
-                    style: const TextStyle(fontSize: 11, color: Colors.white),
-                    textAlign: TextAlign.center,
-                  ),
+            underline: const SizedBox.shrink(),
+            isDense: true,
+            isExpanded: true,
+            alignment: AlignmentDirectional.center,
+            items: ruleOptions.map((rule) {
+              return DropdownMenuItem<String>(
+                value: rule,
+                alignment: AlignmentDirectional.center,
+                child: Text(
+                  rule,
+                  style: const TextStyle(fontSize: 11, color: Colors.white),
+                  textAlign: TextAlign.center,
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 1,
                 ),
               );
             }).toList(),
             onChanged: (newValue) {
               setState(() {
-                _bonusPoints[index] = newValue!;
+                // ✅ Сохраняем выбранный пункт в мапу, но в UI всегда -0.5
+                _removedRuleMap[player.seatNumber] = newValue ?? '';
               });
             },
           ),
@@ -460,6 +422,43 @@ class _GameProtocolScreenState extends State<GameProtocolScreen> {
       ),
     );
   }
+
+  // Обычный Dropdown для живых игроков
+  final bonusValues = [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7];
+  return Padding(
+    padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 0),
+    child: SizedBox(
+      height: 24,
+      width: 44,
+      child: DropdownButtonHideUnderline(
+        child: DropdownButton<double>(
+          value: _bonusPoints[index],
+          dropdownColor: Colors.grey.shade800,
+          style: const TextStyle(color: Colors.white, fontSize: 11),
+          isExpanded: true,
+          icon: const SizedBox.shrink(),
+          items: bonusValues.map((value) {
+            return DropdownMenuItem<double>(
+              value: value,
+              child: Center(
+                child: Text(
+                  value == 0 ? '0' : value.toStringAsFixed(1),
+                  style: const TextStyle(fontSize: 11, color: Colors.white),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            );
+          }).toList(),
+          onChanged: (newValue) {
+            setState(() {
+              _bonusPoints[index] = newValue!;
+            });
+          },
+        ),
+      ),
+    ),
+  );
+}
 
   Widget _buildPointsCell(int index) {
     return Padding(

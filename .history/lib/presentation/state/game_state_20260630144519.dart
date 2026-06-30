@@ -105,7 +105,6 @@ class GameState {
     int? currentDay,
     int? currentSpeakerSeat,
     List<int>? nominatedSeats,
-    List<PlayerModel>? removedPlayers,
     Map<int, int>? votes,
     List<int>? partialBestMove,
     bool? isGameEnded,
@@ -144,7 +143,6 @@ class GameState {
           ? null
           : (currentSpeakerSeat ?? this.currentSpeakerSeat),
       nominatedSeats: nominatedSeats ?? this.nominatedSeats,
-      removedPlayers: removedPlayers ?? this.removedPlayers,
       votes: votes ?? this.votes,
       partialBestMove: partialBestMove ?? this.partialBestMove,
       isGameEnded: isGameEnded ?? this.isGameEnded,

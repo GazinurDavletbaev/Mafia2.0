@@ -12,6 +12,7 @@ import '../state/game_state.dart';
 class GameProtocolScreen extends StatefulWidget {
   final GameHistory gameHistory;
   final GameState gameState;
+  
 
   const GameProtocolScreen({
     super.key,
@@ -30,8 +31,6 @@ class _GameProtocolScreenState extends State<GameProtocolScreen> {
 
   List<int> _points = [];
   List<double> _bonusPoints = [];
-  final Map<int, String> _removedRuleMap = {};
-
   // Контроллеры для редактируемых полей
   final _tournamentController = TextEditingController();
   final _stageController = TextEditingController();
@@ -304,7 +303,7 @@ class _GameProtocolScreenState extends State<GameProtocolScreen> {
             LayoutBuilder(
               builder: (context, constraints) {
                 final totalWidth = constraints.maxWidth;
-                final fixedWidths = 28 + 40 + 45 + 50 + 50;
+                final fixedWidths = 28 + 40 + 45 + 50 + 40;
                 final nameWidth = totalWidth - fixedWidths - 10;
 
                 return Table(
@@ -316,7 +315,7 @@ class _GameProtocolScreenState extends State<GameProtocolScreen> {
                     2: const FixedColumnWidth(40),
                     3: const FixedColumnWidth(45),
                     4: const FixedColumnWidth(50),
-                    5: const FixedColumnWidth(50),
+                    5: const FixedColumnWidth(40),
                   },
                   children: [
                     TableRow(
@@ -359,66 +358,21 @@ class _GameProtocolScreenState extends State<GameProtocolScreen> {
     final isRemoved = widget.gameState.removedPlayers
         .any((p) => p.seatNumber == player.seatNumber);
 
-    final ruleOptions = [
-      'п.8.4.1',
-      'п.8.4.2',
-      'п.8.4.3',
-      'п.8.5.1',
-      'п.8.5.2',
-    ];
-
+    // Если игрок удалён — показываем -0.5 красным
     if (isRemoved) {
-      // currentValue хранится в _removedRuleMap, но не отображается
       return Padding(
         padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 0),
         child: Container(
           height: 24,
           alignment: Alignment.center,
-          child: Container(
-            width: 52,
-            alignment: Alignment.center,
-            child: DropdownButton<String>(
-              value: null, // ← всегда null, чтобы показывать hint (-0.5)
-              dropdownColor: Colors.grey.shade800,
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 11,
-                fontWeight: FontWeight.bold,
-              ),
-              hint: const Text(
-                '-0.5',
-                style: TextStyle(
-                  color: Colors.red,
-                  fontSize: 11,
-                  fontWeight: FontWeight.bold,
-                ),
-                textAlign: TextAlign.center,
-              ),
-              icon: const SizedBox.shrink(),
-              underline: const SizedBox.shrink(),
-              isDense: true,
-              isExpanded: true,
-              alignment: AlignmentDirectional.center,
-              items: ruleOptions.map((rule) {
-                return DropdownMenuItem<String>(
-                  value: rule,
-                  alignment: AlignmentDirectional.center,
-                  child: Text(
-                    rule,
-                    style: const TextStyle(fontSize: 11, color: Colors.white),
-                    textAlign: TextAlign.center,
-                    overflow: TextOverflow.ellipsis,
-                    maxLines: 1,
-                  ),
-                );
-              }).toList(),
-              onChanged: (newValue) {
-                setState(() {
-                  // ✅ Сохраняем выбранный пункт в мапу, но в UI всегда -0.5
-                  _removedRuleMap[player.seatNumber] = newValue ?? '';
-                });
-              },
+          child: Text(
+            '-0.5',
+            style: const TextStyle(
+              color: Colors.red,
+              fontSize: 11,
+              fontWeight: FontWeight.bold,
             ),
+            textAlign: TextAlign.center,
           ),
         ),
       );
@@ -981,19 +935,13 @@ class _GameProtocolScreenState extends State<GameProtocolScreen> {
       'winner': widget.gameState.winner,
       'time': timeString,
       'players': widget.gameState.players.map((p) {
-        final isRemoved = widget.gameState.removedPlayers
-            .any((rp) => rp.seatNumber == p.seatNumber);
-        final bonus = isRemoved ? -0.5 : _bonusPoints[p.seatNumber - 1];
-        final rule = isRemoved ? (_removedRuleMap[p.seatNumber] ?? '') : '';
-
         return {
           'seat': p.seatNumber,
           'name': p.name,
           'role': p.role,
           'fouls': p.fouls,
           'points': _points[p.seatNumber - 1],
-          'bonus': bonus,
-          'rule': rule,
+          'bonus': _bonusPoints[p.seatNumber - 1],
         };
       }).toList(),
       'nightActions': widget.gameState.nightActions ?? [],

@@ -360,68 +360,64 @@ class _GameProtocolScreenState extends State<GameProtocolScreen> {
         .any((p) => p.seatNumber == player.seatNumber);
 
     final ruleOptions = [
-      'п.8.4.1',
-      'п.8.4.2',
-      'п.8.4.3',
-      'п.8.5.1',
-      'п.8.5.2',
+      'п. 8.4.1',
+      'п. 8.4.2',
+      'п. 8.4.3',
+      'п. 8.5.1',
+      'п. 8.5.2',
     ];
 
     if (isRemoved) {
-      // currentValue хранится в _removedRuleMap, но не отображается
+      final currentValue = _removedRuleMap.containsKey(player.seatNumber) &&
+              ruleOptions.contains(_removedRuleMap[player.seatNumber])
+          ? _removedRuleMap[player.seatNumber]
+          : null;
+
       return Padding(
-        padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 0),
-        child: Container(
-          height: 24,
-          alignment: Alignment.center,
-          child: Container(
-            width: 52,
-            alignment: Alignment.center,
-            child: DropdownButton<String>(
-              value: null, // ← всегда null, чтобы показывать hint (-0.5)
-              dropdownColor: Colors.grey.shade800,
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 11,
-                fontWeight: FontWeight.bold,
-              ),
-              hint: const Text(
-                '-0.5',
-                style: TextStyle(
-                  color: Colors.red,
-                  fontSize: 11,
-                  fontWeight: FontWeight.bold,
-                ),
-                textAlign: TextAlign.center,
-              ),
-              icon: const SizedBox.shrink(),
-              underline: const SizedBox.shrink(),
-              isDense: true,
-              isExpanded: true,
-              alignment: AlignmentDirectional.center,
-              items: ruleOptions.map((rule) {
-                return DropdownMenuItem<String>(
-                  value: rule,
-                  alignment: AlignmentDirectional.center,
-                  child: Text(
-                    rule,
-                    style: const TextStyle(fontSize: 11, color: Colors.white),
-                    textAlign: TextAlign.center,
-                    overflow: TextOverflow.ellipsis,
-                    maxLines: 1,
-                  ),
-                );
-              }).toList(),
-              onChanged: (newValue) {
-                setState(() {
-                  // ✅ Сохраняем выбранный пункт в мапу, но в UI всегда -0.5
-                  _removedRuleMap[player.seatNumber] = newValue ?? '';
-                });
-              },
-            ),
+  padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 0),
+  child: Container(
+    height: 24,
+    alignment: Alignment.center,
+    child: Container(
+      width: 52,
+      clipBehavior: Clip.hardEdge,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(4),
+      ),
+      child: DropdownButton<String>(
+        value: currentValue,
+        dropdownColor: Colors.grey.shade800,
+        style: const TextStyle(
+          color: Colors.white,
+          fontSize: 11,
+          fontWeight: FontWeight.bold,
+        ),
+        hint: const Text(
+          '-0.5',
+          style: TextStyle(
+            color: Colors.red,
+            fontSize: 11,
+            fontWeight: FontWeight.bold,
           ),
         ),
-      );
+        icon: const Icon(Icons.arrow_drop_down, color: Colors.red, size: 16),
+        underline: const SizedBox.shrink(),
+        isDense: true,
+        items: ruleOptions.map((rule) {
+          return DropdownMenuItem<String>(
+            value: rule,
+            child: Text(rule, style: const TextStyle(fontSize: 11)),
+          );
+        }).toList(),
+        onChanged: (newValue) {
+          setState(() {
+            _removedRuleMap[player.seatNumber] = newValue ?? '';
+          });
+        },
+      ),
+    ),
+  ),
+);
     }
 
     // Обычный Dropdown для живых игроков

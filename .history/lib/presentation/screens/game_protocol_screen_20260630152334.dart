@@ -12,8 +12,10 @@ import '../state/game_state.dart';
 class GameProtocolScreen extends StatefulWidget {
   final GameHistory gameHistory;
   final GameState gameState;
+  final Map<int, String> _removedRuleMap = {};  // ← добавить
 
-  const GameProtocolScreen({
+
+  GameProtocolScreen({
     super.key,
     required this.gameHistory,
     required this.gameState,
@@ -30,7 +32,7 @@ class _GameProtocolScreenState extends State<GameProtocolScreen> {
 
   List<int> _points = [];
   List<double> _bonusPoints = [];
-  final Map<int, String> _removedRuleMap = {};
+    final Map<int, String> _removedRuleMap = {};
 
   // Контроллеры для редактируемых полей
   final _tournamentController = TextEditingController();
@@ -304,7 +306,7 @@ class _GameProtocolScreenState extends State<GameProtocolScreen> {
             LayoutBuilder(
               builder: (context, constraints) {
                 final totalWidth = constraints.maxWidth;
-                final fixedWidths = 28 + 40 + 45 + 50 + 50;
+                final fixedWidths = 28 + 40 + 45 + 50 + 40;
                 final nameWidth = totalWidth - fixedWidths - 10;
 
                 return Table(
@@ -316,7 +318,7 @@ class _GameProtocolScreenState extends State<GameProtocolScreen> {
                     2: const FixedColumnWidth(40),
                     3: const FixedColumnWidth(45),
                     4: const FixedColumnWidth(50),
-                    5: const FixedColumnWidth(50),
+                    5: const FixedColumnWidth(40),
                   },
                   children: [
                     TableRow(
@@ -354,112 +356,94 @@ class _GameProtocolScreenState extends State<GameProtocolScreen> {
     );
   }
 
-  Widget _buildBonusPointsCell(int index) {
-    final player = widget.gameState.players[index];
-    final isRemoved = widget.gameState.removedPlayers
-        .any((p) => p.seatNumber == player.seatNumber);
+ Widget _buildBonusPointsCell(int index) {
+  final player = widget.gameState.players[index];
+  final isRemoved = widget.gameState.removedPlayers.any((p) => p.seatNumber == player.seatNumber);
 
-    final ruleOptions = [
-      'п.8.4.1',
-      'п.8.4.2',
-      'п.8.4.3',
-      'п.8.5.1',
-      'п.8.5.2',
-    ];
+  final ruleOptions = [
+    'п. 8.4.1',
+    'п. 8.4.2',
+    'п. 8.4.3',
+    'п. 8.5.1',
+    'п. 8.5.2',
+  ];
 
-    if (isRemoved) {
-      // currentValue хранится в _removedRuleMap, но не отображается
-      return Padding(
-        padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 0),
-        child: Container(
-          height: 24,
-          alignment: Alignment.center,
-          child: Container(
-            width: 52,
-            alignment: Alignment.center,
-            child: DropdownButton<String>(
-              value: null, // ← всегда null, чтобы показывать hint (-0.5)
-              dropdownColor: Colors.grey.shade800,
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 11,
-                fontWeight: FontWeight.bold,
-              ),
-              hint: const Text(
-                '-0.5',
-                style: TextStyle(
-                  color: Colors.red,
-                  fontSize: 11,
-                  fontWeight: FontWeight.bold,
-                ),
-                textAlign: TextAlign.center,
-              ),
-              icon: const SizedBox.shrink(),
-              underline: const SizedBox.shrink(),
-              isDense: true,
-              isExpanded: true,
-              alignment: AlignmentDirectional.center,
-              items: ruleOptions.map((rule) {
-                return DropdownMenuItem<String>(
-                  value: rule,
-                  alignment: AlignmentDirectional.center,
-                  child: Text(
-                    rule,
-                    style: const TextStyle(fontSize: 11, color: Colors.white),
-                    textAlign: TextAlign.center,
-                    overflow: TextOverflow.ellipsis,
-                    maxLines: 1,
-                  ),
-                );
-              }).toList(),
-              onChanged: (newValue) {
-                setState(() {
-                  // ✅ Сохраняем выбранный пункт в мапу, но в UI всегда -0.5
-                  _removedRuleMap[player.seatNumber] = newValue ?? '';
-                });
-              },
-            ),
-          ),
-        ),
-      );
-    }
-
-    // Обычный Dropdown для живых игроков
-    final bonusValues = [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7];
+  if (isRemoved) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 0),
-      child: SizedBox(
-        height: 24,
-        width: 44,
-        child: DropdownButtonHideUnderline(
-          child: DropdownButton<double>(
-            value: _bonusPoints[index],
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Text(
+            '-0.5',
+            style: TextStyle(
+              color: Colors.red,
+              fontSize: 11,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(width: 2),
+          DropdownButton<String>(
+            value: _removedRuleMap[player.seatNumber],
             dropdownColor: Colors.grey.shade800,
-            style: const TextStyle(color: Colors.white, fontSize: 11),
-            isExpanded: true,
+            style: const TextStyle(color: Colors.white, fontSize: 10),
+            hint: const Text('▼', style: TextStyle(color: Colors.grey, fontSize: 10)),
             icon: const SizedBox.shrink(),
-            items: bonusValues.map((value) {
-              return DropdownMenuItem<double>(
-                value: value,
-                child: Center(
-                  child: Text(
-                    value == 0 ? '0' : value.toStringAsFixed(1),
-                    style: const TextStyle(fontSize: 11, color: Colors.white),
-                    textAlign: TextAlign.center,
-                  ),
-                ),
+            underline: const SizedBox.shrink(),
+            isDense: true,
+            items: ruleOptions.map((rule) {
+              return DropdownMenuItem<String>(
+                value: rule,
+                child: Text(rule, style: const TextStyle(fontSize: 11)),
               );
             }).toList(),
             onChanged: (newValue) {
               setState(() {
-                _bonusPoints[index] = newValue!;
+                _removedRuleMap[player.seatNumber] = newValue ?? '';
               });
             },
           ),
-        ),
+        ],
       ),
     );
   }
+
+  // Обычный Dropdown для живых игроков
+  final bonusValues = [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7];
+  return Padding(
+    padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 0),
+    child: SizedBox(
+      height: 24,
+      width: 44,
+      child: DropdownButtonHideUnderline(
+        child: DropdownButton<double>(
+          value: _bonusPoints[index],
+          dropdownColor: Colors.grey.shade800,
+          style: const TextStyle(color: Colors.white, fontSize: 11),
+          isExpanded: true,
+          icon: const SizedBox.shrink(),
+          items: bonusValues.map((value) {
+            return DropdownMenuItem<double>(
+              value: value,
+              child: Center(
+                child: Text(
+                  value == 0 ? '0' : value.toStringAsFixed(1),
+                  style: const TextStyle(fontSize: 11, color: Colors.white),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            );
+          }).toList(),
+          onChanged: (newValue) {
+            setState(() {
+              _bonusPoints[index] = newValue!;
+            });
+          },
+        ),
+      ),
+    ),
+  );
+}
 
   Widget _buildPointsCell(int index) {
     return Padding(
@@ -981,21 +965,20 @@ class _GameProtocolScreenState extends State<GameProtocolScreen> {
       'winner': widget.gameState.winner,
       'time': timeString,
       'players': widget.gameState.players.map((p) {
-        final isRemoved = widget.gameState.removedPlayers
-            .any((rp) => rp.seatNumber == p.seatNumber);
-        final bonus = isRemoved ? -0.5 : _bonusPoints[p.seatNumber - 1];
-        final rule = isRemoved ? (_removedRuleMap[p.seatNumber] ?? '') : '';
-
-        return {
-          'seat': p.seatNumber,
-          'name': p.name,
-          'role': p.role,
-          'fouls': p.fouls,
-          'points': _points[p.seatNumber - 1],
-          'bonus': bonus,
-          'rule': rule,
-        };
-      }).toList(),
+  final isRemoved = widget.gameState.removedPlayers.any((rp) => rp.seatNumber == p.seatNumber);
+  final bonus = isRemoved ? -0.5 : _bonusPoints[p.seatNumber - 1];
+  final rule = isRemoved ? (_removedRuleMap[p.seatNumber] ?? '') : '';
+  
+  return {
+    'seat': p.seatNumber,
+    'name': p.name,
+    'role': p.role,
+    'fouls': p.fouls,
+    'points': _points[p.seatNumber - 1],
+    'bonus': bonus,
+    'rule': rule,
+  };
+}).toList(),
       'nightActions': widget.gameState.nightActions ?? [],
       'voteHistory': widget.gameState.voteHistory.map((day, dayData) {
         // Преобразуем rounds: Map<int, int> → Map<String, int>

@@ -144,7 +144,6 @@ class GameState {
           ? null
           : (currentSpeakerSeat ?? this.currentSpeakerSeat),
       nominatedSeats: nominatedSeats ?? this.nominatedSeats,
-      removedPlayers: removedPlayers ?? this.removedPlayers,
       votes: votes ?? this.votes,
       partialBestMove: partialBestMove ?? this.partialBestMove,
       isGameEnded: isGameEnded ?? this.isGameEnded,

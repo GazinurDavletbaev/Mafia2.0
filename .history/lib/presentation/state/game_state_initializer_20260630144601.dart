@@ -50,7 +50,8 @@ class GameStateInitializer {
       currentDay: 0,
       currentSpeakerSeat: null,
       nominatedSeats: [],
-      removedPlayers: [],
+          removedPlayers: [],  // ← добавить
+
       votes: {},
       partialBestMove: [],
       isGameEnded: false,

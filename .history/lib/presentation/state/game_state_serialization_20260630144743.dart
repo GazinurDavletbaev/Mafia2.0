@@ -23,9 +23,7 @@ extension GameStateSerialization on GameState {
       'currentDay': currentDay,
       'currentSpeakerSeat': currentSpeakerSeat,
       'nominatedSeats': nominatedSeats,
-      'removedPlayers': removedPlayers
-          .map((p) => p.toJson())
-          .toList(), // ✅ использует removedPlayers
+      'removedPlayers': players.map((p) => p.toJson()).toList(),
       'votes': votes,
       'partialBestMove': partialBestMove,
       'isGameEnded': isGameEnded,
@@ -107,6 +105,7 @@ extension GameStateSerialization on GameState {
       currentSpeakerSeat: json['currentSpeakerSeat'],
       nominatedSeats: List<int>.from(json['nominatedSeats']),
       removedPlayers: removedPlayers,
+
       votes: Map<int, int>.from(json['votes']),
       partialBestMove: List<int>.from(json['partialBestMove']),
       isGameEnded: json['isGameEnded'],
