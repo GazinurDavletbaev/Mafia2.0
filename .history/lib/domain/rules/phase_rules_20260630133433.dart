@@ -147,19 +147,9 @@ class PhaseRules {
           int index = 0;
           index = (currentState.currentDay - 1) * 3 + 1;
           final nightActions = currentState.nightActions ?? [];
-          print('3333 $nightActions');
-
           if (nightActions.length <= index) {
-            final nwNightActions = [...nightActions, 0];
-            final newNightActions = [...nwNightActions, 0];
-            print('3344 $newNightActions');
+                      final newNightActions = [...nightActions, 0];
 
-            return currentState.copyWith(
-              nightActions: newNightActions,
-              currentSubPhase: SubPhase.donCheck,
-              currentSpeakerTimer: PlayerTimerType.seconds10,
-              currentSpeakerSeat: don.seatNumber,
-            );
           }
           // Дон мертв — пропускаем donCheck, идём сразу в sheriffCheck
           print('1231 $nightActions');

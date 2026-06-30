@@ -155,6 +155,24 @@ class GameViewModel extends StateNotifier<GameState> {
         state = await _phaseRules.calculateNextState(state);
         break;
       case SubPhase.sheriffCheck:
+        int index = 0;
+          index = (currentState.currentDay - 1) * 3 + 0;
+          print('1123 $index');
+          final nightActions = currentState.nightActions ?? [];
+          print(nightActions);
+          if (!nightActions.isEmpty) {
+            print(nightActions[index]);
+          } else {
+            final nightActions = [0];
+            print(nightActions);
+            return currentState.copyWith(
+              nightActions: nightActions,
+              currentSubPhase: SubPhase.donCheck,
+              currentSpeakerTimer: PlayerTimerType.seconds10,
+              currentSpeakerSeat: don.seatNumber,
+            );
+          }
+        }
         _history.push(state);
         state = await _phaseRules.calculateNextState(state);
         break;

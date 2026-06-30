@@ -151,7 +151,7 @@ class PhaseRules {
 
           if (nightActions.length <= index) {
             final nwNightActions = [...nightActions, 0];
-            final newNightActions = [...nwNightActions, 0];
+            final newNightActions = [...nightActions, 0];
             print('3344 $newNightActions');
 
             return currentState.copyWith(

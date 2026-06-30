@@ -150,9 +150,8 @@ class PhaseRules {
           print('3333 $nightActions');
 
           if (nightActions.length <= index) {
-            final nwNightActions = [...nightActions, 0];
-            final newNightActions = [...nwNightActions, 0];
-            print('3344 $newNightActions');
+            final newNightActions = [...nightActions, 0];
+                      print('3344 $nightActions');
 
             return currentState.copyWith(
               nightActions: newNightActions,

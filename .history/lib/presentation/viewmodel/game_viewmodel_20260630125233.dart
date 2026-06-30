@@ -151,9 +151,7 @@ class GameViewModel extends StateNotifier<GameState> {
       case SubPhase.mafiaShoot:
       case SubPhase.donCheck:
       case SubPhase.sheriffLook:
-        _history.push(state);
-        state = await _phaseRules.calculateNextState(state);
-        break;
+      
       case SubPhase.sheriffCheck:
         _history.push(state);
         state = await _phaseRules.calculateNextState(state);

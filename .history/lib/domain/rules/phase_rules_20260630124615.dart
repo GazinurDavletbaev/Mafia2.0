@@ -144,25 +144,9 @@ class PhaseRules {
         final don = currentState.players.firstWhere((p) => p.role == 'don');
         if (!don.isAlive) {
           print('hi don');
-          int index = 0;
-          index = (currentState.currentDay - 1) * 3 + 1;
-          final nightActions = currentState.nightActions ?? [];
-          print('3333 $nightActions');
 
-          if (nightActions.length <= index) {
-            final nwNightActions = [...nightActions, 0];
-            final newNightActions = [...nwNightActions, 0];
-            print('3344 $newNightActions');
-
-            return currentState.copyWith(
-              nightActions: newNightActions,
-              currentSubPhase: SubPhase.donCheck,
-              currentSpeakerTimer: PlayerTimerType.seconds10,
-              currentSpeakerSeat: don.seatNumber,
-            );
-          }
           // Дон мертв — пропускаем donCheck, идём сразу в sheriffCheck
-          print('1231 $nightActions');
+          final nightActions = currentState.nightActions ?? [];
           // Добавляем 0 в nightActions для пропущенной проверки
           final newNightActions = [...nightActions, 0];
           return currentState.copyWith(
@@ -228,24 +212,10 @@ class PhaseRules {
         nextPhase = next;
       } else {
         final nightActions = currentState.nightActions ?? [];
-        print('1111 $nightActions');
+        print()
         final lastKill = nightActions.length >= 3
             ? nightActions[nightActions.length - 3]
             : null;
-        final sheriff =
-            currentState.players.firstWhere((p) => p.role == 'sheriff');
-        int index = 0;
-        index = (currentState.currentDay - 1) * 3 + 2;
-        if (nightActions.length <= index) {
-          final newNightActions = [...nightActions, 0];
-          print(newNightActions);
-          return currentState.copyWith(
-            nightActions: newNightActions,
-            currentSubPhase: SubPhase.sheriffCheck,
-            currentSpeakerTimer: PlayerTimerType.seconds10,
-            currentSpeakerSeat: sheriff.seatNumber,
-          );
-        }
 
         // Промах - если значение -1 или 0
         final isMiss = lastKill == null || lastKill == 0 || lastKill == -1;
