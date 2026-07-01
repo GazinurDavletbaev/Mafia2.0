@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:http/http.dart' as http;
 
 import 'package:flutter/material.dart';
-import 'package:mafia_help/data/local/models/player_model.dart';
 import 'package:mafia_help/presentation/screens/saved_protocols_screen.dart';
 import 'package:mafia_help/presentation/state/vote_day.dart';
 import 'package:path_provider/path_provider.dart';
@@ -28,8 +27,7 @@ class _GameProtocolScreenState extends State<GameProtocolScreen> {
   // ✅ 10 полей для пояснений
   final List<TextEditingController> _noteControllers =
       List.generate(10, (_) => TextEditingController());
-  final TextEditingController _protestCommentController =
-      TextEditingController();
+  final TextEditingController _protestCommentController = TextEditingController();
   String _protestText = 'Нет';
 
   List<int> _points = [];
@@ -419,9 +417,6 @@ class _GameProtocolScreenState extends State<GameProtocolScreen> {
               onChanged: (newValue) {
                 setState(() {
                   _removedRuleMap[player.seatNumber] = newValue ?? '';
-                  if (newValue != null && newValue.isNotEmpty) {
-                    _addRemovedNote(player, newValue);
-                  }
                 });
               },
             ),
@@ -458,45 +453,12 @@ class _GameProtocolScreenState extends State<GameProtocolScreen> {
             onChanged: (newValue) {
               setState(() {
                 _bonusPoints[index] = newValue!;
-                _addBonusNote(index, newValue);
               });
             },
           ),
         ),
       ),
     );
-  }
-
-  void _addRemovedNote(PlayerModel player, String rule) {
-    final note =
-        'Игрок ${player.seatNumber} (${player.name}) был удален по $rule.';
-
-    // Проверяем, есть ли уже запись об этом игроке
-    for (int i = 0; i < _noteControllers.length; i++) {
-      final text = _noteControllers[i].text;
-      if (text.contains('Игрок ${player.seatNumber}') &&
-          text.contains('удален')) {
-        // Обновляем существующую запись
-        _noteControllers[i].text = note;
-        return;
-      }
-    }
-
-    // Ищем свободную строку
-    for (int i = 0; i < _noteControllers.length; i++) {
-      if (_noteControllers[i].text.isEmpty) {
-        _noteControllers[i].text = note;
-        return;
-      }
-    }
-
-    // Если все заняты — добавляем в первую пустую
-    for (int i = 0; i < _noteControllers.length; i++) {
-      if (_noteControllers[i].text.isEmpty) {
-        _noteControllers[i].text = note;
-        return;
-      }
-    }
   }
 
   Widget _buildPointsCell(int index) {
@@ -998,32 +960,6 @@ class _GameProtocolScreenState extends State<GameProtocolScreen> {
         ),
       ),
     );
-  }
-
-  void _addBonusNote(int index, double value) {
-    if (value == 0) return; // если 0 — не добавляем
-
-    final player = widget.gameState.players[index];
-    final note =
-        'Игрок ${player.seatNumber} (${player.name}) получил ${value.toStringAsFixed(1)} балла.';
-
-    // Ищем свободную строку в _noteControllers
-    for (int i = 0; i < _noteControllers.length; i++) {
-      if (_noteControllers[i].text.isEmpty ||
-          _noteControllers[i].text.startsWith('Игрок')) {
-        // Если строка пустая или уже содержит запись об игроке — заменяем
-        _noteControllers[i].text = note;
-        return;
-      }
-    }
-
-    // Если все строки заняты — добавляем в первую пустую
-    for (int i = 0; i < _noteControllers.length; i++) {
-      if (_noteControllers[i].text.isEmpty) {
-        _noteControllers[i].text = note;
-        return;
-      }
-    }
   }
 
   String _getRoleShort(String role) {

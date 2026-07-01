@@ -467,37 +467,35 @@ class _GameProtocolScreenState extends State<GameProtocolScreen> {
     );
   }
 
-  void _addRemovedNote(PlayerModel player, String rule) {
-    final note =
-        'Игрок ${player.seatNumber} (${player.name}) был удален по $rule.';
-
-    // Проверяем, есть ли уже запись об этом игроке
-    for (int i = 0; i < _noteControllers.length; i++) {
-      final text = _noteControllers[i].text;
-      if (text.contains('Игрок ${player.seatNumber}') &&
-          text.contains('удален')) {
-        // Обновляем существующую запись
-        _noteControllers[i].text = note;
-        return;
-      }
-    }
-
-    // Ищем свободную строку
-    for (int i = 0; i < _noteControllers.length; i++) {
-      if (_noteControllers[i].text.isEmpty) {
-        _noteControllers[i].text = note;
-        return;
-      }
-    }
-
-    // Если все заняты — добавляем в первую пустую
-    for (int i = 0; i < _noteControllers.length; i++) {
-      if (_noteControllers[i].text.isEmpty) {
-        _noteControllers[i].text = note;
-        return;
-      }
+void _addRemovedNote(PlayerModel player, String rule) {
+  final note = 'Игрок ${player.seatNumber} (${player.name}) был удален по $rule.';
+  
+  // Проверяем, есть ли уже запись об этом игроке
+  for (int i = 0; i < _noteControllers.length; i++) {
+    final text = _noteControllers[i].text;
+    if (text.contains('Игрок ${player.seatNumber}') && text.contains('удален')) {
+      // Обновляем существующую запись
+      _noteControllers[i].text = note;
+      return;
     }
   }
+  
+  // Ищем свободную строку
+  for (int i = 0; i < _noteControllers.length; i++) {
+    if (_noteControllers[i].text.isEmpty) {
+      _noteControllers[i].text = note;
+      return;
+    }
+  }
+  
+  // Если все заняты — добавляем в первую пустую
+  for (int i = 0; i < _noteControllers.length; i++) {
+    if (_noteControllers[i].text.isEmpty) {
+      _noteControllers[i].text = note;
+      return;
+    }
+  }
+}
 
   Widget _buildPointsCell(int index) {
     return Padding(

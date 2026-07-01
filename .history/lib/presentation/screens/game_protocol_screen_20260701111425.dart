@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:http/http.dart' as http;
 
 import 'package:flutter/material.dart';
-import 'package:mafia_help/data/local/models/player_model.dart';
 import 'package:mafia_help/presentation/screens/saved_protocols_screen.dart';
 import 'package:mafia_help/presentation/state/vote_day.dart';
 import 'package:path_provider/path_provider.dart';
@@ -25,11 +24,8 @@ class GameProtocolScreen extends StatefulWidget {
 }
 
 class _GameProtocolScreenState extends State<GameProtocolScreen> {
-  // ✅ 10 полей для пояснений
   final List<TextEditingController> _noteControllers =
-      List.generate(10, (_) => TextEditingController());
-  final TextEditingController _protestCommentController =
-      TextEditingController();
+      List.generate(5, (_) => TextEditingController());
   String _protestText = 'Нет';
 
   List<int> _points = [];
@@ -99,7 +95,6 @@ class _GameProtocolScreenState extends State<GameProtocolScreen> {
     for (var c in _noteControllers) {
       c.dispose();
     }
-    _protestCommentController.dispose();
     _tournamentController.dispose();
     _stageController.dispose();
     _tableController.dispose();
@@ -373,6 +368,7 @@ class _GameProtocolScreenState extends State<GameProtocolScreen> {
     ];
 
     if (isRemoved) {
+      // currentValue хранится в _removedRuleMap, но не отображается
       return Padding(
         padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 0),
         child: Container(
@@ -382,7 +378,7 @@ class _GameProtocolScreenState extends State<GameProtocolScreen> {
             width: 52,
             alignment: Alignment.center,
             child: DropdownButton<String>(
-              value: null,
+              value: null, // ← всегда null, чтобы показывать hint (-0.5)
               dropdownColor: Colors.grey.shade800,
               style: const TextStyle(
                 color: Colors.white,
@@ -418,10 +414,8 @@ class _GameProtocolScreenState extends State<GameProtocolScreen> {
               }).toList(),
               onChanged: (newValue) {
                 setState(() {
+                  // ✅ Сохраняем выбранный пункт в мапу, но в UI всегда -0.5
                   _removedRuleMap[player.seatNumber] = newValue ?? '';
-                  if (newValue != null && newValue.isNotEmpty) {
-                    _addRemovedNote(player, newValue);
-                  }
                 });
               },
             ),
@@ -430,6 +424,7 @@ class _GameProtocolScreenState extends State<GameProtocolScreen> {
       );
     }
 
+    // Обычный Dropdown для живых игроков
     final bonusValues = [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7];
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 0),
@@ -458,45 +453,12 @@ class _GameProtocolScreenState extends State<GameProtocolScreen> {
             onChanged: (newValue) {
               setState(() {
                 _bonusPoints[index] = newValue!;
-                _addBonusNote(index, newValue);
               });
             },
           ),
         ),
       ),
     );
-  }
-
-  void _addRemovedNote(PlayerModel player, String rule) {
-    final note =
-        'Игрок ${player.seatNumber} (${player.name}) был удален по $rule.';
-
-    // Проверяем, есть ли уже запись об этом игроке
-    for (int i = 0; i < _noteControllers.length; i++) {
-      final text = _noteControllers[i].text;
-      if (text.contains('Игрок ${player.seatNumber}') &&
-          text.contains('удален')) {
-        // Обновляем существующую запись
-        _noteControllers[i].text = note;
-        return;
-      }
-    }
-
-    // Ищем свободную строку
-    for (int i = 0; i < _noteControllers.length; i++) {
-      if (_noteControllers[i].text.isEmpty) {
-        _noteControllers[i].text = note;
-        return;
-      }
-    }
-
-    // Если все заняты — добавляем в первую пустую
-    for (int i = 0; i < _noteControllers.length; i++) {
-      if (_noteControllers[i].text.isEmpty) {
-        _noteControllers[i].text = note;
-        return;
-      }
-    }
   }
 
   Widget _buildPointsCell(int index) {
@@ -786,6 +748,7 @@ class _GameProtocolScreenState extends State<GameProtocolScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
+            // Заголовок по центру
             Text(
               'ГОЛОСОВАНИЕ $voteNumber',
               style: const TextStyle(
@@ -796,6 +759,8 @@ class _GameProtocolScreenState extends State<GameProtocolScreen> {
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 8),
+
+            // Все раунды голосования
             ...dayData.rounds.asMap().entries.map((entry) {
               final roundIndex = entry.key;
               final round = entry.value;
@@ -805,7 +770,10 @@ class _GameProtocolScreenState extends State<GameProtocolScreen> {
                 child: _buildVoteRow(label, round, roundIndex),
               );
             }),
+
             const Divider(color: Colors.grey),
+
+            // Результат
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -830,6 +798,8 @@ class _GameProtocolScreenState extends State<GameProtocolScreen> {
                 ),
               ],
             ),
+
+            // Elimination vote (если был)
             if (dayData.eliminationVotes > 0)
               Text(
                 'Голосование за подъём: ${dayData.eliminationVotes}',
@@ -847,6 +817,7 @@ class _GameProtocolScreenState extends State<GameProtocolScreen> {
   Widget _buildVoteRow(String label, Map<int, int> votes, int roundIndex) {
     final sortedKeys = votes.keys.toList()..sort();
 
+    // Определяем метки для строк
     final String firstRowLabel;
     final String secondRowLabel;
 
@@ -861,6 +832,7 @@ class _GameProtocolScreenState extends State<GameProtocolScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        // Первая строка: Игрок / Пере-
         Row(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
@@ -891,6 +863,7 @@ class _GameProtocolScreenState extends State<GameProtocolScreen> {
           ],
         ),
         const SizedBox(height: 2),
+        // Вторая строка: Голоса / голос.
         Row(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
@@ -941,8 +914,7 @@ class _GameProtocolScreenState extends State<GameProtocolScreen> {
               ),
             ),
             const SizedBox(height: 8),
-            // ✅ 10 полей для пояснений
-            ...List.generate(10, (index) {
+            ...List.generate(5, (index) {
               return Padding(
                 padding: const EdgeInsets.only(bottom: 4),
                 child: Row(
@@ -970,60 +942,10 @@ class _GameProtocolScreenState extends State<GameProtocolScreen> {
                 ),
               );
             }),
-            const SizedBox(height: 16),
-            const Divider(color: Colors.grey),
-            const SizedBox(height: 8),
-            // ✅ Комментарий к протесту
-            const Text(
-              'КОММЕНТАРИЙ К ПРОТЕСТУ:',
-              style: TextStyle(
-                color: Colors.orange,
-                fontSize: 14,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 4),
-            TextField(
-              controller: _protestCommentController,
-              style: const TextStyle(color: Colors.white, fontSize: 12),
-              decoration: InputDecoration(
-                hintText: 'Введите комментарий к протесту...',
-                hintStyle: TextStyle(color: Colors.grey.shade600),
-                border: InputBorder.none,
-                isDense: true,
-                contentPadding: EdgeInsets.zero,
-              ),
-            ),
           ],
         ),
       ),
     );
-  }
-
-  void _addBonusNote(int index, double value) {
-    if (value == 0) return; // если 0 — не добавляем
-
-    final player = widget.gameState.players[index];
-    final note =
-        'Игрок ${player.seatNumber} (${player.name}) получил ${value.toStringAsFixed(1)} балла.';
-
-    // Ищем свободную строку в _noteControllers
-    for (int i = 0; i < _noteControllers.length; i++) {
-      if (_noteControllers[i].text.isEmpty ||
-          _noteControllers[i].text.startsWith('Игрок')) {
-        // Если строка пустая или уже содержит запись об игроке — заменяем
-        _noteControllers[i].text = note;
-        return;
-      }
-    }
-
-    // Если все строки заняты — добавляем в первую пустую
-    for (int i = 0; i < _noteControllers.length; i++) {
-      if (_noteControllers[i].text.isEmpty) {
-        _noteControllers[i].text = note;
-        return;
-      }
-    }
   }
 
   String _getRoleShort(String role) {
@@ -1047,11 +969,6 @@ class _GameProtocolScreenState extends State<GameProtocolScreen> {
     final timeString = startTime != null
         ? '${_formatTime(startTime)} — ${_formatTime(endTime)}'
         : '00:00 — 00:00';
-
-    // ✅ Собираем данные из всех контроллеров
-    final notes = _noteControllers.map((c) => c.text).toList();
-    final protestComment = _protestCommentController.text;
-
     final data = {
       'tournament': _tournamentController.text,
       'stage': _stageController.text,
@@ -1081,6 +998,7 @@ class _GameProtocolScreenState extends State<GameProtocolScreen> {
       }).toList(),
       'nightActions': widget.gameState.nightActions ?? [],
       'voteHistory': widget.gameState.voteHistory.map((day, dayData) {
+        // Преобразуем rounds: Map<int, int> → Map<String, int>
         final rounds = dayData.rounds.map((round) {
           return round.map((key, value) => MapEntry(key.toString(), value));
         }).toList();
@@ -1092,9 +1010,6 @@ class _GameProtocolScreenState extends State<GameProtocolScreen> {
           'result': dayData.result,
         });
       }),
-      // ✅ Новые поля
-      'notes': notes,
-      'protestComment': protestComment,
     };
 
     showDialog(
@@ -1121,6 +1036,8 @@ class _GameProtocolScreenState extends State<GameProtocolScreen> {
       if (response.statusCode == 200) {
         final bytes = response.bodyBytes;
         final directory = await getApplicationDocumentsDirectory();
+
+        // ✅ Новое имя файла: protocol_2026-07-01_10-25_1_1.xlsx
         final fileName =
             '${_dateController.text}_${_formatTime(DateTime.now()).replaceAll(':', '-')}_${_tableController.text}_${_gameController.text}.xlsx';
         final path = '${directory.path}/$fileName';
