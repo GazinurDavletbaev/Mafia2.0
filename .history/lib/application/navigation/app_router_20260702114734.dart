@@ -5,9 +5,13 @@ import '../../presentation/screens/club_select_screen.dart';
 import '../../presentation/screens/club_screen.dart';
 import '../../presentation/screens/new_game_screen.dart';
 import '../../presentation/screens/game_screen.dart';
+import '../../presentation/screens/game_settings_screen.dart';
+import '../../presentation/screens/game_protocol_screen.dart';
+import '../../presentation/screens/saved_protocols_screen.dart';
+import '../../presentation/screens/settings_screen.dart';
 
 final GoRouter router = GoRouter(
-  initialLocation: '/',
+  initialLocation: '/',  // ← SplashScreen
   routes: [
     GoRoute(
       path: '/',
@@ -25,8 +29,8 @@ final GoRouter router = GoRouter(
       builder: (context, state) => const ClubSelectScreen(),
     ),
     GoRoute(
-      path: '/club-page',
-      name: 'club-page',
+      path: '/club',
+      name: 'club',
       builder: (context, state) => const ClubScreen(),
     ),
     GoRoute(
@@ -35,12 +39,29 @@ final GoRouter router = GoRouter(
       builder: (context, state) => const NewGameScreen(),
     ),
     GoRoute(
-      path: '/game/:gameId',
+      path: '/game-settings',
+      name: 'game-settings',
+      builder: (context, state) => const GameSettingsScreen(),
+    ),
+    GoRoute(
+      path: '/game',
       name: 'game',
-      builder: (context, state) {
-        final gameId = state.pathParameters['gameId']!;
-        return GameScreen(gameId: gameId);
-      },
+      builder: (context, state) => const GameScreen(),
+    ),
+    GoRoute(
+      path: '/protocol',
+      name: 'protocol',
+      builder: (context, state) => const GameProtocolScreen(),
+    ),
+    GoRoute(
+      path: '/saved-protocols',
+      name: 'saved-protocols',
+      builder: (context, state) => const SavedProtocolsScreen(),
+    ),
+    GoRoute(
+      path: '/settings',
+      name: 'settings',
+      builder: (context, state) => const SettingsScreen(),
     ),
   ],
 );

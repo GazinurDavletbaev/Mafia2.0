@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mafia_help/application/navigation/app_router.dart';
+import 'package:mafia_help/router/app_router.dart';  // ← импорт
 import 'core/themes/app_theme.dart';
 
 class MyApp extends StatelessWidget {

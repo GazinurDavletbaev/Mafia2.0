@@ -1,6 +1,5 @@
 import 'package:go_router/go_router.dart';
 import 'package:mafia_help/domain/rules/game_history.dart';
-import 'package:mafia_help/presentation/screens/login_screen.dart';
 import 'package:mafia_help/presentation/state/game_state.dart';
 import '../../presentation/screens/splash_screen.dart';
 import '../../presentation/screens/register_screen.dart';
@@ -20,11 +19,6 @@ final GoRouter router = GoRouter(
       path: '/',
       name: 'splash',
       builder: (context, state) => const SplashScreen(),
-    ),
-    GoRoute(
-      path: '/login',
-      name: 'login',
-      builder: (context, state) => const LoginScreen(),
     ),
     GoRoute(
       path: '/register',

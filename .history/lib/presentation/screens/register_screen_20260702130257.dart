@@ -25,7 +25,7 @@ class _RegisterScreenState extends State<RegisterScreen>
 
     _logoAnimation = Tween<Offset>(
       begin: Offset.zero,
-      end: const Offset(0, -1.2),
+      end: const Offset(0, -1),
     ).animate(CurvedAnimation(
       parent: _controller,
       curve: const Interval(0.3, 0.8, curve: Curves.easeOut),

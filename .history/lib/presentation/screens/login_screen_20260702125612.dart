@@ -1,15 +1,15 @@
-// lib/presentation/screens/register_screen.dart
+// lib/presentation/screens/login_screen.dart
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-class RegisterScreen extends StatefulWidget {
-  const RegisterScreen({super.key});
+class LoginScreen extends StatefulWidget {
+  const LoginScreen({super.key});
 
   @override
-  State<RegisterScreen> createState() => _RegisterScreenState();
+  State<LoginScreen> createState() => _LoginScreenState();
 }
 
-class _RegisterScreenState extends State<RegisterScreen>
+class _LoginScreenState extends State<LoginScreen>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<Offset> _logoAnimation;
@@ -25,7 +25,7 @@ class _RegisterScreenState extends State<RegisterScreen>
 
     _logoAnimation = Tween<Offset>(
       begin: Offset.zero,
-      end: const Offset(0, -1.2),
+      end: const Offset(0, -0.7),
     ).animate(CurvedAnimation(
       parent: _controller,
       curve: const Interval(0.3, 0.8, curve: Curves.easeOut),
@@ -39,7 +39,8 @@ class _RegisterScreenState extends State<RegisterScreen>
       curve: const Interval(0.5, 1.0, curve: Curves.easeOut),
     ));
 
-    Future.delayed(const Duration(milliseconds: 100), () {
+    // Запускаем анимацию через 0.5 секунды
+    Future.delayed(const Duration(milliseconds: 500), () {
       if (mounted) _controller.forward();
     });
   }
@@ -78,7 +79,7 @@ class _RegisterScreenState extends State<RegisterScreen>
                 );
               },
             ),
-            // Форма регистрации
+            // Форма входа
             AnimatedBuilder(
               animation: _controller,
               builder: (context, child) {
@@ -92,7 +93,7 @@ class _RegisterScreenState extends State<RegisterScreen>
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           const Text(
-                            'Создать аккаунт',
+                            'Добро пожаловать!',
                             style: TextStyle(
                               color: Colors.white,
                               fontSize: 24,
@@ -101,14 +102,14 @@ class _RegisterScreenState extends State<RegisterScreen>
                           ),
                           const SizedBox(height: 8),
                           const Text(
-                            'Зарегистрируйтесь, чтобы начать',
+                            'Войдите в свой аккаунт',
                             style: TextStyle(
                               color: Colors.grey,
                               fontSize: 14,
                             ),
                           ),
-                          const SizedBox(height: 24),
-                          // Email
+                          const SizedBox(height: 32),
+                          // Email поле
                           TextField(
                             style: const TextStyle(color: Colors.white),
                             decoration: InputDecoration(
@@ -149,37 +150,25 @@ class _RegisterScreenState extends State<RegisterScreen>
                               ),
                             ),
                           ),
-                          const SizedBox(height: 16),
-                          // Подтверждение пароля
-                          TextField(
-                            obscureText: true,
-                            style: const TextStyle(color: Colors.white),
-                            decoration: InputDecoration(
-                              labelText: 'Подтвердите пароль',
-                              labelStyle:
-                                  TextStyle(color: Colors.grey.shade400),
-                              filled: true,
-                              fillColor: Colors.grey.shade800,
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12),
-                                borderSide: BorderSide.none,
-                              ),
-                              prefixIcon: const Icon(Icons.lock_outline,
-                                  color: Colors.orange),
-                              suffixIcon: IconButton(
-                                icon: const Icon(Icons.visibility_off,
-                                    color: Colors.grey),
-                                onPressed: () {},
+                          const SizedBox(height: 8),
+                          // Забыли пароль?
+                          Align(
+                            alignment: Alignment.centerRight,
+                            child: TextButton(
+                              onPressed: () {},
+                              child: const Text(
+                                'Забыли пароль?',
+                                style: TextStyle(color: Colors.orange),
                               ),
                             ),
                           ),
                           const SizedBox(height: 16),
-                          // Кнопка Зарегистрироваться
+                          // Кнопка Войти
                           SizedBox(
                             width: double.infinity,
                             child: ElevatedButton(
                               onPressed: () {
-                                // TODO: регистрация
+                                // TODO: вход
                               },
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Colors.orange,
@@ -191,7 +180,7 @@ class _RegisterScreenState extends State<RegisterScreen>
                                 ),
                               ),
                               child: const Text(
-                                'Зарегистрироваться',
+                                'Войти',
                                 style: TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.bold,
@@ -200,20 +189,20 @@ class _RegisterScreenState extends State<RegisterScreen>
                             ),
                           ),
                           const SizedBox(height: 12),
-                          // Кнопка "Уже есть аккаунт? Войти"
+                          // Кнопка "Нет аккаунта? Зарегистрироваться"
                           Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               const Text(
-                                'Уже есть аккаунт?',
+                                'Нет аккаунта?',
                                 style: TextStyle(color: Colors.grey),
                               ),
                               TextButton(
                                 onPressed: () {
-                                  context.go('/login');
+                                  context.go('/register');
                                 },
                                 child: const Text(
-                                  'Войти',
+                                  'Зарегистрироваться',
                                   style: TextStyle(color: Colors.orange),
                                 ),
                               ),
@@ -233,7 +222,7 @@ class _RegisterScreenState extends State<RegisterScreen>
                                 padding:
                                     const EdgeInsets.symmetric(horizontal: 16),
                                 child: Text(
-                                  'или зарегистрируйтесь через',
+                                  'или войдите через',
                                   style: TextStyle(
                                     color: Colors.grey.shade500,
                                     fontSize: 12,

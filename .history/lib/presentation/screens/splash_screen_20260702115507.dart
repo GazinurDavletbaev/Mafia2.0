@@ -21,7 +21,7 @@ class _SplashScreenState extends State<SplashScreen> {
 
   void _navigateToRegister() {
     if (mounted) {
-      context.go('/register');
+      context.go('/club');
     }
   }
 
@@ -42,7 +42,7 @@ class _SplashScreenState extends State<SplashScreen> {
             _navigateToRegister();
           },
           child: Image.asset(
-            'assets/mafia_.png',
+            'assets/mafia_logo.png',
             width: 300,
             height: 300,
             fit: BoxFit.contain,

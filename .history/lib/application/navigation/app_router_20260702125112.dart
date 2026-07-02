@@ -1,10 +1,17 @@
 import 'package:go_router/go_router.dart';
 import '../../presentation/screens/splash_screen.dart';
+import '../../presentation/screens/login_screen.dart';  // ← добавить
 import '../../presentation/screens/register_screen.dart';
 import '../../presentation/screens/club_select_screen.dart';
 import '../../presentation/screens/club_screen.dart';
 import '../../presentation/screens/new_game_screen.dart';
 import '../../presentation/screens/game_screen.dart';
+import '../../presentation/screens/game_settings_screen.dart';
+import '../../presentation/screens/game_protocol_screen.dart';
+import '../../presentation/screens/saved_protocols_screen.dart';
+import '../../presentation/screens/settings_screen.dart';
+import '../../domain/rules/game_history.dart';
+import '../../presentation/state/game_state.dart';
 
 final GoRouter router = GoRouter(
   initialLocation: '/',
@@ -15,32 +22,15 @@ final GoRouter router = GoRouter(
       builder: (context, state) => const SplashScreen(),
     ),
     GoRoute(
+      path: '/login',
+      name: 'login',
+      builder: (context, state) => const LoginScreen(),
+    ),
+    GoRoute(
       path: '/register',
       name: 'register',
       builder: (context, state) => const RegisterScreen(),
     ),
-    GoRoute(
-      path: '/club-select',
-      name: 'club-select',
-      builder: (context, state) => const ClubSelectScreen(),
-    ),
-    GoRoute(
-      path: '/club-page',
-      name: 'club-page',
-      builder: (context, state) => const ClubPageScreen(),
-    ),
-    GoRoute(
-      path: '/new-game',
-      name: 'new-game',
-      builder: (context, state) => const NewGameScreen(),
-    ),
-    GoRoute(
-      path: '/game/:gameId',
-      name: 'game',
-      builder: (context, state) {
-        final gameId = state.pathParameters['gameId']!;
-        return GameScreen(gameId: gameId);
-      },
-    ),
+    // ... остальные маршруты
   ],
 );

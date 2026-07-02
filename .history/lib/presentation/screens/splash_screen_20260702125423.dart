@@ -44,7 +44,7 @@ class _SplashScreenState extends State<SplashScreen> {
           child: Image.asset(
             'assets/mafia_logo.png',
             width: 200,
-            height: 200,
+            height: 300,
             fit: BoxFit.contain,
           ),
         ),

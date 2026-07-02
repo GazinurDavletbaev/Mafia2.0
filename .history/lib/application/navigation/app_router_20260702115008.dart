@@ -1,7 +1,4 @@
 import 'package:go_router/go_router.dart';
-import 'package:mafia_help/domain/rules/game_history.dart';
-import 'package:mafia_help/presentation/screens/login_screen.dart';
-import 'package:mafia_help/presentation/state/game_state.dart';
 import '../../presentation/screens/splash_screen.dart';
 import '../../presentation/screens/register_screen.dart';
 import '../../presentation/screens/club_select_screen.dart';
@@ -14,17 +11,12 @@ import '../../presentation/screens/saved_protocols_screen.dart';
 import '../../presentation/screens/settings_screen.dart';
 
 final GoRouter router = GoRouter(
-  initialLocation: '/', // ← SplashScreen
+  initialLocation: '/',  // ← SplashScreen
   routes: [
     GoRoute(
       path: '/',
       name: 'splash',
       builder: (context, state) => const SplashScreen(),
-    ),
-    GoRoute(
-      path: '/login',
-      name: 'login',
-      builder: (context, state) => const LoginScreen(),
     ),
     GoRoute(
       path: '/register',
@@ -52,23 +44,17 @@ final GoRouter router = GoRouter(
       builder: (context, state) => const GameSettingsScreen(),
     ),
     GoRoute(
-      path: '/game',
-      name: 'game',
-      builder: (context, state) {
-        final names = state.extra as List<String>? ?? [];
-        return GameScreen(playerNames: names);
-      },
-    ),
+  path: '/game',
+  name: 'game',
+  builder: (context, state) {
+    final names = state.extra as List<String>? ?? [];
+    return GameScreen(playerNames: names);
+  },
+),
     GoRoute(
       path: '/protocol',
       name: 'protocol',
-      builder: (context, state) {
-        final args = state.extra as Map<String, dynamic>?;
-        return GameProtocolScreen(
-          gameHistory: args?['gameHistory'] ?? GameHistory(),
-          gameState: args?['gameState'] ?? GameState.initial(),
-        );
-      },
+      builder: (context, state) => const GameProtocolScreen(),
     ),
     GoRoute(
       path: '/saved-protocols',

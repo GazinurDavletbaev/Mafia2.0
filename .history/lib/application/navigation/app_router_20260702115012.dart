@@ -1,7 +1,4 @@
 import 'package:go_router/go_router.dart';
-import 'package:mafia_help/domain/rules/game_history.dart';
-import 'package:mafia_help/presentation/screens/login_screen.dart';
-import 'package:mafia_help/presentation/state/game_state.dart';
 import '../../presentation/screens/splash_screen.dart';
 import '../../presentation/screens/register_screen.dart';
 import '../../presentation/screens/club_select_screen.dart';
@@ -20,11 +17,6 @@ final GoRouter router = GoRouter(
       path: '/',
       name: 'splash',
       builder: (context, state) => const SplashScreen(),
-    ),
-    GoRoute(
-      path: '/login',
-      name: 'login',
-      builder: (context, state) => const LoginScreen(),
     ),
     GoRoute(
       path: '/register',
@@ -62,13 +54,7 @@ final GoRouter router = GoRouter(
     GoRoute(
       path: '/protocol',
       name: 'protocol',
-      builder: (context, state) {
-        final args = state.extra as Map<String, dynamic>?;
-        return GameProtocolScreen(
-          gameHistory: args?['gameHistory'] ?? GameHistory(),
-          gameState: args?['gameState'] ?? GameState.initial(),
-        );
-      },
+      builder: (context, state) => const GameProtocolScreen(),
     ),
     GoRoute(
       path: '/saved-protocols',

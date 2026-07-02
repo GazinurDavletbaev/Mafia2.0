@@ -9,8 +9,7 @@ class RegisterScreen extends StatefulWidget {
   State<RegisterScreen> createState() => _RegisterScreenState();
 }
 
-class _RegisterScreenState extends State<RegisterScreen>
-    with SingleTickerProviderStateMixin {
+class _RegisterScreenState extends State<RegisterScreen> with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<Offset> _logoAnimation;
   late Animation<double> _fadeAnimation;
@@ -25,7 +24,7 @@ class _RegisterScreenState extends State<RegisterScreen>
 
     _logoAnimation = Tween<Offset>(
       begin: Offset.zero,
-      end: const Offset(0, -1.2),
+      end: const Offset(0, -1),
     ).animate(CurvedAnimation(
       parent: _controller,
       curve: const Interval(0.3, 0.8, curve: Curves.easeOut),
@@ -39,7 +38,7 @@ class _RegisterScreenState extends State<RegisterScreen>
       curve: const Interval(0.5, 1.0, curve: Curves.easeOut),
     ));
 
-    Future.delayed(const Duration(milliseconds: 100), () {
+    Future.delayed(const Duration(milliseconds: 500), () {
       if (mounted) _controller.forward();
     });
   }
@@ -113,16 +112,14 @@ class _RegisterScreenState extends State<RegisterScreen>
                             style: const TextStyle(color: Colors.white),
                             decoration: InputDecoration(
                               labelText: 'Email',
-                              labelStyle:
-                                  TextStyle(color: Colors.grey.shade400),
+                              labelStyle: TextStyle(color: Colors.grey.shade400),
                               filled: true,
                               fillColor: Colors.grey.shade800,
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(12),
                                 borderSide: BorderSide.none,
                               ),
-                              prefixIcon:
-                                  const Icon(Icons.email, color: Colors.orange),
+                              prefixIcon: const Icon(Icons.email, color: Colors.orange),
                             ),
                           ),
                           const SizedBox(height: 16),
@@ -132,19 +129,16 @@ class _RegisterScreenState extends State<RegisterScreen>
                             style: const TextStyle(color: Colors.white),
                             decoration: InputDecoration(
                               labelText: 'Пароль',
-                              labelStyle:
-                                  TextStyle(color: Colors.grey.shade400),
+                              labelStyle: TextStyle(color: Colors.grey.shade400),
                               filled: true,
                               fillColor: Colors.grey.shade800,
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(12),
                                 borderSide: BorderSide.none,
                               ),
-                              prefixIcon:
-                                  const Icon(Icons.lock, color: Colors.orange),
+                              prefixIcon: const Icon(Icons.lock, color: Colors.orange),
                               suffixIcon: IconButton(
-                                icon: const Icon(Icons.visibility_off,
-                                    color: Colors.grey),
+                                icon: const Icon(Icons.visibility_off, color: Colors.grey),
                                 onPressed: () {},
                               ),
                             ),
@@ -156,19 +150,16 @@ class _RegisterScreenState extends State<RegisterScreen>
                             style: const TextStyle(color: Colors.white),
                             decoration: InputDecoration(
                               labelText: 'Подтвердите пароль',
-                              labelStyle:
-                                  TextStyle(color: Colors.grey.shade400),
+                              labelStyle: TextStyle(color: Colors.grey.shade400),
                               filled: true,
                               fillColor: Colors.grey.shade800,
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(12),
                                 borderSide: BorderSide.none,
                               ),
-                              prefixIcon: const Icon(Icons.lock_outline,
-                                  color: Colors.orange),
+                              prefixIcon: const Icon(Icons.lock_outline, color: Colors.orange),
                               suffixIcon: IconButton(
-                                icon: const Icon(Icons.visibility_off,
-                                    color: Colors.grey),
+                                icon: const Icon(Icons.visibility_off, color: Colors.grey),
                                 onPressed: () {},
                               ),
                             ),
@@ -184,8 +175,7 @@ class _RegisterScreenState extends State<RegisterScreen>
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Colors.orange,
                                 foregroundColor: Colors.black,
-                                padding:
-                                    const EdgeInsets.symmetric(vertical: 16),
+                                padding: const EdgeInsets.symmetric(vertical: 16),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(12),
                                 ),
@@ -230,8 +220,7 @@ class _RegisterScreenState extends State<RegisterScreen>
                                 ),
                               ),
                               Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 16),
+                                padding: const EdgeInsets.symmetric(horizontal: 16),
                                 child: Text(
                                   'или зарегистрируйтесь через',
                                   style: TextStyle(
