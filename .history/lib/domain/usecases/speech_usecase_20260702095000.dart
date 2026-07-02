@@ -83,50 +83,50 @@ class SpeechUsecase {
     final isVotingDay = state.isVotingDay;
 
     if (candidates.isEmpty ||
-        (candidates.length == 1 && isDay0) ||
-        !isVotingDay) {
-      final day = state.currentDay;
-      final aliveCount = state.players.where((p) => p.isAlive).length;
-      final isBestMove = aliveCount >= 9;
+    (candidates.length == 1 && isDay0) ||
+    !isVotingDay) {
+  final day = state.currentDay;
+  final aliveCount = state.players.where((p) => p.isAlive).length;
+  final isBestMove = aliveCount >= 9;
 
-      // ✅ Проверяем, есть ли уже запись для этого дня
-      final existingDay = state.voteHistory[day];
+  // ✅ Проверяем, есть ли уже запись для этого дня
+  final existingDay = state.voteHistory[day];
+  
+  Map<int, VoteDay> newVoteHistory;
+  
+  if (existingDay != null) {
+    // ✅ Если день уже есть — используем его (не перезаписываем)
+    newVoteHistory = Map<int, VoteDay>.from(state.voteHistory);
+  } else {
+    // ✅ Если дня нет — создаём новый
+    final voteDay = VoteDay(
+      rounds: candidates.isEmpty
+          ? []
+          : [
+              {candidates.first: 0}
+            ],
+      eliminated: false,
+      eliminationVotes: 0,
+      result: [],
+    );
+    newVoteHistory = Map<int, VoteDay>.from(state.voteHistory)..[day] = voteDay;
+  }
 
-      Map<int, VoteDay> newVoteHistory;
-
-      if (existingDay != null) {
-        // ✅ Если день уже есть — используем его (не перезаписываем)
-        newVoteHistory = Map<int, VoteDay>.from(state.voteHistory);
-      } else {
-        // ✅ Если дня нет — создаём новый
-        final voteDay = VoteDay(
-          rounds: candidates.isEmpty
-              ? []
-              : [
-                  {candidates.first: 0}
-                ],
-          eliminated: false,
-          eliminationVotes: 0,
-          result: [],
-        );
-        newVoteHistory = Map<int, VoteDay>.from(state.voteHistory)
-          ..[day] = voteDay;
-      }
-
-      return (
-        state.copyWith(
-          currentPhase: Phase.night,
-          currentSubPhase: SubPhase.mafiaShoot,
-          currentSpeakerSeat: -1,
-          nominatedSeats: [],
-          currentDay: state.currentDay + 1,
-          isVotingDay: true,
-          currentSpeakerTimer: null,
-          voteHistory: newVoteHistory,
-          isBestMove: isBestMove,
-        ),
-        true,
-      );
+  return (
+    state.copyWith(
+      currentPhase: Phase.night,
+      currentSubPhase: SubPhase.mafiaShoot,
+      currentSpeakerSeat: -1,
+      nominatedSeats: [],
+      currentDay: state.currentDay + 1,
+      isVotingDay: true,
+      currentSpeakerTimer: null,
+      voteHistory: newVoteHistory,
+      isBestMove: isBestMove,
+    ),
+    true,
+  );
+}
     }
 
     print('=== TRANSITION TO VOTING ===');

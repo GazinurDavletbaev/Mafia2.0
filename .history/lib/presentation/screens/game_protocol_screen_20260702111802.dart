@@ -1017,26 +1017,22 @@ class _GameProtocolScreenState extends State<GameProtocolScreen> {
               ),
             ),
             const SizedBox(height: 4),
-            ConstrainedBox(
-              constraints: const BoxConstraints(
-                maxHeight: 120, // ← фиксированная максимальная высота
-              ),
-              child: TextFormField(
-                controller: _protestCommentController,
-                style: const TextStyle(color: Colors.white, fontSize: 12),
-                maxLines: null,
-                expands: true,
-                decoration: InputDecoration(
-                  hintText: 'Введите комментарий к протесту...',
-                  hintStyle: TextStyle(color: Colors.grey.shade600),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                    borderSide: BorderSide(color: Colors.grey.shade600),
-                  ),
-                  filled: true,
-                  fillColor: Colors.grey.shade700.withOpacity(0.3),
-                  contentPadding: const EdgeInsets.all(8),
+            TextFormField(
+              controller: _protestCommentController,
+              style: const TextStyle(color: Colors.white, fontSize: 12),
+              maxLines: null, // ← бесконечное количество строк
+              expands: true, // ← растягивается на всё доступное место
+              // ❌ УБИРАЕМ minLines
+              decoration: InputDecoration(
+                hintText: 'Введите комментарий к протесту...',
+                hintStyle: TextStyle(color: Colors.grey.shade600),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide: BorderSide(color: Colors.grey.shade600),
                 ),
+                filled: true,
+                fillColor: Colors.grey.shade700.withOpacity(0.3),
+                contentPadding: const EdgeInsets.all(8),
               ),
             ),
           ],

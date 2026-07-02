@@ -176,17 +176,16 @@ class PlayerActions {
       );
     } else {
       final day = _vm.state.currentDay;
-      final existingDay = _vm.state.voteHistory[day];
-      final updatedDay = (existingDay ?? VoteDay(rounds: [])).copyWith(
-        result: [seatNumber],
-        eliminated: false,
-      );
+  final existingDay = _vm.state.voteHistory[day];
+  final updatedDay = (existingDay ?? VoteDay(rounds: [])).copyWith(
+    result: [seatNumber],
+    eliminated: false,
+  );
 
-      final newVoteHistory = Map<int, VoteDay>.from(_vm.state.voteHistory);
-      newVoteHistory[day] = updatedDay;
+  final newVoteHistory = Map<int, VoteDay>.from(_vm.state.voteHistory);
+  newVoteHistory[day] = updatedDay;
       newState = _vm.state.copyWith(
         players: newPlayers,
-        voteHistory: newVoteHistory,
         removedPlayers: newRemoved, // ← добавляем
         nominatedSeats: newNominatedSeats,
         isVotingDay: false,

@@ -186,7 +186,8 @@ class PlayerActions {
       newVoteHistory[day] = updatedDay;
       newState = _vm.state.copyWith(
         players: newPlayers,
-        voteHistory: newVoteHistory,
+                voteHistory: newVoteHistory,
+
         removedPlayers: newRemoved, // ← добавляем
         nominatedSeats: newNominatedSeats,
         isVotingDay: false,

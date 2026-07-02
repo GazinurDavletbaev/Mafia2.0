@@ -775,18 +775,11 @@ class _GameProtocolScreenState extends State<GameProtocolScreen> {
 
   Widget _buildVoteDayCard(int day, VoteDay dayData, int voteNumber) {
     print('=== VOTEDAY $day ===');
-    print('rounds: ${dayData.rounds}');
-    print('result: ${dayData.result}');
-    print('eliminated: ${dayData.eliminated}');
-    print('eliminationVotes: ${dayData.eliminationVotes}');
-    print('================================');
-    final hasVoting = dayData.rounds.isNotEmpty;
-    final hasResult = dayData.result.isNotEmpty;
-    final lastRoundPlayers =
-        hasVoting ? dayData.rounds.last.keys.toSet() : <int>{};
-    // Проверяем, входит ли каждый игрок из result в список lastRoundPlayers
-    final isRemoval = hasResult &&
-        dayData.result.any((seat) => !lastRoundPlayers.contains(seat));
+  print('rounds: ${dayData.rounds}');
+  print('result: ${dayData.result}');
+  print('eliminated: ${dayData.eliminated}');
+  print('eliminationVotes: ${dayData.eliminationVotes}');
+  print('================================');
     return Padding(
       padding: const EdgeInsets.only(bottom: 16),
       child: Container(
@@ -809,61 +802,40 @@ class _GameProtocolScreenState extends State<GameProtocolScreen> {
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 8),
-            if (hasVoting && !isRemoval) ...[
-              ...dayData.rounds.asMap().entries.map((entry) {
-                final roundIndex = entry.key;
-                final round = entry.value;
-                final label = roundIndex == 0 ? 'Игрок' : 'Переголосование';
-                return Padding(
-                  padding: const EdgeInsets.only(bottom: 6),
-                  child: _buildVoteRow(label, round, roundIndex),
-                );
-              }),
-              const Divider(color: Colors.grey),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Text(
-                    'Результат: ',
-                    style: TextStyle(
-                      color: Colors.white70,
-                      fontSize: 12,
-                    ),
+            ...dayData.rounds.asMap().entries.map((entry) {
+              final roundIndex = entry.key;
+              final round = entry.value;
+              final label = roundIndex == 0 ? 'Игрок' : 'Переголосование';
+              return Padding(
+                padding: const EdgeInsets.only(bottom: 6),
+                child: _buildVoteRow(label, round, roundIndex),
+              );
+            }),
+            const Divider(color: Colors.grey),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Text(
+                  'Результат: ',
+                  style: TextStyle(
+                    color: Colors.white70,
+                    fontSize: 12,
                   ),
-                  Text(
-                    dayData.result.isNotEmpty ? dayData.result.join(', ') : '0',
-                    style: TextStyle(
-                      color: dayData.result.isNotEmpty
-                          ? Colors.green
-                          : Colors.white54,
-                      fontSize: 14,
-                      fontWeight: dayData.result.isNotEmpty
-                          ? FontWeight.bold
-                          : FontWeight.normal,
-                    ),
+                ),
+                Text(
+                  dayData.result.isNotEmpty ? dayData.result.join(', ') : '0',
+                  style: TextStyle(
+                    color: dayData.result.isNotEmpty
+                        ? Colors.green
+                        : Colors.white54,
+                    fontSize: 14,
+                    fontWeight: dayData.result.isNotEmpty
+                        ? FontWeight.bold
+                        : FontWeight.normal,
                   ),
-                ],
-              ),
-            ] else ...[
-              const SizedBox(height: 4),
-              const Text(
-                'Удалены:',
-                style: TextStyle(
-                  color: Colors.red,
-                  fontSize: 14,
-                  fontWeight: FontWeight.bold,
                 ),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                dayData.result.isNotEmpty ? dayData.result.join(', ') : '0',
-                style: const TextStyle(
-                  color: Colors.red,
-                  fontSize: 14,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ],
+              ],
+            ),
             if (dayData.eliminationVotes > 0)
               Text(
                 'Голосование за подъём: ${dayData.eliminationVotes}',
@@ -1017,26 +989,15 @@ class _GameProtocolScreenState extends State<GameProtocolScreen> {
               ),
             ),
             const SizedBox(height: 4),
-            ConstrainedBox(
-              constraints: const BoxConstraints(
-                maxHeight: 120, // ← фиксированная максимальная высота
-              ),
-              child: TextFormField(
-                controller: _protestCommentController,
-                style: const TextStyle(color: Colors.white, fontSize: 12),
-                maxLines: null,
-                expands: true,
-                decoration: InputDecoration(
-                  hintText: 'Введите комментарий к протесту...',
-                  hintStyle: TextStyle(color: Colors.grey.shade600),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                    borderSide: BorderSide(color: Colors.grey.shade600),
-                  ),
-                  filled: true,
-                  fillColor: Colors.grey.shade700.withOpacity(0.3),
-                  contentPadding: const EdgeInsets.all(8),
-                ),
+            TextField(
+              controller: _protestCommentController,
+              style: const TextStyle(color: Colors.white, fontSize: 12),
+              decoration: InputDecoration(
+                hintText: 'Введите комментарий к протесту...',
+                hintStyle: TextStyle(color: Colors.grey.shade600),
+                border: InputBorder.none,
+                isDense: true,
+                contentPadding: EdgeInsets.zero,
               ),
             ),
           ],

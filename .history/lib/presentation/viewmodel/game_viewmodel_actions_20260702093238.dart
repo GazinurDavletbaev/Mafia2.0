@@ -136,6 +136,19 @@ class PlayerActions {
       newRemoved.add(existingPlayer);
     }
 
+// ✅ Добавляем удалённого игрока в voteHistory
+    final day = _vm.state.currentDay;
+    final existingDay = _vm.state.voteHistory[day];
+    final updatedDay = (existingDay ?? VoteDay(rounds: [])).copyWith(
+      result: [seatNumber],
+      eliminated: false,
+    );
+
+    final newVoteHistory = Map<int, VoteDay>.from(_vm.state.voteHistory);
+    print('222 $newVoteHistory.');
+    newVoteHistory[day] = updatedDay;
+    print('221 $newVoteHistory');
+
     final usecase = _ref.read(killPlayerUsecaseProvider);
     final (newPlayers, winner) = usecase.execute(_vm.state.players, seatNumber);
     final newNominatedSeats =
@@ -150,15 +163,6 @@ class PlayerActions {
     GameState newState;
 
     if (isInVoting) {
-      final day = _vm.state.currentDay;
-      final existingDay = _vm.state.voteHistory[day];
-      final updatedDay = (existingDay ?? VoteDay(rounds: [])).copyWith(
-        result: [seatNumber],
-        eliminated: false,
-      );
-
-      final newVoteHistory = Map<int, VoteDay>.from(_vm.state.voteHistory);
-      newVoteHistory[day] = updatedDay;
       final aliveCount = newPlayers.where((p) => p.isAlive).length;
       newState = _vm.state.copyWith(
         players: newPlayers,
@@ -167,7 +171,6 @@ class PlayerActions {
         currentSubPhase: SubPhase.mafiaShoot,
         currentDay: _vm.state.currentDay + 1,
         nominatedSeats: [],
-        voteHistory: newVoteHistory,
         votes: {},
         isVotingActive: false,
         voteController: null,
@@ -175,18 +178,8 @@ class PlayerActions {
         isBestMove: aliveCount >= 9,
       );
     } else {
-      final day = _vm.state.currentDay;
-      final existingDay = _vm.state.voteHistory[day];
-      final updatedDay = (existingDay ?? VoteDay(rounds: [])).copyWith(
-        result: [seatNumber],
-        eliminated: false,
-      );
-
-      final newVoteHistory = Map<int, VoteDay>.from(_vm.state.voteHistory);
-      newVoteHistory[day] = updatedDay;
       newState = _vm.state.copyWith(
         players: newPlayers,
-        voteHistory: newVoteHistory,
         removedPlayers: newRemoved, // ← добавляем
         nominatedSeats: newNominatedSeats,
         isVotingDay: false,

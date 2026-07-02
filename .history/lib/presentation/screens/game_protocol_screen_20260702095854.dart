@@ -774,19 +774,18 @@ class _GameProtocolScreenState extends State<GameProtocolScreen> {
   }
 
   Widget _buildVoteDayCard(int day, VoteDay dayData, int voteNumber) {
+    // ===== ВЫВОД voteHistory ДЛЯ ЭТОГО ДНЯ =====
     print('=== VOTEDAY $day ===');
     print('rounds: ${dayData.rounds}');
     print('result: ${dayData.result}');
     print('eliminated: ${dayData.eliminated}');
     print('eliminationVotes: ${dayData.eliminationVotes}');
     print('================================');
+
     final hasVoting = dayData.rounds.isNotEmpty;
     final hasResult = dayData.result.isNotEmpty;
-    final lastRoundPlayers =
-        hasVoting ? dayData.rounds.last.keys.toSet() : <int>{};
-    // Проверяем, входит ли каждый игрок из result в список lastRoundPlayers
-    final isRemoval = hasResult &&
-        dayData.result.any((seat) => !lastRoundPlayers.contains(seat));
+    final isRemoval = !hasVoting && hasResult;
+
     return Padding(
       padding: const EdgeInsets.only(bottom: 16),
       child: Container(
@@ -800,16 +799,18 @@ class _GameProtocolScreenState extends State<GameProtocolScreen> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Text(
-              'ГОЛОСОВАНИЕ $voteNumber',
-              style: const TextStyle(
-                color: Colors.white,
+              isRemoval ? 'УДАЛЕНИЕ' : 'ГОЛОСОВАНИЕ $voteNumber',
+              style: TextStyle(
+                color: isRemoval ? Colors.red : Colors.white,
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
               ),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 8),
-            if (hasVoting && !isRemoval) ...[
+
+            // ✅ Если голосование было — показываем раунды
+            if (hasVoting)
               ...dayData.rounds.asMap().entries.map((entry) {
                 final roundIndex = entry.key;
                 final round = entry.value;
@@ -818,8 +819,34 @@ class _GameProtocolScreenState extends State<GameProtocolScreen> {
                   padding: const EdgeInsets.only(bottom: 6),
                   child: _buildVoteRow(label, round, roundIndex),
                 );
-              }),
-              const Divider(color: Colors.grey),
+              })
+            else if (isRemoval)
+              // ✅ Если это удаление — показываем только УДАЛЕНЫ
+              Column(
+                children: [
+                  const SizedBox(height: 4),
+                  const Text(
+                    'Удалены:',
+                    style: TextStyle(
+                      color: Colors.green,
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    dayData.result.join(', '),
+                    style: const TextStyle(
+                      color: Colors.green,
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+
+            // Если голосования не было и удаления не было — показываем "Результат: 0"
+            if (!hasVoting && !hasResult)
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -831,39 +858,64 @@ class _GameProtocolScreenState extends State<GameProtocolScreen> {
                     ),
                   ),
                   Text(
-                    dayData.result.isNotEmpty ? dayData.result.join(', ') : '0',
+                    '0',
                     style: TextStyle(
-                      color: dayData.result.isNotEmpty
-                          ? Colors.green
-                          : Colors.white54,
+                      color: Colors.white54,
                       fontSize: 14,
-                      fontWeight: dayData.result.isNotEmpty
-                          ? FontWeight.bold
-                          : FontWeight.normal,
+                      fontWeight: FontWeight.normal,
                     ),
                   ),
                 ],
               ),
-            ] else ...[
-              const SizedBox(height: 4),
-              const Text(
-                'Удалены:',
-                style: TextStyle(
-                  color: Colors.red,
-                  fontSize: 14,
-                  fontWeight: FontWeight.bold,
-                ),
+
+            const Divider(color: Colors.grey),
+
+            // Результат если было голосование
+            if (hasVoting && hasResult)
+              Column(
+                children: [
+                  const SizedBox(height: 4),
+                  const Text(
+                    'УДАЛЕНЫ:',
+                    style: TextStyle(
+                      color: Colors.green,
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    dayData.result.join(', '),
+                    style: const TextStyle(
+                      color: Colors.green,
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              )
+            else if (hasVoting && !hasResult)
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Text(
+                    'Результат: ',
+                    style: TextStyle(
+                      color: Colors.white70,
+                      fontSize: 12,
+                    ),
+                  ),
+                  Text(
+                    '0',
+                    style: TextStyle(
+                      color: Colors.white54,
+                      fontSize: 14,
+                      fontWeight: FontWeight.normal,
+                    ),
+                  ),
+                ],
               ),
-              const SizedBox(height: 4),
-              Text(
-                dayData.result.isNotEmpty ? dayData.result.join(', ') : '0',
-                style: const TextStyle(
-                  color: Colors.red,
-                  fontSize: 14,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ],
+
             if (dayData.eliminationVotes > 0)
               Text(
                 'Голосование за подъём: ${dayData.eliminationVotes}',
@@ -1017,26 +1069,15 @@ class _GameProtocolScreenState extends State<GameProtocolScreen> {
               ),
             ),
             const SizedBox(height: 4),
-            ConstrainedBox(
-              constraints: const BoxConstraints(
-                maxHeight: 120, // ← фиксированная максимальная высота
-              ),
-              child: TextFormField(
-                controller: _protestCommentController,
-                style: const TextStyle(color: Colors.white, fontSize: 12),
-                maxLines: null,
-                expands: true,
-                decoration: InputDecoration(
-                  hintText: 'Введите комментарий к протесту...',
-                  hintStyle: TextStyle(color: Colors.grey.shade600),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                    borderSide: BorderSide(color: Colors.grey.shade600),
-                  ),
-                  filled: true,
-                  fillColor: Colors.grey.shade700.withOpacity(0.3),
-                  contentPadding: const EdgeInsets.all(8),
-                ),
+            TextField(
+              controller: _protestCommentController,
+              style: const TextStyle(color: Colors.white, fontSize: 12),
+              decoration: InputDecoration(
+                hintText: 'Введите комментарий к протесту...',
+                hintStyle: TextStyle(color: Colors.grey.shade600),
+                border: InputBorder.none,
+                isDense: true,
+                contentPadding: EdgeInsets.zero,
               ),
             ),
           ],

@@ -99,109 +99,102 @@ class PlayerActions {
   }
 
   Future<void> _killPlayer(int seatNumber) async {
-    AppLogger.d('_killPlayer: seat=$seatNumber');
+  AppLogger.d('_killPlayer: seat=$seatNumber');
 
-    // ✅ Находим игрока
-    final existingPlayer =
-        _vm.state.players.firstWhere((p) => p.seatNumber == seatNumber);
-    if (!existingPlayer.isAlive && existingPlayer.fouls == 4) {
-      AppLogger.d('_killPlayer: игрок уже мёртв с 4 фолами, проверяем победу');
+  // ✅ Находим игрока
+  final existingPlayer =
+      _vm.state.players.firstWhere((p) => p.seatNumber == seatNumber);
+  if (!existingPlayer.isAlive && existingPlayer.fouls == 4) {
+    AppLogger.d('_killPlayer: игрок уже мёртв с 4 фолами, проверяем победу');
 
-      final newPlayers = _vm.state.players;
-      final blackAlive =
-          newPlayers.where((p) => p.isAlive && p.team == 'black').length;
-      final redAlive =
-          newPlayers.where((p) => p.isAlive && p.team == 'red').length;
-      final totalAlive = blackAlive + redAlive;
+    final newPlayers = _vm.state.players;
+    final blackAlive =
+        newPlayers.where((p) => p.isAlive && p.team == 'black').length;
+    final redAlive =
+        newPlayers.where((p) => p.isAlive && p.team == 'red').length;
+    final totalAlive = blackAlive + redAlive;
 
-      String? winner;
-      if (blackAlive == 0) {
-        winner = 'red';
-      } else if (redAlive <= blackAlive || totalAlive < 3) {
-        winner = 'black';
-      }
-
-      if (winner != null) {
-        _vm.state = _vm.state.copyWith(
-          isGameEnded: true,
-          winner: winner,
-        );
-      }
-      return;
-    }
-
-    // ✅ Добавляем игрока в список удалённых
-    final newRemoved = List<PlayerModel>.from(_vm.state.removedPlayers);
-    if (!newRemoved.any((p) => p.seatNumber == seatNumber)) {
-      newRemoved.add(existingPlayer);
-    }
-
-    final usecase = _ref.read(killPlayerUsecaseProvider);
-    final (newPlayers, winner) = usecase.execute(_vm.state.players, seatNumber);
-    final newNominatedSeats =
-        _vm.state.nominatedSeats.where((seat) => seat != seatNumber).toList();
-
-    // Проверяем, находимся ли мы в голосовании
-    final isInVoting = _vm.state.isVotingActive ||
-        _vm.state.currentSubPhase == SubPhase.voting ||
-        _vm.state.currentSubPhase == SubPhase.revote ||
-        _vm.state.currentSubPhase == SubPhase.eliminationVote;
-
-    GameState newState;
-
-    if (isInVoting) {
-      final day = _vm.state.currentDay;
-      final existingDay = _vm.state.voteHistory[day];
-      final updatedDay = (existingDay ?? VoteDay(rounds: [])).copyWith(
-        result: [seatNumber],
-        eliminated: false,
-      );
-
-      final newVoteHistory = Map<int, VoteDay>.from(_vm.state.voteHistory);
-      newVoteHistory[day] = updatedDay;
-      final aliveCount = newPlayers.where((p) => p.isAlive).length;
-      newState = _vm.state.copyWith(
-        players: newPlayers,
-        removedPlayers: newRemoved, // ← добавляем
-        currentPhase: Phase.night,
-        currentSubPhase: SubPhase.mafiaShoot,
-        currentDay: _vm.state.currentDay + 1,
-        nominatedSeats: [],
-        voteHistory: newVoteHistory,
-        votes: {},
-        isVotingActive: false,
-        voteController: null,
-        isVotingDay: true,
-        isBestMove: aliveCount >= 9,
-      );
-    } else {
-      final day = _vm.state.currentDay;
-      final existingDay = _vm.state.voteHistory[day];
-      final updatedDay = (existingDay ?? VoteDay(rounds: [])).copyWith(
-        result: [seatNumber],
-        eliminated: false,
-      );
-
-      final newVoteHistory = Map<int, VoteDay>.from(_vm.state.voteHistory);
-      newVoteHistory[day] = updatedDay;
-      newState = _vm.state.copyWith(
-        players: newPlayers,
-        voteHistory: newVoteHistory,
-        removedPlayers: newRemoved, // ← добавляем
-        nominatedSeats: newNominatedSeats,
-        isVotingDay: false,
-      );
+    String? winner;
+    if (blackAlive == 0) {
+      winner = 'red';
+    } else if (redAlive <= blackAlive || totalAlive < 3) {
+      winner = 'black';
     }
 
     if (winner != null) {
-      newState = newState.copyWith(
+      _vm.state = _vm.state.copyWith(
         isGameEnded: true,
-        winner: winner ? 'red' : 'black',
+        winner: winner,
       );
     }
-
-    _vm.state = newState;
+    return;
   }
+
+  // ✅ Добавляем игрока в список удалённых
+  final newRemoved = List<PlayerModel>.from(_vm.state.removedPlayers);
+  if (!newRemoved.any((p) => p.seatNumber == seatNumber)) {
+    newRemoved.add(existingPlayer);
+  }
+
+  // ✅ Добавляем удалённого игрока в voteHistory
+  final day = _vm.state.currentDay;
+  final existingDay = _vm.state.voteHistory[day];
+  final updatedDay = (existingDay ?? VoteDay(rounds: [])).copyWith(
+    result: [seatNumber],
+    eliminated: false,
+  );
+
+  final newVoteHistory = Map<int, VoteDay>.from(_vm.state.voteHistory);
+  newVoteHistory[day] = updatedDay;
+
+  final usecase = _ref.read(killPlayerUsecaseProvider);
+  final (newPlayers, winner) = usecase.execute(_vm.state.players, seatNumber);
+  final newNominatedSeats =
+      _vm.state.nominatedSeats.where((seat) => seat != seatNumber).toList();
+
+  // Проверяем, находимся ли мы в голосовании
+  final isInVoting = _vm.state.isVotingActive ||
+      _vm.state.currentSubPhase == SubPhase.voting ||
+      _vm.state.currentSubPhase == SubPhase.revote ||
+      _vm.state.currentSubPhase == SubPhase.eliminationVote;
+
+  GameState newState;
+
+  if (isInVoting) {
+    final aliveCount = newPlayers.where((p) => p.isAlive).length;
+    newState = _vm.state.copyWith(
+      players: newPlayers,
+      removedPlayers: newRemoved,
+      voteHistory: newVoteHistory, // ← ДОБАВИТЬ
+      currentPhase: Phase.night,
+      currentSubPhase: SubPhase.mafiaShoot,
+      currentDay: _vm.state.currentDay + 1,
+      nominatedSeats: [],
+      votes: {},
+      isVotingActive: false,
+      voteController: null,
+      isVotingDay: true,
+      isBestMove: aliveCount >= 9,
+    );
+  } else {
+    newState = _vm.state.copyWith(
+      players: newPlayers,
+      removedPlayers: newRemoved,
+      voteHistory: newVoteHistory, // ← ДОБАВИТЬ
+      nominatedSeats: newNominatedSeats,
+      isVotingDay: false,
+    );
+  }
+
+  if (winner != null) {
+    newState = newState.copyWith(
+      isGameEnded: true,
+      winner: winner ? 'red' : 'black',
+    );
+  }
+
+  _vm.state = newState;
+}
 
   Future<void> _revivePlayer(int seatNumber) async {
     AppLogger.d('_revivePlayer: seat=$seatNumber');

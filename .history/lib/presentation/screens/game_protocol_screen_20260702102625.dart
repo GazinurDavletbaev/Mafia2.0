@@ -782,11 +782,6 @@ class _GameProtocolScreenState extends State<GameProtocolScreen> {
     print('================================');
     final hasVoting = dayData.rounds.isNotEmpty;
     final hasResult = dayData.result.isNotEmpty;
-    final lastRoundPlayers =
-        hasVoting ? dayData.rounds.last.keys.toSet() : <int>{};
-    // Проверяем, входит ли каждый игрок из result в список lastRoundPlayers
-    final isRemoval = hasResult &&
-        dayData.result.any((seat) => !lastRoundPlayers.contains(seat));
     return Padding(
       padding: const EdgeInsets.only(bottom: 16),
       child: Container(
@@ -809,7 +804,7 @@ class _GameProtocolScreenState extends State<GameProtocolScreen> {
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 8),
-            if (hasVoting && !isRemoval) ...[
+            if (hasVoting)
               ...dayData.rounds.asMap().entries.map((entry) {
                 final roundIndex = entry.key;
                 final round = entry.value;
@@ -818,52 +813,58 @@ class _GameProtocolScreenState extends State<GameProtocolScreen> {
                   padding: const EdgeInsets.only(bottom: 6),
                   child: _buildVoteRow(label, round, roundIndex),
                 );
-              }),
-              const Divider(color: Colors.grey),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
+                const Divider(color: Colors.grey),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Text(
+                  'Результат: ',
+                  style: TextStyle(
+                    color: Colors.white70,
+                    fontSize: 12,
+                  ),
+                ),
+                Text(
+                  dayData.result.isNotEmpty ? dayData.result.join(', ') : '0',
+                  style: TextStyle(
+                    color: dayData.result.isNotEmpty
+                        ? Colors.green
+                        : Colors.white54,
+                    fontSize: 14,
+                    fontWeight: dayData.result.isNotEmpty
+                        ? FontWeight.bold
+                        : FontWeight.normal,
+                  ),
+                ),
+              ],
+            );
+              })
+              
+            else
+              // ✅ Если голосования не было — показываем только "Удалены:"
+              Column(
                 children: [
+                  const SizedBox(height: 4),
                   const Text(
-                    'Результат: ',
+                    'Удалены:',
                     style: TextStyle(
-                      color: Colors.white70,
-                      fontSize: 12,
+                      color: Colors.red,
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
+                  const SizedBox(height: 4),
                   Text(
                     dayData.result.isNotEmpty ? dayData.result.join(', ') : '0',
-                    style: TextStyle(
-                      color: dayData.result.isNotEmpty
-                          ? Colors.green
-                          : Colors.white54,
+                    style: const TextStyle(
+                      color: Colors.red,
                       fontSize: 14,
-                      fontWeight: dayData.result.isNotEmpty
-                          ? FontWeight.bold
-                          : FontWeight.normal,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
                 ],
               ),
-            ] else ...[
-              const SizedBox(height: 4),
-              const Text(
-                'Удалены:',
-                style: TextStyle(
-                  color: Colors.red,
-                  fontSize: 14,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                dayData.result.isNotEmpty ? dayData.result.join(', ') : '0',
-                style: const TextStyle(
-                  color: Colors.red,
-                  fontSize: 14,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ],
+            
             if (dayData.eliminationVotes > 0)
               Text(
                 'Голосование за подъём: ${dayData.eliminationVotes}',
@@ -1017,26 +1018,15 @@ class _GameProtocolScreenState extends State<GameProtocolScreen> {
               ),
             ),
             const SizedBox(height: 4),
-            ConstrainedBox(
-              constraints: const BoxConstraints(
-                maxHeight: 120, // ← фиксированная максимальная высота
-              ),
-              child: TextFormField(
-                controller: _protestCommentController,
-                style: const TextStyle(color: Colors.white, fontSize: 12),
-                maxLines: null,
-                expands: true,
-                decoration: InputDecoration(
-                  hintText: 'Введите комментарий к протесту...',
-                  hintStyle: TextStyle(color: Colors.grey.shade600),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                    borderSide: BorderSide(color: Colors.grey.shade600),
-                  ),
-                  filled: true,
-                  fillColor: Colors.grey.shade700.withOpacity(0.3),
-                  contentPadding: const EdgeInsets.all(8),
-                ),
+            TextField(
+              controller: _protestCommentController,
+              style: const TextStyle(color: Colors.white, fontSize: 12),
+              decoration: InputDecoration(
+                hintText: 'Введите комментарий к протесту...',
+                hintStyle: TextStyle(color: Colors.grey.shade600),
+                border: InputBorder.none,
+                isDense: true,
+                contentPadding: EdgeInsets.zero,
               ),
             ),
           ],
