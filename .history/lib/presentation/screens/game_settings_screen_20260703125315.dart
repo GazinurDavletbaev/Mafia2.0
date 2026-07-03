@@ -218,9 +218,8 @@ class _GameSettingsScreenState extends ConsumerState<GameSettingsScreen> {
               child: ElevatedButton(
                 onPressed: _showNewGameDialog,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor:
-                      isDark ? Colors.grey.shade800 : Colors.grey.shade200,
-                  foregroundColor: isDark ? Colors.white : Colors.black87,
+                  backgroundColor: Colors.red.shade700,
+                  foregroundColor: Colors.white,
                   padding: const EdgeInsets.symmetric(vertical: 16),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),

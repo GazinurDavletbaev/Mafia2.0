@@ -87,7 +87,8 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
       GameSettingsScreen(
         initialData: _gameData,
         onSettingsChanged: _updateGameData,
-        onNewGame: _onNewGame, // ← передаём метод
+          onNewGame: _onNewGame,  // ← передаём метод
+
       ),
       SeatSetupScreen(
         initialData: _gameData,
@@ -150,19 +151,13 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
     );
   }
 
-  // lib/presentation/screens/lobby_screen.dart
-
   void _onNewGame() {
     // ✅ Сохраняем имя судьи
     final judgeName = _gameData.judgeName;
 
-    // ✅ Сбрасываем GameViewModel
-    final vm = ref.read(gameViewModelProvider.notifier);
-    vm.resetGame(); // ← нужен метод resetGame()
-
     // ✅ Создаём новый GameData с сохранённым судьёй
     final newGameData = GameData(
-      judgeName: judgeName,
+      judgeName: judgeName, // ← сохраняем судью
     );
 
     _updateGameData(newGameData);

@@ -6,13 +6,12 @@ import 'package:mafia_help/presentation/screens/lobby_screen.dart';
 class GameSettingsScreen extends ConsumerStatefulWidget {
   final GameData initialData;
   final Function(GameData) onSettingsChanged;
-  final VoidCallback onNewGame;
+  
 
   const GameSettingsScreen({
     super.key,
     required this.initialData,
     required this.onSettingsChanged,
-    required this.onNewGame,
   });
 
   @override
@@ -27,6 +26,7 @@ class _GameSettingsScreenState extends ConsumerState<GameSettingsScreen> {
   late TextEditingController _judgeController;
   late DateTime _selectedDate;
 
+  // ✅ Месяца для автоматического заполнения
   final List<String> _months = [
     'ЯНВАРЬ',
     'ФЕВРАЛЬ',
@@ -46,6 +46,7 @@ class _GameSettingsScreenState extends ConsumerState<GameSettingsScreen> {
   void initState() {
     super.initState();
 
+    // ✅ Если стадия пустая — ставим текущий месяц
     final initialStage = widget.initialData.stageName.isNotEmpty
         ? widget.initialData.stageName
         : _months[DateTime.now().month - 1];
@@ -101,51 +102,6 @@ class _GameSettingsScreenState extends ConsumerState<GameSettingsScreen> {
     );
   }
 
-  void _showNewGameDialog() {
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
-
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: isDark ? Colors.grey.shade900 : Colors.white,
-        title: Text(
-          'Новая игра?',
-          style: TextStyle(
-            color: isDark ? Colors.white : Colors.black87,
-          ),
-        ),
-        content: Text(
-          'Все несохранённые данные будут потеряны.\nИмя судьи будет сохранено.',
-          style: TextStyle(
-            color: isDark ? Colors.white70 : Colors.black54,
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text(
-              'Отмена',
-              style: TextStyle(
-                color: isDark ? Colors.grey : Colors.grey.shade600,
-              ),
-            ),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-              widget.onNewGame();
-            },
-            child: const Text(
-              'Создать',
-              style: TextStyle(color: Colors.orange),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -157,13 +113,6 @@ class _GameSettingsScreenState extends ConsumerState<GameSettingsScreen> {
         title: const Text('Настройки игры'),
         backgroundColor: theme.appBarTheme.backgroundColor,
         foregroundColor: theme.appBarTheme.foregroundColor,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.refresh, color: Colors.orange),
-            onPressed: _showNewGameDialog,
-            tooltip: 'Новая игра',
-          ),
-        ],
       ),
       body: Padding(
         padding: const EdgeInsets.all(24.0),
@@ -213,29 +162,6 @@ class _GameSettingsScreenState extends ConsumerState<GameSettingsScreen> {
               onChanged: (_) => _notifyChanges(),
             ),
             const Spacer(),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: _showNewGameDialog,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor:
-                      isDark ? Colors.grey.shade800 : Colors.grey.shade200,
-                  foregroundColor: isDark ? Colors.white : Colors.black87,
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-                child: const Text(
-                  '🔄 НОВАЯ ИГРА',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(height: 20),
           ],
         ),
       ),
@@ -363,6 +289,7 @@ class _GameSettingsScreenState extends ConsumerState<GameSettingsScreen> {
             time.hour,
             time.minute,
           );
+          // ✅ Обновляем стадию при изменении даты
           _stageController.text = _months[_selectedDate.month - 1];
           _notifyChanges();
         });

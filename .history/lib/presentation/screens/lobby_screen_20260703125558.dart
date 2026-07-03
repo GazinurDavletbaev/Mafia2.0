@@ -152,28 +152,28 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
 
   // lib/presentation/screens/lobby_screen.dart
 
-  void _onNewGame() {
-    // ✅ Сохраняем имя судьи
-    final judgeName = _gameData.judgeName;
-
-    // ✅ Сбрасываем GameViewModel
-    final vm = ref.read(gameViewModelProvider.notifier);
-    vm.resetGame(); // ← нужен метод resetGame()
-
-    // ✅ Создаём новый GameData с сохранённым судьёй
-    final newGameData = GameData(
-      judgeName: judgeName,
-    );
-
-    _updateGameData(newGameData);
-
-    // ✅ Показываем сообщение
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('🔄 Новая игра создана!'),
-        backgroundColor: Colors.green,
-        duration: Duration(seconds: 2),
-      ),
-    );
-  }
+void _onNewGame() {
+  // ✅ Сохраняем имя судьи
+  final judgeName = _gameData.judgeName;
+  
+  // ✅ Сбрасываем GameViewModel
+  final vm = ref.read(gameViewModelProvider.notifier);
+  vm.resetGame();  // ← нужен метод resetGame()
+  
+  // ✅ Создаём новый GameData с сохранённым судьёй
+  final newGameData = GameData(
+    judgeName: judgeName,
+  );
+  
+  _updateGameData(newGameData);
+  
+  // ✅ Показываем сообщение
+  ScaffoldMessenger.of(context).showSnackBar(
+    const SnackBar(
+      content: Text('🔄 Новая игра создана!'),
+      backgroundColor: Colors.green,
+      duration: Duration(seconds: 2),
+    ),
+  );
+}
 }

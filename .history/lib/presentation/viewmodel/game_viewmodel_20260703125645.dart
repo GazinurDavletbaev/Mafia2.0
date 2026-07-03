@@ -483,16 +483,7 @@ class GameViewModel extends StateNotifier<GameState> {
       },
     );
   }
-
-// lib/presentation/viewmodel/game_viewmodel.dart
-
-  void resetGame() {
-    // Сбрасываем состояние на начальное
-    state = GameState.initial();
-    _history.clear(); // если есть
-    _history.push(state);
-  }
-
+  
   void updateState(GameState newState) {
     print('=== UPDATE STATE ===');
     print(
