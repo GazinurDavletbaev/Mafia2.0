@@ -145,7 +145,7 @@ class _ClubScreenState extends ConsumerState<ClubScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'MAFIA HELP',
+                'ЬФ',
                 style: TextStyle(
                   color: isDark ? Colors.white : Colors.black87,
                   fontSize: 20,
@@ -154,7 +154,7 @@ class _ClubScreenState extends ConsumerState<ClubScreen> {
               ),
               const SizedBox(height: 2),
               Text(
-                'Когда я читаю книгу, книга получает знания!',
+                'Семья это не главное! Семья это всё!',
                 style: TextStyle(
                   color: isDark ? Colors.grey : Colors.grey.shade600,
                   fontSize: 12,
@@ -181,7 +181,7 @@ class _ClubScreenState extends ConsumerState<ClubScreen> {
                   ),
                   const SizedBox(width: 8),
                   Text(
-                    'Google',
+                    'BackInBlack',
                     style: TextStyle(
                       color: isDark ? Colors.white : Colors.black87,
                       fontSize: 14,

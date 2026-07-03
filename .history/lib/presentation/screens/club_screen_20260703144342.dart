@@ -154,7 +154,7 @@ class _ClubScreenState extends ConsumerState<ClubScreen> {
               ),
               const SizedBox(height: 2),
               Text(
-                'Когда я читаю книгу, книга получает знания!',
+                'Ко!',
                 style: TextStyle(
                   color: isDark ? Colors.grey : Colors.grey.shade600,
                   fontSize: 12,

@@ -145,7 +145,7 @@ class _ClubScreenState extends ConsumerState<ClubScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'MAFIA HELP',
+                'HeadShot FSM',
                 style: TextStyle(
                   color: isDark ? Colors.white : Colors.black87,
                   fontSize: 20,
@@ -154,7 +154,7 @@ class _ClubScreenState extends ConsumerState<ClubScreen> {
               ),
               const SizedBox(height: 2),
               Text(
-                'Когда я читаю книгу, книга получает знания!',
+                'Семья это не главное! Семья это всё!',
                 style: TextStyle(
                   color: isDark ? Colors.grey : Colors.grey.shade600,
                   fontSize: 12,
@@ -168,8 +168,7 @@ class _ClubScreenState extends ConsumerState<ClubScreen> {
                     width: 24,
                     height: 24,
                     decoration: BoxDecoration(
-                      color:
-                          isDark ? Colors.grey.shade700 : Colors.grey.shade300,
+                      color: isDark ? Colors.grey.shade700 : Colors.grey.shade300,
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Image.asset(
@@ -181,7 +180,7 @@ class _ClubScreenState extends ConsumerState<ClubScreen> {
                   ),
                   const SizedBox(width: 8),
                   Text(
-                    'Google',
+                    'BackInBlack',
                     style: TextStyle(
                       color: isDark ? Colors.white : Colors.black87,
                       fontSize: 14,
@@ -190,8 +189,7 @@ class _ClubScreenState extends ConsumerState<ClubScreen> {
                   ),
                   const SizedBox(width: 8),
                   Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                     decoration: BoxDecoration(
                       color: Colors.orange.withOpacity(0.2),
                       borderRadius: BorderRadius.circular(8),
@@ -398,46 +396,14 @@ class _ClubScreenState extends ConsumerState<ClubScreen> {
 
   List<Map<String, dynamic>> _generatePlayers(int count) {
     final names = [
-      'Алексей',
-      'Дмитрий',
-      'Сергей',
-      'Иван',
-      'Петр',
-      'Михаил',
-      'Андрей',
-      'Николай',
-      'Олег',
-      'Владимир',
-      'Артем',
-      'Максим',
-      'Антон',
-      'Егор',
-      'Роман',
-      'Денис',
-      'Виктор',
-      'Юрий',
-      'Анатолий',
-      'Константин',
-      'Вячеслав',
-      'Григорий',
-      'Павел',
-      'Василий',
-      'Тимофей',
-      'Илья',
-      'Никита',
-      'Матвей',
-      'Захар',
-      'Ярослав',
-      'Степан',
-      'Кирилл',
-      'Александр',
-      'Евгений',
-      'Глеб',
-      'Даниил',
-      'Федор',
-      'Лев',
-      'Марк',
-      'Борис',
+      'Алексей', 'Дмитрий', 'Сергей', 'Иван', 'Петр',
+      'Михаил', 'Андрей', 'Николай', 'Олег', 'Владимир',
+      'Артем', 'Максим', 'Антон', 'Егор', 'Роман',
+      'Денис', 'Виктор', 'Юрий', 'Анатолий', 'Константин',
+      'Вячеслав', 'Григорий', 'Павел', 'Василий', 'Тимофей',
+      'Илья', 'Никита', 'Матвей', 'Захар', 'Ярослав',
+      'Степан', 'Кирилл', 'Александр', 'Евгений', 'Глеб',
+      'Даниил', 'Федор', 'Лев', 'Марк', 'Борис',
     ];
 
     final players = <Map<String, dynamic>>[];
