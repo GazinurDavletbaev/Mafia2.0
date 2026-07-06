@@ -97,10 +97,10 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen>
     final email = isEmail ? login : null;
 
     final result = await AuthService.register(
-      email: email ?? '',
+      email: email ?? '', // ← если null → пустая строка
       username: username,
       password: password,
-      phone: phone ?? '',
+      phone: phone ?? '', // ← если null → пустая строка
     );
 
     setState(() => _isLoading = false);
@@ -108,25 +108,17 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen>
     if (result['success']) {
       await AuthService.saveToken(result['token']);
 
-      // ✅ Если регистрация по email → экран подтверждения
-      if (email != null && email.isNotEmpty) {
+      // Если регистрация по email → показываем экран подтверждения
+      if (email != null && email!.isNotEmpty) {
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
-            builder: (context) => EmailVerifyScreen(email: email),
+            builder: (context) => EmailVerifyScreen(email: email!),
           ),
         );
-      }
-      // ✅ Если регистрация по телефону → переходим в лобби
-      else if (phone != null && phone.isNotEmpty) {
+      } else {
         context.go('/lobby');
       }
-      // ✅ Если не указано ни то, ни другое (на всякий случай)
-      else {
-        context.go('/lobby');
-      }
-    } else {
-      _showSnackBar(result['error'] ?? 'Ошибка регистрации', Colors.red);
     }
   }
 

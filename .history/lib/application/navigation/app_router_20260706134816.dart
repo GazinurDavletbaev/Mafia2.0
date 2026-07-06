@@ -2,7 +2,6 @@ import 'package:go_router/go_router.dart';
 import 'package:mafia_help/domain/rules/game_history.dart';
 import 'package:mafia_help/presentation/screens/lobby_screen.dart';
 import 'package:mafia_help/presentation/screens/login_screen.dart';
-import 'package:mafia_help/presentation/screens/phone_verify_screen.dart';
 import 'package:mafia_help/presentation/state/game_state.dart';
 import '../../presentation/screens/splash_screen.dart';
 import '../../presentation/screens/register_screen.dart';

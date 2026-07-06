@@ -70,65 +70,65 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen>
   }
 
   Future<void> _register() async {
-    final login = _loginController.text.trim();
-    final username = _usernameController.text.trim();
-    final password = _passwordController.text;
-    final confirmPassword = _confirmPasswordController.text;
+  final login = _loginController.text.trim();
+  final username = _usernameController.text.trim();
+  final password = _passwordController.text;
+  final confirmPassword = _confirmPasswordController.text;
 
-    if (login.isEmpty || username.isEmpty || password.isEmpty) {
-      _showSnackBar('Заполните все поля', Colors.red);
-      return;
-    }
-
-    if (password != confirmPassword) {
-      _showSnackBar('Пароли не совпадают', Colors.red);
-      return;
-    }
-
-    if (password.length < 6) {
-      _showSnackBar('Пароль должен быть не менее 6 символов', Colors.red);
-      return;
-    }
-
-    setState(() => _isLoading = true);
-
-    final isEmail = _isEmail(login);
-    final phone = isEmail ? null : login;
-    final email = isEmail ? login : null;
-
-    final result = await AuthService.register(
-      email: email ?? '',
-      username: username,
-      password: password,
-      phone: phone ?? '',
-    );
-
-    setState(() => _isLoading = false);
-
-    if (result['success']) {
-      await AuthService.saveToken(result['token']);
-
-      // ✅ Если регистрация по email → экран подтверждения
-      if (email != null && email.isNotEmpty) {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (context) => EmailVerifyScreen(email: email),
-          ),
-        );
-      }
-      // ✅ Если регистрация по телефону → переходим в лобби
-      else if (phone != null && phone.isNotEmpty) {
-        context.go('/lobby');
-      }
-      // ✅ Если не указано ни то, ни другое (на всякий случай)
-      else {
-        context.go('/lobby');
-      }
-    } else {
-      _showSnackBar(result['error'] ?? 'Ошибка регистрации', Colors.red);
-    }
+  if (login.isEmpty || username.isEmpty || password.isEmpty) {
+    _showSnackBar('Заполните все поля', Colors.red);
+    return;
   }
+
+  if (password != confirmPassword) {
+    _showSnackBar('Пароли не совпадают', Colors.red);
+    return;
+  }
+
+  if (password.length < 6) {
+    _showSnackBar('Пароль должен быть не менее 6 символов', Colors.red);
+    return;
+  }
+
+  setState(() => _isLoading = true);
+
+  final isEmail = _isEmail(login);
+  final phone = isEmail ? null : login;
+  final email = isEmail ? login : null;
+
+  final result = await AuthService.register(
+    email: email ?? '',
+    username: username,
+    password: password,
+    phone: phone ?? '',
+  );
+
+  setState(() => _isLoading = false);
+
+  if (result['success']) {
+    await AuthService.saveToken(result['token']);
+
+    // ✅ Если регистрация по email → экран подтверждения
+    if (email != null && email.isNotEmpty) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => EmailVerifyScreen(email: email),
+        ),
+      );
+    } 
+    // ✅ Если регистрация по телефону → переходим в лобби
+    else if (phone != null && phone.isNotEmpty) {
+      context.go('/lobby');
+    } 
+    // ✅ Если не указано ни то, ни другое (на всякий случай)
+    else {
+      context.go('/lobby');
+    }
+  } else {
+    _showSnackBar(result['error'] ?? 'Ошибка регистрации', Colors.red);
+  }
+}
 
   void _showSnackBar(String message, Color color) {
     ScaffoldMessenger.of(context).showSnackBar(

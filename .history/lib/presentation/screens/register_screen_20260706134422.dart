@@ -2,8 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:mafia_help/presentation/screens/email_verify_screen.dart';
-import '../../services/auth_service.dart';
+import '../../core/services/auth_service.dart';
 
 class RegisterScreen extends ConsumerStatefulWidget {
   const RegisterScreen({super.key});
@@ -18,10 +17,11 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen>
   late Animation<Offset> _logoAnimation;
   late Animation<double> _fadeAnimation;
 
-  final _loginController = TextEditingController(); // email или телефон
+  final _emailController = TextEditingController();
   final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
+  final _phoneController = TextEditingController();
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
   bool _isLoading = false;
@@ -58,24 +58,22 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen>
   @override
   void dispose() {
     _controller.dispose();
-    _loginController.dispose();
+    _emailController.dispose();
     _usernameController.dispose();
     _passwordController.dispose();
     _confirmPasswordController.dispose();
+    _phoneController.dispose();
     super.dispose();
   }
 
-  bool _isEmail(String input) {
-    return input.contains('@') && input.contains('.');
-  }
-
   Future<void> _register() async {
-    final login = _loginController.text.trim();
+    final email = _emailController.text.trim();
     final username = _usernameController.text.trim();
     final password = _passwordController.text;
     final confirmPassword = _confirmPasswordController.text;
+    final phone = _phoneController.text.trim();
 
-    if (login.isEmpty || username.isEmpty || password.isEmpty) {
+    if (email.isEmpty || username.isEmpty || password.isEmpty) {
       _showSnackBar('Заполните все поля', Colors.red);
       return;
     }
@@ -92,37 +90,24 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen>
 
     setState(() => _isLoading = true);
 
-    final isEmail = _isEmail(login);
-    final phone = isEmail ? null : login;
-    final email = isEmail ? login : null;
-
     final result = await AuthService.register(
-      email: email ?? '',
+      email: email,
       username: username,
       password: password,
-      phone: phone ?? '',
+      phone: phone.isEmpty ? null : phone,
     );
 
     setState(() => _isLoading = false);
 
     if (result['success']) {
+      // Сохраняем токен
       await AuthService.saveToken(result['token']);
-
-      // ✅ Если регистрация по email → экран подтверждения
-      if (email != null && email.isNotEmpty) {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (context) => EmailVerifyScreen(email: email),
-          ),
-        );
-      }
-      // ✅ Если регистрация по телефону → переходим в лобби
-      else if (phone != null && phone.isNotEmpty) {
-        context.go('/lobby');
-      }
-      // ✅ Если не указано ни то, ни другое (на всякий случай)
-      else {
+      _showSnackBar('Регистрация успешна! Проверьте email', Colors.green);
+      
+      // Если указан телефон — переходим на подтверждение телефона
+      if (phone.isNotEmpty) {
+        context.push('/phone-verify', extra: {'phone': phone});
+      } else {
         context.go('/lobby');
       }
     } else {
@@ -167,7 +152,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen>
                 );
               },
             ),
-            // Форма регистрации
+            // Форма
             AnimatedBuilder(
               animation: _controller,
               builder: (context, child) {
@@ -199,86 +184,70 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen>
                             ),
                           ),
                           const SizedBox(height: 24),
-
-                          // Поле: Email или Телефон (одно поле)
                           _buildTextField(
-                            controller: _loginController,
-                            label: 'Email или телефон',
-                            icon: Icons.alternate_email,
-                            keyboardType: TextInputType.text,
-                            hint: 'example@mail.com или +7 (999) 123-45-67',
+                            controller: _emailController,
+                            label: 'Email',
+                            icon: Icons.email,
+                            keyboardType: TextInputType.emailAddress,
                           ),
                           const SizedBox(height: 12),
-
-                          // Никнейм
                           _buildTextField(
                             controller: _usernameController,
                             label: 'Никнейм',
                             icon: Icons.person,
-                            hint: 'Как вас будут называть',
                           ),
                           const SizedBox(height: 12),
-
-                          // Пароль
+                          _buildTextField(
+                            controller: _phoneController,
+                            label: 'Телефон (необязательно)',
+                            icon: Icons.phone,
+                            keyboardType: TextInputType.phone,
+                          ),
+                          const SizedBox(height: 12),
                           _buildTextField(
                             controller: _passwordController,
                             label: 'Пароль',
                             icon: Icons.lock,
                             obscureText: _obscurePassword,
-                            onToggle: () => setState(
-                                () => _obscurePassword = !_obscurePassword),
+                            onToggle: () => setState(() => _obscurePassword = !_obscurePassword),
                           ),
                           const SizedBox(height: 12),
-
-                          // Подтверждение пароля
                           _buildTextField(
                             controller: _confirmPasswordController,
                             label: 'Подтвердите пароль',
                             icon: Icons.lock_outline,
                             obscureText: _obscureConfirmPassword,
-                            onToggle: () => setState(() =>
-                                _obscureConfirmPassword =
-                                    !_obscureConfirmPassword),
+                            onToggle: () => setState(() => _obscureConfirmPassword = !_obscureConfirmPassword),
                           ),
                           const SizedBox(height: 20),
-
-                          // Кнопка регистрации
                           SizedBox(
                             width: double.infinity,
                             child: _isLoading
-                                ? const Center(
-                                    child: CircularProgressIndicator())
+                                ? const Center(child: CircularProgressIndicator())
                                 : ElevatedButton(
                                     onPressed: _register,
                                     style: ElevatedButton.styleFrom(
                                       backgroundColor: Colors.orange,
                                       foregroundColor: Colors.black,
-                                      padding: const EdgeInsets.symmetric(
-                                          vertical: 16),
+                                      padding: const EdgeInsets.symmetric(vertical: 16),
                                       shape: RoundedRectangleBorder(
                                         borderRadius: BorderRadius.circular(12),
                                       ),
                                     ),
                                     child: const Text(
                                       'Зарегистрироваться',
-                                      style: TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.bold),
+                                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                                     ),
                                   ),
                           ),
                           const SizedBox(height: 12),
-
-                          // Уже есть аккаунт?
                           Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Text(
                                 'Уже есть аккаунт?',
                                 style: TextStyle(
-                                  color: isDark
-                                      ? Colors.grey
-                                      : Colors.grey.shade600,
+                                  color: isDark ? Colors.grey : Colors.grey.shade600,
                                 ),
                               ),
                               TextButton(
@@ -291,44 +260,33 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen>
                             ],
                           ),
                           const SizedBox(height: 16),
-
-                          // Разделитель
                           Row(
                             children: [
                               Expanded(
                                 child: Divider(
-                                  color: isDark
-                                      ? Colors.grey.shade700
-                                      : Colors.grey.shade300,
+                                  color: isDark ? Colors.grey.shade700 : Colors.grey.shade300,
                                   thickness: 0.5,
                                 ),
                               ),
                               Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 16),
+                                padding: const EdgeInsets.symmetric(horizontal: 16),
                                 child: Text(
                                   'или',
                                   style: TextStyle(
-                                    color: isDark
-                                        ? Colors.grey.shade500
-                                        : Colors.grey.shade600,
+                                    color: isDark ? Colors.grey.shade500 : Colors.grey.shade600,
                                     fontSize: 12,
                                   ),
                                 ),
                               ),
                               Expanded(
                                 child: Divider(
-                                  color: isDark
-                                      ? Colors.grey.shade700
-                                      : Colors.grey.shade300,
+                                  color: isDark ? Colors.grey.shade700 : Colors.grey.shade300,
                                   thickness: 0.5,
                                 ),
                               ),
                             ],
                           ),
                           const SizedBox(height: 16),
-
-                          // Социальные кнопки
                           Row(
                             children: [
                               Expanded(
@@ -353,15 +311,12 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen>
                             ],
                           ),
                           const SizedBox(height: 20),
-
-                          // Войти без регистрации
                           TextButton(
                             onPressed: () => context.go('/lobby'),
                             child: Text(
                               'Войти без регистрации →',
                               style: TextStyle(
-                                color:
-                                    isDark ? Colors.grey : Colors.grey.shade600,
+                                color: isDark ? Colors.grey : Colors.grey.shade600,
                                 fontSize: 14,
                               ),
                             ),
@@ -387,7 +342,6 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen>
     bool obscureText = false,
     VoidCallback? onToggle,
     TextInputType? keyboardType,
-    String? hint,
   }) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
@@ -403,10 +357,6 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen>
         labelText: label,
         labelStyle: TextStyle(
           color: isDark ? Colors.grey.shade400 : Colors.grey.shade600,
-        ),
-        hintText: hint,
-        hintStyle: TextStyle(
-          color: isDark ? Colors.grey.shade600 : Colors.grey.shade400,
         ),
         filled: true,
         fillColor: isDark ? Colors.grey.shade800 : Colors.grey.shade200,

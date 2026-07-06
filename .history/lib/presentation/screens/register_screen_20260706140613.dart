@@ -2,7 +2,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:mafia_help/presentation/screens/email_verify_screen.dart';
 import '../../services/auth_service.dart';
 
 class RegisterScreen extends ConsumerStatefulWidget {
@@ -92,37 +91,27 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen>
 
     setState(() => _isLoading = true);
 
+    // Определяем, что ввёл пользователь
     final isEmail = _isEmail(login);
     final phone = isEmail ? null : login;
     final email = isEmail ? login : null;
 
     final result = await AuthService.register(
-      email: email ?? '',
+      email: email,
       username: username,
       password: password,
-      phone: phone ?? '',
+      phone: phone,
     );
 
     setState(() => _isLoading = false);
 
     if (result['success']) {
       await AuthService.saveToken(result['token']);
+      _showSnackBar('Регистрация успешна!', Colors.green);
 
-      // ✅ Если регистрация по email → экран подтверждения
-      if (email != null && email.isNotEmpty) {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (context) => EmailVerifyScreen(email: email),
-          ),
-        );
-      }
-      // ✅ Если регистрация по телефону → переходим в лобби
-      else if (phone != null && phone.isNotEmpty) {
-        context.go('/lobby');
-      }
-      // ✅ Если не указано ни то, ни другое (на всякий случай)
-      else {
+      if (phone != null) {
+        context.push('/phone-verify', extra: {'phone': phone});
+      } else {
         context.go('/lobby');
       }
     } else {
@@ -225,8 +214,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen>
                             label: 'Пароль',
                             icon: Icons.lock,
                             obscureText: _obscurePassword,
-                            onToggle: () => setState(
-                                () => _obscurePassword = !_obscurePassword),
+                            onToggle: () => setState(() => _obscurePassword = !_obscurePassword),
                           ),
                           const SizedBox(height: 12),
 
@@ -236,9 +224,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen>
                             label: 'Подтвердите пароль',
                             icon: Icons.lock_outline,
                             obscureText: _obscureConfirmPassword,
-                            onToggle: () => setState(() =>
-                                _obscureConfirmPassword =
-                                    !_obscureConfirmPassword),
+                            onToggle: () => setState(() => _obscureConfirmPassword = !_obscureConfirmPassword),
                           ),
                           const SizedBox(height: 20),
 
@@ -246,24 +232,20 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen>
                           SizedBox(
                             width: double.infinity,
                             child: _isLoading
-                                ? const Center(
-                                    child: CircularProgressIndicator())
+                                ? const Center(child: CircularProgressIndicator())
                                 : ElevatedButton(
                                     onPressed: _register,
                                     style: ElevatedButton.styleFrom(
                                       backgroundColor: Colors.orange,
                                       foregroundColor: Colors.black,
-                                      padding: const EdgeInsets.symmetric(
-                                          vertical: 16),
+                                      padding: const EdgeInsets.symmetric(vertical: 16),
                                       shape: RoundedRectangleBorder(
                                         borderRadius: BorderRadius.circular(12),
                                       ),
                                     ),
                                     child: const Text(
                                       'Зарегистрироваться',
-                                      style: TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.bold),
+                                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                                     ),
                                   ),
                           ),
@@ -276,9 +258,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen>
                               Text(
                                 'Уже есть аккаунт?',
                                 style: TextStyle(
-                                  color: isDark
-                                      ? Colors.grey
-                                      : Colors.grey.shade600,
+                                  color: isDark ? Colors.grey : Colors.grey.shade600,
                                 ),
                               ),
                               TextButton(
@@ -297,30 +277,23 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen>
                             children: [
                               Expanded(
                                 child: Divider(
-                                  color: isDark
-                                      ? Colors.grey.shade700
-                                      : Colors.grey.shade300,
+                                  color: isDark ? Colors.grey.shade700 : Colors.grey.shade300,
                                   thickness: 0.5,
                                 ),
                               ),
                               Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 16),
+                                padding: const EdgeInsets.symmetric(horizontal: 16),
                                 child: Text(
                                   'или',
                                   style: TextStyle(
-                                    color: isDark
-                                        ? Colors.grey.shade500
-                                        : Colors.grey.shade600,
+                                    color: isDark ? Colors.grey.shade500 : Colors.grey.shade600,
                                     fontSize: 12,
                                   ),
                                 ),
                               ),
                               Expanded(
                                 child: Divider(
-                                  color: isDark
-                                      ? Colors.grey.shade700
-                                      : Colors.grey.shade300,
+                                  color: isDark ? Colors.grey.shade700 : Colors.grey.shade300,
                                   thickness: 0.5,
                                 ),
                               ),
@@ -360,8 +333,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen>
                             child: Text(
                               'Войти без регистрации →',
                               style: TextStyle(
-                                color:
-                                    isDark ? Colors.grey : Colors.grey.shade600,
+                                color: isDark ? Colors.grey : Colors.grey.shade600,
                                 fontSize: 14,
                               ),
                             ),
