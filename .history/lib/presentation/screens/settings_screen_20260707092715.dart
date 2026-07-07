@@ -93,17 +93,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 _showAboutDialog(context, isDark);
               },
             ),
-            // ✅ СМЕНА ПАРОЛЯ
-            _buildSettingsTile(
-              context,
-              title: 'Сменить пароль',
-              subtitle: 'Изменить текущий пароль',
-              icon: Icons.lock_outline,
-              isDark: isDark,
-              onTap: () {
-                context.go('/change-password');
-              },
-            ),
             const Divider(color: Colors.grey, height: 32),
             // ✅ КНОПКА ВЫХОДА
             _buildSettingsTile(
@@ -155,8 +144,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             color: isDark ? Colors.grey.shade400 : Colors.grey.shade600,
           ),
         ),
-        trailing:
-            trailing ?? const Icon(Icons.arrow_forward_ios, color: Colors.grey),
+        trailing: trailing ?? const Icon(Icons.arrow_forward_ios, color: Colors.grey),
         onTap: onTap,
       ),
     );

@@ -155,8 +155,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             color: isDark ? Colors.grey.shade400 : Colors.grey.shade600,
           ),
         ),
-        trailing:
-            trailing ?? const Icon(Icons.arrow_forward_ios, color: Colors.grey),
+        trailing: trailing ?? const Icon(Icons.arrow_forward_ios, color: Colors.grey),
         onTap: onTap,
       ),
     );

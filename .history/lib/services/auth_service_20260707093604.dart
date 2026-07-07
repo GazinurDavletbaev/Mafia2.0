@@ -75,50 +75,49 @@ class AuthService {
 
 // lib/services/auth_service.dart
 
-  static Future<Map<String, dynamic>> forgotPassword(
-      {required String email}) async {
-    final response = await http.post(
-      Uri.parse('$baseUrl/auth/forgot-password'),
-      headers: {'Content-Type': 'application/json'},
-      body: jsonEncode({'email': email}),
-    );
-    return _handleResponse(response);
+static Future<Map<String, dynamic>> forgotPassword({required String email}) async {
+  final response = await http.post(
+    Uri.parse('$baseUrl/auth/forgot-password'),
+    headers: {'Content-Type': 'application/json'},
+    body: jsonEncode({'email': email}),
+  );
+  return _handleResponse(response);
+}
+
+static Future<Map<String, dynamic>> resetPassword({
+  required String token,
+  required String newPassword,
+}) async {
+  final response = await http.post(
+    Uri.parse('$baseUrl/auth/reset-password'),
+    headers: {'Content-Type': 'application/json'},
+    body: jsonEncode({
+      'token': token,
+      'new_password': newPassword,
+    }),
+  );
+  return _handleResponse(response);
+}
+
+static Future<Map<String, dynamic>> changePassword({
+  required String oldPassword,
+  required String newPassword,
+}) async {
+  final token = await getToken();
+  if (token == null) {
+    return {'success': false, 'error': 'Не авторизован'};
   }
 
-  static Future<Map<String, dynamic>> resetPassword({
-    required String token,
-    required String newPassword,
-  }) async {
-    final response = await http.post(
-      Uri.parse('$baseUrl/auth/reset-password'),
-      headers: {'Content-Type': 'application/json'},
-      body: jsonEncode({
-        'token': token,
-        'new_password': newPassword,
-      }),
-    );
-    return _handleResponse(response);
-  }
-
-  static Future<Map<String, dynamic>> changePassword({
-    required String oldPassword,
-    required String newPassword,
-  }) async {
-    final token = await getToken();
-    if (token == null) {
-      return {'success': false, 'error': 'Не авторизован'};
-    }
-
-    final response = await http.post(
-      Uri.parse('$baseUrl/auth/change-password?token=$token'),
-      headers: {'Content-Type': 'application/json'},
-      body: jsonEncode({
-        'old_password': oldPassword,
-        'new_password': newPassword,
-      }),
-    );
-    return _handleResponse(response);
-  }
+  final response = await http.post(
+    Uri.parse('$baseUrl/auth/change-password?token=$token'),
+    headers: {'Content-Type': 'application/json'},
+    body: jsonEncode({
+      'old_password': oldPassword,
+      'new_password': newPassword,
+    }),
+  );
+  return _handleResponse(response);
+}
 
   static Map<String, dynamic> _handleResponse(http.Response response) {
     try {
@@ -176,7 +175,7 @@ class AuthService {
         'error': 'Не удалось получить профиль',
       };
     }
-  }
+  }    
 
   static Future<void> saveToken(String token) async {
     final prefs = await SharedPreferences.getInstance();

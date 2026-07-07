@@ -16,6 +16,7 @@ import 'hive_registrar.g.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
+  // Только для десктопа (Linux/Windows/macOS)
   if (Platform.isLinux || Platform.isWindows || Platform.isMacOS) {
     await windowManager.ensureInitialized();
 
@@ -76,13 +77,8 @@ class MyApp extends ConsumerWidget {
 }
 
 // ✅ ФУНКЦИЯ ДЛЯ ОБРАБОТКИ ГЛУБОКИХ ССЫЛОК
+// ✅ ФУНКЦИЯ ДЛЯ ОБРАБОТКИ ГЛУБОКИХ ССЫЛОК
 Future<void> initUniLinks() async {
-  // ✅ ДЕСКТОП — ПРОПУСКАЕМ
-  if (Platform.isLinux || Platform.isWindows || Platform.isMacOS) {
-    print('🖥️ Десктоп: uni_links не поддерживается');
-    return;
-  }
-
   try {
     // Получаем ссылку при запуске
     final initialLink = await getInitialLink();
@@ -90,11 +86,9 @@ Future<void> initUniLinks() async {
       _handleIncomingLink(initialLink);
     }
 
-    // Подписываемся на ссылки
-    linkStream.listen((String? link) {
-      if (link != null) {
-        _handleIncomingLink(link);
-      }
+    // ✅ ИСПРАВЛЕНО: getLinksStream() → linkStream
+    linkStream.listen((String link) {
+      _handleIncomingLink(link);
     }, onError: (err) {
       print('❌ Ошибка в linkStream: $err');
     });
@@ -103,7 +97,7 @@ Future<void> initUniLinks() async {
   }
 }
 
-// ✅ ОБРАБОТЧИК ССЫЛОК
+// ✅ ОБРАБОТЧИК ССЫЛОК С НАВИГАЦИЕЙ
 void _handleIncomingLink(String link) {
   final uri = Uri.parse(link);
   print('🔗 Получена ссылка: $link');
@@ -111,17 +105,20 @@ void _handleIncomingLink(String link) {
   if (uri.host == 'reset-password') {
     final token = uri.queryParameters['token'];
     print('🔑 Сброс пароля, токен: $token');
-
+    
+    // Переход на экран сброса пароля
     WidgetsBinding.instance.addPostFrameCallback((_) {
       navigatorKey.currentState?.pushNamed(
         '/reset-password',
         arguments: token,
       );
     });
+    
   } else if (uri.host == 'verify-email') {
     final token = uri.queryParameters['token'];
     print('🔑 Подтверждение email, токен: $token');
-
+    
+    // Переход на экран подтверждения email
     WidgetsBinding.instance.addPostFrameCallback((_) {
       navigatorKey.currentState?.pushNamed(
         '/verify-email',

@@ -1,12 +1,8 @@
-import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mafia_help/domain/rules/game_history.dart';
-import 'package:mafia_help/presentation/screens/change_password_screen.dart';
-import 'package:mafia_help/presentation/screens/forgot_password_screen.dart';
 import 'package:mafia_help/presentation/screens/lobby_screen.dart';
 import 'package:mafia_help/presentation/screens/login_screen.dart';
 import 'package:mafia_help/presentation/screens/phone_verify_screen.dart';
-import 'package:mafia_help/presentation/screens/reset_password_screen.dart';
 import 'package:mafia_help/presentation/state/game_state.dart';
 import 'package:mafia_help/services/auth_service.dart';
 import '../../presentation/screens/splash_screen.dart';
@@ -20,13 +16,10 @@ import '../../presentation/screens/game_protocol_screen.dart';
 import '../../presentation/screens/saved_protocols_screen.dart';
 import '../../presentation/screens/settings_screen.dart';
 
-// ✅ ГЛОБАЛЬНЫЙ КЛЮЧ НАВИГАЦИИ
-final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
-
 final GoRouter router = GoRouter(
-  navigatorKey: navigatorKey,  // ✅ ДОБАВЛЕНО
   initialLocation: '/',
   redirect: (context, state) {
+    // ✅ state.uri.path — правильный путь
     if (state.uri.path == '/') {
       return Future<String?>(() async {
         final token = await AuthService.getToken();
@@ -91,25 +84,6 @@ final GoRouter router = GoRouter(
       },
     ),
     GoRoute(
-      path: '/change-password',
-      name: 'change-password',
-      builder: (context, state) => const ChangePasswordScreen(),
-    ),
-    GoRoute(
-      path: '/forgot-password',
-      name: 'forgot-password',
-      builder: (context, state) => const ForgotPasswordScreen(),
-    ),
-    GoRoute(
-      path: '/reset-password',
-      name: 'reset-password',
-      builder: (context, state) {
-        // ✅ Токен из query-параметров
-        final token = state.uri.queryParameters['token'] ?? '';
-        return ResetPasswordScreen(token: token);
-      },
-    ),
-    GoRoute(
       path: '/saved-protocols',
       name: 'saved-protocols',
       builder: (context, state) => const SavedProtocolsScreen(),
@@ -118,20 +92,6 @@ final GoRouter router = GoRouter(
       path: '/settings',
       name: 'settings',
       builder: (context, state) => const SettingsScreen(),
-    ),
-    // ✅ НОВЫЙ МАРШРУТ ДЛЯ ПОДТВЕРЖДЕНИЯ EMAIL
-    GoRoute(
-      path: '/verify-email',
-      name: 'verify-email',
-      builder: (context, state) {
-        final token = state.uri.queryParameters['token'] ?? '';
-        // TODO: создать экран VerifyEmailScreen
-        return Scaffold(
-          body: Center(
-            child: Text('Подтверждение email: $token'),
-          ),
-        );
-      },
     ),
   ],
 );

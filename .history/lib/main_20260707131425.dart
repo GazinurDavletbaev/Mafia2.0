@@ -77,12 +77,6 @@ class MyApp extends ConsumerWidget {
 
 // ✅ ФУНКЦИЯ ДЛЯ ОБРАБОТКИ ГЛУБОКИХ ССЫЛОК
 Future<void> initUniLinks() async {
-  // ✅ ДЕСКТОП — ПРОПУСКАЕМ
-  if (Platform.isLinux || Platform.isWindows || Platform.isMacOS) {
-    print('🖥️ Десктоп: uni_links не поддерживается');
-    return;
-  }
-
   try {
     // Получаем ссылку при запуске
     final initialLink = await getInitialLink();
@@ -90,7 +84,7 @@ Future<void> initUniLinks() async {
       _handleIncomingLink(initialLink);
     }
 
-    // Подписываемся на ссылки
+    // ✅ ИСПРАВЛЕНО: тип String? и проверка на null
     linkStream.listen((String? link) {
       if (link != null) {
         _handleIncomingLink(link);
