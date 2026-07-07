@@ -86,17 +86,17 @@ Future<void> initUniLinks() async {
   try {
     final appLinks = AppLinks();
 
-    // Получаем ссылку при запуске
+    // Получаем ссылку при запуске (возвращает Uri?)
     final initialLink = await appLinks.getInitialLink();
     if (initialLink != null) {
-      _handleIncomingLink(initialLink.toString());
+      _handleIncomingLink(initialLink.toString()); // ✅ .toString()
     }
 
-    // ✅ ИСПРАВЛЕНО: uriLinkStream вместо linkStream
-    appLinks.uriLinkStream.listen((Uri link) {
-      _handleIncomingLink(link.toString());
+    // Подписываемся на ссылки (возвращает Uri)
+    appLinks.linkStream.listen((Uri link) {
+      _handleIncomingLink(link.toString()); // ✅ .toString()
     }, onError: (err) {
-      print('❌ Ошибка в uriLinkStream: $err');
+      print('❌ Ошибка в linkStream: $err');
     });
   } catch (e) {
     print('❌ Ошибка app_links: $e');

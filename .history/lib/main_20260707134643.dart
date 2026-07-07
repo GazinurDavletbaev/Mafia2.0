@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:app_links/app_links.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_ce/hive.dart';
@@ -6,7 +7,7 @@ import 'package:mafia_help/application/navigation/app_router.dart';
 import 'package:mafia_help/core/themes/app_theme.dart';
 import 'package:path_provider/path_provider.dart' as path_provider;
 import 'package:window_manager/window_manager.dart';
-import 'package:app_links/app_links.dart';
+import 'package:uni_links/uni_links.dart';
 import 'application/providers/providers.dart';
 import 'application/providers/theme_provider.dart';
 import 'data/local/sources/game_local_source.dart';
@@ -89,14 +90,14 @@ Future<void> initUniLinks() async {
     // Получаем ссылку при запуске
     final initialLink = await appLinks.getInitialLink();
     if (initialLink != null) {
-      _handleIncomingLink(initialLink.toString());
+      _handleIncomingLink(initialLink);
     }
 
-    // ✅ ИСПРАВЛЕНО: uriLinkStream вместо linkStream
-    appLinks.uriLinkStream.listen((Uri link) {
-      _handleIncomingLink(link.toString());
+    // Подписываемся на ссылки
+    appLinks.linkStream.listen((String link) {
+      _handleIncomingLink(link);
     }, onError: (err) {
-      print('❌ Ошибка в uriLinkStream: $err');
+      print('❌ Ошибка в linkStream: $err');
     });
   } catch (e) {
     print('❌ Ошибка app_links: $e');
