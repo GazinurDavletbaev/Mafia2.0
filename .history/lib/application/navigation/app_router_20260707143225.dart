@@ -21,7 +21,11 @@ import '../../presentation/screens/game_protocol_screen.dart';
 import '../../presentation/screens/saved_protocols_screen.dart';
 import '../../presentation/screens/settings_screen.dart';
 
+// ✅ ГЛОБАЛЬНЫЙ КЛЮЧ НАВИГАЦИИ
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+
 final GoRouter router = GoRouter(
+  navigatorKey: navigatorKey, // ✅ ДОБАВЛЕНО
   initialLocation: '/',
   redirect: (context, state) {
     if (state.uri.path == '/') {
@@ -98,19 +102,11 @@ final GoRouter router = GoRouter(
       builder: (context, state) => const ForgotPasswordScreen(),
     ),
     GoRoute(
-      path: '/reset-code',
-      name: 'reset-code',
-      builder: (context, state) {
-        final email = state.extra as String? ?? '';
-        return ResetCodeScreen(email: email);
-      },
-    ),
-    GoRoute(
       path: '/reset-password',
       name: 'reset-password',
       builder: (context, state) {
-        // ✅ Токен из extra (передаётся из ResetCodeScreen)
-        final token = state.extra as String? ?? '';
+        // ✅ Токен из query-параметров
+        final token = state.uri.queryParameters['token'] ?? '';
         return ResetPasswordScreen(token: token);
       },
     ),
@@ -123,6 +119,28 @@ final GoRouter router = GoRouter(
       path: '/settings',
       name: 'settings',
       builder: (context, state) => const SettingsScreen(),
+    ),
+    GoRoute(
+      path: '/reset-code',
+      name: 'reset-code',
+      builder: (context, state) {
+        final email = state.extra as String? ?? '';
+        return ResetCodeScreen(email: email);
+      },
+    ),
+    // ✅ НОВЫЙ МАРШРУТ ДЛЯ ПОДТВЕРЖДЕНИЯ EMAIL
+    GoRoute(
+      path: '/verify-email',
+      name: 'verify-email',
+      builder: (context, state) {
+        final token = state.uri.queryParameters['token'] ?? '';
+        // TODO: создать экран VerifyEmailScreen
+        return Scaffold(
+          body: Center(
+            child: Text('Подтверждение email: $token'),
+          ),
+        );
+      },
     ),
   ],
 );

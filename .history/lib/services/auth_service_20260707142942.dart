@@ -112,28 +112,7 @@ class AuthService {
         'code': code,
       }),
     );
-
-    try {
-      final data = jsonDecode(response.body);
-      print('📦 Ответ verify-reset-code: $data'); // ✅ Отладка
-
-      if (response.statusCode == 200) {
-        return {
-          'success': true,
-          'reset_token': data['reset_token'], // ✅ КЛЮЧ: reset_token
-        };
-      } else {
-        return {
-          'success': false,
-          'error': data['detail'] ?? 'Неверный код',
-        };
-      }
-    } catch (e) {
-      return {
-        'success': false,
-        'error': 'Ошибка соединения с сервером',
-      };
-    }
+    return _handleResponse(response);
   }
 
   static Future<Map<String, dynamic>> changePassword({

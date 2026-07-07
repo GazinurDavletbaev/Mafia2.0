@@ -35,7 +35,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
     setState(() => _isLoading = false);
 
     if (result['success']) {
-      context.push('/reset-code', extra: email);
+
     } else {
       _showSnackBar(result['error'] ?? 'Ошибка', Colors.red);
     }

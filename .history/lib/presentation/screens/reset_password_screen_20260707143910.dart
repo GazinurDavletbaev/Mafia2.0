@@ -216,3 +216,4 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
     );
   }
 }
+flutter pub remove app_links

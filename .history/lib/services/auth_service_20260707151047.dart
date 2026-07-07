@@ -101,40 +101,40 @@ class AuthService {
   }
 
   static Future<Map<String, dynamic>> verifyResetCode({
-    required String email,
-    required String code,
-  }) async {
-    final response = await http.post(
-      Uri.parse('$baseUrl/auth/verify-reset-code'),
-      headers: {'Content-Type': 'application/json'},
-      body: jsonEncode({
-        'email': email,
-        'code': code,
-      }),
-    );
+  required String email,
+  required String code,
+}) async {
+  final response = await http.post(
+    Uri.parse('$baseUrl/auth/verify-reset-code'),
+    headers: {'Content-Type': 'application/json'},
+    body: jsonEncode({
+      'email': email,
+      'code': code,
+    }),
+  );
 
-    try {
-      final data = jsonDecode(response.body);
-      print('📦 Ответ verify-reset-code: $data'); // ✅ Отладка
-
-      if (response.statusCode == 200) {
-        return {
-          'success': true,
-          'reset_token': data['reset_token'], // ✅ КЛЮЧ: reset_token
-        };
-      } else {
-        return {
-          'success': false,
-          'error': data['detail'] ?? 'Неверный код',
-        };
-      }
-    } catch (e) {
+  try {
+    final data = jsonDecode(response.body);
+    print('📦 Ответ verify-reset-code: $data'); // ✅ Отладка
+    
+    if (response.statusCode == 200) {
+      return {
+        'success': true,
+        'reset_token': data['reset_token'], // ✅ КЛЮЧ: reset_token
+      };
+    } else {
       return {
         'success': false,
-        'error': 'Ошибка соединения с сервером',
+        'error': data['detail'] ?? 'Неверный код',
       };
     }
+  } catch (e) {
+    return {
+      'success': false,
+      'error': 'Ошибка соединения с сервером',
+    };
   }
+}
 
   static Future<Map<String, dynamic>> changePassword({
     required String oldPassword,
