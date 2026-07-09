@@ -183,7 +183,7 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
-          onPressed: () => context.go('/lobby'),
+          onPressed: () => context.go('/profile'),
         ),
       ),
       body: _isLoading

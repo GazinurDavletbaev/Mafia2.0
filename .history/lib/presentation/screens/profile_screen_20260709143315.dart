@@ -252,7 +252,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
         foregroundColor: theme.appBarTheme.foregroundColor,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
-          onPressed: () => context.go('/lobby'),
+          onPressed: () => context.go('/'),
         ),
         actions: [
           IconButton(

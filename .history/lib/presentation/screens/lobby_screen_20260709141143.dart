@@ -254,28 +254,8 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
                 ),
             ],
             // ✅ АВАТАРКА + НИКНЕЙМ ВМЕСТО КНОПКИ НАСТРОЕК
-            PopupMenuButton<String>(
-              offset: const Offset(0, 40),
-              color: Theme.of(context).scaffoldBackgroundColor,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-              onSelected: (value) {
-                switch (value) {
-                  case 'profile':
-                    context.push('/edit-profile');
-                    break;
-                  case 'club':
-                    context.push('/profile');
-                    break;
-                  case 'settings':
-                    context.push('/settings');
-                    break;
-                  case 'logout':
-                    _showLogoutDialog();
-                    break;
-                }
-              },
+            GestureDetector(
+              onTap: () => context.push('/edit-profile'),
               child: Padding(
                 padding: const EdgeInsets.only(right: 16, left: 8),
                 child: Row(
@@ -285,8 +265,8 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
                       style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w500,
-                        color: Theme.of(context).textTheme.titleLarge?.color ??
-                            Colors.white,
+                        color:
+                            theme.textTheme.titleLarge?.color ?? Colors.white,
                       ),
                     ),
                     const SizedBox(width: 8),
@@ -315,48 +295,6 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
                   ],
                 ),
               ),
-              itemBuilder: (context) => [
-                const PopupMenuItem(
-                  value: 'profile',
-                  child: Row(
-                    children: [
-                      Icon(Icons.person, color: Colors.orange),
-                      SizedBox(width: 12),
-                      Text('Профиль'),
-                    ],
-                  ),
-                ),
-                const PopupMenuItem(
-                  value: 'club',
-                  child: Row(
-                    children: [
-                      Icon(Icons.people, color: Colors.orange),
-                      SizedBox(width: 12),
-                      Text('Клуб'),
-                    ],
-                  ),
-                ),
-                const PopupMenuItem(
-                  value: 'settings',
-                  child: Row(
-                    children: [
-                      Icon(Icons.settings, color: Colors.orange),
-                      SizedBox(width: 12),
-                      Text('Настройки'),
-                    ],
-                  ),
-                ),
-                const PopupMenuItem(
-                  value: 'logout',
-                  child: Row(
-                    children: [
-                      Icon(Icons.logout, color: Colors.red),
-                      SizedBox(width: 12),
-                      Text('Выйти', style: TextStyle(color: Colors.red)),
-                    ],
-                  ),
-                ),
-              ],
             ),
           ],
         ),
@@ -395,35 +333,6 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
             ),
           ],
         ),
-      ),
-    );
-  }
-
-  void _showLogoutDialog() {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-        title: const Text('Выход из аккаунта'),
-        content: const Text('Вы уверены, что хотите выйти?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Отмена'),
-          ),
-          TextButton(
-            onPressed: () async {
-              await AuthService.logout();
-              if (mounted) {
-                context.go('/login');
-              }
-            },
-            child: const Text(
-              'Выйти',
-              style: TextStyle(color: Colors.red),
-            ),
-          ),
-        ],
       ),
     );
   }

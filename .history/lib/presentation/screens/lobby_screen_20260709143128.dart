@@ -255,109 +255,103 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
             ],
             // ✅ АВАТАРКА + НИКНЕЙМ ВМЕСТО КНОПКИ НАСТРОЕК
             PopupMenuButton<String>(
-              offset: const Offset(0, 40),
-              color: Theme.of(context).scaffoldBackgroundColor,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-              onSelected: (value) {
-                switch (value) {
-                  case 'profile':
-                    context.push('/edit-profile');
-                    break;
-                  case 'club':
-                    context.push('/profile');
-                    break;
-                  case 'settings':
-                    context.push('/settings');
-                    break;
-                  case 'logout':
-                    _showLogoutDialog();
-                    break;
-                }
-              },
-              child: Padding(
-                padding: const EdgeInsets.only(right: 16, left: 8),
-                child: Row(
-                  children: [
-                    Text(
-                      _user?['username'] ?? 'Профиль',
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500,
-                        color: Theme.of(context).textTheme.titleLarge?.color ??
-                            Colors.white,
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    CircleAvatar(
-                      radius: 16,
-                      backgroundColor: Colors.orange.shade200,
-                      backgroundImage: _user?['avatarUrl'] != null &&
-                              _user!['avatarUrl'].isNotEmpty
-                          ? NetworkImage(_user!['avatarUrl'])
-                          : null,
-                      child: _user?['avatarUrl'] == null ||
-                              _user!['avatarUrl'].isEmpty
-                          ? Text(
-                              _user?['username']
-                                      ?.substring(0, 1)
-                                      .toUpperCase() ??
-                                  '?',
-                              style: const TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black87,
-                              ),
-                            )
-                          : null,
-                    ),
-                  ],
-                ),
-              ),
-              itemBuilder: (context) => [
-                const PopupMenuItem(
-                  value: 'profile',
-                  child: Row(
-                    children: [
-                      Icon(Icons.person, color: Colors.orange),
-                      SizedBox(width: 12),
-                      Text('Профиль'),
-                    ],
-                  ),
-                ),
-                const PopupMenuItem(
-                  value: 'club',
-                  child: Row(
-                    children: [
-                      Icon(Icons.people, color: Colors.orange),
-                      SizedBox(width: 12),
-                      Text('Клуб'),
-                    ],
-                  ),
-                ),
-                const PopupMenuItem(
-                  value: 'settings',
-                  child: Row(
-                    children: [
-                      Icon(Icons.settings, color: Colors.orange),
-                      SizedBox(width: 12),
-                      Text('Настройки'),
-                    ],
-                  ),
-                ),
-                const PopupMenuItem(
-                  value: 'logout',
-                  child: Row(
-                    children: [
-                      Icon(Icons.logout, color: Colors.red),
-                      SizedBox(width: 12),
-                      Text('Выйти', style: TextStyle(color: Colors.red)),
-                    ],
-                  ),
-                ),
-              ],
+    offset: const Offset(0, 40),
+    color: Theme.of(context).scaffoldBackgroundColor,
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(12),
+    ),
+    onSelected: (value) {
+      switch (value) {
+        case 'profile':
+          context.push('/edit-profile');
+          break;
+        case 'club':
+          context.push('/profile');
+          break;
+        case 'settings':
+          context.push('/settings');
+          break;
+        case 'logout':
+          _showLogoutDialog();
+          break;
+      }
+    },
+    child: Padding(
+      padding: const EdgeInsets.only(right: 16, left: 8),
+      child: Row(
+        children: [
+          Text(
+            _user?['username'] ?? 'Профиль',
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
+              color: Theme.of(context).textTheme.titleLarge?.color ?? Colors.white,
             ),
+          ),
+          const SizedBox(width: 8),
+          CircleAvatar(
+            radius: 16,
+            backgroundColor: Colors.orange.shade200,
+            backgroundImage: _user?['avatarUrl'] != null && _user!['avatarUrl'].isNotEmpty
+                ? NetworkImage(_user!['avatarUrl'])
+                : null,
+            child: _user?['avatarUrl'] == null || _user!['avatarUrl'].isEmpty
+                ? Text(
+                    _user?['username']?.substring(0, 1).toUpperCase() ?? '?',
+                    style: const TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black87,
+                    ),
+                  )
+                : null,
+          ),
+        ],
+      ),
+    ),
+    itemBuilder: (context) => [
+      const PopupMenuItem(
+        value: 'profile',
+        child: Row(
+          children: [
+            Icon(Icons.person, color: Colors.orange),
+            SizedBox(width: 12),
+            Text('Профиль'),
+          ],
+        ),
+      ),
+      const PopupMenuItem(
+        value: 'club',
+        child: Row(
+          children: [
+            Icon(Icons.people, color: Colors.orange),
+            SizedBox(width: 12),
+            Text('Клуб'),
+          ],
+        ),
+      ),
+      const PopupMenuItem(
+        value: 'settings',
+        child: Row(
+          children: [
+            Icon(Icons.settings, color: Colors.orange),
+            SizedBox(width: 12),
+            Text('Настройки'),
+          ],
+        ),
+      ),
+      const PopupMenuItem(
+        value: 'logout',
+        child: Row(
+          children: [
+            Icon(Icons.logout, color: Colors.red),
+            SizedBox(width: 12),
+            Text('Выйти', style: TextStyle(color: Colors.red)),
+          ],
+        ),
+      ),
+    ],
+  ),
           ],
         ),
         body: _pages[_selectedIndex],
@@ -399,34 +393,34 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
     );
   }
 
-  void _showLogoutDialog() {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-        title: const Text('Выход из аккаунта'),
-        content: const Text('Вы уверены, что хотите выйти?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Отмена'),
+void _showLogoutDialog() {
+  showDialog(
+    context: context,
+    builder: (context) => AlertDialog(
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      title: const Text('Выход из аккаунта'),
+      content: const Text('Вы уверены, что хотите выйти?'),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text('Отмена'),
+        ),
+        TextButton(
+          onPressed: () async {
+            await AuthService.logout();
+            if (mounted) {
+              context.go('/login');
+            }
+          },
+          child: const Text(
+            'Выйти',
+            style: TextStyle(color: Colors.red),
           ),
-          TextButton(
-            onPressed: () async {
-              await AuthService.logout();
-              if (mounted) {
-                context.go('/login');
-              }
-            },
-            child: const Text(
-              'Выйти',
-              style: TextStyle(color: Colors.red),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+        ),
+      ],
+    ),
+  );
+}
 
   void _onNewGame() {
     final judgeName = _gameData.judgeName;
