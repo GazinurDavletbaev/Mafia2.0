@@ -1,9 +1,7 @@
 // lib/services/club_service.dart
 import 'dart:convert';
-import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:mafia_help/services/auth_service.dart';
-import 'package:http_parser/http_parser.dart'; // ✅ ДОБАВИТЬ
 
 class ClubService {
   static const String baseUrl = 'http://161.104.46.234:8001';
@@ -11,48 +9,6 @@ class ClubService {
   // ============================================================
   // БАЗОВЫЕ МЕТОДЫ
   // ============================================================
-
-  static Future<Map<String, dynamic>> updateClub({
-    required int clubId,
-    String? title,
-    String? description,
-    String? city,
-    String? country,
-    String? region,
-    String? logoUrl,
-  }) async {
-    final token = await AuthService.getToken();
-    if (token == null) {
-      return {'success': false, 'error': 'Не авторизован'};
-    }
-
-    final response = await http.put(
-      Uri.parse('$baseUrl/clubs/$clubId?token=$token'),
-      headers: {'Content-Type': 'application/json'},
-      body: jsonEncode({
-        'title': title,
-        'description': description,
-        'city': city,
-        'country': country,
-        'region': region,
-        'logo_url': logoUrl,
-      }),
-    );
-
-    try {
-      final data = jsonDecode(response.body);
-      if (response.statusCode == 200) {
-        return {'success': true, 'club': data};
-      } else {
-        return {
-          'success': false,
-          'error': data['detail'] ?? 'Ошибка обновления',
-        };
-      }
-    } catch (e) {
-      return {'success': false, 'error': 'Ошибка соединения'};
-    }
-  }
 
   static Map<String, dynamic> _handleResponse(http.Response response) {
     try {
@@ -382,48 +338,5 @@ class ClubService {
       headers: {'Content-Type': 'application/json'},
     );
     return _handleResponse(response);
-  }
-
-  static Future<Map<String, dynamic>> uploadClubLogo({
-    required int clubId,
-    required File image,
-  }) async {
-    final token = await AuthService.getToken();
-    if (token == null) {
-      return {'success': false, 'error': 'Не авторизован'};
-    }
-
-    var request = http.MultipartRequest(
-      'POST',
-      Uri.parse(
-          '$baseUrl/clubs/$clubId/upload-logo?token=$token'), // ✅ ДВАЖДЫ /clubs
-    );
-
-    request.files.add(
-      await http.MultipartFile.fromPath(
-        'file',
-        image.path,
-        contentType: MediaType('image', 'jpeg'),
-      ),
-    );
-
-    var response = await request.send();
-    var responseData = await response.stream.toBytes();
-    var responseString = String.fromCharCodes(responseData);
-    var json = jsonDecode(responseString);
-
-    print('📦 uploadClubLogo response: $json');
-
-    if (response.statusCode == 200) {
-      return {
-        'success': true,
-        'logo_url': json['logo_url'],
-      };
-    } else {
-      return {
-        'success': false,
-        'error': json['detail'] ?? 'Ошибка загрузки',
-      };
-    }
   }
 }

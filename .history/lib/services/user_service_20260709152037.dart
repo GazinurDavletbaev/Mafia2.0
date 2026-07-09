@@ -12,41 +12,41 @@ class UserService {
 // lib/services/user_service.dart
 
   static Future<Map<String, dynamic>> uploadAvatar(File image) async {
-    final token = await AuthService.getToken();
-    if (token == null) {
-      return {'success': false, 'error': 'Не авторизован'};
-    }
-
-    var request = http.MultipartRequest(
-      'POST',
-      Uri.parse('$baseUrl/user/upload-avatar?token=$token'),
-    );
-
-    request.files.add(
-      await http.MultipartFile.fromPath(
-        'file',
-        image.path,
-        contentType: MediaType('image', 'jpeg'),
-      ),
-    );
-
-    var response = await request.send();
-    var responseData = await response.stream.toBytes();
-    var responseString = String.fromCharCodes(responseData);
-    var json = jsonDecode(responseString);
-
-    if (response.statusCode == 200) {
-      return {
-        'success': true,
-        'avatar_url': json['avatar_url'],
-      };
-    } else {
-      return {
-        'success': false,
-        'error': json['detail'] ?? 'Ошибка загрузки',
-      };
-    }
+  final token = await AuthService.getToken();
+  if (token == null) {
+    return {'success': false, 'error': 'Не авторизован'};
   }
+
+  var request = http.MultipartRequest(
+    'POST',
+    Uri.parse('$baseUrl/user/upload-avatar?token=$token'),
+  );
+  
+  request.files.add(
+    await http.MultipartFile.fromPath(
+      'file',
+      image.path,
+      contentType: MediaType('image', 'jpeg'),
+    ),
+  );
+
+  var response = await request.send();
+  var responseData = await response.stream.toBytes();
+  var responseString = String.fromCharCodes(responseData);
+  var json = jsonDecode(responseString);
+
+  if (response.statusCode == 200) {
+    return {
+      'success': true,
+      'avatar_url': json['avatar_url'],
+    };
+  } else {
+    return {
+      'success': false,
+      'error': json['detail'] ?? 'Ошибка загрузки',
+    };
+  }
+}
 
   static Future<Map<String, dynamic>> updateProfile({
     required String nickname,
@@ -55,7 +55,8 @@ class UserService {
     String? country,
     String? city,
     String? region,
-    String? avatarUrl, // ✅ ЕСТЬ ЛИ ЭТОТ ПАРАМЕТР?
+      String? avatarUrl, // ✅ ЕСТЬ ЛИ ЭТОТ ПАРАМЕТР?
+
   }) async {
     final token = await AuthService.getToken();
     if (token == null) {
@@ -72,7 +73,6 @@ class UserService {
         'country': country,
         'city': city,
         'region': region,
-        'avatar_url': avatarUrl, // ✅ ЕСТЬ ЛИ ЭТО?
       }),
     );
 

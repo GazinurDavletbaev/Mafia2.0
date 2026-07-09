@@ -396,7 +396,7 @@ class ClubService {
     var request = http.MultipartRequest(
       'POST',
       Uri.parse(
-          '$baseUrl/clubs/$clubId/upload-logo?token=$token'), // ✅ ДВАЖДЫ /clubs
+          '$baseUrl/clubs/clubs/$clubId/upload-logo?token=$token'), // ✅ ДВАЖДЫ /clubs
     );
 
     request.files.add(

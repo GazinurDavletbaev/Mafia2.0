@@ -85,7 +85,7 @@ final GoRouter router = GoRouter(
       },
     ),
     GoRoute(
-      path: '/edit-profile',
+      path: '/edit-profie',
       name: 'edit-profile',
       builder: (context, state) => const EditProfileScreen(),
     ),

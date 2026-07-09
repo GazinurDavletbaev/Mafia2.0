@@ -93,8 +93,8 @@ final GoRouter router = GoRouter(
       path: '/edit-club',
       name: 'edit-club',
       builder: (context, state) {
-        final club = state.extra as Map<String, dynamic>? ?? {};
-        return EditClubScreen(club: club);
+        final clubId = state.extra as int? ?? 0;
+        return EditClubScreen(clubId: clubId);
       },
     ),
     GoRoute(

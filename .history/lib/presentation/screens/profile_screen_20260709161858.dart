@@ -51,8 +51,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     setState(() => _isLoading = false);
 
     if (_club == null && mounted) {
-      context.replace('/create-club');
-    }
+    context.replace('/create-club');
+  }
   }
 
   @override

@@ -27,7 +27,7 @@ class ClubService {
     }
 
     final response = await http.put(
-      Uri.parse('$baseUrl/clubs/$clubId?token=$token'),
+      Uri.parse('$baseUrl/clubs/clubs/$clubId?token=$token'),
       headers: {'Content-Type': 'application/json'},
       body: jsonEncode({
         'title': title,

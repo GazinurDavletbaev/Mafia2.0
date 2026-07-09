@@ -36,7 +36,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
         final user = userResult['user'];
         _user = {
           'id': user.id,
-          'username': user.nickname,
+          'username': user.username,
           'email': user.email,
           'avatarUrl': user.avatarUrl,
         };
@@ -49,10 +49,6 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     }
 
     setState(() => _isLoading = false);
-
-    if (_club == null && mounted) {
-      context.replace('/create-club');
-    }
   }
 
   @override
@@ -72,8 +68,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     }
 
     // ✅ Если президент — показываем редактирование
-    final isPresident =
-        _club?['president_id'].toString() == _user?['id'].toString();
+    final isPresident = _club?['president_id'].toString() == _user?['id'].toString();
     if (isPresident) {
       return EditClubScreen(club: _club!);
     }
@@ -127,8 +122,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.orange,
                   foregroundColor: Colors.black,
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 32, vertical: 14),
+                  padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 14),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),

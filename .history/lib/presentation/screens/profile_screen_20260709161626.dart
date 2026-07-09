@@ -75,7 +75,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     final isPresident =
         _club?['president_id'].toString() == _user?['id'].toString();
     if (isPresident) {
-      return EditClubScreen(club: _club!);
+      return EditClubScreen(club: _club!['id']);
     }
 
     // ✅ Обычный участник — просмотр клуба

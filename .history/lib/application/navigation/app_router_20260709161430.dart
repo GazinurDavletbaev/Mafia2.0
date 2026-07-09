@@ -90,13 +90,13 @@ final GoRouter router = GoRouter(
       builder: (context, state) => const EditProfileScreen(),
     ),
     GoRoute(
-      path: '/edit-club',
-      name: 'edit-club',
-      builder: (context, state) {
-        final club = state.extra as Map<String, dynamic>? ?? {};
-        return EditClubScreen(club: club);
-      },
-    ),
+  path: '/edit-club',
+  name: 'edit-club',
+  builder: (context, state) {
+    final clubId = state.extra as int? ?? 0;
+    return EditClubScreen(clubId: clubId);
+  },
+),
     GoRoute(
       path: '/club-members-list',
       name: 'club-members-list',

@@ -12,48 +12,6 @@ class ClubService {
   // БАЗОВЫЕ МЕТОДЫ
   // ============================================================
 
-  static Future<Map<String, dynamic>> updateClub({
-    required int clubId,
-    String? title,
-    String? description,
-    String? city,
-    String? country,
-    String? region,
-    String? logoUrl,
-  }) async {
-    final token = await AuthService.getToken();
-    if (token == null) {
-      return {'success': false, 'error': 'Не авторизован'};
-    }
-
-    final response = await http.put(
-      Uri.parse('$baseUrl/clubs/$clubId?token=$token'),
-      headers: {'Content-Type': 'application/json'},
-      body: jsonEncode({
-        'title': title,
-        'description': description,
-        'city': city,
-        'country': country,
-        'region': region,
-        'logo_url': logoUrl,
-      }),
-    );
-
-    try {
-      final data = jsonDecode(response.body);
-      if (response.statusCode == 200) {
-        return {'success': true, 'club': data};
-      } else {
-        return {
-          'success': false,
-          'error': data['detail'] ?? 'Ошибка обновления',
-        };
-      }
-    } catch (e) {
-      return {'success': false, 'error': 'Ошибка соединения'};
-    }
-  }
-
   static Map<String, dynamic> _handleResponse(http.Response response) {
     try {
       final data = jsonDecode(response.body);
@@ -68,7 +26,7 @@ class ClubService {
       } else {
         return {
           'success': false,
-          'error': data['detail'] ?? data['message'] ?? 'Ошибка сервера',
+          'error': data['detail'] ?? data['message'] ?? 'Ошибка сервра',
           'code': response.statusCode,
         };
       }
@@ -396,7 +354,7 @@ class ClubService {
     var request = http.MultipartRequest(
       'POST',
       Uri.parse(
-          '$baseUrl/clubs/$clubId/upload-logo?token=$token'), // ✅ ДВАЖДЫ /clubs
+          '$baseUrl/clubs/clubs/$clubId/upload-logo?token=$token'), // ✅ ДВАЖДЫ /clubs
     );
 
     request.files.add(

@@ -4,7 +4,6 @@ import 'package:mafia_help/domain/rules/game_history.dart';
 import 'package:mafia_help/presentation/screens/change_password_screen.dart';
 import 'package:mafia_help/presentation/screens/club_detail_screen.dart';
 import 'package:mafia_help/presentation/screens/club_members_list_screen.dart';
-import 'package:mafia_help/presentation/screens/edit_club_screen.dart';
 import 'package:mafia_help/presentation/screens/edit_profile_screen.dart';
 import 'package:mafia_help/presentation/screens/forgot_password_screen.dart';
 import 'package:mafia_help/presentation/screens/lobby_screen.dart';
@@ -90,13 +89,13 @@ final GoRouter router = GoRouter(
       builder: (context, state) => const EditProfileScreen(),
     ),
     GoRoute(
-      path: '/edit-club',
-      name: 'edit-club',
-      builder: (context, state) {
-        final club = state.extra as Map<String, dynamic>? ?? {};
-        return EditClubScreen(club: club);
-      },
-    ),
+  path: '/edit-club',
+  name: 'edit-club',
+  builder: (context, state) {
+    final club = state.extra as Map<String, dynamic>? ?? {};
+    return EditClubScreen(club: club);
+  },
+),
     GoRoute(
       path: '/club-members-list',
       name: 'club-members-list',
