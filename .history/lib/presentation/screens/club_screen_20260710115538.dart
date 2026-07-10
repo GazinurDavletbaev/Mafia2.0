@@ -54,29 +54,28 @@ class _ClubScreenState extends ConsumerState<ClubScreen> {
   // ЗАГРУЗКА ДАННЫХ
   // ============================================================
   Future<void> _loadData() async {
-    setState(() => _isLoading = true);
+  setState(() => _isLoading = true);
 
-    final myClubsResult = await ClubService.getMyClub();
-    print('📦 myClubsResult: $myClubsResult');
+  final myClubsResult = await ClubService.getMyClub();
+  print('📦 myClubsResult: $myClubsResult');
 
-    if (myClubsResult['success'] && myClubsResult['club'] != null) {
-      print('✅ ЕСТЬ КЛУБ!');
+  if (myClubsResult['success'] && myClubsResult['club'] != null) {
+    print('✅ ЕСТЬ КЛУБ!');
 
-      // ✅ ПРЯМО ПРИСВАИВАЕМ КЛУБ
-      _club = myClubsResult['club']; // ← ЭТО Map, НЕ List
-      _hasClub = true;
-
-      await _loadRating();
-      setState(() => _isLoading = false);
-      return;
-    }
-
-    // 2. Нет клуба — загружаем список всех клубов
-    _hasClub = false;
-    await _loadAllClubs();
+    // ✅ ПРЯМО ПРИСВАИВАЕМ КЛУБ
+    _club = myClubsResult['club'];  // ← ЭТО Map, НЕ List
+    _hasClub = true;
+    
+    await _loadRating();
     setState(() => _isLoading = false);
+    return;
   }
 
+  // 2. Нет клуба — загружаем список всех клубов
+  _hasClub = false;
+  await _loadAllClubs();
+  setState(() => _isLoading = false);
+}
   Future<void> _loadRating() async {
     if (_club == null) return;
 

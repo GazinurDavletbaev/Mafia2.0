@@ -44,6 +44,12 @@ class _ClubScreenState extends ConsumerState<ClubScreen> {
     });
   }
 
+@override
+void didChangeDependencies() {
+  super.didChangeDependencies();
+  _loadData(); // ✅ Всегда свежие данные
+}
+
   @override
   void dispose() {
     _searchController.dispose();

@@ -56,19 +56,21 @@ class _ClubScreenState extends ConsumerState<ClubScreen> {
   Future<void> _loadData() async {
     setState(() => _isLoading = true);
 
+    // 1. Получаем клубы пользователя
     final myClubsResult = await ClubService.getMyClub();
-    print('📦 myClubsResult: $myClubsResult');
+    print('📦 myClubsResult: $myClubsResult'); // 👈 СЮДА СМОТРИ
 
     if (myClubsResult['success'] && myClubsResult['club'] != null) {
-      print('✅ ЕСТЬ КЛУБ!');
+      print('✅ ЕСТЬ КЛУБ!'); // 👈 ДОБАВЬ
 
-      // ✅ ПРЯМО ПРИСВАИВАЕМ КЛУБ
-      _club = myClubsResult['club']; // ← ЭТО Map, НЕ List
-      _hasClub = true;
-
-      await _loadRating();
-      setState(() => _isLoading = false);
-      return;
+      final clubs = myClubsResult['club'] as List? ?? [];
+      if (clubs.isNotEmpty) {
+        _club = clubs[0];
+        _hasClub = true;
+        await _loadRating();
+        setState(() => _isLoading = false);
+        return;
+      }
     }
 
     // 2. Нет клуба — загружаем список всех клубов
@@ -85,8 +87,6 @@ class _ClubScreenState extends ConsumerState<ClubScreen> {
       month: _month,
       year: _year,
     );
-
-    print('📦 rating result: $result'); // 👈 ДОБАВЬ
 
     if (result['success']) {
       setState(() {
@@ -155,8 +155,6 @@ class _ClubScreenState extends ConsumerState<ClubScreen> {
   // 1. ЕСТЬ КЛУБ
   // ============================================================
   Widget _buildClubContent(ThemeData theme, bool isDark) {
-    print('📦 _buildClubContent _club: $_club'); // 👈 ДОБАВЬ
-
     return Column(
       children: [
         Container(

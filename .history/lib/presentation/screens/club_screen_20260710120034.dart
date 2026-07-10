@@ -44,6 +44,7 @@ class _ClubScreenState extends ConsumerState<ClubScreen> {
     });
   }
 
+
   @override
   void dispose() {
     _searchController.dispose();
