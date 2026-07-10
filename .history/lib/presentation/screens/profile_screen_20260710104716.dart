@@ -70,7 +70,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     }
 
     // ✅ Если нет клуба — предлагаем создать
-    if (_club == null || _club!['id'] == null) {
+if (_club == null || _club!['id'] == null) {
       return _buildNoClubScreen(theme, isDark);
     }
 

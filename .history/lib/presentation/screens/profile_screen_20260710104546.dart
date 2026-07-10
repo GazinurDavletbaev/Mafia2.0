@@ -70,7 +70,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     }
 
     // ✅ Если нет клуба — предлагаем создать
-    if (_club == null || _club!['id'] == null) {
+    if (_club == null) {
       return _buildNoClubScreen(theme, isDark);
     }
 
@@ -163,7 +163,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     final presidentName = _club?['president_name'] ?? 'Неизвестен';
     final clubName = _club?['title'] ?? 'Клуб';
     final clubLogo = _club?['logo_url'];
-    print("zaebal nahyy");
+    pri
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(

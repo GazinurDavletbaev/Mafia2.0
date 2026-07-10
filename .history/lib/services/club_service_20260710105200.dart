@@ -190,8 +190,8 @@ class ClubService {
       if (response.statusCode >= 200 && response.statusCode < 300) {
         return {
           'success': true,
-          'id': data['id'], // ✅ ЕСТЬ
-          'club': data, // ✅ ВЕСЬ КЛУБ
+          'id': data['id'], // ✅ ЯВНО ВОЗВРАЩАЕМ ID
+          'club': data,
         };
       } else {
         return {

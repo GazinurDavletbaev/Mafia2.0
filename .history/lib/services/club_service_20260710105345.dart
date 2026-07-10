@@ -156,53 +156,53 @@ class ClubService {
   }
 
   static Future<Map<String, dynamic>> createClub({
-    required String title,
-    String? city,
-    String? description,
-    String? country,
-    String? region,
-    String? vk,
-    String? telegram,
-    String? twitch,
-  }) async {
-    final token = await AuthService.getToken();
-    if (token == null) {
-      return {'success': false, 'error': 'Не авторизован'};
-    }
-
-    final response = await http.post(
-      Uri.parse('$baseUrl/clubs?token=$token'),
-      headers: {'Content-Type': 'application/json'},
-      body: jsonEncode({
-        'title': title,
-        'city': city,
-        'description': description,
-        'country': country,
-        'region': region,
-        'vk': vk,
-        'telegram': telegram,
-        'twitch': twitch,
-      }),
-    );
-
-    try {
-      final data = jsonDecode(response.body);
-      if (response.statusCode >= 200 && response.statusCode < 300) {
-        return {
-          'success': true,
-          'id': data['id'], // ✅ ЕСТЬ
-          'club': data, // ✅ ВЕСЬ КЛУБ
-        };
-      } else {
-        return {
-          'success': false,
-          'error': data['detail'] ?? 'Ошибка создания',
-        };
-      }
-    } catch (e) {
-      return {'success': false, 'error': 'Ошибка соединения'};
-    }
+  required String title,
+  String? city,
+  String? description,
+  String? country,
+  String? region,
+  String? vk,
+  String? telegram,
+  String? twitch,
+}) async {
+  final token = await AuthService.getToken();
+  if (token == null) {
+    return {'success': false, 'error': 'Не авторизован'};
   }
+
+  final response = await http.post(
+    Uri.parse('$baseUrl/clubs?token=$token'),
+    headers: {'Content-Type': 'application/json'},
+    body: jsonEncode({
+      'title': title,
+      'city': city,
+      'description': description,
+      'country': country,
+      'region': region,
+      'vk': vk,
+      'telegram': telegram,
+      'twitch': twitch,
+    }),
+  );
+
+  try {
+    final data = jsonDecode(response.body);
+    if (response.statusCode >= 200 && response.statusCode < 300) {
+      return {
+        'success': true,
+        'id': data['id'],          // ✅ ЕСТЬ
+        'club': data,              // ✅ ВЕСЬ КЛУБ
+      };
+    } else {
+      return {
+        'success': false,
+        'error': data['detail'] ?? 'Ошибка создания',
+      };
+    }
+  } catch (e) {
+    return {'success': false, 'error': 'Ошибка соединения'};
+  }
+}
 
   static Future<Map<String, dynamic>> joinClub(int clubId) async {
     final token = await AuthService.getToken();

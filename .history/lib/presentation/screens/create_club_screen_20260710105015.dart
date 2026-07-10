@@ -69,63 +69,57 @@ class _CreateClubScreenState extends ConsumerState<CreateClubScreen> {
   }
 
   Future<void> _createClub() async {
-    final title = _titleController.text.trim();
-    final description = _descriptionController.text.trim();
-    final city = _cityController.text.trim();
+  final title = _titleController.text.trim();
+  final description = _descriptionController.text.trim();
+  final city = _cityController.text.trim();
 
-    if (title.isEmpty) {
-      _showSnackBar('Введите название клуба', Colors.red);
-      return;
-    }
-
-    setState(() => _isLoading = true);
-
-    // ✅ 1. Сначала создаём клуб
-    final result = await ClubService.createClub(
-      title: title,
-      city: city.isNotEmpty ? city : null,
-      description: description.isNotEmpty ? description : null,
-      country: _selectedCountry,
-      region: _selectedRegion,
-      vk: _vkController.text.trim().isNotEmpty
-          ? _vkController.text.trim()
-          : null,
-      telegram: _telegramController.text.trim().isNotEmpty
-          ? _telegramController.text.trim()
-          : null,
-      twitch: _twitchController.text.trim().isNotEmpty
-          ? _twitchController.text.trim()
-          : null,
-    );
-
-    if (result['success']) {
-      final clubId = result['id'];
-
-      // ✅ 2. Если есть фото — загружаем
-      if (_clubImage != null) {
-        final uploadResult = await ClubService.uploadClubLogo(
-          clubId: clubId,
-          image: _clubImage!,
-        );
-        if (uploadResult['success']) {
-          print('📦 Логотип загружен: ${uploadResult['logo_url']}');
-        } else {
-          print('❌ Ошибка загрузки логотипа: ${uploadResult['error']}');
-        }
-      }
-
-      _showSnackBar('Клуб успешно создан!', Colors.green);
-      Future.delayed(const Duration(seconds: 1), () {
-        if (mounted) {
-          context.go('/lobby');
-        }
-      });
-    } else {
-      _showSnackBar(result['error'] ?? 'Ошибка создания клуба', Colors.red);
-    }
-
-    setState(() => _isLoading = false);
+  if (title.isEmpty) {
+    _showSnackBar('Введите название клуба', Colors.red);
+    return;
   }
+
+  setState(() => _isLoading = true);
+
+  // ✅ 1. Сначала создаём клуб
+  final result = await ClubService.createClub(
+    title: title,
+    city: city.isNotEmpty ? city : null,
+    description: description.isNotEmpty ? description : null,
+    country: _selectedCountry,
+    region: _selectedRegion,
+    vk: _vkController.text.trim().isNotEmpty ? _vkController.text.trim() : null,
+    telegram: _telegramController.text.trim().isNotEmpty ? _telegramController.text.trim() : null,
+    twitch: _twitchController.text.trim().isNotEmpty ? _twitchController.text.trim() : null,
+  );
+
+  if (result['success']) {
+    final clubId = result['id'];
+    
+    // ✅ 2. Если есть фото — загружаем
+    if (_clubImage != null) {
+      final uploadResult = await ClubService.uploadClubLogo(
+        clubId: clubId,
+        image: _clubImage!,
+      );
+      if (uploadResult['success']) {
+        print('📦 Логотип загружен: ${uploadResult['logo_url']}');
+      } else {
+        print('❌ Ошибка загрузки логотипа: ${uploadResult['error']}');
+      }
+    }
+    
+    _showSnackBar('Клуб успешно создан!', Colors.green);
+    Future.delayed(const Duration(seconds: 1), () {
+      if (mounted) {
+        context.go('/settings');
+      }
+    });
+  } else {
+    _showSnackBar(result['error'] ?? 'Ошибка создания клуба', Colors.red);
+  }
+
+  setState(() => _isLoading = false);
+}
 
   void _showSnackBar(String message, Color color) {
     ScaffoldMessenger.of(context).showSnackBar(

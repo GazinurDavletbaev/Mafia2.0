@@ -43,11 +43,12 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
       }
 
       final clubResult = await ClubService.getCurrentClub();
-      print('📦 Club result: $clubResult'); // ✅ ДОБАВЬ
+      print('📦 Club result: $clubResult');
 
       if (clubResult['success'] && clubResult['club'] != null) {
         _club = clubResult['club'];
-        print('📦 _club: $_club'); // ✅ ДОБАВЬ
+      } else {
+        _club = null;
       }
     }
 
@@ -70,7 +71,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     }
 
     // ✅ Если нет клуба — предлагаем создать
-    if (_club == null || _club!['id'] == null) {
+    if (_club == null) {
       return _buildNoClubScreen(theme, isDark);
     }
 
@@ -163,7 +164,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     final presidentName = _club?['president_name'] ?? 'Неизвестен';
     final clubName = _club?['title'] ?? 'Клуб';
     final clubLogo = _club?['logo_url'];
-    print("zaebal nahyy");
+
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(

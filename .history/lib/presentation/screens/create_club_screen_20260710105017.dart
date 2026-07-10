@@ -117,7 +117,7 @@ class _CreateClubScreenState extends ConsumerState<CreateClubScreen> {
       _showSnackBar('Клуб успешно создан!', Colors.green);
       Future.delayed(const Duration(seconds: 1), () {
         if (mounted) {
-          context.go('/lobby');
+          context.go('/settings');
         }
       });
     } else {

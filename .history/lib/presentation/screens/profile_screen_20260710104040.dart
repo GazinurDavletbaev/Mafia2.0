@@ -27,36 +27,37 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   }
 
   Future<void> _loadData() async {
-    setState(() => _isLoading = true);
+  setState(() => _isLoading = true);
 
-    final token = await AuthService.getToken();
-    if (token != null) {
-      final userResult = await AuthService.getMe(token);
-      if (userResult['success']) {
-        final user = userResult['user'];
-        _user = {
-          'id': user.id,
-          'username': user.nickname,
-          'email': user.email,
-          'avatarUrl': user.avatarUrl,
-        };
-      }
-
-      final clubResult = await ClubService.getCurrentClub();
-      print('📦 Club result: $clubResult'); // ✅ ДОБАВЬ
-
-      if (clubResult['success'] && clubResult['club'] != null) {
-        _club = clubResult['club'];
-        print('📦 _club: $_club'); // ✅ ДОБАВЬ
-      }
+  final token = await AuthService.getToken();
+  if (token != null) {
+    final userResult = await AuthService.getMe(token);
+    if (userResult['success']) {
+      final user = userResult['user'];
+      _user = {
+        'id': user.id,
+        'username': user.nickname,
+        'email': user.email,
+        'avatarUrl': user.avatarUrl,
+      };
     }
 
-    setState(() => _isLoading = false);
+    final clubResult = await ClubService.getCurrentClub();
+    print('📦 Club result: $clubResult');
 
-    if (_club == null && mounted) {
-      context.replace('/create-club');
+    if (clubResult['success'] && clubResult['club'] != null) {
+      _club = clubResult['club'];
+    } else {
+      _club = null;
     }
   }
+
+  setState(() => _isLoading = false);
+
+  if (_club == null && mounted) {
+    context.replace('/create-club');
+  }
+}
 
   @override
   Widget build(BuildContext context) {
@@ -70,7 +71,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     }
 
     // ✅ Если нет клуба — предлагаем создать
-    if (_club == null || _club!['id'] == null) {
+    if (_club == null) {
       return _buildNoClubScreen(theme, isDark);
     }
 
@@ -163,7 +164,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     final presidentName = _club?['president_name'] ?? 'Неизвестен';
     final clubName = _club?['title'] ?? 'Клуб';
     final clubLogo = _club?['logo_url'];
-    print("zaebal nahyy");
+
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
