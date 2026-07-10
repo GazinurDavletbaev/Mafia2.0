@@ -109,16 +109,12 @@ class ClubService {
       headers: {'Content-Type': 'application/json'},
     );
 
-    print('📦 getMyClub status: ${response.statusCode}');
-    print('📦 getMyClub body: ${response.body}');
-
     try {
       final data = jsonDecode(response.body);
       if (response.statusCode == 200) {
-        // ✅ Сервер возвращает клуб напрямую
         return {
           'success': true,
-          'club': data, // ✅ НЕ data['club']
+          'club': data['club'],
         };
       } else {
         return {

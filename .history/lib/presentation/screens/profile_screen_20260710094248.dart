@@ -47,7 +47,6 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
 
       if (clubResult['success'] && clubResult['club'] != null) {
         _club = clubResult['club'];
-        print('📦 _club: $_club'); // ✅ ДОБАВЬ
       }
     }
 

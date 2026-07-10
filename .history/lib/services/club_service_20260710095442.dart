@@ -99,48 +99,44 @@ class ClubService {
   }
 
   static Future<Map<String, dynamic>> getMyClub() async {
-    final token = await AuthService.getToken();
-    if (token == null) {
-      return {'success': false, 'error': 'Не авторизован'};
-    }
-
-    final response = await http.get(
-      Uri.parse('$baseUrl/clubs/my-club?token=$token'),
-      headers: {'Content-Type': 'application/json'},
-    );
-
-    print('📦 getMyClub status: ${response.statusCode}');
-    print('📦 getMyClub body: ${response.body}');
-
-    try {
-      final data = jsonDecode(response.body);
-      if (response.statusCode == 200) {
-        // ✅ Сервер возвращает клуб напрямую
-        return {
-          'success': true,
-          'club': data, // ✅ НЕ data['club']
-        };
-      } else {
-        return {
-          'success': false,
-          'error': data['detail'] ?? 'Ошибка',
-        };
-      }
-    } catch (e) {
-      return {'success': false, 'error': 'Ошибка соединения'};
-    }
+  final token = await AuthService.getToken();
+  if (token == null) {
+    return {'success': false, 'error': 'Не авторизован'};
   }
 
-  static Future<Map<String, dynamic>> getCurrentClub() async {
-    final result = await getMyClub();
-    if (result['success'] && result['club'] != null) {
+  final response = await http.get(
+    Uri.parse('$baseUrl/clubs/my-club?token=$token'),
+    headers: {'Content-Type': 'application/json'},
+  );
+
+  try {
+    final data = jsonDecode(response.body);
+    if (response.statusCode == 200) {
       return {
         'success': true,
-        'club': result['club'],
+        'club': data['club'],
+      };
+    } else {
+      return {
+        'success': false,
+        'error': data['detail'] ?? 'Ошибка',
       };
     }
-    return {'success': true, 'club': null};
+  } catch (e) {
+    return {'success': false, 'error': 'Ошибка соединения'};
   }
+}
+
+static Future<Map<String, dynamic>> getCurrentClub() async {
+  final result = await getMyClub();
+  if (result['success'] && result['club'] != null) {
+    return {
+      'success': true,
+      'club': result['club'],
+    };
+  }
+  return {'success': true, 'club': null};
+}
 
   static Future<Map<String, dynamic>> getClub(int clubId) async {
     final token = await AuthService.getToken();

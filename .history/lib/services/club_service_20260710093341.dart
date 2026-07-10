@@ -92,51 +92,55 @@ class ClubService {
     }
 
     final response = await http.get(
-      Uri.parse('$baseUrl/clubs?token=$token'),
+      Uri.parse('$baseUrl/clubs/?token=$token'),
       headers: {'Content-Type': 'application/json'},
     );
     return _handleResponse(response);
   }
 
-  static Future<Map<String, dynamic>> getMyClub() async {
+  static Future<Map<String, dynamic>> getMyClubs() async {
     final token = await AuthService.getToken();
     if (token == null) {
       return {'success': false, 'error': 'Не авторизован'};
     }
 
     final response = await http.get(
-      Uri.parse('$baseUrl/clubs/my-club?token=$token'),
+      Uri.parse('$baseUrl/clubs/my-clubs?token=$token'),
       headers: {'Content-Type': 'application/json'},
     );
 
-    print('📦 getMyClub status: ${response.statusCode}');
-    print('📦 getMyClub body: ${response.body}');
-
     try {
       final data = jsonDecode(response.body);
-      if (response.statusCode == 200) {
-        // ✅ Сервер возвращает клуб напрямую
-        return {
-          'success': true,
-          'club': data, // ✅ НЕ data['club']
-        };
+      if (response.statusCode >= 200 && response.statusCode < 300) {
+        if (data is List) {
+          return {
+            'success': true,
+            'clubs': data.cast<Map<String, dynamic>>(),
+          };
+        }
+        return {'success': true, 'clubs': data};
       } else {
         return {
           'success': false,
-          'error': data['detail'] ?? 'Ошибка',
+          'error': data['detail'] ?? data['message'] ?? 'Ошибка сервера',
         };
       }
     } catch (e) {
-      return {'success': false, 'error': 'Ошибка соединения'};
+      return {
+        'success': false,
+        'error': 'Ошибка соединения: $e',
+      };
     }
   }
 
   static Future<Map<String, dynamic>> getCurrentClub() async {
-    final result = await getMyClub();
-    if (result['success'] && result['club'] != null) {
+    final result = await getMyClubs();
+    if (result['success'] &&
+        result['clubs'] != null &&
+        result['clubs'].isNotEmpty) {
       return {
         'success': true,
-        'club': result['club'],
+        'club': result['clubs'][0],
       };
     }
     return {'success': true, 'club': null};
@@ -252,7 +256,8 @@ class ClubService {
     }
 
     final response = await http.post(
-      Uri.parse('$baseUrl/clubs/requests/$requestId/approve?token=$token'),
+      Uri.parse(
+          '$baseUrl/clubs/requests/$requestId/approve?token=$token'),
       headers: {'Content-Type': 'application/json'},
     );
     return _handleResponse(response);
@@ -282,7 +287,7 @@ class ClubService {
     }
 
     final response = await http.get(
-      Uri.parse('$baseUrl/clubs/$clubId/members?token=$token'),
+      Uri.parse('$baseUrl/clubs/clubs/$clubId/members?token=$token'),
       headers: {'Content-Type': 'application/json'},
     );
     return _handleResponse(response);
@@ -296,7 +301,7 @@ class ClubService {
     }
 
     final response = await http.delete(
-      Uri.parse('$baseUrl/clubs/$clubId/members/$userId?token=$token'),
+      Uri.parse('$baseUrl/clubs/clubs/$clubId/members/$userId?token=$token'),
       headers: {'Content-Type': 'application/json'},
     );
     return _handleResponse(response);
@@ -310,7 +315,7 @@ class ClubService {
     }
 
     final response = await http.post(
-      Uri.parse('$baseUrl/clubs/$clubId/promote/$userId?token=$token'),
+      Uri.parse('$baseUrl/clubs/clubs/$clubId/promote/$userId?token=$token'),
       headers: {'Content-Type': 'application/json'},
     );
     return _handleResponse(response);
@@ -324,7 +329,7 @@ class ClubService {
     }
 
     final response = await http.post(
-      Uri.parse('$baseUrl/clubs/$clubId/demote/$userId?token=$token'),
+      Uri.parse('$baseUrl/clubs/clubs/$clubId/demote/$userId?token=$token'),
       headers: {'Content-Type': 'application/json'},
     );
     return _handleResponse(response);
@@ -356,7 +361,7 @@ class ClubService {
 
     final response = await http.get(
       Uri.parse(
-          '$baseUrl/clubs/$clubId/rating?token=$token&month=$month&year=$year'),
+          '$baseUrl/clubs/clubs/$clubId/rating?token=$token&month=$month&year=$year'),
       headers: {'Content-Type': 'application/json'},
     );
     return _handleResponse(response);
@@ -373,7 +378,7 @@ class ClubService {
     }
 
     final response = await http.post(
-      Uri.parse('$baseUrl/clubs/$clubId/verify?token=$token'),
+      Uri.parse('$baseUrl/clubs/clubs/$clubId/verify?token=$token'),
       headers: {'Content-Type': 'application/json'},
     );
     return _handleResponse(response);
