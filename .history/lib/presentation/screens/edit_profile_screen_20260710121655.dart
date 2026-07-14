@@ -6,7 +6,6 @@ import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import '../../services/auth_service.dart';
 import '../../services/user_service.dart';
-import 'package:mafia_help/application/providers/user_provider.dart';
 
 class EditProfileScreen extends ConsumerStatefulWidget {
   const EditProfileScreen({super.key});
@@ -151,12 +150,11 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     setState(() => _isSaving = false);
 
     if (result['success']) {
-      // ✅ ОБНОВЛЯЕМ ДАННЫЕ В LOBBY
-      ref.invalidate(userProvider);
-
       _showSnackBar('Профиль обновлён!', Colors.green);
       Future.delayed(const Duration(seconds: 1), () {
-        if (mounted) context.go('/lobby');
+        if (mounted) {
+          context.pushReplacement('/lobby'); // ✅ ЗАМЕНЯЕТ ТЕКУЩИЙ ЭКРАН
+        }
       });
     } else {
       _showSnackBar(result['error'] ?? 'Ошибка', Colors.red);

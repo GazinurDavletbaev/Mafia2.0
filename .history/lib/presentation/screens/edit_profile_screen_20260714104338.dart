@@ -151,9 +151,6 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     setState(() => _isSaving = false);
 
     if (result['success']) {
-      // ✅ ОБНОВЛЯЕМ ДАННЫЕ В LOBBY
-      ref.invalidate(userProvider);
-
       _showSnackBar('Профиль обновлён!', Colors.green);
       Future.delayed(const Duration(seconds: 1), () {
         if (mounted) context.go('/lobby');

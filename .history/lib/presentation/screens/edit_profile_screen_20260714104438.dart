@@ -111,57 +111,57 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
   }
 
   Future<void> _saveProfile() async {
-    final nickname = _nicknameController.text.trim();
-    final firstName = _firstNameController.text.trim();
-    final lastName = _lastNameController.text.trim();
-    final city = _cityController.text.trim();
+  final nickname = _nicknameController.text.trim();
+  final firstName = _firstNameController.text.trim();
+  final lastName = _lastNameController.text.trim();
+  final city = _cityController.text.trim();
 
-    if (nickname.isEmpty) {
-      _showSnackBar('Введите никнейм', Colors.red);
-      return;
-    }
+  if (nickname.isEmpty) {
+    _showSnackBar('Введите никнейм', Colors.red);
+    return;
+  }
 
-    setState(() => _isSaving = true);
+  setState(() => _isSaving = true);
 
-    // ✅ Если есть фото — загружаем
-    String? newAvatarUrl;
-    if (_avatarImage != null) {
-      final uploadResult = await UserService.uploadAvatar(_avatarImage!);
-      if (uploadResult['success']) {
-        newAvatarUrl = uploadResult['avatar_url'];
-        // ✅ Обнови _currentAvatarUrl
-        setState(() {
-          _currentAvatarUrl = newAvatarUrl;
-        });
-      } else {
-        _showSnackBar('Ошибка загрузки фото', Colors.red);
-      }
-    }
-
-    // ✅ Сохраняем профиль
-    final result = await UserService.updateProfile(
-      nickname: nickname,
-      firstName: firstName.isNotEmpty ? firstName : null,
-      lastName: lastName.isNotEmpty ? lastName : null,
-      country: _selectedCountry,
-      city: city.isNotEmpty ? city : null,
-      region: _selectedRegion,
-    );
-
-    setState(() => _isSaving = false);
-
-    if (result['success']) {
-      // ✅ ОБНОВЛЯЕМ ДАННЫЕ В LOBBY
-      ref.invalidate(userProvider);
-
-      _showSnackBar('Профиль обновлён!', Colors.green);
-      Future.delayed(const Duration(seconds: 1), () {
-        if (mounted) context.go('/lobby');
+  // ✅ Если есть фото — загружаем
+  String? newAvatarUrl;
+  if (_avatarImage != null) {
+    final uploadResult = await UserService.uploadAvatar(_avatarImage!);
+    if (uploadResult['success']) {
+      newAvatarUrl = uploadResult['avatar_url'];
+      // ✅ Обнови _currentAvatarUrl
+      setState(() {
+        _currentAvatarUrl = newAvatarUrl;
       });
     } else {
-      _showSnackBar(result['error'] ?? 'Ошибка', Colors.red);
+      _showSnackBar('Ошибка загрузки фото', Colors.red);
     }
   }
+
+  // ✅ Сохраняем профиль
+  final result = await UserService.updateProfile(
+    nickname: nickname,
+    firstName: firstName.isNotEmpty ? firstName : null,
+    lastName: lastName.isNotEmpty ? lastName : null,
+    country: _selectedCountry,
+    city: city.isNotEmpty ? city : null,
+    region: _selectedRegion,
+  );
+
+  setState(() => _isSaving = false);
+
+  if (result['success']) {
+    // ✅ ОБНОВЛЯЕМ ДАННЫЕ В LOBBY
+    ref.invalidate(userProvider);
+    
+    _showSnackBar('Профиль обновлён!', Colors.green);
+    Future.delayed(const Duration(seconds: 1), () {
+      if (mounted) context.go('/lobby');
+    });
+  } else {
+    _showSnackBar(result['error'] ?? 'Ошибка', Colors.red);
+  }
+}
 
   void _showSnackBar(String message, Color color) {
     ScaffoldMessenger.of(context).showSnackBar(
