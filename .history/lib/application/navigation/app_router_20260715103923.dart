@@ -111,23 +111,23 @@ final GoRouter router = GoRouter(
       },
     ),
     GoRoute(
-      path: '/club-games-list',
-      name: 'club-games-list',
-      builder: (context, state) {
-        final args = state.extra as Map<String, dynamic>?;
-        return ClubGamesListScreen(
-          clubId: args?['clubId'] ?? 0,
-          clubTitle: args?['clubTitle'] ?? 'Клуб',
-        );
-      },
-    ),
-    GoRoute(
-      path: '/game-protocol-view',
-      builder: (context, state) {
-        final gameId = state.extra as int;
-        return GameProtocolViewScreen(gameId: gameId);
-      },
-    ),
+  path: '/club-games-list',
+  name: 'club-games-list',
+  builder: (context, state) {
+    final args = state.extra as Map<String, dynamic>?;
+    return ClubGamesListScreen(
+      clubId: args?['clubId'] ?? 0,
+      clubTitle: args?['clubTitle'] ?? 'Клуб',
+    );
+  },
+),
+GoRoute(
+  path: '/game-protocol-view',
+  builder: (context, state) {
+    final gameId = state.extra as int;
+    return GameProtocolViewScreen(gameId: gameId);
+  },
+),
 
     GoRoute(
       path: '/protocol',

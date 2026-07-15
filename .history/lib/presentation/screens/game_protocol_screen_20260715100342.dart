@@ -4,12 +4,10 @@ import 'package:http/http.dart' as http;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mafia_help/application/providers/club_provider.dart';
 import 'package:mafia_help/application/providers/user_provider.dart';
 import 'package:mafia_help/data/local/models/player_model.dart';
 import 'package:mafia_help/presentation/screens/saved_protocols_screen.dart';
 import 'package:mafia_help/presentation/state/vote_day.dart';
-import 'package:mafia_help/services/auth_service.dart';
 import 'package:path_provider/path_provider.dart';
 import '../../domain/rules/game_history.dart';
 import '../state/game_state.dart';
@@ -1215,158 +1213,155 @@ class _GameProtocolScreenState extends ConsumerState<GameProtocolScreen> {
   }
 
   void _saveProtocol() async {
-    final theme = Theme.of(context);
-    final startTime = widget.gameState.gameDate;
-    final endTime = DateTime.now();
-    final timeString = startTime != null
-        ? '${_formatTime(startTime)} — ${_formatTime(endTime)}'
-        : '00:00 — 00:00';
+  final theme = Theme.of(context);
+  final startTime = widget.gameState.gameDate;
+  final endTime = DateTime.now();
+  final timeString = startTime != null
+      ? '${_formatTime(startTime)} — ${_formatTime(endTime)}'
+      : '00:00 — 00:00';
 
-    final notes = _noteControllers.map((c) => c.text).toList();
-    final protestComment = _protestCommentController.text;
+  final notes = _noteControllers.map((c) => c.text).toList();
+  final protestComment = _protestCommentController.text;
 
-    // ========== 1. ПОЛУЧАЕМ CLUB_ID ==========
-    final clubAsync = ref.watch(clubProvider);
-    final clubId = clubAsync.when(
-      data: (club) => club?['id'] ?? 0,
-      loading: () => 0,
-      error: (_, __) => 0,
+  // ========== 1. ПОЛУЧАЕМ CLUB_ID ==========
+  final clubAsync = ref.watch(clubProvider);
+  final clubId = clubAsync.when(
+    data: (club) => club?['id'] ?? 0,
+    loading: () => 0,
+    error: (_, __) => 0,
+  );
+
+  if (clubId == 0) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('❌ Вы не состоите в клубе'),
+        backgroundColor: Colors.red,
+      ),
+    );
+    return;
+  }
+
+  // ========== 2. ФОРМИРУЕМ ДАННЫЕ ==========
+  final data = {
+    'club_id': clubId,
+    'tournament': _tournamentController.text,
+    'stage': _stageController.text,
+    'table': int.tryParse(_tableController.text) ?? 1,
+    'game': int.tryParse(_gameController.text) ?? 1,
+    'date': _dateController.text,
+    'time': _formatTime(DateTime.now()),
+    'judge': _judgeController.text,
+    'bestMove': _bestMoveController.text,
+    'protest': _protestText,
+    'protestComment': protestComment,
+    'winner': widget.gameState.winner,
+    'players': widget.gameState.players.map((p) {
+      final isRemoved = widget.gameState.removedPlayers
+          .any((rp) => rp.seatNumber == p.seatNumber);
+      final bonus = isRemoved ? -0.5 : _bonusPoints[p.seatNumber - 1];
+      final rule = isRemoved ? (_removedRuleMap[p.seatNumber] ?? '') : '';
+
+      return {
+        'seat': p.seatNumber,
+        'name': p.name,
+        'role': p.role,
+        'fouls': p.fouls,
+        'points': _points[p.seatNumber - 1],
+        'bonus': bonus,
+        'rule': rule,
+      };
+    }).toList(),
+    'nightActions': widget.gameState.nightActions ?? [],
+    'voteHistory': widget.gameState.voteHistory.map((day, dayData) {
+      final rounds = dayData.rounds.map((round) {
+        return round.map((key, value) => MapEntry(key.toString(), value));
+      }).toList();
+
+      return MapEntry(day.toString(), {
+        'rounds': rounds,
+        'eliminated': dayData.eliminated,
+        'eliminationVotes': dayData.eliminationVotes,
+        'result': dayData.result,
+      });
+    }),
+    'notes': notes,
+  };
+
+  showDialog(
+    context: context,
+    barrierDismissible: false,
+    builder: (context) => const Center(
+      child: CircularProgressIndicator(),
+    ),
+  );
+
+  print('=== SENDING DATA ===');
+  print(jsonEncode(data));
+  print('====================');
+
+  try {
+    // ========== 3. СОХРАНЯЕМ ИГРУ В КЛУБ ==========
+    final saveResponse = await http.post(
+      Uri.parse('http://161.104.46.234:8001/games/save'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode(data),
     );
 
-    if (clubId == 0) {
+    print('📤 Save game status: ${saveResponse.statusCode}');
+    print('📤 Save game body: ${saveResponse.body}');
+
+    if (saveResponse.statusCode != 200) {
+      Navigator.pop(context);
+      final errorData = jsonDecode(saveResponse.body);
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('❌ Вы не состоите в клубе'),
+        SnackBar(
+          content: Text('❌ Ошибка сохранения: ${errorData['detail'] ?? 'Неизвестная ошибка'}'),
           backgroundColor: Colors.red,
         ),
       );
       return;
     }
 
-    // ========== 2. ФОРМИРУЕМ ДАННЫЕ ==========
-    final data = {
-      'club_id': clubId,
-      'tournament': _tournamentController.text,
-      'stage': _stageController.text,
-      'table': int.tryParse(_tableController.text) ?? 1,
-      'game': int.tryParse(_gameController.text) ?? 1,
-      'date': _dateController.text,
-      'time': _formatTime(DateTime.now()),
-      'judge': _judgeController.text,
-      'bestMove': _bestMoveController.text,
-      'protest': _protestText,
-      'protestComment': protestComment,
-      'winner': widget.gameState.winner,
-      'players': widget.gameState.players.map((p) {
-        final isRemoved = widget.gameState.removedPlayers
-            .any((rp) => rp.seatNumber == p.seatNumber);
-        final bonus = isRemoved ? -0.5 : _bonusPoints[p.seatNumber - 1];
-        final rule = isRemoved ? (_removedRuleMap[p.seatNumber] ?? '') : '';
-
-        return {
-          'seat': p.seatNumber,
-          'name': p.name,
-          'role': p.role,
-          'fouls': p.fouls,
-          'points': _points[p.seatNumber - 1],
-          'bonus': bonus,
-          'rule': rule,
-        };
-      }).toList(),
-      'nightActions': widget.gameState.nightActions ?? [],
-      'voteHistory': widget.gameState.voteHistory.map((day, dayData) {
-        final rounds = dayData.rounds.map((round) {
-          return round.map((key, value) => MapEntry(key.toString(), value));
-        }).toList();
-
-        return MapEntry(day.toString(), {
-          'rounds': rounds,
-          'eliminated': dayData.eliminated,
-          'eliminationVotes': dayData.eliminationVotes,
-          'result': dayData.result,
-        });
-      }),
-      'notes': notes,
-    };
-
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) => const Center(
-        child: CircularProgressIndicator(),
-      ),
+    // ========== 4. ГЕНЕРИРУЕМ EXCEL ==========
+    final excelResponse = await http.post(
+      Uri.parse('http://161.104.46.234:8001/generate-protocol-excel'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode(data),
     );
 
-    print('=== SENDING DATA ===');
-    print(jsonEncode(data));
-    print('====================');
+    Navigator.pop(context);
 
-    try {
-      // ========== 3. СОХРАНЯЕМ ИГРУ В КЛУБ ==========
-      final token = await AuthService.getToken();
-      final saveResponse = await http.post(
-        Uri.parse('http://161.104.46.234:8001/games/save?token=$token'),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode(data),
+    if (excelResponse.statusCode == 200) {
+      final bytes = excelResponse.bodyBytes;
+      final directory = await getApplicationDocumentsDirectory();
+      final fileName =
+          '${_dateController.text}_${_formatTime(DateTime.now()).replaceAll(':', '-')}_${_tableController.text}_${_gameController.text}.xlsx';
+      final path = '${directory.path}/$fileName';
+      final file = File(path);
+      await file.writeAsBytes(bytes);
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('✅ Игра сохранена в клуб и Excel создан!'),
+          backgroundColor: Colors.green,
+        ),
       );
-
-      print('📤 Save game status: ${saveResponse.statusCode}');
-      print('📤 Save game body: ${saveResponse.body}');
-
-      if (saveResponse.statusCode != 200) {
-        Navigator.pop(context);
-        final errorData = jsonDecode(saveResponse.body);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-                '❌ Ошибка сохранения: ${errorData['detail'] ?? 'Неизвестная ошибка'}'),
-            backgroundColor: Colors.red,
-          ),
-        );
-        return;
-      }
-
-      // ========== 4. ГЕНЕРИРУЕМ EXCEL ==========
-      final excelResponse = await http.post(
-        Uri.parse('http://161.104.46.234:8001/protocol/generate'),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode(data),
-      );
-
-      Navigator.pop(context);
-
-      if (excelResponse.statusCode == 200) {
-        final bytes = excelResponse.bodyBytes;
-        final directory = await getApplicationDocumentsDirectory();
-        final fileName =
-            '${_dateController.text}_${_formatTime(DateTime.now()).replaceAll(':', '-')}_${_tableController.text}_${_gameController.text}.xlsx';
-        final path = '${directory.path}/$fileName';
-        final file = File(path);
-        await file.writeAsBytes(bytes);
-
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('✅ Игра сохранена в клуб и Excel создан!'),
-            backgroundColor: Colors.green,
-          ),
-        );
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-                '⚠️ Игра сохранена, но Excel не создан: ${excelResponse.statusCode}'),
-            backgroundColor: Colors.orange,
-          ),
-        );
-      }
-    } catch (e) {
-      Navigator.pop(context);
+    } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('❌ Ошибка: $e'),
-          backgroundColor: Colors.red,
+          content: Text('⚠️ Игра сохранена, но Excel не создан: ${excelResponse.statusCode}'),
+          backgroundColor: Colors.orange,
         ),
       );
     }
+  } catch (e) {
+    Navigator.pop(context);
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('❌ Ошибка: $e'),
+        backgroundColor: Colors.red,
+      ),
+    );
   }
+}
 }

@@ -9,7 +9,6 @@ import 'package:mafia_help/application/providers/user_provider.dart';
 import 'package:mafia_help/data/local/models/player_model.dart';
 import 'package:mafia_help/presentation/screens/saved_protocols_screen.dart';
 import 'package:mafia_help/presentation/state/vote_day.dart';
-import 'package:mafia_help/services/auth_service.dart';
 import 'package:path_provider/path_provider.dart';
 import '../../domain/rules/game_history.dart';
 import '../state/game_state.dart';
@@ -1304,11 +1303,11 @@ class _GameProtocolScreenState extends ConsumerState<GameProtocolScreen> {
     try {
       // ========== 3. СОХРАНЯЕМ ИГРУ В КЛУБ ==========
       final token = await AuthService.getToken();
-      final saveResponse = await http.post(
-        Uri.parse('http://161.104.46.234:8001/games/save?token=$token'),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode(data),
-      );
+final saveResponse = await http.post(
+  Uri.parse('http://161.104.46.234:8001/games/save?token=$token'),
+  headers: {'Content-Type': 'application/json'},
+  body: jsonEncode(data),
+);
 
       print('📤 Save game status: ${saveResponse.statusCode}');
       print('📤 Save game body: ${saveResponse.body}');

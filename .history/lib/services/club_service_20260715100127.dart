@@ -451,56 +451,22 @@ class ClubService {
       };
     }
   }
-
 // ========== СОХРАНЕНИЕ ИГРЫ ==========
-  static Future<Map<String, dynamic>> saveGameToClub(
-      Map<String, dynamic> gameData) async {
-    final token = await AuthService.getToken();
-    if (token == null) {
-      return {'success': false, 'error': 'Не авторизован'};
-    }
-
-    try {
-      final response = await http.post(
-        Uri.parse('$baseUrl/games/save?token=$token'),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode(gameData),
-      );
-
-      print('📤 saveGame status: ${response.statusCode}');
-      print('📤 saveGame body: ${response.body}');
-
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        return {'success': true, 'data': data};
-      } else {
-        final data = jsonDecode(response.body);
-        return {
-          'success': false,
-          'error': data['detail'] ?? 'Ошибка сохранения',
-        };
-      }
-    } catch (e) {
-      print('❌ saveGame error: $e');
-      return {'success': false, 'error': 'Ошибка соединения: $e'};
-    }
-  }
-
-  // lib/services/club_service.dart
-static Future<Map<String, dynamic>> getGame(int gameId) async {
+static Future<Map<String, dynamic>> saveGameToClub(Map<String, dynamic> gameData) async {
   final token = await AuthService.getToken();
   if (token == null) {
     return {'success': false, 'error': 'Не авторизован'};
   }
 
   try {
-    final response = await http.get(
-      Uri.parse('$baseUrl/games/$gameId?token=$token'),
+    final response = await http.post(
+      Uri.parse('$baseUrl/games/save?token=$token'),
       headers: {'Content-Type': 'application/json'},
+      body: jsonEncode(gameData),
     );
 
-    print('📦 getGame status: ${response.statusCode}');
-    print('📦 getGame body: ${response.body}');
+    print('📤 saveGame status: ${response.statusCode}');
+    print('📤 saveGame body: ${response.body}');
 
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
@@ -509,11 +475,13 @@ static Future<Map<String, dynamic>> getGame(int gameId) async {
       final data = jsonDecode(response.body);
       return {
         'success': false,
-        'error': data['detail'] ?? 'Ошибка получения игры',
+        'error': data['detail'] ?? 'Ошибка сохранения',
       };
     }
   } catch (e) {
+    print('❌ saveGame error: $e');
     return {'success': false, 'error': 'Ошибка соединения: $e'};
   }
 }
+
 }

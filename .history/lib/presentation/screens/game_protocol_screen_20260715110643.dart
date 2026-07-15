@@ -1304,11 +1304,11 @@ class _GameProtocolScreenState extends ConsumerState<GameProtocolScreen> {
     try {
       // ========== 3. СОХРАНЯЕМ ИГРУ В КЛУБ ==========
       final token = await AuthService.getToken();
-      final saveResponse = await http.post(
-        Uri.parse('http://161.104.46.234:8001/games/save?token=$token'),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode(data),
-      );
+final saveResponse = await http.post(
+  Uri.parse('http://161.104.46.234:8001/games/save?token=$token'),
+  headers: {'Content-Type': 'application/json'},
+  body: jsonEncode(data),
+);
 
       print('📤 Save game status: ${saveResponse.statusCode}');
       print('📤 Save game body: ${saveResponse.body}');
