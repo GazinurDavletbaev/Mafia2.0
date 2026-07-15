@@ -46,7 +46,7 @@ class _ClubGamesListScreenState extends ConsumerState<ClubGamesListScreen> {
       } else if (result['clubs'] != null) {
         data = result['clubs'] as List;
       }
-
+      
       print('📦 _loadGames: data length = ${data.length}');
       print('📦 _loadGames: data = $data');
 

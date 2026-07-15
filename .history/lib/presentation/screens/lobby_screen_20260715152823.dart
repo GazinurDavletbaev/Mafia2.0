@@ -62,7 +62,8 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _initGameData();
-      ref.read(savedGameIdProvider.notifier).state = null;
+        ref.read(savedGameIdProvider.notifier).state = null;
+
     });
   }
 

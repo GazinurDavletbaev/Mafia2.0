@@ -26,30 +26,22 @@ class _ClubGamesListScreenState extends ConsumerState<ClubGamesListScreen> {
   @override
   void initState() {
     super.initState();
-    print(
-        '📦 ClubGamesListScreen initState: clubId=${widget.clubId}, clubTitle=${widget.clubTitle}');
+    print('📦 ClubGamesListScreen initState: clubId=${widget.clubId}, clubTitle=${widget.clubTitle}');
     _loadGames();
   }
 
   Future<void> _loadGames() async {
     setState(() => _isLoading = true);
     print('📦 _loadGames: началась загрузка игр для клуба ${widget.clubId}');
-
+    
     final result = await ClubService.getClubGames(widget.clubId);
     print('📦 _loadGames: result = $result');
-
+    
     if (result['success']) {
-      // ✅ Исправлено: проверяем оба варианта
-      List data = [];
-      if (result['data'] != null) {
-        data = result['data'] as List;
-      } else if (result['clubs'] != null) {
-        data = result['clubs'] as List;
-      }
-
+      final data = result['data'] as List? ?? [];
       print('📦 _loadGames: data length = ${data.length}');
       print('📦 _loadGames: data = $data');
-
+      
       setState(() {
         _games = data.cast<Map<String, dynamic>>();
       });
@@ -66,8 +58,7 @@ class _ClubGamesListScreenState extends ConsumerState<ClubGamesListScreen> {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
 
-    print(
-        '📦 build: _games length = ${_games.length}, _isLoading = $_isLoading');
+    print('📦 build: _games length = ${_games.length}, _isLoading = $_isLoading');
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
@@ -107,7 +98,7 @@ class _ClubGamesListScreenState extends ConsumerState<ClubGamesListScreen> {
                   itemBuilder: (context, index) {
                     final game = _games[index];
                     print('📦 build: отображаю игру ${index + 1}: $game');
-
+                    
                     final date = game['game_date'] != null
                         ? DateTime.parse(game['game_date'])
                             .toString()

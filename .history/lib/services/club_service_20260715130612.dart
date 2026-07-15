@@ -487,33 +487,33 @@ class ClubService {
   }
 
   // lib/services/club_service.dart
-  static Future<Map<String, dynamic>> getGame(int gameId) async {
-    final token = await AuthService.getToken();
-    if (token == null) {
-      return {'success': false, 'error': 'Не авторизован'};
-    }
-
-    try {
-      final response = await http.get(
-        Uri.parse('$baseUrl/games/game/$gameId?token=$token'),
-        headers: {'Content-Type': 'application/json'},
-      );
-
-      print('📦 getGame status: ${response.statusCode}');
-      print('📦 getGame body: ${response.body}');
-
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        return {'success': true, 'data': data};
-      } else {
-        final data = jsonDecode(response.body);
-        return {
-          'success': false,
-          'error': data['detail'] ?? 'Ошибка получения игры',
-        };
-      }
-    } catch (e) {
-      return {'success': false, 'error': 'Ошибка соединения: $e'};
-    }
+static Future<Map<String, dynamic>> getGame(int gameId) async {
+  final token = await AuthService.getToken();
+  if (token == null) {
+    return {'success': false, 'error': 'Не авторизован'};
   }
+
+  try {
+    final response = await http.get(
+      Uri.parse('$baseUrl/$gameId?token=$token'),
+      headers: {'Content-Type': 'application/json'},
+    );
+
+    print('📦 getGame status: ${response.statusCode}');
+    print('📦 getGame body: ${response.body}');
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      return {'success': true, 'data': data};
+    } else {
+      final data = jsonDecode(response.body);
+      return {
+        'success': false,
+        'error': data['detail'] ?? 'Ошибка получения игры',
+      };
+    }
+  } catch (e) {
+    return {'success': false, 'error': 'Ошибка соединения: $e'};
+  }
+}
 }

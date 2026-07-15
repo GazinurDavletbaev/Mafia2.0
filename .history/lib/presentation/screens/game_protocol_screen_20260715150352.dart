@@ -5,7 +5,6 @@ import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mafia_help/application/providers/club_provider.dart';
-import 'package:mafia_help/application/providers/game_provider.dart';
 import 'package:mafia_help/application/providers/user_provider.dart';
 import 'package:mafia_help/data/local/models/player_model.dart';
 import 'package:mafia_help/presentation/screens/saved_protocols_screen.dart';
@@ -40,6 +39,9 @@ class _GameProtocolScreenState extends ConsumerState<GameProtocolScreen> {
   List<int> _points = [];
   List<double> _bonusPoints = [];
   final Map<int, String> _removedRuleMap = {};
+    int? _savedGameId; // ✅ ID сохранённой игры
+
+
   // Контроллеры для редактируемых полей
   final _tournamentController = TextEditingController();
   final _stageController = TextEditingController();
@@ -52,6 +54,8 @@ class _GameProtocolScreenState extends ConsumerState<GameProtocolScreen> {
   @override
   void initState() {
     super.initState();
+      _savedGameId = null; // ✅ При загрузке экрана сбрасываем
+
     // ===== ВЫВОД voteHistory =====
     print('=== PROTOCOL SCREEN: voteHistory ===');
     print('voteHistory: ${widget.gameState.voteHistory}');
@@ -98,6 +102,12 @@ class _GameProtocolScreenState extends ConsumerState<GameProtocolScreen> {
     }
   }
 
+void resetGame() {
+  setState(() {
+    _savedGameId = null; // ✅ Сбрасываем ID
+  });
+}
+
   @override
   void dispose() {
     for (var c in _noteControllers) {
@@ -111,7 +121,6 @@ class _GameProtocolScreenState extends ConsumerState<GameProtocolScreen> {
     _dateController.dispose();
     _judgeController.dispose();
     _bestMoveController.dispose();
-    super.dispose(); // ✅ ДОБАВЬ ЭТУ СТРОКУ
   }
 
   Widget _buildEditableField(TextEditingController controller,
@@ -144,8 +153,7 @@ class _GameProtocolScreenState extends ConsumerState<GameProtocolScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    final savedGameId = ref.watch(savedGameIdProvider);
-    final savedGameIdNotifier = ref.read(savedGameIdProvider.notifier);
+
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
@@ -1332,35 +1340,10 @@ class _GameProtocolScreenState extends ConsumerState<GameProtocolScreen> {
     print('====================');
 
     try {
-      // ========== 4. ПОЛУЧАЕМ ТОКЕН ==========
+      // ========== 4. СОХРАНЯЕМ ИГРУ В КЛУБ ==========
       final token = await AuthService.getToken();
-      if (token == null) {
-        Navigator.pop(context);
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('❌ Не авторизован'),
-            backgroundColor: Colors.red,
-          ),
-        );
-        return;
-      }
-
-      // ========== 5. СОХРАНЯЕМ ИЛИ ОБНОВЛЯЕМ ИГРУ ==========
-      final savedGameId = ref.read(savedGameIdProvider);
-      final savedGameIdNotifier = ref.read(savedGameIdProvider.notifier);
-
-      String url;
-      if (savedGameId != null) {
-        url =
-            'http://161.104.46.234:8001/games/update/$savedGameId?token=$token';
-        print('🔄 Обновляем игру ID: $savedGameId');
-      } else {
-        url = 'http://161.104.46.234:8001/games/save?token=$token';
-        print('🆕 Создаём новую игру');
-      }
-
       final saveResponse = await http.post(
-        Uri.parse(url),
+        Uri.parse('http://161.104.46.234:8001/games/save?token=$token'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode(data),
       );
@@ -1381,12 +1364,7 @@ class _GameProtocolScreenState extends ConsumerState<GameProtocolScreen> {
         return;
       }
 
-      // ✅ Сохраняем game_id
-      final responseData = jsonDecode(saveResponse.body);
-      savedGameIdNotifier.state = responseData['game_id'];
-      print('✅ Сохранён game_id: ${responseData['game_id']}');
-
-      // ========== 6. ГЕНЕРИРУЕМ EXCEL ==========
+      // ========== 5. ГЕНЕРИРУЕМ EXCEL ==========
       final excelResponse = await http.post(
         Uri.parse('http://161.104.46.234:8001/protocol/generate'),
         headers: {'Content-Type': 'application/json'},

@@ -1347,17 +1347,16 @@ class _GameProtocolScreenState extends ConsumerState<GameProtocolScreen> {
 
       // ========== 5. СОХРАНЯЕМ ИЛИ ОБНОВЛЯЕМ ИГРУ ==========
       final savedGameId = ref.read(savedGameIdProvider);
-      final savedGameIdNotifier = ref.read(savedGameIdProvider.notifier);
+    final savedGameIdNotifier = ref.read(savedGameIdProvider.notifier);
 
-      String url;
-      if (savedGameId != null) {
-        url =
-            'http://161.104.46.234:8001/games/update/$savedGameId?token=$token';
-        print('🔄 Обновляем игру ID: $savedGameId');
-      } else {
-        url = 'http://161.104.46.234:8001/games/save?token=$token';
-        print('🆕 Создаём новую игру');
-      }
+    String url;
+    if (savedGameId != null) {
+      url = 'http://161.104.46.234:8001/games/update/$savedGameId?token=$token';
+      print('🔄 Обновляем игру ID: $savedGameId');
+    } else {
+      url = 'http://161.104.46.234:8001/games/save?token=$token';
+      print('🆕 Создаём новую игру');
+    }
 
       final saveResponse = await http.post(
         Uri.parse(url),
@@ -1383,8 +1382,8 @@ class _GameProtocolScreenState extends ConsumerState<GameProtocolScreen> {
 
       // ✅ Сохраняем game_id
       final responseData = jsonDecode(saveResponse.body);
-      savedGameIdNotifier.state = responseData['game_id'];
-      print('✅ Сохранён game_id: ${responseData['game_id']}');
+    savedGameIdNotifier.state = responseData['game_id'];
+    print('✅ Сохранён game_id: ${responseData['game_id']}');
 
       // ========== 6. ГЕНЕРИРУЕМ EXCEL ==========
       final excelResponse = await http.post(

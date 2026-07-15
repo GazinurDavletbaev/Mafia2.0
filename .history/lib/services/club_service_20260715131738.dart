@@ -495,7 +495,7 @@ class ClubService {
 
     try {
       final response = await http.get(
-        Uri.parse('$baseUrl/games/game/$gameId?token=$token'),
+        Uri.parse('$baseUrl/games/$gameId?token=$token'),
         headers: {'Content-Type': 'application/json'},
       );
 

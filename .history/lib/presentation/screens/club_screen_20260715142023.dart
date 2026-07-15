@@ -145,9 +145,7 @@ class _ClubScreenState extends ConsumerState<ClubScreen> {
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
-      body: _hasClub
-          ? _buildClubContent(theme, isDark)
-          : _buildClubList(theme, isDark),
+      body: _hasClub ? _buildRatingTable() : _buildClubList(theme, isDark),
     );
   }
 
@@ -347,11 +345,7 @@ class _ClubScreenState extends ConsumerState<ClubScreen> {
         const Divider(height: 1),
         Expanded(
           child: _hasGames
-              ? SingleChildScrollView(
-                  // ← добавить скролл
-                  padding: const EdgeInsets.symmetric(horizontal: 8),
-                  child: _buildRatingTable(),
-                )
+              ? _buildRatingTable()
               : _buildNoGamesPlaceholder(isDark),
         ),
         // ✅ КНОПКА "ПОИСК КЛУБА"

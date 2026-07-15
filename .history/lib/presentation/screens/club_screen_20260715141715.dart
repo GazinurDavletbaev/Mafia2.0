@@ -146,186 +146,172 @@ class _ClubScreenState extends ConsumerState<ClubScreen> {
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       body: _hasClub
-          ? _buildClubContent(theme, isDark)
-          : _buildClubList(theme, isDark),
+      ? _buildRatingTable()          : _buildClubList(theme, isDark),
     );
   }
 
   // ============================================================
   // 1. ЕСТЬ КЛУБ
   // ============================================================
-  Widget _buildRatingTable() {
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
+Widget _buildRatingTable() {
+  final theme = Theme.of(context);
+  final isDark = theme.brightness == Brightness.dark;
 
-    if (_ratingPlayers.isEmpty) {
-      return _buildNoGamesPlaceholder(isDark);
-    }
+  if (_ratingPlayers.isEmpty) {
+    return _buildNoGamesPlaceholder(isDark);
+  }
 
-    return Card(
-      color: isDark ? Colors.grey.shade800 : Colors.white,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: Padding(
-        padding: const EdgeInsets.all(12),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'РЕЙТИНГ КЛУБА',
-              style: TextStyle(
-                color: Colors.orange,
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-              ),
+  return Card(
+    color: isDark ? Colors.grey.shade800 : Colors.white,
+    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+    child: Padding(
+      padding: const EdgeInsets.all(12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'РЕЙТИНГ КЛУБА',
+            style: TextStyle(
+              color: Colors.orange,
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
             ),
-            const SizedBox(height: 6),
-            LayoutBuilder(
-              builder: (context, constraints) {
-                final totalWidth = constraints.maxWidth;
-                final fixedWidths = 30 + 40 + 50 + 50 + 50 + 50 + 50;
-                final nameWidth = totalWidth - fixedWidths - 10;
+          ),
+          const SizedBox(height: 6),
+          LayoutBuilder(
+            builder: (context, constraints) {
+              final totalWidth = constraints.maxWidth;
+              final fixedWidths = 30 + 40 + 50 + 50 + 50 + 50 + 50;
+              final nameWidth = totalWidth - fixedWidths - 10;
 
-                return Table(
-                  border: TableBorder.all(
-                    color: isDark ? Colors.grey.shade600 : Colors.grey.shade300,
-                    width: 0.5,
+              return Table(
+                border: TableBorder.all(
+                  color: isDark ? Colors.grey.shade600 : Colors.grey.shade300,
+                  width: 0.5,
+                ),
+                columnWidths: {
+                  0: const FixedColumnWidth(30),  // Место
+                  1: FixedColumnWidth(nameWidth > 80 ? nameWidth : 80),  // Игрок
+                  2: const FixedColumnWidth(50),  // Игр
+                  3: const FixedColumnWidth(50),  // Побед
+                  4: const FixedColumnWidth(50),  // Очки
+                  5: const FixedColumnWidth(50),  // Бонус
+                  6: const FixedColumnWidth(50),  // Всего
+                },
+                children: [
+                  // Заголовки
+                  TableRow(
+                    decoration: BoxDecoration(
+                      color: isDark ? Colors.grey.shade700 : Colors.grey.shade200,
+                    ),
+                    children: [
+                      _ratingCell('№', isHeader: true),
+                      _ratingCell('Игрок', isHeader: true),
+                      _ratingCell('Игр', isHeader: true, align: TextAlign.center),
+                      _ratingCell('Побед', isHeader: true, align: TextAlign.center),
+                      _ratingCell('Очки', isHeader: true, align: TextAlign.center),
+                      _ratingCell('Бонус', isHeader: true, align: TextAlign.center),
+                      _ratingCell('Всего', isHeader: true, align: TextAlign.center),
+                    ],
                   ),
-                  columnWidths: {
-                    0: const FixedColumnWidth(30), // Место
-                    1: FixedColumnWidth(
-                        nameWidth > 80 ? nameWidth : 80), // Игрок
-                    2: const FixedColumnWidth(50), // Игр
-                    3: const FixedColumnWidth(50), // Побед
-                    4: const FixedColumnWidth(50), // Очки
-                    5: const FixedColumnWidth(50), // Бонус
-                    6: const FixedColumnWidth(50), // Всего
-                  },
-                  children: [
-                    // Заголовки
-                    TableRow(
+                  // Данные
+                  ..._ratingPlayers.asMap().entries.map((entry) {
+                    final index = entry.key;
+                    final player = entry.value;
+                    final total = (player['points'] ?? 0) + (player['bonus'] ?? 0);
+                    final isTop = index < 3;
+
+                    return TableRow(
                       decoration: BoxDecoration(
-                        color: isDark
-                            ? Colors.grey.shade700
-                            : Colors.grey.shade200,
+                        color: isTop
+                            ? (isDark ? Colors.grey.shade700 : Colors.orange.shade50)
+                            : null,
                       ),
                       children: [
-                        _ratingCell('№', isHeader: true),
-                        _ratingCell('Игрок', isHeader: true),
-                        _ratingCell('Игр',
-                            isHeader: true, align: TextAlign.center),
-                        _ratingCell('Побед',
-                            isHeader: true, align: TextAlign.center),
-                        _ratingCell('Очки',
-                            isHeader: true, align: TextAlign.center),
-                        _ratingCell('Бонус',
-                            isHeader: true, align: TextAlign.center),
-                        _ratingCell('Всего',
-                            isHeader: true, align: TextAlign.center),
-                      ],
-                    ),
-                    // Данные
-                    ..._ratingPlayers.asMap().entries.map((entry) {
-                      final index = entry.key;
-                      final player = entry.value;
-                      final total =
-                          (player['points'] ?? 0) + (player['bonus'] ?? 0);
-                      final isTop = index < 3;
-
-                      return TableRow(
-                        decoration: BoxDecoration(
-                          color: isTop
-                              ? (isDark
-                                  ? Colors.grey.shade700
-                                  : Colors.orange.shade50)
-                              : null,
+                        _ratingCell(
+                          '${index + 1}',
+                          isTop: isTop,
+                          color: isTop ? Colors.orange : null,
                         ),
-                        children: [
-                          _ratingCell(
-                            '${index + 1}',
-                            isTop: isTop,
-                            color: isTop ? Colors.orange : null,
-                          ),
-                          _ratingCell(
-                            player['username'] ?? 'Игрок',
-                            isTop: isTop,
-                            fontWeight:
-                                isTop ? FontWeight.bold : FontWeight.normal,
-                          ),
-                          _ratingCell(
-                            '${player['games_played'] ?? 0}',
-                            align: TextAlign.center,
-                            isTop: isTop,
-                          ),
-                          _ratingCell(
-                            '${player['wins'] ?? 0}',
-                            align: TextAlign.center,
-                            isTop: isTop,
-                            color: Colors.yellow.shade700,
-                          ),
-                          _ratingCell(
-                            '${player['points'] ?? 0}',
-                            align: TextAlign.center,
-                            isTop: isTop,
-                          ),
-                          _ratingCell(
-                            '${player['bonus'] ?? 0}',
-                            align: TextAlign.center,
-                            isTop: isTop,
-                            color: (player['bonus'] ?? 0) > 0
-                                ? Colors.green
-                                : (player['bonus'] ?? 0) < 0
-                                    ? Colors.red
-                                    : null,
-                          ),
-                          _ratingCell(
-                            total.toString(),
-                            align: TextAlign.center,
-                            isTop: isTop,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.orange,
-                          ),
-                        ],
-                      );
-                    }).toList(),
-                  ],
-                );
-              },
-            ),
-          ],
-        ),
+                        _ratingCell(
+                          player['username'] ?? 'Игрок',
+                          isTop: isTop,
+                          fontWeight: isTop ? FontWeight.bold : FontWeight.normal,
+                        ),
+                        _ratingCell(
+                          '${player['games_played'] ?? 0}',
+                          align: TextAlign.center,
+                          isTop: isTop,
+                        ),
+                        _ratingCell(
+                          '${player['wins'] ?? 0}',
+                          align: TextAlign.center,
+                          isTop: isTop,
+                          color: Colors.yellow.shade700,
+                        ),
+                        _ratingCell(
+                          '${player['points'] ?? 0}',
+                          align: TextAlign.center,
+                          isTop: isTop,
+                        ),
+                        _ratingCell(
+                          '${player['bonus'] ?? 0}',
+                          align: TextAlign.center,
+                          isTop: isTop,
+                          color: (player['bonus'] ?? 0) > 0 
+                              ? Colors.green 
+                              : (player['bonus'] ?? 0) < 0 
+                                  ? Colors.red 
+                                  : null,
+                        ),
+                        _ratingCell(
+                          total.toString(),
+                          align: TextAlign.center,
+                          isTop: isTop,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.orange,
+                        ),
+                      ],
+                    );
+                  }).toList(),
+                ],
+              );
+            },
+          ),
+        ],
       ),
-    );
-  }
+    ),
+  );
+}
 
-  Widget _ratingCell(
-    String text, {
-    bool isHeader = false,
-    bool isTop = false,
-    TextAlign align = TextAlign.left,
-    Color? color,
-    FontWeight fontWeight = FontWeight.normal,
-  }) {
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
+Widget _ratingCell(
+  String text, {
+  bool isHeader = false,
+  bool isTop = false,
+  TextAlign align = TextAlign.left,
+  Color? color,
+  FontWeight fontWeight = FontWeight.normal,
+}) {
+  final theme = Theme.of(context);
+  final isDark = theme.brightness == Brightness.dark;
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 4),
-      child: Text(
-        text,
-        style: TextStyle(
-          color: color ??
-              (isHeader
-                  ? Colors.orange
-                  : (isDark ? Colors.white : Colors.black87)),
-          fontWeight: isHeader || fontWeight == FontWeight.bold
-              ? FontWeight.bold
-              : FontWeight.normal,
-          fontSize: isHeader ? 12 : 13,
-        ),
-        textAlign: align,
+  return Padding(
+    padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 4),
+    child: Text(
+      text,
+      style: TextStyle(
+        color: color ?? (isHeader 
+            ? Colors.orange 
+            : (isDark ? Colors.white : Colors.black87)),
+        fontWeight: isHeader || fontWeight == FontWeight.bold 
+            ? FontWeight.bold 
+            : FontWeight.normal,
+        fontSize: isHeader ? 12 : 13,
       ),
-    );
-  }
+      textAlign: align,
+    ),
+  );
+}
 
   Widget _buildClubContent(ThemeData theme, bool isDark) {
     print('📦 _buildClubContent _club: $_club'); // 👈 ДОБАВЬ
@@ -347,11 +333,7 @@ class _ClubScreenState extends ConsumerState<ClubScreen> {
         const Divider(height: 1),
         Expanded(
           child: _hasGames
-              ? SingleChildScrollView(
-                  // ← добавить скролл
-                  padding: const EdgeInsets.symmetric(horizontal: 8),
-                  child: _buildRatingTable(),
-                )
+              ? _buildRatingTable(isDark)
               : _buildNoGamesPlaceholder(isDark),
         ),
         // ✅ КНОПКА "ПОИСК КЛУБА"
@@ -565,6 +547,107 @@ class _ClubScreenState extends ConsumerState<ClubScreen> {
           ],
         ),
       ],
+    );
+  }
+
+  Widget _buildRatingTable(bool isDark) {
+    if (_ratingPlayers.isEmpty) {
+      return _buildNoGamesPlaceholder(isDark);
+    }
+
+    return ListView.builder(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      itemCount: _ratingPlayers.length,
+      itemBuilder: (context, index) {
+        final player = _ratingPlayers[index];
+        final total = (player['points'] ?? 0) + (player['bonus'] ?? 0);
+        final isTop = index < 3;
+
+        return Container(
+          margin: const EdgeInsets.only(bottom: 6),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          decoration: BoxDecoration(
+            color: isDark ? Colors.grey.shade800 : Colors.white,
+            borderRadius: BorderRadius.circular(10),
+            border: isTop
+                ? Border.all(
+                    color: index == 0
+                        ? Colors.yellow
+                        : index == 1
+                            ? Colors.grey.shade400
+                            : index == 2
+                                ? Colors.brown.shade300
+                                : Colors.transparent,
+                    width: 1.5,
+                  )
+                : null,
+          ),
+          child: Row(
+            children: [
+              Container(
+                width: 26,
+                height: 26,
+                decoration: BoxDecoration(
+                  color: isTop ? Colors.orange : Colors.transparent,
+                  shape: BoxShape.circle,
+                ),
+                child: Center(
+                  child: Text(
+                    '${index + 1}',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 12,
+                      color: isTop
+                          ? Colors.white
+                          : (isDark ? Colors.grey : Colors.grey.shade600),
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  player['username'] ?? 'Игрок',
+                  style: TextStyle(
+                    fontWeight: isTop ? FontWeight.bold : FontWeight.normal,
+                    fontSize: 13,
+                    color: isDark ? Colors.white : Colors.black87,
+                  ),
+                ),
+              ),
+              Row(
+                children: [
+                  const Icon(Icons.emoji_events,
+                      color: Colors.yellow, size: 14),
+                  const SizedBox(width: 4),
+                  Text(
+                    '${player['wins'] ?? 0}',
+                    style: TextStyle(
+                      color: isDark ? Colors.grey : Colors.grey.shade600,
+                      fontSize: 12,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(width: 14),
+              Row(
+                children: [
+                  const Icon(Icons.star, color: Colors.orange, size: 14),
+                  const SizedBox(width: 4),
+                  Text(
+                    total.toString(),
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 13,
+                      color: isDark ? Colors.white : Colors.black87,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 

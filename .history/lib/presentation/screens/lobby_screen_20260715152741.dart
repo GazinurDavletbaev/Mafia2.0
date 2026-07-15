@@ -2,7 +2,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:mafia_help/application/providers/game_provider.dart';
 import 'package:mafia_help/application/providers/notification_provider.dart';
 import 'package:mafia_help/application/providers/user_provider.dart';
 import 'package:mafia_help/application/providers/club_provider.dart';
@@ -62,7 +61,6 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _initGameData();
-      ref.read(savedGameIdProvider.notifier).state = null;
     });
   }
 
@@ -420,7 +418,8 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
       'ДЕКАБРЬ'
     ];
 
-    ref.read(savedGameIdProvider.notifier).state = null;
+  ref.read(savedGameIdProvider.notifier).state = null;
+
 
     final vm = ref.read(gameViewModelProvider.notifier);
     vm.resetGame();

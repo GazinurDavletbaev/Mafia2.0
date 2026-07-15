@@ -62,8 +62,7 @@ class _GameProtocolViewScreenState
         foregroundColor: theme.appBarTheme.foregroundColor,
         actions: [
           IconButton(
-            icon: Icon(Icons.refresh,
-                color: isDark ? Colors.white : Colors.black87),
+            icon: Icon(Icons.refresh, color: isDark ? Colors.white : Colors.black87),
             onPressed: _loadGame,
           ),
         ],
@@ -120,10 +119,8 @@ class _GameProtocolViewScreenState
 
     final players = game['players'] as List? ?? [];
     final nightActions = game['night_actions'] as List? ?? [];
-// В _buildContent():
-    final voteHistory = game['vote_history'] != null
-        ? Map<String, dynamic>.from(game['vote_history'] as Map)
-        : <String, dynamic>{};
+    final voteHistory = game['vote_history'] as Map? ?? {};
+
     return SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Column(
@@ -148,8 +145,7 @@ class _GameProtocolViewScreenState
     );
   }
 
-  Widget _buildHeader(Map<String, dynamic> game, String date, String time,
-      String winner, bool isDark) {
+  Widget _buildHeader(Map<String, dynamic> game, String date, String time, String winner, bool isDark) {
     return Card(
       color: isDark ? Colors.grey.shade800 : Colors.white,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -171,8 +167,7 @@ class _GameProtocolViewScreenState
                   ),
                 ),
                 Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                   decoration: BoxDecoration(
                     color: game['winner'] == 'red'
                         ? Colors.red.shade100
@@ -202,8 +197,7 @@ class _GameProtocolViewScreenState
               children: [
                 _buildInfoChip(Icons.calendar_today, date),
                 _buildInfoChip(Icons.access_time, time),
-                _buildInfoChip(
-                    Icons.table_chart, 'Стол ${game['table'] ?? '?'}'),
+                _buildInfoChip(Icons.table_chart, 'Стол ${game['table'] ?? '?'}'),
                 _buildInfoChip(Icons.numbers, 'Игра ${game['game'] ?? '?'}'),
               ],
             ),
@@ -215,8 +209,7 @@ class _GameProtocolViewScreenState
                 fontSize: 14,
               ),
             ),
-            if (game['best_move'] != null &&
-                game['best_move'].toString().isNotEmpty)
+            if (game['best_move'] != null && game['best_move'].toString().isNotEmpty)
               Text(
                 'Лучший ход: ${game['best_move']}',
                 style: TextStyle(
@@ -224,8 +217,7 @@ class _GameProtocolViewScreenState
                   fontSize: 14,
                 ),
               ),
-            if (game['protest'] != null &&
-                game['protest'].toString().isNotEmpty)
+            if (game['protest'] != null && game['protest'].toString().isNotEmpty)
               Text(
                 'Протест: ${game['protest']}',
                 style: const TextStyle(color: Colors.orange, fontSize: 14),
@@ -277,39 +269,13 @@ class _GameProtocolViewScreenState
               children: [
                 const SizedBox(width: 28),
                 const SizedBox(width: 8),
-                Expanded(
-                    child: Text('Игрок',
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 12,
-                            color: Colors.grey))),
+                Expanded(child: Text('Игрок', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: Colors.grey))),
                 const SizedBox(width: 8),
-                SizedBox(
-                    width: 24,
-                    child: Text('Роль',
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 12,
-                            color: Colors.grey),
-                        textAlign: TextAlign.center)),
+                SizedBox(width: 24, child: Text('Роль', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: Colors.grey), textAlign: TextAlign.center)),
                 const SizedBox(width: 8),
-                SizedBox(
-                    width: 30,
-                    child: Text('Ф',
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 12,
-                            color: Colors.grey),
-                        textAlign: TextAlign.center)),
+                SizedBox(width: 30, child: Text('Ф', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: Colors.grey), textAlign: TextAlign.center)),
                 const SizedBox(width: 8),
-                SizedBox(
-                    width: 30,
-                    child: Text('Очки',
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 12,
-                            color: Colors.grey),
-                        textAlign: TextAlign.center)),
+                SizedBox(width: 30, child: Text('Очки', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: Colors.grey), textAlign: TextAlign.center)),
               ],
             ),
             const Divider(height: 8),
@@ -321,121 +287,117 @@ class _GameProtocolViewScreenState
   }
 
   Widget _buildPlayerRow(Map<String, dynamic> player, bool isDark) {
-    final roleShort = {
-          'don': 'Д',
-          'mafia': 'Ч',
-          'sheriff': 'Ш',
-          'citizen': 'К',
-        }[player['role']] ??
-        '?';
+  final roleShort = {
+    'don': 'Д',
+    'mafia': 'Ч',
+    'sheriff': 'Ш',
+    'citizen': 'К',
+  }[player['role']] ?? '?';
 
-    final isRemoved =
-        player['rule'] != null && player['rule'].toString().isNotEmpty;
+  final isRemoved = player['rule'] != null && player['rule'].toString().isNotEmpty;
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 2),
-      child: Row(
-        children: [
-          Container(
-            width: 28,
-            height: 28,
-            decoration: BoxDecoration(
-              color: Colors.orange.withOpacity(0.2),
-              borderRadius: BorderRadius.circular(4),
-            ),
-            child: Center(
-              child: Text(
-                '${player['seat']}',
-                style:
-                    const TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
-              ),
-            ),
+  return Padding(
+    padding: const EdgeInsets.symmetric(vertical: 2),
+    child: Row(
+      children: [
+        Container(
+          width: 28,
+          height: 28,
+          decoration: BoxDecoration(
+            color: Colors.orange.withOpacity(0.2),
+            borderRadius: BorderRadius.circular(4),
           ),
-          const SizedBox(width: 8),
-          Expanded(
+          child: Center(
             child: Text(
-              player['name'] ?? 'Игрок',
-              style: TextStyle(
-                color: isDark ? Colors.white : Colors.black87,
-                fontWeight: FontWeight.w500,
-                fontSize: 13,
-              ),
+              '${player['seat']}',
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
             ),
           ),
-          Container(
-            width: 24,
-            height: 24,
-            decoration: BoxDecoration(
-              color: {
-                'don': Colors.purple.shade100,
-                'mafia': Colors.red.shade100,
-                'sheriff': Colors.green.shade100,
-                'citizen': Colors.blue.shade100,
-              }[player['role']],
-              borderRadius: BorderRadius.circular(4),
-            ),
-            child: Center(
-              child: Text(
-                roleShort,
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  color: {
-                    'don': Colors.purple.shade800,
-                    'mafia': Colors.red.shade800,
-                    'sheriff': Colors.green.shade800,
-                    'citizen': Colors.blue.shade800,
-                  }[player['role']],
-                  fontSize: 11,
-                ),
-              ),
+        ),
+        const SizedBox(width: 8),
+        Expanded(
+          child: Text(
+            player['name'] ?? 'Игрок',
+            style: TextStyle(
+              color: isDark ? Colors.white : Colors.black87,
+              fontWeight: FontWeight.w500,
+              fontSize: 13,
             ),
           ),
-          const SizedBox(width: 8),
-          SizedBox(
-            width: 30,
+        ),
+        Container(
+          width: 24,
+          height: 24,
+          decoration: BoxDecoration(
+            color: {
+              'don': Colors.purple.shade100,
+              'mafia': Colors.red.shade100,
+              'sheriff': Colors.green.shade100,
+              'citizen': Colors.blue.shade100,
+            }[player['role']],
+            borderRadius: BorderRadius.circular(4),
+          ),
+          child: Center(
             child: Text(
-              '${player['fouls'] ?? 0}',
+              roleShort,
               style: TextStyle(
-                color: isDark ? Colors.white70 : Colors.black54,
-                fontSize: 12,
-              ),
-              textAlign: TextAlign.center,
-            ),
-          ),
-          const SizedBox(width: 8),
-          SizedBox(
-            width: 30,
-            child: Text(
-              '${player['points'] ?? 0}',
-              style: TextStyle(
-                color: isDark ? Colors.white : Colors.black87,
                 fontWeight: FontWeight.bold,
-                fontSize: 13,
+                color: {
+                  'don': Colors.purple.shade800,
+                  'mafia': Colors.red.shade800,
+                  'sheriff': Colors.green.shade800,
+                  'citizen': Colors.blue.shade800,
+                }[player['role']],
+                fontSize: 11,
               ),
-              textAlign: TextAlign.center,
             ),
           ),
-          if (player['bonus'] != null && player['bonus'] != 0)
-            Padding(
-              padding: const EdgeInsets.only(left: 4),
-              child: Text(
-                '(${player['bonus']})',
-                style: TextStyle(
-                  color: player['bonus'] > 0 ? Colors.green : Colors.red,
-                  fontSize: 11,
-                ),
+        ),
+        const SizedBox(width: 8),
+        SizedBox(
+          width: 30,
+          child: Text(
+            '${player['fouls'] ?? 0}',
+            style: TextStyle(
+              color: isDark ? Colors.white70 : Colors.black54,
+              fontSize: 12,
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ),
+        const SizedBox(width: 8),
+        SizedBox(
+          width: 30,
+          child: Text(
+            '${player['points'] ?? 0}',
+            style: TextStyle(
+              color: isDark ? Colors.white : Colors.black87,
+              fontWeight: FontWeight.bold,
+              fontSize: 13,
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ),
+        if (player['bonus'] != null && player['bonus'] != 0)
+          Padding(
+            padding: const EdgeInsets.only(left: 4),
+            child: Text(
+              '(${player['bonus']})',
+              style: TextStyle(
+                color: player['bonus'] > 0 ? Colors.green : Colors.red,
+                fontSize: 11,
               ),
             ),
-          if (isRemoved)
-            Padding(
-              padding: const EdgeInsets.only(left: 4),
-              child: Text('🚫',
-                  style: TextStyle(fontSize: 12, color: Colors.red.shade400)),
-            ),
-        ],
-      ),
-    );
-  }
+          ),
+        if (isRemoved)
+          Padding(
+            padding: const EdgeInsets.only(left: 4),
+            child: Text('🚫', style: TextStyle(fontSize: 12, color: Colors.red.shade400)),
+          ),
+      ],
+    ),
+  );
+}
 
   Widget _buildNightActions(List<dynamic> nightActions, bool isDark) {
     return Card(
@@ -460,31 +422,15 @@ class _GameProtocolViewScreenState
               children: [
                 const SizedBox(width: 60),
                 const SizedBox(width: 8),
-                Expanded(
-                    child: Text('Стрельба',
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 12,
-                            color: Colors.grey))),
+                Expanded(child: Text('Стрельба', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: Colors.grey))),
                 const SizedBox(width: 8),
-                Expanded(
-                    child: Text('Дон',
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 12,
-                            color: Colors.grey))),
+                Expanded(child: Text('Дон', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: Colors.grey))),
                 const SizedBox(width: 8),
-                Expanded(
-                    child: Text('Шериф',
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 12,
-                            color: Colors.grey))),
+                Expanded(child: Text('Шериф', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: Colors.grey))),
               ],
             ),
             const Divider(height: 8),
-            ...nightActions
-                .map((action) => _buildNightActionRow(action, isDark)),
+            ...nightActions.map((action) => _buildNightActionRow(action, isDark)),
           ],
         ),
       ),
@@ -541,8 +487,7 @@ class _GameProtocolViewScreenState
   }
 
   Widget _buildVoteHistory(Map<String, dynamic> voteHistory, bool isDark) {
-    final days = voteHistory.keys.toList()
-      ..sort((a, b) => int.parse(a).compareTo(int.parse(b)));
+    final days = voteHistory.keys.toList()..sort((a, b) => int.parse(a).compareTo(int.parse(b)));
 
     return Card(
       color: isDark ? Colors.grey.shade800 : Colors.white,
@@ -571,8 +516,7 @@ class _GameProtocolViewScreenState
     );
   }
 
-  Widget _buildVoteDay(
-      String dayKey, Map<String, dynamic> dayData, bool isDark) {
+  Widget _buildVoteDay(String dayKey, Map<String, dynamic> dayData, bool isDark) {
     final day = int.parse(dayKey);
     final rounds = dayData['rounds'] as List? ?? [];
     final result = dayData['result'] as List? ?? [];
@@ -601,16 +545,14 @@ class _GameProtocolViewScreenState
           const SizedBox(height: 8),
           if (rounds.isNotEmpty) ...[
             // Основное голосование
-            _buildVoteRound(
-                'Голосование', rounds[0] as Map<String, dynamic>, isDark),
-
+            _buildVoteRound('Голосование', rounds[0] as Map<String, dynamic>, isDark),
+            
             // Переголосования
             if (rounds.length > 1)
               for (int i = 1; i < rounds.length; i++)
-                _buildVoteRound('Переголосование ${i}',
-                    rounds[i] as Map<String, dynamic>, isDark),
+                _buildVoteRound('Переголосование ${i}', rounds[i] as Map<String, dynamic>, isDark),
           ],
-
+          
           // Результат
           const SizedBox(height: 4),
           Row(
@@ -632,7 +574,7 @@ class _GameProtocolViewScreenState
               ),
             ],
           ),
-
+          
           if (eliminationVotes > 0)
             Text(
               'Голосование за подъём: $eliminationVotes',
@@ -646,10 +588,8 @@ class _GameProtocolViewScreenState
     );
   }
 
-  Widget _buildVoteRound(
-      String title, Map<String, dynamic> votes, bool isDark) {
-    final entries = votes.entries.toList()
-      ..sort((a, b) => int.parse(a.key).compareTo(int.parse(b.key)));
+  Widget _buildVoteRound(String title, Map<String, dynamic> votes, bool isDark) {
+    final entries = votes.entries.toList()..sort((a, b) => int.parse(a.key).compareTo(int.parse(b.key)));
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 6),
@@ -693,8 +633,7 @@ class _GameProtocolViewScreenState
                     ),
                     const SizedBox(width: 4),
                     Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 6, vertical: 2),
+                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                       decoration: BoxDecoration(
                         color: Colors.grey.shade200,
                         borderRadius: BorderRadius.circular(4),

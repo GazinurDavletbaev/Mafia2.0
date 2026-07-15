@@ -62,7 +62,6 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _initGameData();
-      ref.read(savedGameIdProvider.notifier).state = null;
     });
   }
 
@@ -420,7 +419,8 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
       'ДЕКАБРЬ'
     ];
 
-    ref.read(savedGameIdProvider.notifier).state = null;
+  ref.read(savedGameIdProvider.notifier).state = null;
+
 
     final vm = ref.read(gameViewModelProvider.notifier);
     vm.resetGame();

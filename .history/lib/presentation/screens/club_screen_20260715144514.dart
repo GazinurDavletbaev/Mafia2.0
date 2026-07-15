@@ -346,14 +346,13 @@ class _ClubScreenState extends ConsumerState<ClubScreen> {
         ),
         const Divider(height: 1),
         Expanded(
-          child: _hasGames
-              ? SingleChildScrollView(
-                  // ← добавить скролл
-                  padding: const EdgeInsets.symmetric(horizontal: 8),
-                  child: _buildRatingTable(),
-                )
-              : _buildNoGamesPlaceholder(isDark),
-        ),
+  child: _hasGames
+      ? SingleChildScrollView(  // ← добавить скролл
+          padding: const EdgeInsets.symmetric(horizontal: 8),
+          child: _buildRatingTable(),
+        )
+      : _buildNoGamesPlaceholder(isDark),
+),
         // ✅ КНОПКА "ПОИСК КЛУБА"
         Padding(
           padding: const EdgeInsets.all(12),

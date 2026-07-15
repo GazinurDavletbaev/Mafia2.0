@@ -145,9 +145,7 @@ class _ClubScreenState extends ConsumerState<ClubScreen> {
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
-      body: _hasClub
-          ? _buildClubContent(theme, isDark)
-          : _buildClubList(theme, isDark),
+      body: _hasClub ? _buildRatingTable(is,) : _buildClubList(theme, isDark),
     );
   }
 
@@ -347,11 +345,7 @@ class _ClubScreenState extends ConsumerState<ClubScreen> {
         const Divider(height: 1),
         Expanded(
           child: _hasGames
-              ? SingleChildScrollView(
-                  // ← добавить скролл
-                  padding: const EdgeInsets.symmetric(horizontal: 8),
-                  child: _buildRatingTable(),
-                )
+              ? _buildRatingTable(isDark)
               : _buildNoGamesPlaceholder(isDark),
         ),
         // ✅ КНОПКА "ПОИСК КЛУБА"
@@ -565,6 +559,107 @@ class _ClubScreenState extends ConsumerState<ClubScreen> {
           ],
         ),
       ],
+    );
+  }
+
+  Widget _buildRatingTable(bool isDark) {
+    if (_ratingPlayers.isEmpty) {
+      return _buildNoGamesPlaceholder(isDark);
+    }
+
+    return ListView.builder(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      itemCount: _ratingPlayers.length,
+      itemBuilder: (context, index) {
+        final player = _ratingPlayers[index];
+        final total = (player['points'] ?? 0) + (player['bonus'] ?? 0);
+        final isTop = index < 3;
+
+        return Container(
+          margin: const EdgeInsets.only(bottom: 6),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          decoration: BoxDecoration(
+            color: isDark ? Colors.grey.shade800 : Colors.white,
+            borderRadius: BorderRadius.circular(10),
+            border: isTop
+                ? Border.all(
+                    color: index == 0
+                        ? Colors.yellow
+                        : index == 1
+                            ? Colors.grey.shade400
+                            : index == 2
+                                ? Colors.brown.shade300
+                                : Colors.transparent,
+                    width: 1.5,
+                  )
+                : null,
+          ),
+          child: Row(
+            children: [
+              Container(
+                width: 26,
+                height: 26,
+                decoration: BoxDecoration(
+                  color: isTop ? Colors.orange : Colors.transparent,
+                  shape: BoxShape.circle,
+                ),
+                child: Center(
+                  child: Text(
+                    '${index + 1}',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 12,
+                      color: isTop
+                          ? Colors.white
+                          : (isDark ? Colors.grey : Colors.grey.shade600),
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  player['username'] ?? 'Игрок',
+                  style: TextStyle(
+                    fontWeight: isTop ? FontWeight.bold : FontWeight.normal,
+                    fontSize: 13,
+                    color: isDark ? Colors.white : Colors.black87,
+                  ),
+                ),
+              ),
+              Row(
+                children: [
+                  const Icon(Icons.emoji_events,
+                      color: Colors.yellow, size: 14),
+                  const SizedBox(width: 4),
+                  Text(
+                    '${player['wins'] ?? 0}',
+                    style: TextStyle(
+                      color: isDark ? Colors.grey : Colors.grey.shade600,
+                      fontSize: 12,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(width: 14),
+              Row(
+                children: [
+                  const Icon(Icons.star, color: Colors.orange, size: 14),
+                  const SizedBox(width: 4),
+                  Text(
+                    total.toString(),
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 13,
+                      color: isDark ? Colors.white : Colors.black87,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 
