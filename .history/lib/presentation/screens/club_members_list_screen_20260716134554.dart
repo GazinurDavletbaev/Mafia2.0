@@ -43,8 +43,7 @@ class _ClubMembersListScreenState extends ConsumerState<ClubMembersListScreen> {
     // Получаем участников
     final result = await ClubService.getClubMembers(widget.clubId);
     if (result['success']) {
-      _members =
-          (result['members'] as List? ?? []).cast<Map<String, dynamic>>();
+      _members = (result['members'] as List? ?? []).cast<Map<String, dynamic>>();
     }
 
     setState(() => _isLoading = false);
@@ -55,7 +54,7 @@ class _ClubMembersListScreenState extends ConsumerState<ClubMembersListScreen> {
     if (result['success']) {
       // ✅ Обновляем провайдер
       ref.invalidate(clubProvider);
-
+      
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('✅ Пользователь назначен судьёй'),
@@ -78,7 +77,7 @@ class _ClubMembersListScreenState extends ConsumerState<ClubMembersListScreen> {
     if (result['success']) {
       // ✅ Обновляем провайдер
       ref.invalidate(clubProvider);
-
+      
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('✅ Судья снят с должности'),
@@ -108,7 +107,7 @@ class _ClubMembersListScreenState extends ConsumerState<ClubMembersListScreen> {
     if (result['success']) {
       // ✅ Обновляем провайдер
       ref.invalidate(clubProvider);
-
+      
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('✅ Участник удалён из клуба'),
@@ -213,9 +212,7 @@ class _ClubMembersListScreenState extends ConsumerState<ClubMembersListScreen> {
                       Icon(
                         Icons.people_outline,
                         size: 64,
-                        color: isDark
-                            ? Colors.grey.shade600
-                            : Colors.grey.shade400,
+                        color: isDark ? Colors.grey.shade600 : Colors.grey.shade400,
                       ),
                       const SizedBox(height: 16),
                       Text(
@@ -256,8 +253,7 @@ class _ClubMembersListScreenState extends ConsumerState<ClubMembersListScreen> {
                                   ? Colors.blue
                                   : Colors.grey.shade300,
                           child: Text(
-                            member['username']?.substring(0, 1).toUpperCase() ??
-                                '?',
+                            member['username']?.substring(0, 1).toUpperCase() ?? '?',
                             style: TextStyle(
                               color: isPresidentUser || isJudge
                                   ? Colors.white
@@ -326,15 +322,12 @@ class _ClubMembersListScreenState extends ConsumerState<ClubMembersListScreen> {
                         subtitle: Text(
                           member['email'] ?? '',
                           style: TextStyle(
-                            color: isDark
-                                ? Colors.grey.shade400
-                                : Colors.grey.shade600,
+                            color: isDark ? Colors.grey.shade400 : Colors.grey.shade600,
                             fontSize: 12,
                           ),
                         ),
                         trailing: isPresidentUser
-                            ? const Icon(Icons.star,
-                                color: Colors.orange, size: 20)
+                            ? const Icon(Icons.star, color: Colors.orange, size: 20)
                             : isPresident
                                 ? PopupMenuButton<String>(
                                     icon: const Icon(Icons.more_vert),
@@ -353,8 +346,7 @@ class _ClubMembersListScreenState extends ConsumerState<ClubMembersListScreen> {
                                           value: 'promote',
                                           child: Row(
                                             children: [
-                                              Icon(Icons.gavel,
-                                                  color: Colors.blue, size: 20),
+                                              Icon(Icons.gavel, color: Colors.blue, size: 20),
                                               SizedBox(width: 8),
                                               Text('Назначить судьёй'),
                                             ],
@@ -365,9 +357,7 @@ class _ClubMembersListScreenState extends ConsumerState<ClubMembersListScreen> {
                                           value: 'demote',
                                           child: Row(
                                             children: [
-                                              Icon(Icons.person_remove,
-                                                  color: Colors.orange,
-                                                  size: 20),
+                                              Icon(Icons.person_remove, color: Colors.orange, size: 20),
                                               SizedBox(width: 8),
                                               Text('Снять с должности судьи'),
                                             ],
@@ -377,8 +367,7 @@ class _ClubMembersListScreenState extends ConsumerState<ClubMembersListScreen> {
                                         value: 'remove',
                                         child: Row(
                                           children: [
-                                            Icon(Icons.remove_circle,
-                                                color: Colors.red, size: 20),
+                                            Icon(Icons.remove_circle, color: Colors.red, size: 20),
                                             SizedBox(width: 8),
                                             Text('Удалить из клуба'),
                                           ],
