@@ -30,6 +30,7 @@ import '../../presentation/screens/club_members_screen.dart';
 
 final GoRouter router = GoRouter(
   initialLocation: '/',
+  
   routes: [
     GoRoute(
       path: '/',

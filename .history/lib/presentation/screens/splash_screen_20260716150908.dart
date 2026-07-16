@@ -22,15 +22,15 @@ class _SplashScreenState extends State<SplashScreen> {
 
   Future<void> _navigateToNext() async {
     if (!mounted) return;
-
+    
     // ✅ Проверяем токен
     final token = await AuthService.getToken();
-
+    
     if (mounted) {
       if (token != null && token.isNotEmpty) {
-        context.go('/lobby'); // Есть токен → в лобби
+        context.go('/lobby');  // Есть токен → в лобби
       } else {
-        context.go('/login'); // Нет токена → на логин
+        context.go('/login');  // Нет токена → на логин
       }
     }
   }
