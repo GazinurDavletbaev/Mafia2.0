@@ -60,11 +60,11 @@ class _ClubRequestsScreenState extends ConsumerState<ClubRequestsScreen> {
     if (result['success']) {
       // ✅ Обновляем провайдер
       ref.invalidate(pendingRequestsProvider);
-
+      
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(
-              action == 'approve' ? '✅ Заявка принята' : '❌ Заявка отклонена'),
+          content:
+              Text(action == 'approve' ? '✅ Заявка принята' : '❌ Заявка отклонена'),
           backgroundColor: action == 'approve' ? Colors.green : Colors.orange,
         ),
       );

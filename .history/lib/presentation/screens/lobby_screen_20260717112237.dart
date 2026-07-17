@@ -64,15 +64,7 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
       _initGameData();
       ref.read(savedGameIdProvider.notifier).state = null;
       ref.invalidate(clubProvider);
-      ref.invalidate(pendingRequestsProvider);
     });
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    print('hi');
-    setState(() {});
   }
 
   void _initGameData() {
@@ -113,20 +105,11 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    final pendingRequestsAsync = ref.watch(pendingRequestsProvider);
 
-    final pendingRequestsCount = pendingRequestsAsync.when(
-      data: (value) => value,
-      loading: () => 0,
-      error: (_, __) => 0,
-    );
+    final pendingRequestsCount = ref.watch(pendingRequestsProvider);
     final userAsync = ref.watch(userProvider);
     final clubAsync = ref.watch(clubProvider);
-    ref.listen(pendingRequestsProvider, (previous, next) {
-      print('📦 pendingRequestsProvider changed: $next');
-      // Перестраиваем UI
-      setState(() {});
-    });
+
     // ✅ Определяем, есть ли клуб
     final hasClub = clubAsync.when(
       data: (club) => club != null && club['id'] != null,
@@ -363,7 +346,6 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
             setState(() {
               _selectedIndex = index;
             });
-            ref.invalidate(pendingRequestsProvider);
           },
           backgroundColor: isDark ? Colors.grey.shade900 : Colors.white,
           selectedItemColor: Colors.orange,

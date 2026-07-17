@@ -68,13 +68,6 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
     });
   }
 
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    print('hi');
-    setState(() {});
-  }
-
   void _initGameData() {
     final user = ref.watch(userProvider).value;
     final judgeName = user?['username'] ?? 'Судья';
@@ -363,7 +356,6 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
             setState(() {
               _selectedIndex = index;
             });
-            ref.invalidate(pendingRequestsProvider);
           },
           backgroundColor: isDark ? Colors.grey.shade900 : Colors.white,
           selectedItemColor: Colors.orange,

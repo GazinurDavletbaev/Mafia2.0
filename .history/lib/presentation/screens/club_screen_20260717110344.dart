@@ -54,32 +54,30 @@ class _ClubScreenState extends ConsumerState<ClubScreen> {
   // ЗАГРУЗКА ДАННЫХ
   // ============================================================
   Future<void> _loadData() async {
-    setState(() => _isLoading = true);
+  setState(() => _isLoading = true);
 
-    final myClubsResult = await ClubService.getMyClub();
-    print('📦 myClubsResult: $myClubsResult');
+  final myClubsResult = await ClubService.getMyClub();
+  print('📦 myClubsResult: $myClubsResult');
 
-    // ✅ Правильная проверка — клуб есть и у него есть id
-    final clubData = myClubsResult['club'];
-    if (myClubsResult['success'] &&
-        clubData != null &&
-        clubData['id'] != null) {
-      print('✅ ЕСТЬ КЛУБ!');
+  // ✅ Правильная проверка — клуб есть и у него есть id
+  final clubData = myClubsResult['club'];
+  if (myClubsResult['success'] && clubData != null && clubData['id'] != null) {
+    print('✅ ЕСТЬ КЛУБ!');
 
-      _club = clubData;
-      _hasClub = true;
+    _club = clubData;
+    _hasClub = true;
 
-      await _loadRating();
-      setState(() => _isLoading = false);
-      return;
-    }
-
-    // 2. Нет клуба — загружаем список всех клубов
-    print('❌ НЕТ КЛУБА!');
-    _hasClub = false;
-    await _loadAllClubs();
+    await _loadRating();
     setState(() => _isLoading = false);
+    return;
   }
+
+  // 2. Нет клуба — загружаем список всех клубов
+  print('❌ НЕТ КЛУБА!');
+  _hasClub = false;
+  await _loadAllClubs();
+  setState(() => _isLoading = false);
+}
 
   Future<void> _loadRating() async {
     if (_club == null) return;

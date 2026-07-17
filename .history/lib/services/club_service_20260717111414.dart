@@ -55,31 +55,41 @@ class ClubService {
   }
 
   static Map<String, dynamic> _handleResponse(http.Response response) {
-    try {
-      final data = jsonDecode(response.body);
-      if (response.statusCode >= 200 && response.statusCode < 300) {
-        if (data is List) {
-          return {
-            'success': true,
-            'clubs': data.cast<Map<String, dynamic>>(),
-          };
-        }
-        return {'success': true, ...data};
-      } else {
+  try {
+    final data = jsonDecode(response.body);
+    print('📦 _handleResponse data: $data');
+    
+    if (response.statusCode == 200 || response.statusCode == 201) {
+      // ✅ Для эндпоинта pending-count возвращаем count
+      if (data.containsKey('count')) {
         return {
-          'success': false,
-          'error': data['detail'] ?? data['message'] ?? 'Ошибка сервера',
-          'code': response.statusCode,
+          'success': true,
+          'count': data['count'],
         };
       }
-    } catch (e) {
+      
+      return {
+        'success': true,
+        'token': data['access_token'],
+        'user': data['user'] != null ? User.fromJson(data['user']) : null,
+      };
+    } else {
+      final errorMessage = data['detail'] ?? data['message'] ?? 'Ошибка сервера';
       return {
         'success': false,
-        'error': 'Ошибка соединения с сервером: $e',
-        'code': 500,
+        'error': errorMessage,
+        'code': response.statusCode,
       };
     }
+  } catch (e) {
+    print('❌ _handleResponse error: $e');
+    return {
+      'success': false,
+      'error': 'Ошибка соединения с сервером',
+      'code': 500,
+    };
   }
+}
 
   // ============================================================
   // КЛУБЫ
@@ -272,22 +282,7 @@ class ClubService {
       Uri.parse('$baseUrl/clubs/$clubId/requests?token=$token'),
       headers: {'Content-Type': 'application/json'},
     );
-
-    print('📦 getClubRequests status: ${response.statusCode}');
-    print('📦 getClubRequests body: ${response.body}');
-
-    if (response.statusCode == 200) {
-      final data = jsonDecode(response.body);
-      return {
-        'success': true,
-        'requests': data, // ← вместо 'clubs' используем 'requests'
-      };
-    } else {
-      return {
-        'success': false,
-        'error': 'Ошибка ${response.statusCode}',
-      };
-    }
+    return _handleResponse(response);
   }
 
   static Future<Map<String, dynamic>> approveRequest(int requestId) async {
@@ -376,25 +371,25 @@ class ClubService {
   }
 
   static Future<Map<String, dynamic>> getPendingRequestsCount() async {
-    final token = await AuthService.getToken();
-    if (token == null) {
-      print('❌ getPendingRequestsCount: token null');
-      return {'success': false, 'error': 'Не авторизован'};
-    }
-
-    final url = '$baseUrl/clubs/requests/pending-count?token=$token';
-    print('📦 getPendingRequestsCount URL: $url');
-
-    final response = await http.get(
-      Uri.parse(url),
-      headers: {'Content-Type': 'application/json'},
-    );
-
-    print('📦 getPendingRequestsCount status: ${response.statusCode}');
-    print('📦 getPendingRequestsCount body: ${response.body}');
-
-    return _handleResponse(response);
+  final token = await AuthService.getToken();
+  if (token == null) {
+    print('❌ getPendingRequestsCount: token null');
+    return {'success': false, 'error': 'Не авторизован'};
   }
+
+  final url = '$baseUrl/clubs/requests/pending-count?token=$token';
+  print('📦 getPendingRequestsCount URL: $url');
+  
+  final response = await http.get(
+    Uri.parse(url),
+    headers: {'Content-Type': 'application/json'},
+  );
+  
+  print('📦 getPendingRequestsCount status: ${response.statusCode}');
+  print('📦 getPendingRequestsCount body: ${response.body}');
+  
+  return _handleResponse(response);
+}
 
   // ========== РЕЙТИНГ КЛУБА ==========
   static Future<Map<String, dynamic>> getClubRating({

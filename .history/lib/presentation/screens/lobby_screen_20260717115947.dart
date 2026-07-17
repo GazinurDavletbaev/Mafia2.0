@@ -68,12 +68,13 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
     });
   }
 
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    print('hi');
-    setState(() {});
-  }
+// Вместо инвалидации — просто обновляем состояние
+@override
+void didChangeDependencies() {
+  super.didChangeDependencies();
+  // ✅ Принудительно перестраиваем UI
+  setState(() {});
+}
 
   void _initGameData() {
     final user = ref.watch(userProvider).value;
@@ -101,6 +102,14 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
         stageName: months[DateTime.now().month - 1],
       );
     });
+  }
+
+// Вместо инвалидации — просто обновляем состояние
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // ✅ Принудительно перестраиваем UI
+    setState(() {});
   }
 
   void _updateGameData(GameData newData) {
@@ -363,7 +372,6 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
             setState(() {
               _selectedIndex = index;
             });
-            ref.invalidate(pendingRequestsProvider);
           },
           backgroundColor: isDark ? Colors.grey.shade900 : Colors.white,
           selectedItemColor: Colors.orange,

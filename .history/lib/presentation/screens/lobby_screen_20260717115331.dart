@@ -71,8 +71,8 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    print('hi');
-    setState(() {});
+    // ✅ Инвалидируем при каждом возврате на экран
+    ref.invalidate(pendingRequestsProvider);
   }
 
   void _initGameData() {
@@ -363,7 +363,6 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
             setState(() {
               _selectedIndex = index;
             });
-            ref.invalidate(pendingRequestsProvider);
           },
           backgroundColor: isDark ? Colors.grey.shade900 : Colors.white,
           selectedItemColor: Colors.orange,

@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:mafia_help/application/providers/club_provider.dart';
-import 'package:mafia_help/application/providers/user_provider.dart';
 import 'dart:io';
 import '../../services/club_service.dart';
 
@@ -102,8 +101,8 @@ class _CreateClubScreenState extends ConsumerState<CreateClubScreen> {
 
     if (result['success']) {
       final clubId = result['id'];
-      ref.invalidate(clubProvider);
-      ref.invalidate(userProvider);
+ref.invalidate(clubProvider);
+  ref.invalidate(userProvider);
       // ✅ 2. Если есть фото — загружаем
       if (_clubImage != null) {
         final uploadResult = await ClubService.uploadClubLogo(

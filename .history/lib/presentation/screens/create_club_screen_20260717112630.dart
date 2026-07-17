@@ -102,8 +102,8 @@ class _CreateClubScreenState extends ConsumerState<CreateClubScreen> {
 
     if (result['success']) {
       final clubId = result['id'];
-      ref.invalidate(clubProvider);
-      ref.invalidate(userProvider);
+ref.invalidate(clubProvider);
+  ref.invalidate(userProvider);
       // ✅ 2. Если есть фото — загружаем
       if (_clubImage != null) {
         final uploadResult = await ClubService.uploadClubLogo(

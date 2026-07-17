@@ -18,39 +18,39 @@ class _ClubRequestsScreenState extends ConsumerState<ClubRequestsScreen> {
   Map<String, dynamic>? _club;
 
   @override
-  void initState() {
-    super.initState();
-    _loadData();
-  }
+void initState() {
+  super.initState();
+  _loadData();
+}
 
-  Future<void> _loadData() async {
-    setState(() => _isLoading = true);
+Future<void> _loadData() async {
+  setState(() => _isLoading = true);
 
-    final clubResult = await ClubService.getCurrentClub();
-    print('📦 clubResult: $clubResult');
+  final clubResult = await ClubService.getCurrentClub();
+  print('📦 clubResult: $clubResult');
+  
+  if (clubResult['success'] && clubResult['club'] != null) {
+    _club = clubResult['club'];
 
-    if (clubResult['success'] && clubResult['club'] != null) {
-      _club = clubResult['club'];
+    final requestsResult = await ClubService.getClubRequests(_club!['id']);
+    print('📦 requestsResult: $requestsResult');
 
-      final requestsResult = await ClubService.getClubRequests(_club!['id']);
-      print('📦 requestsResult: $requestsResult');
-
-      if (requestsResult['success']) {
-        // ✅ Проверяем оба варианта ключа
-        List data = [];
-        if (requestsResult['requests'] != null) {
-          data = requestsResult['requests'] as List;
-        } else if (requestsResult['clubs'] != null) {
-          data = requestsResult['clubs'] as List;
-        }
-
-        _requests = data.cast<Map<String, dynamic>>();
-        print('📦 Количество заявок: ${_requests.length}');
+    if (requestsResult['success']) {
+      // ✅ Проверяем оба варианта ключа
+      List data = [];
+      if (requestsResult['requests'] != null) {
+        data = requestsResult['requests'] as List;
+      } else if (requestsResult['clubs'] != null) {
+        data = requestsResult['clubs'] as List;
       }
+      
+      _requests = data.cast<Map<String, dynamic>>();
+      print('📦 Количество заявок: ${_requests.length}');
     }
-
-    setState(() => _isLoading = false);
   }
+
+  setState(() => _isLoading = false);
+}
 
   Future<void> _handleRequest(int requestId, String action) async {
     final result = action == 'approve'
@@ -58,17 +58,15 @@ class _ClubRequestsScreenState extends ConsumerState<ClubRequestsScreen> {
         : await ClubService.rejectRequest(requestId);
 
     if (result['success']) {
-      // ✅ Обновляем провайдер
-      ref.invalidate(pendingRequestsProvider);
-
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(
-              action == 'approve' ? '✅ Заявка принята' : '❌ Заявка отклонена'),
-          backgroundColor: action == 'approve' ? Colors.green : Colors.orange,
+          content:
+              Text(action == 'approve' ? 'Заявка принята' : 'Заявка отклонена'),
+          backgroundColor: action == 'approve' ? Colors.green : Colors.red,
         ),
       );
       _loadData();
+      ref.read(pendingRequestsProvider.notifier).state = _requests.length;
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -90,13 +88,6 @@ class _ClubRequestsScreenState extends ConsumerState<ClubRequestsScreen> {
         title: Text(_club != null ? 'Заявки в "${_club!['title']}"' : 'Заявки'),
         backgroundColor: theme.appBarTheme.backgroundColor,
         foregroundColor: theme.appBarTheme.foregroundColor,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.refresh),
-            onPressed: _loadData,
-            tooltip: 'Обновить',
-          ),
-        ],
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())

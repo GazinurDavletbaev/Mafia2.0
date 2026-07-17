@@ -263,32 +263,32 @@ class ClubService {
   // ============================================================
 
   static Future<Map<String, dynamic>> getClubRequests(int clubId) async {
-    final token = await AuthService.getToken();
-    if (token == null) {
-      return {'success': false, 'error': 'Не авторизован'};
-    }
-
-    final response = await http.get(
-      Uri.parse('$baseUrl/clubs/$clubId/requests?token=$token'),
-      headers: {'Content-Type': 'application/json'},
-    );
-
-    print('📦 getClubRequests status: ${response.statusCode}');
-    print('📦 getClubRequests body: ${response.body}');
-
-    if (response.statusCode == 200) {
-      final data = jsonDecode(response.body);
-      return {
-        'success': true,
-        'requests': data, // ← вместо 'clubs' используем 'requests'
-      };
-    } else {
-      return {
-        'success': false,
-        'error': 'Ошибка ${response.statusCode}',
-      };
-    }
+  final token = await AuthService.getToken();
+  if (token == null) {
+    return {'success': false, 'error': 'Не авторизован'};
   }
+
+  final response = await http.get(
+    Uri.parse('$baseUrl/clubs/$clubId/requests?token=$token'),
+    headers: {'Content-Type': 'application/json'},
+  );
+
+  print('📦 getClubRequests status: ${response.statusCode}');
+  print('📦 getClubRequests body: ${response.body}');
+
+  if (response.statusCode == 200) {
+    final data = jsonDecode(response.body);
+    return {
+      'success': true,
+      'requests': data,  // ← вместо 'clubs' используем 'requests'
+    };
+  } else {
+    return {
+      'success': false,
+      'error': 'Ошибка ${response.statusCode}',
+    };
+  }
+}
 
   static Future<Map<String, dynamic>> approveRequest(int requestId) async {
     final token = await AuthService.getToken();

@@ -272,22 +272,7 @@ class ClubService {
       Uri.parse('$baseUrl/clubs/$clubId/requests?token=$token'),
       headers: {'Content-Type': 'application/json'},
     );
-
-    print('📦 getClubRequests status: ${response.statusCode}');
-    print('📦 getClubRequests body: ${response.body}');
-
-    if (response.statusCode == 200) {
-      final data = jsonDecode(response.body);
-      return {
-        'success': true,
-        'requests': data, // ← вместо 'clubs' используем 'requests'
-      };
-    } else {
-      return {
-        'success': false,
-        'error': 'Ошибка ${response.statusCode}',
-      };
-    }
+    return _handleResponse(response);
   }
 
   static Future<Map<String, dynamic>> approveRequest(int requestId) async {
@@ -378,21 +363,13 @@ class ClubService {
   static Future<Map<String, dynamic>> getPendingRequestsCount() async {
     final token = await AuthService.getToken();
     if (token == null) {
-      print('❌ getPendingRequestsCount: token null');
       return {'success': false, 'error': 'Не авторизован'};
     }
 
-    final url = '$baseUrl/clubs/requests/pending-count?token=$token';
-    print('📦 getPendingRequestsCount URL: $url');
-
     final response = await http.get(
-      Uri.parse(url),
+      Uri.parse('$baseUrl/clubs/requests/pending-count?token=$token'),
       headers: {'Content-Type': 'application/json'},
     );
-
-    print('📦 getPendingRequestsCount status: ${response.statusCode}');
-    print('📦 getPendingRequestsCount body: ${response.body}');
-
     return _handleResponse(response);
   }
 

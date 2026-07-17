@@ -58,17 +58,15 @@ class _ClubRequestsScreenState extends ConsumerState<ClubRequestsScreen> {
         : await ClubService.rejectRequest(requestId);
 
     if (result['success']) {
-      // ✅ Обновляем провайдер
-      ref.invalidate(pendingRequestsProvider);
-
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(
-              action == 'approve' ? '✅ Заявка принята' : '❌ Заявка отклонена'),
-          backgroundColor: action == 'approve' ? Colors.green : Colors.orange,
+          content:
+              Text(action == 'approve' ? 'Заявка принята' : 'Заявка отклонена'),
+          backgroundColor: action == 'approve' ? Colors.green : Colors.red,
         ),
       );
       _loadData();
+      ref.read(pendingRequestsProvider.notifier).state = _requests.length;
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -90,13 +88,6 @@ class _ClubRequestsScreenState extends ConsumerState<ClubRequestsScreen> {
         title: Text(_club != null ? 'Заявки в "${_club!['title']}"' : 'Заявки'),
         backgroundColor: theme.appBarTheme.backgroundColor,
         foregroundColor: theme.appBarTheme.foregroundColor,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.refresh),
-            onPressed: _loadData,
-            tooltip: 'Обновить',
-          ),
-        ],
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())

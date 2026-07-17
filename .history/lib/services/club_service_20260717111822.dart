@@ -272,22 +272,7 @@ class ClubService {
       Uri.parse('$baseUrl/clubs/$clubId/requests?token=$token'),
       headers: {'Content-Type': 'application/json'},
     );
-
-    print('📦 getClubRequests status: ${response.statusCode}');
-    print('📦 getClubRequests body: ${response.body}');
-
-    if (response.statusCode == 200) {
-      final data = jsonDecode(response.body);
-      return {
-        'success': true,
-        'requests': data, // ← вместо 'clubs' используем 'requests'
-      };
-    } else {
-      return {
-        'success': false,
-        'error': 'Ошибка ${response.statusCode}',
-      };
-    }
+    return _handleResponse(response);
   }
 
   static Future<Map<String, dynamic>> approveRequest(int requestId) async {

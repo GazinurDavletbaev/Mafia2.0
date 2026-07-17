@@ -64,15 +64,7 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
       _initGameData();
       ref.read(savedGameIdProvider.notifier).state = null;
       ref.invalidate(clubProvider);
-      ref.invalidate(pendingRequestsProvider);
     });
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    print('hi');
-    setState(() {});
   }
 
   void _initGameData() {
@@ -363,7 +355,6 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
             setState(() {
               _selectedIndex = index;
             });
-            ref.invalidate(pendingRequestsProvider);
           },
           backgroundColor: isDark ? Colors.grey.shade900 : Colors.white,
           selectedItemColor: Colors.orange,

@@ -64,14 +64,17 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
       _initGameData();
       ref.read(savedGameIdProvider.notifier).state = null;
       ref.invalidate(clubProvider);
-      ref.invalidate(pendingRequestsProvider);
+      refreshPendingRequests(ref);
     });
   }
 
+// Вместо инвалидации — просто обновляем состояние
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    print('hi');
+    // ✅ Принудительно перестраиваем UI
+    refreshPendingRequests(ref);
+
     setState(() {});
   }
 
@@ -101,6 +104,14 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
         stageName: months[DateTime.now().month - 1],
       );
     });
+  }
+
+// Вместо инвалидации — просто обновляем состояние
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // ✅ Принудительно перестраиваем UI
+    setState(() {});
   }
 
   void _updateGameData(GameData newData) {
@@ -363,7 +374,6 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
             setState(() {
               _selectedIndex = index;
             });
-            ref.invalidate(pendingRequestsProvider);
           },
           backgroundColor: isDark ? Colors.grey.shade900 : Colors.white,
           selectedItemColor: Colors.orange,

@@ -68,13 +68,6 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
     });
   }
 
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    print('hi');
-    setState(() {});
-  }
-
   void _initGameData() {
     final user = ref.watch(userProvider).value;
     final judgeName = user?['username'] ?? 'Судья';
@@ -126,6 +119,12 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
       print('📦 pendingRequestsProvider changed: $next');
       // Перестраиваем UI
       setState(() {});
+    });
+    ref.listen(pendingRequestsProvider, (previous, next) {
+      // Если данные устарели — инвалидируем
+      if (previous != null && previous.value != next.value) {
+        ref.invalidate(pendingRequestsProvider);
+      }
     });
     // ✅ Определяем, есть ли клуб
     final hasClub = clubAsync.when(
@@ -363,7 +362,6 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
             setState(() {
               _selectedIndex = index;
             });
-            ref.invalidate(pendingRequestsProvider);
           },
           backgroundColor: isDark ? Colors.grey.shade900 : Colors.white,
           selectedItemColor: Colors.orange,
