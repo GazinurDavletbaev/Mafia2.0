@@ -186,45 +186,24 @@ class _SeatSetupScreenState extends ConsumerState<SeatSetupScreen> {
   }
 
   Widget _buildTextField(int index, int seat, bool isLeft) {
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
-    final controller = _nameControllers[index];
+  final theme = Theme.of(context);
+  final isDark = theme.brightness == Brightness.dark;
+  final controller = _nameControllers[index];
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        TextField(
-          controller: controller,
+  // Текущий выбранный участник
+  final selectedMember = _selectedPlayers[index];
+
+  return Row(
+    children: [
+      Expanded(
+        child: DropdownButtonFormField<Map<String, dynamic>>(
+          value: selectedMember,
+          isExpanded: true,
+          dropdownColor: isDark ? Colors.grey.shade800 : Colors.white,
           style: TextStyle(
-            color: theme.textTheme.bodyLarge?.color ?? Colors.white,
+            color: isDark ? Colors.white : Colors.black87,
+            fontSize: 14,
           ),
-          onChanged: (value) {
-            setState(() {
-              _focusedIndex = index;
-              final q = value.toLowerCase().trim();
-              if (q.isNotEmpty) {
-                _filteredMembers = _clubMembers
-                    .where(
-                        (m) => (m['username'] ?? '').toLowerCase().contains(q))
-                    .toList();
-              } else {
-                _filteredMembers = [];
-              }
-            });
-            _notifyChanges();
-          },
-          onTap: () {
-            if (controller.text.isNotEmpty) {
-              setState(() {
-                _focusedIndex = index;
-                final q = controller.text.toLowerCase().trim();
-                _filteredMembers = _clubMembers
-                    .where(
-                        (m) => (m['username'] ?? '').toLowerCase().contains(q))
-                    .toList();
-              });
-            }
-          },
           decoration: InputDecoration(
             hintText: 'Игрок $seat',
             hintStyle: TextStyle(
@@ -241,29 +220,14 @@ class _SeatSetupScreenState extends ConsumerState<SeatSetupScreen> {
               vertical: 8,
             ),
           ),
-          textAlign: isLeft ? TextAlign.left : TextAlign.right,
-        ),
-        if (_focusedIndex == index && _filteredMembers.isNotEmpty)
-          Container(
-            margin: const EdgeInsets.only(top: 4),
-            constraints: const BoxConstraints(maxHeight: 150),
-            decoration: BoxDecoration(
-              color: isDark ? Colors.grey.shade800 : Colors.white,
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(
-                color: isDark ? Colors.grey.shade700 : Colors.grey.shade300,
-              ),
-            ),
-            child: ListView.builder(
-              padding: EdgeInsets.zero,
-              shrinkWrap: true,
-              itemCount: _filteredMembers.length,
-              itemBuilder: (context, i) {
-                final member = _filteredMembers[i];
-                final avatarUrl = member['avatar_url'];
-                return ListTile(
-                  leading: CircleAvatar(
-                    radius: 16,
+          items: _clubMembers.map((member) {
+            final avatarUrl = member['avatar_url'];
+            return DropdownMenuItem<Map<String, dynamic>>(
+              value: member,
+              child: Row(
+                children: [
+                  CircleAvatar(
+                    radius: 12,
                     backgroundImage:
                         avatarUrl != null && avatarUrl.toString().isNotEmpty
                             ? NetworkImage(avatarUrl)
@@ -271,32 +235,41 @@ class _SeatSetupScreenState extends ConsumerState<SeatSetupScreen> {
                     child: avatarUrl == null || avatarUrl.toString().isEmpty
                         ? Image.asset(
                             'assets/mafia_logo.png',
-                            width: 20,
-                            height: 20,
+                            width: 16,
+                            height: 16,
                             fit: BoxFit.contain,
                           )
                         : null,
                   ),
-                  title: Text(
-                    member['username'] ?? '',
-                    style: TextStyle(
-                      color: isDark ? Colors.white : Colors.black87,
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      member['username'] ?? '',
+                      style: TextStyle(
+                        color: isDark ? Colors.white : Colors.black87,
+                      ),
                     ),
                   ),
-                  onTap: () {
-                    setState(() {
-                      _selectedPlayers[index] = member;
-                      controller.text = member['username'] ?? '';
-                      _filteredMembers = [];
-                      _focusedIndex = -1;
-                    });
-                    _notifyChanges();
-                  },
-                );
-              },
-            ),
-          ),
-      ],
-    );
-  }
+                ],
+              ),
+            );
+          }).toList(),
+          onChanged: (member) {
+            if (member != null) {
+              setState(() {
+                _selectedPlayers[index] = member;
+                controller.text = member['username'] ?? '';
+              });
+              _notifyChanges();
+            }
+          },
+          onTap: () {
+            // Скрываем клавиатуру при открытии
+            FocusScope.of(context).unfocus();
+          },
+        ),
+      ),
+    ],
+  );
+}
 }

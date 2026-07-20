@@ -190,8 +190,8 @@ class _SeatSetupScreenState extends ConsumerState<SeatSetupScreen> {
     final isDark = theme.brightness == Brightness.dark;
     final controller = _nameControllers[index];
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+    return Stack(
+      clipBehavior: Clip.none, // ✅ Чтобы список не обрезался
       children: [
         TextField(
           controller: controller,
@@ -244,56 +244,64 @@ class _SeatSetupScreenState extends ConsumerState<SeatSetupScreen> {
           textAlign: isLeft ? TextAlign.left : TextAlign.right,
         ),
         if (_focusedIndex == index && _filteredMembers.isNotEmpty)
-          Container(
-            margin: const EdgeInsets.only(top: 4),
-            constraints: const BoxConstraints(maxHeight: 150),
-            decoration: BoxDecoration(
-              color: isDark ? Colors.grey.shade800 : Colors.white,
+          Positioned(
+            top: 50, // ✅ Список под полем
+            left: 0,
+            right: 0,
+            child: Material(
+              elevation: 8, // ✅ Тень для выделения
               borderRadius: BorderRadius.circular(8),
-              border: Border.all(
-                color: isDark ? Colors.grey.shade700 : Colors.grey.shade300,
-              ),
-            ),
-            child: ListView.builder(
-              padding: EdgeInsets.zero,
-              shrinkWrap: true,
-              itemCount: _filteredMembers.length,
-              itemBuilder: (context, i) {
-                final member = _filteredMembers[i];
-                final avatarUrl = member['avatar_url'];
-                return ListTile(
-                  leading: CircleAvatar(
-                    radius: 16,
-                    backgroundImage:
-                        avatarUrl != null && avatarUrl.toString().isNotEmpty
-                            ? NetworkImage(avatarUrl)
+              child: Container(
+                decoration: BoxDecoration(
+                  color: isDark ? Colors.grey.shade800 : Colors.white,
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(
+                    color: isDark ? Colors.grey.shade700 : Colors.grey.shade300,
+                  ),
+                ),
+                constraints: const BoxConstraints(maxHeight: 150),
+                child: ListView.builder(
+                  padding: EdgeInsets.zero,
+                  shrinkWrap: true,
+                  itemCount: _filteredMembers.length,
+                  itemBuilder: (context, i) {
+                    final member = _filteredMembers[i];
+                    final avatarUrl = member['avatar_url'];
+                    return ListTile(
+                      leading: CircleAvatar(
+                        radius: 16,
+                        backgroundImage:
+                            avatarUrl != null && avatarUrl.toString().isNotEmpty
+                                ? NetworkImage(avatarUrl)
+                                : null,
+                        child: avatarUrl == null || avatarUrl.toString().isEmpty
+                            ? Image.asset(
+                                'assets/mafia_logo.png',
+                                width: 20,
+                                height: 20,
+                                fit: BoxFit.contain,
+                              )
                             : null,
-                    child: avatarUrl == null || avatarUrl.toString().isEmpty
-                        ? Image.asset(
-                            'assets/mafia_logo.png',
-                            width: 20,
-                            height: 20,
-                            fit: BoxFit.contain,
-                          )
-                        : null,
-                  ),
-                  title: Text(
-                    member['username'] ?? '',
-                    style: TextStyle(
-                      color: isDark ? Colors.white : Colors.black87,
-                    ),
-                  ),
-                  onTap: () {
-                    setState(() {
-                      _selectedPlayers[index] = member;
-                      controller.text = member['username'] ?? '';
-                      _filteredMembers = [];
-                      _focusedIndex = -1;
-                    });
-                    _notifyChanges();
+                      ),
+                      title: Text(
+                        member['username'] ?? '',
+                        style: TextStyle(
+                          color: isDark ? Colors.white : Colors.black87,
+                        ),
+                      ),
+                      onTap: () {
+                        setState(() {
+                          _selectedPlayers[index] = member;
+                          controller.text = member['username'] ?? '';
+                          _filteredMembers = [];
+                          _focusedIndex = -1;
+                        });
+                        _notifyChanges();
+                      },
+                    );
                   },
-                );
-              },
+                ),
+              ),
             ),
           ),
       ],

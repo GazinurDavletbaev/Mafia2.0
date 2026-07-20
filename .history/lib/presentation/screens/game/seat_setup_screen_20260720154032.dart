@@ -186,117 +186,117 @@ class _SeatSetupScreenState extends ConsumerState<SeatSetupScreen> {
   }
 
   Widget _buildTextField(int index, int seat, bool isLeft) {
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
-    final controller = _nameControllers[index];
+  final theme = Theme.of(context);
+  final isDark = theme.brightness == Brightness.dark;
+  final controller = _nameControllers[index];
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        TextField(
-          controller: controller,
-          style: TextStyle(
-            color: theme.textTheme.bodyLarge?.color ?? Colors.white,
-          ),
-          onChanged: (value) {
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      TextField(
+        controller: controller,
+        style: TextStyle(
+          color: theme.textTheme.bodyLarge?.color ?? Colors.white,
+        ),
+        onChanged: (value) {
+          setState(() {
+            _focusedIndex = index;
+            final q = value.toLowerCase().trim();
+            if (q.isNotEmpty) {
+              _filteredMembers = _clubMembers
+                  .where(
+                      (m) => (m['username'] ?? '').toLowerCase().contains(q))
+                  .toList();
+            } else {
+              _filteredMembers = [];
+            }
+          });
+          _notifyChanges();
+        },
+        onTap: () {
+          if (controller.text.isNotEmpty) {
             setState(() {
               _focusedIndex = index;
-              final q = value.toLowerCase().trim();
-              if (q.isNotEmpty) {
-                _filteredMembers = _clubMembers
-                    .where(
-                        (m) => (m['username'] ?? '').toLowerCase().contains(q))
-                    .toList();
-              } else {
-                _filteredMembers = [];
-              }
+              final q = controller.text.toLowerCase().trim();
+              _filteredMembers = _clubMembers
+                  .where(
+                      (m) => (m['username'] ?? '').toLowerCase().contains(q))
+                  .toList();
             });
-            _notifyChanges();
-          },
-          onTap: () {
-            if (controller.text.isNotEmpty) {
-              setState(() {
-                _focusedIndex = index;
-                final q = controller.text.toLowerCase().trim();
-                _filteredMembers = _clubMembers
-                    .where(
-                        (m) => (m['username'] ?? '').toLowerCase().contains(q))
-                    .toList();
-              });
-            }
-          },
-          decoration: InputDecoration(
-            hintText: 'Игрок $seat',
-            hintStyle: TextStyle(
-              color: isDark ? Colors.grey.shade600 : Colors.grey.shade400,
-            ),
-            filled: true,
-            fillColor: isDark ? Colors.grey.shade800 : Colors.grey.shade200,
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide.none,
-            ),
-            contentPadding: const EdgeInsets.symmetric(
-              horizontal: 12,
-              vertical: 8,
-            ),
+          }
+        },
+        decoration: InputDecoration(
+          hintText: 'Игрок $seat',
+          hintStyle: TextStyle(
+            color: isDark ? Colors.grey.shade600 : Colors.grey.shade400,
           ),
-          textAlign: isLeft ? TextAlign.left : TextAlign.right,
+          filled: true,
+          fillColor: isDark ? Colors.grey.shade800 : Colors.grey.shade200,
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(8),
+            borderSide: BorderSide.none,
+          ),
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 12,
+            vertical: 8,
+          ),
         ),
-        if (_focusedIndex == index && _filteredMembers.isNotEmpty)
-          Container(
-            margin: const EdgeInsets.only(top: 4),
-            constraints: const BoxConstraints(maxHeight: 150),
-            decoration: BoxDecoration(
-              color: isDark ? Colors.grey.shade800 : Colors.white,
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(
-                color: isDark ? Colors.grey.shade700 : Colors.grey.shade300,
-              ),
-            ),
-            child: ListView.builder(
-              padding: EdgeInsets.zero,
-              shrinkWrap: true,
-              itemCount: _filteredMembers.length,
-              itemBuilder: (context, i) {
-                final member = _filteredMembers[i];
-                final avatarUrl = member['avatar_url'];
-                return ListTile(
-                  leading: CircleAvatar(
-                    radius: 16,
-                    backgroundImage:
-                        avatarUrl != null && avatarUrl.toString().isNotEmpty
-                            ? NetworkImage(avatarUrl)
-                            : null,
-                    child: avatarUrl == null || avatarUrl.toString().isEmpty
-                        ? Image.asset(
-                            'assets/mafia_logo.png',
-                            width: 20,
-                            height: 20,
-                            fit: BoxFit.contain,
-                          )
-                        : null,
-                  ),
-                  title: Text(
-                    member['username'] ?? '',
-                    style: TextStyle(
-                      color: isDark ? Colors.white : Colors.black87,
-                    ),
-                  ),
-                  onTap: () {
-                    setState(() {
-                      _selectedPlayers[index] = member;
-                      controller.text = member['username'] ?? '';
-                      _filteredMembers = [];
-                      _focusedIndex = -1;
-                    });
-                    _notifyChanges();
-                  },
-                );
-              },
+        textAlign: isLeft ? TextAlign.left : TextAlign.right,
+      ),
+      if (_focusedIndex == index && _filteredMembers.isNotEmpty)
+        Container(
+          margin: const EdgeInsets.only(top: 4),
+          constraints: const BoxConstraints(maxHeight: 150),
+          decoration: BoxDecoration(
+            color: isDark ? Colors.grey.shade800 : Colors.white,
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(
+              color: isDark ? Colors.grey.shade700 : Colors.grey.shade300,
             ),
           ),
-      ],
-    );
-  }
+          child: ListView.builder(
+            padding: EdgeInsets.zero,
+            shrinkWrap: true,
+            itemCount: _filteredMembers.length,
+            itemBuilder: (context, i) {
+              final member = _filteredMembers[i];
+              final avatarUrl = member['avatar_url'];
+              return ListTile(
+                leading: CircleAvatar(
+                  radius: 16,
+                  backgroundImage:
+                      avatarUrl != null && avatarUrl.toString().isNotEmpty
+                          ? NetworkImage(avatarUrl)
+                          : null,
+                  child: avatarUrl == null || avatarUrl.toString().isEmpty
+                      ? Image.asset(
+                          'assets/mafia_logo.png',
+                          width: 20,
+                          height: 20,
+                          fit: BoxFit.contain,
+                        )
+                      : null,
+                ),
+                title: Text(
+                  member['username'] ?? '',
+                  style: TextStyle(
+                    color: isDark ? Colors.white : Colors.black87,
+                  ),
+                ),
+                onTap: () {
+                  setState(() {
+                    _selectedPlayers[index] = member;
+                    controller.text = member['username'] ?? '';
+                    _filteredMembers = [];
+                    _focusedIndex = -1;
+                  });
+                  _notifyChanges();
+                },
+              );
+            },
+          ),
+        ),
+    ],
+  );
+}
 }

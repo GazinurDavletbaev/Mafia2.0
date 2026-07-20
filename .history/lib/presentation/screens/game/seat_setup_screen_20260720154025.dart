@@ -246,7 +246,6 @@ class _SeatSetupScreenState extends ConsumerState<SeatSetupScreen> {
         if (_focusedIndex == index && _filteredMembers.isNotEmpty)
           Container(
             margin: const EdgeInsets.only(top: 4),
-            constraints: const BoxConstraints(maxHeight: 150),
             decoration: BoxDecoration(
               color: isDark ? Colors.grey.shade800 : Colors.white,
               borderRadius: BorderRadius.circular(8),
@@ -254,6 +253,7 @@ class _SeatSetupScreenState extends ConsumerState<SeatSetupScreen> {
                 color: isDark ? Colors.grey.shade700 : Colors.grey.shade300,
               ),
             ),
+            constraints: const BoxConstraints(maxHeight: 150),
             child: ListView.builder(
               padding: EdgeInsets.zero,
               shrinkWrap: true,
@@ -285,7 +285,7 @@ class _SeatSetupScreenState extends ConsumerState<SeatSetupScreen> {
                   ),
                   onTap: () {
                     setState(() {
-                      _selectedPlayers[index] = member;
+                      _selectedPlayers[index] = member; // ✅
                       controller.text = member['username'] ?? '';
                       _filteredMembers = [];
                       _focusedIndex = -1;

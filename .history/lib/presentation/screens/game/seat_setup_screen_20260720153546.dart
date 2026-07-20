@@ -246,17 +246,26 @@ class _SeatSetupScreenState extends ConsumerState<SeatSetupScreen> {
         if (_focusedIndex == index && _filteredMembers.isNotEmpty)
           Container(
             margin: const EdgeInsets.only(top: 4),
-            constraints: const BoxConstraints(maxHeight: 150),
+            width: double.infinity, // ✅ На всю ширину
+            constraints:
+                const BoxConstraints(maxHeight: 150), // ✅ Максимальная высота
             decoration: BoxDecoration(
               color: isDark ? Colors.grey.shade800 : Colors.white,
               borderRadius: BorderRadius.circular(8),
               border: Border.all(
                 color: isDark ? Colors.grey.shade700 : Colors.grey.shade300,
               ),
+              boxShadow: const [
+                BoxShadow(
+                  color: Colors.black26,
+                  blurRadius: 8,
+                  offset: Offset(0, 4),
+                ),
+              ],
             ),
             child: ListView.builder(
               padding: EdgeInsets.zero,
-              shrinkWrap: true,
+              shrinkWrap: true, // ✅ Занимает только нужную высоту
               itemCount: _filteredMembers.length,
               itemBuilder: (context, i) {
                 final member = _filteredMembers[i];
