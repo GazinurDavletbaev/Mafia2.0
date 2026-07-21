@@ -621,35 +621,35 @@ class ClubService {
       ),
     );
   }
-
-  static Future<Map<String, dynamic>> toggleGameRating(int gameId) async {
-    final token = await AuthService.getToken();
-    if (token == null) {
-      return {'success': false, 'error': 'Не авторизован'};
-    }
-
-    try {
-      final response = await http.post(
-        Uri.parse('$baseUrl/games/$gameId/toggle-rating?token=$token'),
-        headers: {'Content-Type': 'application/json'},
-      );
-
-      print('📤 toggleGameRating status: ${response.statusCode}');
-      print('📤 toggleGameRating body: ${response.body}');
-
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        return {'success': true, 'data': data};
-      } else {
-        final data = jsonDecode(response.body);
-        return {
-          'success': false,
-          'error': data['detail'] ?? 'Ошибка',
-        };
-      }
-    } catch (e) {
-      print('❌ toggleGameRating error: $e');
-      return {'success': false, 'error': 'Ошибка соединения: $e'};
-    }
+static Future<Map<String, dynamic>> toggleGameRating(int gameId) async {
+  final token = await AuthService.getToken();
+  if (token == null) {
+    return {'success': false, 'error': 'Не авторизован'};
   }
+
+  try {
+    final response = await http.post(
+      Uri.parse('$baseUrl/games/$gameId/toggle-rating?token=$token'),
+      headers: {'Content-Type': 'application/json'},
+    );
+
+    print('📤 toggleGameRating status: ${response.statusCode}');
+    print('📤 toggleGameRating body: ${response.body}');
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      return {'success': true, 'data': data};
+    } else {
+      final data = jsonDecode(response.body);
+      return {
+        'success': false,
+        'error': data['detail'] ?? 'Ошибка',
+      };
+    }
+  } catch (e) {
+    print('❌ toggleGameRating error: $e');
+    return {'success': false, 'error': 'Ошибка соединения: $e'};
+  }
+}
+
 }
