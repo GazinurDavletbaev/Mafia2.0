@@ -49,40 +49,18 @@ class _SeatSetupScreenState extends ConsumerState<SeatSetupScreen> {
     for (var controller in _nameControllers) {
       controller.dispose();
     }
-    // ✅ Просто удаляем оверлей без setState
-    _overlayEntry?.remove();
-    _overlayEntry = null;
+    _closeOverlay();
     super.dispose();
   }
 
   void _updateFilteredList() {
     final q = _searchQuery.toLowerCase().trim();
     setState(() {
-      // Собираем имена игроков, уже выбранных на другие места
-      final takenUsernames = <String>{};
-      for (int i = 0; i < _selectedPlayers.length; i++) {
-        // ✅ Пропускаем только если _focusedIndex >= 0 и i == _focusedIndex
-        if (_focusedIndex >= 0 && i == _focusedIndex) continue;
-
-        final selected = _selectedPlayers[i];
-        if (selected != null) {
-          final username = selected['username'];
-          if (username != null && username.isNotEmpty) {
-            takenUsernames.add(username);
-          }
-        }
-      }
-
-      // Фильтруем
       if (q.isEmpty) {
-        _filteredMembers = _clubMembers
-            .where((m) => !takenUsernames.contains(m['username']))
-            .toList();
+        _filteredMembers = List.from(_clubMembers);
       } else {
         _filteredMembers = _clubMembers
-            .where((m) =>
-                (m['username'] ?? '').toLowerCase().contains(q) &&
-                !takenUsernames.contains(m['username']))
+            .where((m) => (m['username'] ?? '').toLowerCase().contains(q))
             .toList();
       }
     });
@@ -240,22 +218,16 @@ class _SeatSetupScreenState extends ConsumerState<SeatSetupScreen> {
       final index = entry.key;
       final player = entry.value;
       final newName = names.length > index ? names[index] : player.name;
-      final oldName = player.name;
 
-      // ✅ ЕСЛИ ИМЯ НЕ ИЗМЕНИЛОСЬ — ОСТАВЛЯЕМ КАК БЫЛО
-      if (newName == oldName) {
-        return player;
-      }
-
-      // ✅ ЕСЛИ ИМЯ ИЗМЕНИЛОСЬ — ОБНОВЛЯЕМ
-      final selected = _selectedPlayers[index];
-      final int? userId = selected != null ? selected['id'] as int? : null;
-      final String? avatarUrl =
-          (userId != null) ? selected!['avatar_url'] as String? : '';
+      // ✅ Всегда берём аватарку из _selectedPlayers (если есть)
+      final selected =
+          _selectedPlayers.length > index ? _selectedPlayers[index] : null;
+      final avatarUrl = selected?['avatar_url'];
+      final userId = selected?['id'];
 
       return player.copyWith(
         name: newName,
-        avatarUrl: avatarUrl,
+        avatarUrl: avatarUrl, // если null — в PlayerCard покажется стандартная
         userId: userId,
       );
     }).toList();

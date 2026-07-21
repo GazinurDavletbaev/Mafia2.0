@@ -49,40 +49,18 @@ class _SeatSetupScreenState extends ConsumerState<SeatSetupScreen> {
     for (var controller in _nameControllers) {
       controller.dispose();
     }
-    // ✅ Просто удаляем оверлей без setState
-    _overlayEntry?.remove();
-    _overlayEntry = null;
+    _closeOverlay();
     super.dispose();
   }
 
   void _updateFilteredList() {
     final q = _searchQuery.toLowerCase().trim();
     setState(() {
-      // Собираем имена игроков, уже выбранных на другие места
-      final takenUsernames = <String>{};
-      for (int i = 0; i < _selectedPlayers.length; i++) {
-        // ✅ Пропускаем только если _focusedIndex >= 0 и i == _focusedIndex
-        if (_focusedIndex >= 0 && i == _focusedIndex) continue;
-
-        final selected = _selectedPlayers[i];
-        if (selected != null) {
-          final username = selected['username'];
-          if (username != null && username.isNotEmpty) {
-            takenUsernames.add(username);
-          }
-        }
-      }
-
-      // Фильтруем
       if (q.isEmpty) {
-        _filteredMembers = _clubMembers
-            .where((m) => !takenUsernames.contains(m['username']))
-            .toList();
+        _filteredMembers = List.from(_clubMembers);
       } else {
         _filteredMembers = _clubMembers
-            .where((m) =>
-                (m['username'] ?? '').toLowerCase().contains(q) &&
-                !takenUsernames.contains(m['username']))
+            .where((m) => (m['username'] ?? '').toLowerCase().contains(q))
             .toList();
       }
     });
@@ -240,23 +218,27 @@ class _SeatSetupScreenState extends ConsumerState<SeatSetupScreen> {
       final index = entry.key;
       final player = entry.value;
       final newName = names.length > index ? names[index] : player.name;
-      final oldName = player.name;
 
-      // ✅ ЕСЛИ ИМЯ НЕ ИЗМЕНИЛОСЬ — ОСТАВЛЯЕМ КАК БЫЛО
-      if (newName == oldName) {
-        return player;
+      final selected =
+          _selectedPlayers.length > index ? _selectedPlayers[index] : null;
+
+      // ✅ Логика аватарки:
+      // 1. Если есть selected и у него есть avatar_url — берём его
+      // 2. Иначе — null (игрок без аватарки, в игре покажется mafia_logo.png)
+      String? avatarUrl;
+      if (selected != null) {
+        final url = selected['avatar_url'];
+        if (url != null && url.toString().isNotEmpty) {
+          avatarUrl = url;
+        }
+        // если url пустой или null — avatarUrl остаётся null
       }
-
-      // ✅ ЕСЛИ ИМЯ ИЗМЕНИЛОСЬ — ОБНОВЛЯЕМ
-      final selected = _selectedPlayers[index];
-      final int? userId = selected != null ? selected['id'] as int? : null;
-      final String? avatarUrl =
-          (userId != null) ? selected!['avatar_url'] as String? : '';
+      // если selected == null — avatarUrl остаётся null
 
       return player.copyWith(
         name: newName,
-        avatarUrl: avatarUrl,
-        userId: userId,
+        avatarUrl: avatarUrl, // если null — в игре будет лого
+        userId: selected?['id'],
       );
     }).toList();
 
@@ -386,11 +368,26 @@ class _SeatSetupScreenState extends ConsumerState<SeatSetupScreen> {
               }
             },
             onTap: () {
-              _focusedIndex = index;
-              _searchQuery = controller.text;
-              _updateFilteredList();
-              _showOverlay(context, index);
-            },
+  setState(() {
+    // ✅ Если у игрока нет id — аватарка null
+    if (member['id'] == null) {
+      _selectedPlayers[index] = {
+        'id': null,
+        'username': member['username'],
+        'avatar_url': null,
+      };
+    } else {
+      _selectedPlayers[index] = member;
+    }
+    
+    _nameControllers[index].text = member['username'] ?? '';
+    _filteredMembers = [];
+    _focusedIndex = -1;
+    _searchQuery = '';
+  });
+  _closeOverlay();
+  _notifyChanges();
+},
             decoration: InputDecoration(
               hintText: 'Игрок $seat',
               hintStyle: TextStyle(

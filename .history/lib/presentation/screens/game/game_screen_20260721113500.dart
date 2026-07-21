@@ -35,29 +35,56 @@ class _GameScreenState extends ConsumerState<GameScreen> {
   late GameViewModel _vm;
   bool _dialogShown = false;
 
-  @override
-  void initState() {
-    super.initState();
-    _vm = ref.read(gameViewModelProvider.notifier);
+  @@override
+void initState() {
+  super.initState();
+  _vm = ref.read(gameViewModelProvider.notifier);
 
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      print('=== GAME SCREEN INIT ===');
-      print('playerNames: ${widget.initialData.playerNames}');
-      print(
-          'gameState.players: ${widget.initialData.gameState.players.map((p) => p.name)}');
+  WidgetsBinding.instance.addPostFrameCallback((_) {
+    print('=== GAME SCREEN INIT ===');
+    print('playerNames: ${widget.initialData.playerNames}');
+    print('gameState.players: ${widget.initialData.gameState.players.map((p) => p.name)}');
 
-      final players = widget.initialData.gameState.players;
-      final namesFromData = widget.initialData.playerNames;
-      final avatars = players.map((p) => p.avatarUrl).toList(); // ✅
+    final players = widget.initialData.gameState.players;
+    final namesFromData = widget.initialData.playerNames;
+    final avatars = players.map((p) => p.avatarUrl).toList(); // ✅
 
-      print('📦 avatars: $avatars'); // ✅ ДОБАВЬ
+    print('📦 avatars: $avatars'); // ✅ ДОБАВЬ
 
-      final hasNames = namesFromData.any((name) => name.isNotEmpty);
+    final hasNames = namesFromData.any((name) => name.isNotEmpty);
 
-      if (hasNames) {
+    if (hasNames) {
+      _vm.initializeGame(
+        playerNames: namesFromData,
+        avatars: avatars, // ✅
+        tableNumber: widget.initialData.tableNumber,
+        gameNumber: widget.initialData.gameNumber,
+        gameDate: widget.initialData.date,
+        judgeName: widget.initialData.judgeName,
+        tournamentName: widget.initialData.tournamentName,
+        stageName: widget.initialData.stageName,
+      );
+      _notifyGameStateChanged();
+    } else {
+      final playerNamesFromState = players.map((p) => p.name).toList();
+      final hasStateNames = playerNamesFromState.any((name) => name.isNotEmpty);
+      if (hasStateNames) {
+        widget.onGameStateChanged(
+          GameData(
+            tournamentName: widget.initialData.tournamentName,
+            stageName: widget.initialData.stageName,
+            tableNumber: widget.initialData.tableNumber,
+            gameNumber: widget.initialData.gameNumber,
+            date: widget.initialData.date,
+            judgeName: widget.initialData.judgeName,
+            playerNames: playerNamesFromState,
+            gameState: widget.initialData.gameState,
+            gameHistory: widget.initialData.gameHistory,
+          ),
+        );
         _vm.initializeGame(
-          playerNames: namesFromData,
-          avatars: avatars, // ✅
+          playerNames: playerNamesFromState,
+          avatars: avatars, // ✅ ДОБАВИТЬ
           tableNumber: widget.initialData.tableNumber,
           gameNumber: widget.initialData.gameNumber,
           gameDate: widget.initialData.date,
@@ -66,39 +93,10 @@ class _GameScreenState extends ConsumerState<GameScreen> {
           stageName: widget.initialData.stageName,
         );
         _notifyGameStateChanged();
-      } else {
-        final playerNamesFromState = players.map((p) => p.name).toList();
-        final hasStateNames =
-            playerNamesFromState.any((name) => name.isNotEmpty);
-        if (hasStateNames) {
-          widget.onGameStateChanged(
-            GameData(
-              tournamentName: widget.initialData.tournamentName,
-              stageName: widget.initialData.stageName,
-              tableNumber: widget.initialData.tableNumber,
-              gameNumber: widget.initialData.gameNumber,
-              date: widget.initialData.date,
-              judgeName: widget.initialData.judgeName,
-              playerNames: playerNamesFromState,
-              gameState: widget.initialData.gameState,
-              gameHistory: widget.initialData.gameHistory,
-            ),
-          );
-          _vm.initializeGame(
-            playerNames: playerNamesFromState,
-            avatars: avatars, // ✅ ДОБАВИТЬ
-            tableNumber: widget.initialData.tableNumber,
-            gameNumber: widget.initialData.gameNumber,
-            gameDate: widget.initialData.date,
-            judgeName: widget.initialData.judgeName,
-            tournamentName: widget.initialData.tournamentName,
-            stageName: widget.initialData.stageName,
-          );
-          _notifyGameStateChanged();
-        }
       }
-    });
-  }
+    }
+  });
+}
 
   @override
   void didUpdateWidget(covariant GameScreen oldWidget) {

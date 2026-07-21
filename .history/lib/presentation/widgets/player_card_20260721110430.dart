@@ -124,11 +124,12 @@ class PlayerCard extends StatelessWidget {
                             ? NetworkImage(player.avatarUrl!)
                             : null,
                     child: player.avatarUrl == null || player.avatarUrl!.isEmpty
-                        ? Image.asset(
-                            'assets/mafia_logo.png',
-                            width: 30,
-                            height: 30,
-                            fit: BoxFit.contain,
+                        ? Text(
+                            player.name.isNotEmpty
+                                ? player.name.substring(0, 1).toUpperCase()
+                                : '?',
+                            style: const TextStyle(
+                                fontSize: 16, fontWeight: FontWeight.bold),
                           )
                         : null,
                   ),

@@ -58,12 +58,10 @@ class _SeatSetupScreenState extends ConsumerState<SeatSetupScreen> {
   void _updateFilteredList() {
     final q = _searchQuery.toLowerCase().trim();
     setState(() {
-      // Собираем имена игроков, уже выбранных на другие места
+      // Собираем имена игроков, уже выбранных на другие места (кроме текущего)
       final takenUsernames = <String>{};
       for (int i = 0; i < _selectedPlayers.length; i++) {
-        // ✅ Пропускаем только если _focusedIndex >= 0 и i == _focusedIndex
-        if (_focusedIndex >= 0 && i == _focusedIndex) continue;
-
+        if (i == _focusedIndex) continue; // пропускаем текущее поле
         final selected = _selectedPlayers[i];
         if (selected != null) {
           final username = selected['username'];
@@ -73,7 +71,9 @@ class _SeatSetupScreenState extends ConsumerState<SeatSetupScreen> {
         }
       }
 
-      // Фильтруем
+      // Фильтруем _clubMembers:
+      // - исключаем тех, кто уже занят
+      // - и фильтруем по поисковому запросу
       if (q.isEmpty) {
         _filteredMembers = _clubMembers
             .where((m) => !takenUsernames.contains(m['username']))
@@ -240,18 +240,14 @@ class _SeatSetupScreenState extends ConsumerState<SeatSetupScreen> {
       final index = entry.key;
       final player = entry.value;
       final newName = names.length > index ? names[index] : player.name;
-      final oldName = player.name;
 
-      // ✅ ЕСЛИ ИМЯ НЕ ИЗМЕНИЛОСЬ — ОСТАВЛЯЕМ КАК БЫЛО
-      if (newName == oldName) {
-        return player;
-      }
-
-      // ✅ ЕСЛИ ИМЯ ИЗМЕНИЛОСЬ — ОБНОВЛЯЕМ
       final selected = _selectedPlayers[index];
-      final int? userId = selected != null ? selected['id'] as int? : null;
-      final String? avatarUrl =
-          (userId != null) ? selected!['avatar_url'] as String? : '';
+      final avatarUrl = selected != null ? selected['avatar_url'] : null;
+      final userId = selected != null ? selected['id'] : null;
+
+      // ✅ ПРИНТ
+      print(
+          '📦 _notifyChanges: index=$index, name=$newName, avatarUrl=$avatarUrl, userId=$userId');
 
       return player.copyWith(
         name: newName,

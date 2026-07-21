@@ -58,31 +58,11 @@ class _SeatSetupScreenState extends ConsumerState<SeatSetupScreen> {
   void _updateFilteredList() {
     final q = _searchQuery.toLowerCase().trim();
     setState(() {
-      // Собираем имена игроков, уже выбранных на другие места
-      final takenUsernames = <String>{};
-      for (int i = 0; i < _selectedPlayers.length; i++) {
-        // ✅ Пропускаем только если _focusedIndex >= 0 и i == _focusedIndex
-        if (_focusedIndex >= 0 && i == _focusedIndex) continue;
-
-        final selected = _selectedPlayers[i];
-        if (selected != null) {
-          final username = selected['username'];
-          if (username != null && username.isNotEmpty) {
-            takenUsernames.add(username);
-          }
-        }
-      }
-
-      // Фильтруем
       if (q.isEmpty) {
-        _filteredMembers = _clubMembers
-            .where((m) => !takenUsernames.contains(m['username']))
-            .toList();
+        _filteredMembers = List.from(_clubMembers);
       } else {
         _filteredMembers = _clubMembers
-            .where((m) =>
-                (m['username'] ?? '').toLowerCase().contains(q) &&
-                !takenUsernames.contains(m['username']))
+            .where((m) => (m['username'] ?? '').toLowerCase().contains(q))
             .toList();
       }
     });
@@ -240,18 +220,14 @@ class _SeatSetupScreenState extends ConsumerState<SeatSetupScreen> {
       final index = entry.key;
       final player = entry.value;
       final newName = names.length > index ? names[index] : player.name;
-      final oldName = player.name;
 
-      // ✅ ЕСЛИ ИМЯ НЕ ИЗМЕНИЛОСЬ — ОСТАВЛЯЕМ КАК БЫЛО
-      if (newName == oldName) {
-        return player;
-      }
-
-      // ✅ ЕСЛИ ИМЯ ИЗМЕНИЛОСЬ — ОБНОВЛЯЕМ
       final selected = _selectedPlayers[index];
       final int? userId = selected != null ? selected['id'] as int? : null;
       final String? avatarUrl =
-          (userId != null) ? selected!['avatar_url'] as String? : '';
+          userId != null ? selected!['avatar_url'] as String? : null;
+
+      print(
+          '📦 _notifyChanges: index=$index, name=$newName, avatarUrl=$avatarUrl, userId=$userId');
 
       return player.copyWith(
         name: newName,
@@ -376,15 +352,15 @@ class _SeatSetupScreenState extends ConsumerState<SeatSetupScreen> {
               color: theme.textTheme.bodyLarge?.color ?? Colors.white,
             ),
             onChanged: (value) {
-              _searchQuery = value;
-              _focusedIndex = index;
-              _updateFilteredList();
-              _notifyChanges();
-
-              if (_overlayEntry != null) {
-                _showOverlay(context, index);
-              }
-            },
+  _searchQuery = value;
+  _focusedIndex = index;
+  _selectedPlayers[index] = null; // 👈 ВОТ ЭТО
+  _updateFilteredList();
+  _notifyChanges();
+  if (_overlayEntry != null) {
+    _showOverlay(context, index);
+  }
+},
             onTap: () {
               _focusedIndex = index;
               _searchQuery = controller.text;

@@ -49,40 +49,18 @@ class _SeatSetupScreenState extends ConsumerState<SeatSetupScreen> {
     for (var controller in _nameControllers) {
       controller.dispose();
     }
-    // ✅ Просто удаляем оверлей без setState
-    _overlayEntry?.remove();
-    _overlayEntry = null;
+    _closeOverlay();
     super.dispose();
   }
 
   void _updateFilteredList() {
     final q = _searchQuery.toLowerCase().trim();
     setState(() {
-      // Собираем имена игроков, уже выбранных на другие места
-      final takenUsernames = <String>{};
-      for (int i = 0; i < _selectedPlayers.length; i++) {
-        // ✅ Пропускаем только если _focusedIndex >= 0 и i == _focusedIndex
-        if (_focusedIndex >= 0 && i == _focusedIndex) continue;
-
-        final selected = _selectedPlayers[i];
-        if (selected != null) {
-          final username = selected['username'];
-          if (username != null && username.isNotEmpty) {
-            takenUsernames.add(username);
-          }
-        }
-      }
-
-      // Фильтруем
       if (q.isEmpty) {
-        _filteredMembers = _clubMembers
-            .where((m) => !takenUsernames.contains(m['username']))
-            .toList();
+        _filteredMembers = List.from(_clubMembers);
       } else {
         _filteredMembers = _clubMembers
-            .where((m) =>
-                (m['username'] ?? '').toLowerCase().contains(q) &&
-                !takenUsernames.contains(m['username']))
+            .where((m) => (m['username'] ?? '').toLowerCase().contains(q))
             .toList();
       }
     });
@@ -233,51 +211,46 @@ class _SeatSetupScreenState extends ConsumerState<SeatSetupScreen> {
   }
 
   void _notifyChanges() {
-    final names = _nameControllers.map((c) => c.text.trim()).toList();
+  final names = _nameControllers.map((c) => c.text.trim()).toList();
 
-    final updatedPlayers =
-        widget.initialData.gameState.players.asMap().entries.map((entry) {
-      final index = entry.key;
-      final player = entry.value;
-      final newName = names.length > index ? names[index] : player.name;
-      final oldName = player.name;
+  final updatedPlayers =
+      widget.initialData.gameState.players.asMap().entries.map((entry) {
+    final index = entry.key;
+    final player = entry.value;
+    final newName = names.length > index ? names[index] : player.name;
+    final oldName = player.name;
 
-      // ✅ ЕСЛИ ИМЯ НЕ ИЗМЕНИЛОСЬ — ОСТАВЛЯЕМ КАК БЫЛО
-      if (newName == oldName) {
-        return player;
-      }
-
-      // ✅ ЕСЛИ ИМЯ ИЗМЕНИЛОСЬ — ОБНОВЛЯЕМ
-      final selected = _selectedPlayers[index];
-      final int? userId = selected != null ? selected['id'] as int? : null;
-      final String? avatarUrl =
-          (userId != null) ? selected!['avatar_url'] as String? : '';
-
+    // ✅ Если имя изменилось — сбрасываем аватарку и userId
+    if (newName != oldName) {
       return player.copyWith(
         name: newName,
-        avatarUrl: avatarUrl,
-        userId: userId,
+        avatarUrl: null,
+        userId: null,
       );
-    }).toList();
+    }
 
-    final updatedGameState = widget.initialData.gameState.copyWith(
-      players: updatedPlayers,
-    );
+    // ✅ Если имя не изменилось — оставляем как было
+    return player;
+  }).toList();
 
-    widget.onNamesChanged(
-      GameData(
-        tournamentName: widget.initialData.tournamentName,
-        stageName: widget.initialData.stageName,
-        tableNumber: widget.initialData.tableNumber,
-        gameNumber: widget.initialData.gameNumber,
-        date: widget.initialData.date,
-        judgeName: widget.initialData.judgeName,
-        playerNames: names,
-        gameState: updatedGameState,
-        gameHistory: widget.initialData.gameHistory,
-      ),
-    );
-  }
+  final updatedGameState = widget.initialData.gameState.copyWith(
+    players: updatedPlayers,
+  );
+
+  widget.onNamesChanged(
+    GameData(
+      tournamentName: widget.initialData.tournamentName,
+      stageName: widget.initialData.stageName,
+      tableNumber: widget.initialData.tableNumber,
+      gameNumber: widget.initialData.gameNumber,
+      date: widget.initialData.date,
+      judgeName: widget.initialData.judgeName,
+      playerNames: names,
+      gameState: updatedGameState,
+      gameHistory: widget.initialData.gameHistory,
+    ),
+  );
+}
 
   @override
   Widget build(BuildContext context) {
@@ -378,6 +351,15 @@ class _SeatSetupScreenState extends ConsumerState<SeatSetupScreen> {
             onChanged: (value) {
               _searchQuery = value;
               _focusedIndex = index;
+
+              // ✅ Если пользователь вводит вручную — сбрасываем выбор
+              final selected = _selectedPlayers[index];
+              if (selected != null && selected['username'] != value.trim()) {
+                setState(() {
+                  _selectedPlayers[index] = null;
+                });
+              }
+
               _updateFilteredList();
               _notifyChanges();
 

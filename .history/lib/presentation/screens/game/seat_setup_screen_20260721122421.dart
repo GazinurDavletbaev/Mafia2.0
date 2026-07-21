@@ -56,37 +56,37 @@ class _SeatSetupScreenState extends ConsumerState<SeatSetupScreen> {
   }
 
   void _updateFilteredList() {
-    final q = _searchQuery.toLowerCase().trim();
-    setState(() {
-      // Собираем имена игроков, уже выбранных на другие места
-      final takenUsernames = <String>{};
-      for (int i = 0; i < _selectedPlayers.length; i++) {
-        // ✅ Пропускаем только если _focusedIndex >= 0 и i == _focusedIndex
-        if (_focusedIndex >= 0 && i == _focusedIndex) continue;
-
-        final selected = _selectedPlayers[i];
-        if (selected != null) {
-          final username = selected['username'];
-          if (username != null && username.isNotEmpty) {
-            takenUsernames.add(username);
-          }
+  final q = _searchQuery.toLowerCase().trim();
+  setState(() {
+    // Собираем имена игроков, уже выбранных на другие места
+    final takenUsernames = <String>{};
+    for (int i = 0; i < _selectedPlayers.length; i++) {
+      // ✅ Пропускаем только если _focusedIndex >= 0 и i == _focusedIndex
+      if (_focusedIndex >= 0 && i == _focusedIndex) continue;
+      
+      final selected = _selectedPlayers[i];
+      if (selected != null) {
+        final username = selected['username'];
+        if (username != null && username.isNotEmpty) {
+          takenUsernames.add(username);
         }
       }
+    }
 
-      // Фильтруем
-      if (q.isEmpty) {
-        _filteredMembers = _clubMembers
-            .where((m) => !takenUsernames.contains(m['username']))
-            .toList();
-      } else {
-        _filteredMembers = _clubMembers
-            .where((m) =>
-                (m['username'] ?? '').toLowerCase().contains(q) &&
-                !takenUsernames.contains(m['username']))
-            .toList();
-      }
-    });
-  }
+    // Фильтруем
+    if (q.isEmpty) {
+      _filteredMembers = _clubMembers
+          .where((m) => !takenUsernames.contains(m['username']))
+          .toList();
+    } else {
+      _filteredMembers = _clubMembers
+          .where((m) =>
+              (m['username'] ?? '').toLowerCase().contains(q) &&
+              !takenUsernames.contains(m['username']))
+          .toList();
+    }
+  });
+}
 
   void _showOverlay(BuildContext context, int index) {
     _overlayEntry?.remove();

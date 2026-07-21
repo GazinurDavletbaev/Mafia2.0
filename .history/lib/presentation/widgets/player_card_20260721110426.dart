@@ -117,21 +117,20 @@ class PlayerCard extends StatelessWidget {
               clipBehavior: Clip.none,
               children: [
                 Center(
-                  child: CircleAvatar(
-                    radius: 28,
-                    backgroundImage:
-                        player.avatarUrl != null && player.avatarUrl!.isNotEmpty
-                            ? NetworkImage(player.avatarUrl!)
-                            : null,
-                    child: player.avatarUrl == null || player.avatarUrl!.isEmpty
-                        ? Image.asset(
-                            'assets/mafia_logo.png',
-                            width: 30,
-                            height: 30,
-                            fit: BoxFit.contain,
-                          )
-                        : null,
-                  ),
+                  CircleAvatar(
+  radius: 28,
+  backgroundImage: player.avatarUrl != null && player.avatarUrl!.isNotEmpty
+      ? NetworkImage(player.avatarUrl!)
+      : null,
+  child: player.avatarUrl == null || player.avatarUrl!.isEmpty
+      ? Image.asset(
+          'assets/mafia_logo.png',
+          width: 30,
+          height: 30,
+          fit: BoxFit.contain,
+        )
+      : null,
+),
                 ),
                 Positioned(
                   top: 0,
