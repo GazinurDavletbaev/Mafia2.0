@@ -2,7 +2,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:mafia_help/application/providers/club_provider.dart';
 import 'package:mafia_help/application/providers/notification_provider.dart';
 import '../../../services/club_service.dart';
 
@@ -60,7 +59,7 @@ class _ClubRequestsScreenState extends ConsumerState<ClubRequestsScreen> {
 
     if (result['success']) {
       // ✅ Обновляем провайдер
-      ref.invalidate(clubProvider);
+        ref.invalidate(clubProvider);
 
       ref.invalidate(pendingRequestsProvider);
 

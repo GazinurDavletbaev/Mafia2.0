@@ -1260,14 +1260,16 @@ class _GameProtocolScreenState extends ConsumerState<GameProtocolScreen> {
     // ========== 2. ПОЛУЧАЕМ CLUB_ID ==========
     final clubAsync = ref.watch(clubProvider);
     final clubId = clubAsync.when(
-      data: (club) => club?['id'],
-      loading: () => null,
-      error: (_, __) => null,
+      data: (club) => club?['id'] ?? 0,
+      loading: () => 0,
+      error: (_, __) => 0,
     );
+
+    
 
     // ========== 3. ФОРМИРУЕМ ДАННЫЕ ==========
     final data = {
-      'club_id': clubId ?? 0,
+      'club_id': clubId,
       'tournament': _tournamentController.text,
       'stage': _stageController.text,
       'table': int.tryParse(_tableController.text) ?? 1,
@@ -1337,51 +1339,46 @@ class _GameProtocolScreenState extends ConsumerState<GameProtocolScreen> {
         return;
       }
 
-      // ========== 5. СОХРАНЯЕМ В КЛУБ (ЕСЛИ ЕСТЬ КЛУБ) ==========
-      bool savedToClub = false;
-      if (clubId != null && clubId != 0) {
-        final savedGameId = ref.read(savedGameIdProvider);
-        final savedGameIdNotifier = ref.read(savedGameIdProvider.notifier);
+      // ========== 5. СОХРАНЯЕМ ИЛИ ОБНОВЛЯЕМ ИГРУ ==========
+      final savedGameId = ref.read(savedGameIdProvider);
+      final savedGameIdNotifier = ref.read(savedGameIdProvider.notifier);
 
-        String url;
-        if (savedGameId != null) {
-          url =
-              'http://161.104.46.234:8001/games/update/$savedGameId?token=$token';
-          print('🔄 Обновляем игру ID: $savedGameId');
-        } else {
-          url = 'http://161.104.46.234:8001/games/save?token=$token';
-          print('🆕 Создаём новую игру');
-        }
-
-        final saveResponse = await http.post(
-          Uri.parse(url),
-          headers: {'Content-Type': 'application/json'},
-          body: jsonEncode(data),
-        );
-
-        print('📤 Save game status: ${saveResponse.statusCode}');
-        print('📤 Save game body: ${saveResponse.body}');
-
-        if (saveResponse.statusCode == 200) {
-          final responseData = jsonDecode(saveResponse.body);
-          savedGameIdNotifier.state = responseData['game_id'];
-          savedToClub = true;
-          print('✅ Сохранён game_id: ${responseData['game_id']}');
-        } else {
-          // Если ошибка — показываем, но Excel всё равно генерируем
-          final errorData = jsonDecode(saveResponse.body);
-          print('❌ Ошибка сохранения: ${errorData['detail']}');
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                  '⚠️ Игра не сохранена в клуб: ${errorData['detail'] ?? 'Неизвестная ошибка'}'),
-              backgroundColor: Colors.orange,
-            ),
-          );
-        }
+      String url;
+      if (savedGameId != null) {
+        url =
+            'http://161.104.46.234:8001/games/update/$savedGameId?token=$token';
+        print('🔄 Обновляем игру ID: $savedGameId');
       } else {
-        print('ℹ️ Нет клуба — только Excel');
+        url = 'http://161.104.46.234:8001/games/save?token=$token';
+        print('🆕 Создаём новую игру');
       }
+
+      final saveResponse = await http.post(
+        Uri.parse(url),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode(data),
+      );
+
+      print('📤 Save game status: ${saveResponse.statusCode}');
+      print('📤 Save game body: ${saveResponse.body}');
+
+      if (saveResponse.statusCode != 200) {
+        Navigator.pop(context);
+        final errorData = jsonDecode(saveResponse.body);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+                '❌ Ошибка сохранения: ${errorData['detail'] ?? 'Неизвестная ошибка'}'),
+            backgroundColor: Colors.red,
+          ),
+        );
+        return;
+      }
+
+      // ✅ Сохраняем game_id
+      final responseData = jsonDecode(saveResponse.body);
+      savedGameIdNotifier.state = responseData['game_id'];
+      print('✅ Сохранён game_id: ${responseData['game_id']}');
 
       // ========== 6. ГЕНЕРИРУЕМ EXCEL ==========
       final excelResponse = await http.post(
@@ -1402,12 +1399,8 @@ class _GameProtocolScreenState extends ConsumerState<GameProtocolScreen> {
         await file.writeAsBytes(bytes);
 
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              savedToClub
-                  ? '✅ Игра сохранена в клуб и Excel создан!'
-                  : '✅ Excel создан!',
-            ),
+          const SnackBar(
+            content: Text('✅ Игра сохранена в клуб и Excel создан!'),
             backgroundColor: Colors.green,
           ),
         );
@@ -1415,8 +1408,7 @@ class _GameProtocolScreenState extends ConsumerState<GameProtocolScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              '⚠️ ${savedToClub ? 'Игра сохранена, но' : ''} Excel не создан: ${excelResponse.statusCode}',
-            ),
+                '⚠️ Игра сохранена, но Excel не создан: ${excelResponse.statusCode}'),
             backgroundColor: Colors.orange,
           ),
         );

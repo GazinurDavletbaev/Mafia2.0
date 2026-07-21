@@ -11,6 +11,7 @@ import 'package:mafia_help/data/local/models/player_model.dart';
 import 'package:mafia_help/presentation/screens/game/saved_protocols_screen.dart';
 import 'package:mafia_help/presentation/state/vote_day.dart';
 import 'package:mafia_help/services/auth_service.dart';
+import 'package:mafia_help/services/club_service.dart';
 import 'package:path_provider/path_provider.dart';
 import '../../../domain/rules/game_history.dart';
 import '../../state/game_state.dart';
@@ -1260,14 +1261,14 @@ class _GameProtocolScreenState extends ConsumerState<GameProtocolScreen> {
     // ========== 2. ПОЛУЧАЕМ CLUB_ID ==========
     final clubAsync = ref.watch(clubProvider);
     final clubId = clubAsync.when(
-      data: (club) => club?['id'],
-      loading: () => null,
-      error: (_, __) => null,
+      data: (club) => club?['id'] ?? 0,
+      loading: () => 0,
+      error: (_, __) => 0,
     );
 
     // ========== 3. ФОРМИРУЕМ ДАННЫЕ ==========
     final data = {
-      'club_id': clubId ?? 0,
+      'club_id': clubId,
       'tournament': _tournamentController.text,
       'stage': _stageController.text,
       'table': int.tryParse(_tableController.text) ?? 1,
@@ -1324,7 +1325,6 @@ class _GameProtocolScreenState extends ConsumerState<GameProtocolScreen> {
     print('====================');
 
     try {
-      // ========== 4. ПОЛУЧАЕМ ТОКЕН ==========
       final token = await AuthService.getToken();
       if (token == null) {
         Navigator.pop(context);
@@ -1337,9 +1337,29 @@ class _GameProtocolScreenState extends ConsumerState<GameProtocolScreen> {
         return;
       }
 
-      // ========== 5. СОХРАНЯЕМ В КЛУБ (ЕСЛИ ЕСТЬ КЛУБ) ==========
-      bool savedToClub = false;
+      // ========== 4. ПРОВЕРЯЕМ ПРАВА ==========
+      bool canSaveToClub = false;
       if (clubId != null && clubId != 0) {
+        // Проверяем, является ли пользователь президентом или судьёй
+        final clubResult = await ClubService.getClub(clubId);
+        if (clubResult['success']) {
+          final club = clubResult['club'];
+          final userId = ref.read(userProvider).value?['id'];
+          final isPresident = club?['president_id'] == userId;
+
+          // Проверяем, судья ли пользователь
+          final membersResult = await ClubService.getClubMembers(clubId);
+          final isJudge = membersResult['success'] &&
+                  (membersResult['members'] as List?)?.any(
+                      (m) => m['id'] == userId && m['is_judge'] == true) ??
+              false;
+
+          canSaveToClub = isPresident || isJudge;
+        }
+      }
+
+      // ========== 5. СОХРАНЯЕМ В КЛУБ (ЕСЛИ ЕСТЬ ПРАВА) ==========
+      if (canSaveToClub) {
         final savedGameId = ref.read(savedGameIdProvider);
         final savedGameIdNotifier = ref.read(savedGameIdProvider.notifier);
 
@@ -1365,22 +1385,19 @@ class _GameProtocolScreenState extends ConsumerState<GameProtocolScreen> {
         if (saveResponse.statusCode == 200) {
           final responseData = jsonDecode(saveResponse.body);
           savedGameIdNotifier.state = responseData['game_id'];
-          savedToClub = true;
           print('✅ Сохранён game_id: ${responseData['game_id']}');
         } else {
-          // Если ошибка — показываем, но Excel всё равно генерируем
           final errorData = jsonDecode(saveResponse.body);
-          print('❌ Ошибка сохранения: ${errorData['detail']}');
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(
-                  '⚠️ Игра не сохранена в клуб: ${errorData['detail'] ?? 'Неизвестная ошибка'}'),
-              backgroundColor: Colors.orange,
+              content: Text('❌ ${errorData['detail'] ?? 'Неизвестная ошибка'}'),
+              backgroundColor: Colors.red,
             ),
           );
+          return;
         }
       } else {
-        print('ℹ️ Нет клуба — только Excel');
+        print('ℹ️ Нет прав для сохранения в клуб, только Excel');
       }
 
       // ========== 6. ГЕНЕРИРУЕМ EXCEL ==========
@@ -1404,7 +1421,7 @@ class _GameProtocolScreenState extends ConsumerState<GameProtocolScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              savedToClub
+              canSaveToClub
                   ? '✅ Игра сохранена в клуб и Excel создан!'
                   : '✅ Excel создан!',
             ),
@@ -1415,7 +1432,7 @@ class _GameProtocolScreenState extends ConsumerState<GameProtocolScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              '⚠️ ${savedToClub ? 'Игра сохранена, но' : ''} Excel не создан: ${excelResponse.statusCode}',
+              '⚠️ ${canSaveToClub ? 'Игра сохранена, но' : ''} Excel не создан: ${excelResponse.statusCode}',
             ),
             backgroundColor: Colors.orange,
           ),

@@ -60,7 +60,7 @@ class _ClubRequestsScreenState extends ConsumerState<ClubRequestsScreen> {
 
     if (result['success']) {
       // ✅ Обновляем провайдер
-      ref.invalidate(clubProvider);
+        ref.invalidate(clubProvider);
 
       ref.invalidate(pendingRequestsProvider);
 
