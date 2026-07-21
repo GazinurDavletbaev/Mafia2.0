@@ -12,8 +12,7 @@ class ClubService {
   // БАЗОВЫЕ МЕТОДЫ
   // ============================================================
 
-  static Future<Map<String, dynamic>> _safeRequest(
-      Future<http.Response> request) async {
+  static Future<Map<String, dynamic>> _safeRequest(Future<http.Response> request) async {
     try {
       final response = await request;
 
@@ -352,8 +351,7 @@ class ClubService {
     );
   }
 
-  static Future<Map<String, dynamic>> removeMember(
-      int clubId, int userId) async {
+  static Future<Map<String, dynamic>> removeMember(int clubId, int userId) async {
     final token = await AuthService.getToken();
     if (token == null) {
       return {'success': false, 'error': 'Не авторизован'};
@@ -367,8 +365,7 @@ class ClubService {
     );
   }
 
-  static Future<Map<String, dynamic>> promoteToJudge(
-      int clubId, int userId) async {
+  static Future<Map<String, dynamic>> promoteToJudge(int clubId, int userId) async {
     final token = await AuthService.getToken();
     if (token == null) {
       return {'success': false, 'error': 'Не авторизован'};
@@ -382,8 +379,7 @@ class ClubService {
     );
   }
 
-  static Future<Map<String, dynamic>> demoteFromJudge(
-      int clubId, int userId) async {
+  static Future<Map<String, dynamic>> demoteFromJudge(int clubId, int userId) async {
     final token = await AuthService.getToken();
     if (token == null) {
       return {'success': false, 'error': 'Не авторизован'};
@@ -441,8 +437,7 @@ class ClubService {
 
     return _safeRequest(
       http.get(
-        Uri.parse(
-            '$baseUrl/clubs/$clubId/rating?token=$token&month=$month&year=$year'),
+        Uri.parse('$baseUrl/clubs/$clubId/rating?token=$token&month=$month&year=$year'),
         headers: {'Content-Type': 'application/json'},
       ),
     );
@@ -509,8 +504,7 @@ class ClubService {
   }
 
   // ========== ИГРЫ ==========
-  static Future<Map<String, dynamic>> saveGameToClub(
-      Map<String, dynamic> gameData) async {
+  static Future<Map<String, dynamic>> saveGameToClub(Map<String, dynamic> gameData) async {
     final token = await AuthService.getToken();
     if (token == null) {
       return {'success': false, 'error': 'Не авторизован'};

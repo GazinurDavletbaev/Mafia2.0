@@ -30,12 +30,10 @@ import '../../presentation/screens/club/club_members_screen.dart';
 
 final GoRouter router = GoRouter(
   initialLocation: '/',
-  redirect: (context, state) async {
-    final token = await AuthService.getToken();
-    print('📦 redirect: token = $token, path = ${state.uri.path}'); // ← ДОБАВЬ
-    if (token == null &&
-        state.uri.path != '/login' &&
-        state.uri.path != '/register') {
+  redirect: (context, state) {
+    // ✅ ДОБАВИТЬ ЭТОТ БЛОК
+    final token = AuthService.getToken();
+    if (token == null && state.uri.path != '/login' && state.uri.path != '/register') {
       return '/login';
     }
     return null;

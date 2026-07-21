@@ -11,7 +11,7 @@ class AuthService {
     required String email,
     required String username,
     required String password,
-    required String phone,
+    required String phone, // ← теперь required, не nullable
   }) async {
     final body = <String, dynamic>{
       'username': username,
@@ -46,7 +46,8 @@ class AuthService {
     return _handleResponse(response);
   }
 
-  static Future<Map<String, dynamic>> sendPhoneCode({required String phone}) async {
+  static Future<Map<String, dynamic>> sendPhoneCode(
+      {required String phone}) async {
     final response = await http.post(
       Uri.parse('$baseUrl/auth/phone/send-code'),
       headers: {'Content-Type': 'application/json'},
@@ -72,7 +73,10 @@ class AuthService {
     return _handleResponse(response);
   }
 
-  static Future<Map<String, dynamic>> forgotPassword({required String email}) async {
+// lib/services/auth_service.dart
+
+  static Future<Map<String, dynamic>> forgotPassword(
+      {required String email}) async {
     final response = await http.post(
       Uri.parse('$baseUrl/auth/forgot-password'),
       headers: {'Content-Type': 'application/json'},
@@ -111,12 +115,12 @@ class AuthService {
 
     try {
       final data = jsonDecode(response.body);
-      print('📦 Ответ verify-reset-code: $data');
+      print('📦 Ответ verify-reset-code: $data'); // ✅ Отладка
 
       if (response.statusCode == 200) {
         return {
           'success': true,
-          'reset_token': data['reset_token'],
+          'reset_token': data['reset_token'], // ✅ КЛЮЧ: reset_token
         };
       } else {
         return {
@@ -152,7 +156,47 @@ class AuthService {
     return _handleResponse(response);
   }
 
-  static Future<Map<String, dynamic>> sendVerificationEmail({required String email}) async {
+  static Map<String, dynamic> _handleResponse(http.Response response) {
+    try {
+      final data = jsonDecode(response.body);
+
+// ✅ ДОБАВИТЬ ЭТОТ БЛОК
+      if (response.statusCode == 401) {
+        logout(); // удаляем токен
+        return {
+          'success': false,
+          'error': 'Сессия истекла. Войдите заново.',
+          'code': 401,
+        };
+      }
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        return {
+          'success': true,
+          'token': data['access_token'],
+          'user': data['user'] != null ? User.fromJson(data['user']) : null,
+        };
+      } else {
+        // Берём сообщение от сервера
+        final errorMessage =
+            data['detail'] ?? data['message'] ?? 'Ошибка сервера';
+        return {
+          'success': false,
+          'error': errorMessage,
+          'code': response.statusCode,
+        };
+      }
+    } catch (e) {
+      return {
+        'success': false,
+        'error': 'Ошибка соединения с сервером',
+        'code': 500,
+      };
+    }
+  }
+
+  static Future<Map<String, dynamic>> sendVerificationEmail(
+      {required String email}) async {
     final response = await http.post(
       Uri.parse('$baseUrl/auth/send-verification'),
       headers: {'Content-Type': 'application/json'},
@@ -164,12 +208,12 @@ class AuthService {
 
   static Future<Map<String, dynamic>> getMe(String token) async {
     final response = await http.get(
-      Uri.parse('$baseUrl/user/profile?token=$token'),
+      Uri.parse('$baseUrl/user/profile?token=$token'), // ✅ НОВЫЙ ЭНДПОИНТ
     );
 
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
-      print('📦 getMe response: $data');
+      print('📦 getMe response: $data'); // ✅ Отладка
       return {
         'success': true,
         'user': User.fromJson(data),
@@ -193,51 +237,7 @@ class AuthService {
   }
 
   static Future<void> logout() async {
-    print('🔴 logout() вызван!');
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove('auth_token');
-    print('🔴 Токен удалён!');
-  }
-
-  // ============================================================
-  // ОБРАБОТКА ОТВЕТОВ
-  // ============================================================
-
-  static Map<String, dynamic> _handleResponse(http.Response response) {
-    try {
-      final data = jsonDecode(response.body);
-
-      // ✅ 401 → logout
-      if (response.statusCode == 401) {
-        print('🔴 401 Unauthorized! Удаляем токен...');
-        logout();
-        return {
-          'success': false,
-          'error': 'Сессия истекла. Войдите заново.',
-          'code': 401,
-        };
-      }
-
-      if (response.statusCode == 200 || response.statusCode == 201) {
-        return {
-          'success': true,
-          'token': data['access_token'],
-          'user': data['user'] != null ? User.fromJson(data['user']) : null,
-        };
-      } else {
-        final errorMessage = data['detail'] ?? data['message'] ?? 'Ошибка сервера';
-        return {
-          'success': false,
-          'error': errorMessage,
-          'code': response.statusCode,
-        };
-      }
-    } catch (e) {
-      return {
-        'success': false,
-        'error': 'Ошибка соединения с сервером',
-        'code': 500,
-      };
-    }
   }
 }
