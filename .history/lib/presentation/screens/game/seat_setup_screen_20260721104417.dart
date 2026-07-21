@@ -25,11 +25,9 @@ class _SeatSetupScreenState extends ConsumerState<SeatSetupScreen> {
   List<Map<String, dynamic>> _clubMembers = [];
   List<Map<String, dynamic>> _filteredMembers = [];
   int _focusedIndex = -1;
-  String _searchQuery = '';
   final List<GlobalKey> _textFieldKeys =
       List.generate(10, (index) => GlobalKey());
   OverlayEntry? _overlayEntry;
-
   @override
   void initState() {
     super.initState();
@@ -40,7 +38,9 @@ class _SeatSetupScreenState extends ConsumerState<SeatSetupScreen> {
             : '',
       );
     });
-    _selectedPlayers = List.generate(10, (index) => null);
+    _selectedPlayers =
+        List.generate(10, (index) => null); // ← ДОБАВЬ ЭТУ СТРОКУ
+
     _loadClubMembers();
   }
 
@@ -50,23 +50,12 @@ class _SeatSetupScreenState extends ConsumerState<SeatSetupScreen> {
       controller.dispose();
     }
     _closeOverlay();
+
     super.dispose();
   }
 
-  void _updateFilteredList() {
-    final q = _searchQuery.toLowerCase().trim();
-    setState(() {
-      if (q.isEmpty) {
-        _filteredMembers = List.from(_clubMembers);
-      } else {
-        _filteredMembers = _clubMembers
-            .where((m) => (m['username'] ?? '').toLowerCase().contains(q))
-            .toList();
-      }
-    });
-  }
-
   void _showOverlay(BuildContext context, int index) {
+    // Закрываем старый оверлей
     _overlayEntry?.remove();
 
     final renderBox =
@@ -75,13 +64,14 @@ class _SeatSetupScreenState extends ConsumerState<SeatSetupScreen> {
 
     final offset = renderBox.localToGlobal(Offset.zero);
     final width = renderBox.size.width;
-    final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    _updateFilteredList();
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     _overlayEntry = OverlayEntry(
       builder: (context) => GestureDetector(
-        onTap: _closeOverlay,
+        onTap: () {
+          _closeOverlay();
+        },
         behavior: HitTestBehavior.opaque,
         child: Stack(
           children: [
@@ -132,7 +122,6 @@ class _SeatSetupScreenState extends ConsumerState<SeatSetupScreen> {
                                 member['username'] ?? '';
                             _filteredMembers = [];
                             _focusedIndex = -1;
-                            _searchQuery = '';
                           });
                           _closeOverlay();
                           _notifyChanges();
@@ -157,7 +146,6 @@ class _SeatSetupScreenState extends ConsumerState<SeatSetupScreen> {
     setState(() {
       _filteredMembers = [];
       _focusedIndex = -1;
-      _searchQuery = '';
     });
   }
 
@@ -166,6 +154,7 @@ class _SeatSetupScreenState extends ConsumerState<SeatSetupScreen> {
     final club = clubAsync.value;
     if (club == null) return;
 
+    // 1. Загружаем участников клуба
     final membersResult = await ClubService.getClubMembers(club['id']);
     final List<Map<String, dynamic>> allPlayers = [];
 
@@ -175,6 +164,7 @@ class _SeatSetupScreenState extends ConsumerState<SeatSetupScreen> {
       allPlayers.addAll(members);
     }
 
+    // 2. Загружаем рейтинг за текущий месяц
     final now = DateTime.now();
     final ratingResult = await ClubService.getClubRating(
       clubId: club['id'],
@@ -186,13 +176,14 @@ class _SeatSetupScreenState extends ConsumerState<SeatSetupScreen> {
       final ratingPlayers =
           (ratingResult['players'] as List? ?? []).cast<Map<String, dynamic>>();
 
+      // Добавляем игроков из рейтинга, которых ещё нет в списке
       for (var player in ratingPlayers) {
         final username = player['username'] ?? '';
         final alreadyExists = allPlayers.any((m) => m['username'] == username);
 
         if (!alreadyExists) {
           allPlayers.add({
-            'id': null,
+            'id': null, // ← нет user_id
             'username': username,
             'avatar_url': null,
             'email': null,
@@ -206,23 +197,24 @@ class _SeatSetupScreenState extends ConsumerState<SeatSetupScreen> {
 
     setState(() {
       _clubMembers = allPlayers;
-      _filteredMembers = List.from(allPlayers);
     });
   }
 
   void _notifyChanges() {
     final names = _nameControllers.map((c) => c.text.trim()).toList();
-    final avatars = _selectedPlayers.map((p) => p?['avatar_url']).toList();
+    final avatars =
+        _selectedPlayers.map((p) => p?['avatar_url']).toList(); // ✅ ДОБАВИТЬ
 
     final updatedPlayers =
         widget.initialData.gameState.players.asMap().entries.map((entry) {
       final index = entry.key;
       final player = entry.value;
       final name = names.length > index ? names[index] : player.name;
-      final avatar = avatars.length > index ? avatars[index] : player.avatarUrl;
+      final avatar =
+          avatars.length > index ? avatars[index] : player.avatarUrl; // ✅
       return player.copyWith(
         name: name,
-        avatarUrl: avatar,
+        avatarUrl: avatar, // ✅
       );
     }).toList();
 
@@ -252,6 +244,7 @@ class _SeatSetupScreenState extends ConsumerState<SeatSetupScreen> {
     final leftSeats = [5, 4, 3, 2, 1];
     final rightSeats = [6, 7, 8, 9, 10];
 
+    // Восстанавливаем имена при возврате
     for (int i = 0; i < 10; i++) {
       final savedName = widget.initialData.playerNames.length > i
           ? widget.initialData.playerNames[i]
@@ -288,6 +281,9 @@ class _SeatSetupScreenState extends ConsumerState<SeatSetupScreen> {
   }
 
   Widget _buildColumn(List<int> seats, {required bool isLeft}) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Column(
       children: seats.map((seat) {
         final index = seat - 1;
@@ -329,7 +325,7 @@ class _SeatSetupScreenState extends ConsumerState<SeatSetupScreen> {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
     final controller = _nameControllers[index];
-    final key = _textFieldKeys[index];
+    final key = _textFieldKeys[index]; // ← уникальный ключ для каждого поля
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -342,20 +338,30 @@ class _SeatSetupScreenState extends ConsumerState<SeatSetupScreen> {
               color: theme.textTheme.bodyLarge?.color ?? Colors.white,
             ),
             onChanged: (value) {
-              _searchQuery = value;
-              _focusedIndex = index;
-              _updateFilteredList();
+              setState(() {
+                _focusedIndex = index;
+                final q = value.toLowerCase().trim();
+                if (q.isNotEmpty) {
+                  _filteredMembers = _clubMembers
+                      .where((m) =>
+                          (m['username'] ?? '').toLowerCase().contains(q))
+                      .toList();
+                } else {
+                  _filteredMembers = [];
+                }
+              });
               _notifyChanges();
-
-              if (_overlayEntry != null) {
-                _showOverlay(context, index);
-              }
             },
             onTap: () {
-              _focusedIndex = index;
-              _searchQuery = controller.text;
-              _updateFilteredList();
-              _showOverlay(context, index);
+              setState(() {
+                _focusedIndex = index;
+                final q = controller.text.toLowerCase().trim();
+                _filteredMembers = _clubMembers
+                    .where(
+                        (m) => (m['username'] ?? '').toLowerCase().contains(q))
+                    .toList();
+              });
+              _showOverlay(context, index); // ← показываем список через Overlay
             },
             decoration: InputDecoration(
               hintText: 'Игрок $seat',

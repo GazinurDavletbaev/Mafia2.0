@@ -25,7 +25,6 @@ class _SeatSetupScreenState extends ConsumerState<SeatSetupScreen> {
   List<Map<String, dynamic>> _clubMembers = [];
   List<Map<String, dynamic>> _filteredMembers = [];
   int _focusedIndex = -1;
-  String _searchQuery = '';
   final List<GlobalKey> _textFieldKeys =
       List.generate(10, (index) => GlobalKey());
   OverlayEntry? _overlayEntry;
@@ -53,19 +52,6 @@ class _SeatSetupScreenState extends ConsumerState<SeatSetupScreen> {
     super.dispose();
   }
 
-  void _updateFilteredList() {
-    final q = _searchQuery.toLowerCase().trim();
-    setState(() {
-      if (q.isEmpty) {
-        _filteredMembers = List.from(_clubMembers);
-      } else {
-        _filteredMembers = _clubMembers
-            .where((m) => (m['username'] ?? '').toLowerCase().contains(q))
-            .toList();
-      }
-    });
-  }
-
   void _showOverlay(BuildContext context, int index) {
     _overlayEntry?.remove();
 
@@ -75,9 +61,8 @@ class _SeatSetupScreenState extends ConsumerState<SeatSetupScreen> {
 
     final offset = renderBox.localToGlobal(Offset.zero);
     final width = renderBox.size.width;
-    final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    _updateFilteredList();
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     _overlayEntry = OverlayEntry(
       builder: (context) => GestureDetector(
@@ -109,15 +94,15 @@ class _SeatSetupScreenState extends ConsumerState<SeatSetupScreen> {
                                   avatarUrl.toString().isNotEmpty
                               ? NetworkImage(avatarUrl)
                               : null,
-                          child:
-                              avatarUrl == null || avatarUrl.toString().isEmpty
-                                  ? Image.asset(
-                                      'assets/mafia_logo.png',
-                                      width: 20,
-                                      height: 20,
-                                      fit: BoxFit.contain,
-                                    )
-                                  : null,
+                          child: avatarUrl == null ||
+                                  avatarUrl.toString().isEmpty
+                              ? Image.asset(
+                                  'assets/mafia_logo.png',
+                                  width: 20,
+                                  height: 20,
+                                  fit: BoxFit.contain,
+                                )
+                              : null,
                         ),
                         title: Text(
                           member['username'] ?? '',
@@ -132,7 +117,6 @@ class _SeatSetupScreenState extends ConsumerState<SeatSetupScreen> {
                                 member['username'] ?? '';
                             _filteredMembers = [];
                             _focusedIndex = -1;
-                            _searchQuery = '';
                           });
                           _closeOverlay();
                           _notifyChanges();
@@ -157,7 +141,6 @@ class _SeatSetupScreenState extends ConsumerState<SeatSetupScreen> {
     setState(() {
       _filteredMembers = [];
       _focusedIndex = -1;
-      _searchQuery = '';
     });
   }
 
@@ -166,6 +149,7 @@ class _SeatSetupScreenState extends ConsumerState<SeatSetupScreen> {
     final club = clubAsync.value;
     if (club == null) return;
 
+    // 1. Загружаем участников клуба
     final membersResult = await ClubService.getClubMembers(club['id']);
     final List<Map<String, dynamic>> allPlayers = [];
 
@@ -175,6 +159,7 @@ class _SeatSetupScreenState extends ConsumerState<SeatSetupScreen> {
       allPlayers.addAll(members);
     }
 
+    // 2. Загружаем рейтинг за текущий месяц
     final now = DateTime.now();
     final ratingResult = await ClubService.getClubRating(
       clubId: club['id'],
@@ -342,19 +327,33 @@ class _SeatSetupScreenState extends ConsumerState<SeatSetupScreen> {
               color: theme.textTheme.bodyLarge?.color ?? Colors.white,
             ),
             onChanged: (value) {
-              _searchQuery = value;
-              _focusedIndex = index;
-              _updateFilteredList();
+              setState(() {
+                _focusedIndex = index;
+                final q = value.toLowerCase().trim();
+                if (q.isNotEmpty) {
+                  _filteredMembers = _clubMembers
+                      .where((m) =>
+                          (m['username'] ?? '').toLowerCase().contains(q))
+                      .toList();
+                } else {
+                  _filteredMembers = List.from(_clubMembers);
+                }
+              });
               _notifyChanges();
-
-              if (_overlayEntry != null) {
-                _showOverlay(context, index);
-              }
             },
             onTap: () {
-              _focusedIndex = index;
-              _searchQuery = controller.text;
-              _updateFilteredList();
+              setState(() {
+                _focusedIndex = index;
+                final q = controller.text.toLowerCase().trim();
+                if (q.isNotEmpty) {
+                  _filteredMembers = _clubMembers
+                      .where((m) =>
+                          (m['username'] ?? '').toLowerCase().contains(q))
+                      .toList();
+                } else {
+                  _filteredMembers = List.from(_clubMembers);
+                }
+              });
               _showOverlay(context, index);
             },
             decoration: InputDecoration(
