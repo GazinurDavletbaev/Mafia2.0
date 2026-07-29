@@ -1,0 +1,307 @@
+import 'package:flutter/material.dart';
+import 'package:mafia_help/services/club_service.dart';
+
+class ClubSearchList extends StatefulWidget {
+  final bool isDark;
+  final Function(int) onClubSelected;
+
+  const ClubSearchList({
+    super.key,
+    required this.isDark,
+    required this.onClubSelected,
+  });
+
+  @override
+  State<ClubSearchList> createState() => _ClubSearchListState();
+}
+
+class _ClubSearchListState extends State<ClubSearchList> {
+  final TextEditingController _searchController = TextEditingController();
+  List<Map<String, dynamic>> _allClubs = [];
+  List<Map<String, dynamic>> _filteredClubs = [];
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadClubs();
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _loadClubs() async {
+    final result = await ClubService.getAllClubs();
+    setState(() {
+      _isLoading = false;
+      if (result['success']) {
+        _allClubs = (result['clubs'] as List? ?? []).cast<Map<String, dynamic>>();
+        _filteredClubs = List.from(_allClubs);
+      }
+    });
+  }
+
+  void _filterClubs(String query) {
+    final q = query.toLowerCase().trim();
+    setState(() {
+      if (q.isEmpty) {
+        _filteredClubs = List.from(_allClubs);
+      } else {
+        _filteredClubs = _allClubs.where((club) {
+          final title = club['title']?.toLowerCase() ?? '';
+          final city = club['city']?.toLowerCase() ?? '';
+          return title.contains(q) || city.contains(q);
+        }).toList();
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = widget.isDark;
+
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.all(12),
+          child: TextField(
+            controller: _searchController,
+            onChanged: _filterClubs,
+            style: TextStyle(
+              color: theme.textTheme.bodyLarge?.color ?? Colors.white,
+            ),
+            decoration: InputDecoration(
+              hintText: 'Поиск по названию или городу...',
+              hintStyle: TextStyle(
+                color: isDark ? Colors.grey.shade500 : Colors.grey.shade500,
+              ),
+              filled: true,
+              fillColor: isDark ? Colors.grey.shade800 : Colors.grey.shade200,
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(12),
+                borderSide: BorderSide.none,
+              ),
+              prefixIcon: Icon(Icons.search, color: theme.primaryColor),
+              suffixIcon: _searchController.text.isNotEmpty
+                  ? IconButton(
+                      icon: const Icon(Icons.clear, color: Colors.grey),
+                      onPressed: () {
+                        _searchController.clear();
+                        _filterClubs('');
+                      },
+                    )
+                  : null,
+            ),
+          ),
+        ),
+        Expanded(
+          child: _isLoading
+              ? const Center(child: CircularProgressIndicator())
+              : _allClubs.isEmpty
+                  ? Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.search_off,
+                            size: 48,
+                            color: isDark
+                                ? Colors.grey.shade600
+                                : Colors.grey.shade400,
+                          ),
+                          const SizedBox(height: 16),
+                          Text(
+                            'Клубы не найдены',
+                            style: TextStyle(
+                              color: isDark
+                                  ? Colors.grey.shade400
+                                  : Colors.grey.shade600,
+                              fontSize: 16,
+                            ),
+                          ),
+                        ],
+                      ),
+                    )
+                  : _filteredClubs.isEmpty
+                      ? Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.search_off,
+                                size: 48,
+                                color: isDark
+                                    ? Colors.grey.shade600
+                                    : Colors.grey.shade400,
+                              ),
+                              const SizedBox(height: 16),
+                              Text(
+                                'Ничего не найдено',
+                                style: TextStyle(
+                                  color: isDark
+                                      ? Colors.grey.shade400
+                                      : Colors.grey.shade600,
+                                  fontSize: 16,
+                                ),
+                              ),
+                            ],
+                          ),
+                        )
+                      : ListView.builder(
+                          padding: const EdgeInsets.all(8),
+                          itemCount: _filteredClubs.length,
+                          itemBuilder: (context, index) {
+                            final club = _filteredClubs[index];
+                            final isOfficial = club['is_official'] == true;
+                            final isMember = club['is_member'] == true;
+                            final isPending = club['is_pending'] == true;
+
+                            return GestureDetector(
+                              onTap: () => widget.onClubSelected(club['id']),
+                              child: Card(
+                                color: theme.cardColor,
+                                margin: const EdgeInsets.only(bottom: 8),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                  side: isOfficial
+                                      ? BorderSide(
+                                          color: theme.primaryColor, width: 2)
+                                      : BorderSide.none,
+                                ),
+                                child: Padding(
+                                  padding: const EdgeInsets.all(12),
+                                  child: Row(
+                                    children: [
+                                      CircleAvatar(
+                                        backgroundColor: isOfficial
+                                            ? theme.primaryColor
+                                            : Colors.grey.shade300,
+                                        child: Text(
+                                          club['title']
+                                                  ?.substring(0, 1)
+                                                  .toUpperCase() ??
+                                              '?',
+                                          style: TextStyle(
+                                            color: isOfficial
+                                                ? Colors.white
+                                                : Colors.black54,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ),
+                                      const SizedBox(width: 12),
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Row(
+                                              children: [
+                                                Expanded(
+                                                  child: Text(
+                                                    club['title'] ??
+                                                        'Без названия',
+                                                    style: TextStyle(
+                                                      fontSize: 15,
+                                                      fontWeight: FontWeight.w600,
+                                                      color: theme.textTheme
+                                                              .bodyLarge
+                                                              ?.color ??
+                                                          Colors.white,
+                                                    ),
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
+                                                  ),
+                                                ),
+                                                if (isOfficial) ...[
+                                                  const SizedBox(width: 4),
+                                                  Icon(Icons.verified,
+                                                      color: theme.primaryColor,
+                                                      size: 16),
+                                                ],
+                                              ],
+                                            ),
+                                            if (club['city'] != null &&
+                                                club['city'].isNotEmpty)
+                                              Text(
+                                                '📍 ${club['city']}',
+                                                style: TextStyle(
+                                                  color: isDark
+                                                      ? Colors.grey.shade400
+                                                      : Colors.grey.shade600,
+                                                  fontSize: 12,
+                                                ),
+                                              ),
+                                            Text(
+                                              '👤 ${club['president_name'] ?? 'Неизвестен'}',
+                                              style: TextStyle(
+                                                color: isDark
+                                                    ? Colors.grey.shade400
+                                                    : Colors.grey.shade600,
+                                                fontSize: 12,
+                                              ),
+                                            ),
+                                            Text(
+                                              '👥 ${club['judges_count'] ?? 0} участников',
+                                              style: TextStyle(
+                                                color: isDark
+                                                    ? Colors.grey.shade400
+                                                    : Colors.grey.shade600,
+                                                fontSize: 12,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      if (isMember)
+                                        Container(
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 8, vertical: 4),
+                                          decoration: BoxDecoration(
+                                            color: Colors.green.withOpacity(0.2),
+                                            borderRadius:
+                                                BorderRadius.circular(6),
+                                          ),
+                                          child: const Text(
+                                            '✅ Состою',
+                                            style: TextStyle(
+                                              color: Colors.green,
+                                              fontSize: 11,
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                          ),
+                                        )
+                                      else if (isPending)
+                                        Container(
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 8, vertical: 4),
+                                          decoration: BoxDecoration(
+                                            color: Colors.orange.withOpacity(0.2),
+                                            borderRadius:
+                                                BorderRadius.circular(6),
+                                          ),
+                                          child: const Text(
+                                            '⏳ Заявка',
+                                            style: TextStyle(
+                                              color: Colors.orange,
+                                              fontSize: 11,
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                          ),
+                                        ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+        ),
+      ],
+    );
+  }
+}

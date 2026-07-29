@@ -1,0 +1,265 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mafia_help/presentation/widgets/app_card.dart';
+import 'package:mafia_help/presentation/widgets/club/club_header.dart';
+import 'package:mafia_help/presentation/widgets/club/club_rating_table.dart';
+import 'package:mafia_help/presentation/widgets/club/club_search_list.dart';
+import 'package:mafia_help/presentation/widgets/club/club_stats.dart';
+import '../../../services/club_service.dart';
+import '../../../services/update_service.dart';
+
+class ClubScreen extends ConsumerStatefulWidget {
+  const ClubScreen({super.key});
+
+  @override
+  ConsumerState<ClubScreen> createState() => _ClubScreenState();
+}
+
+class _ClubScreenState extends ConsumerState<ClubScreen> {
+  bool _isLoading = true;
+  bool _showClubSearch = false;
+
+  // 🔥 Данные текущего отображаемого клуба
+  int? _myClubId; // ID моего клуба (если есть)
+  Map<String, dynamic>? _club; // Текущий отображаемый клуб
+  int? _currentClubId; // ID текущего отображаемого клуба
+
+  // Рейтинг
+  List<Map<String, dynamic>> _ratingPlayers = [];
+  bool _hasGames = false;
+  int _gamesCount = 0;
+
+  DateTime _currentDate = DateTime.now();
+  int get _month => _currentDate.month;
+  int get _year => _currentDate.year;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadData();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        UpdateService.checkForUpdate(context);
+      }
+    });
+  }
+
+  void _selectClub(int clubId) {
+    setState(() {
+      _showClubSearch = false;
+      _currentClubId = clubId;
+    });
+    _loadData(clubId: clubId);
+  }
+
+  Future<void> _loadData({int? clubId}) async {
+    setState(() => _isLoading = true);
+
+    if (clubId != null) {
+      // 📦 Загружаем выбранный клуб
+      final result = await ClubService.getClub(clubId);
+      if (result['success']) {
+        setState(() {
+          _club = result;
+          _currentClubId = clubId;
+        });
+        await _loadRating();
+      } else {
+        setState(() {
+          _club = null;
+          _isLoading = false;
+        });
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(result['error'] ?? 'Клуб не найден'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+        return;
+      }
+    } else {
+      // 📦 Загружаем свой клуб
+      final myClubsResult = await ClubService.getMyClub();
+      final clubData = myClubsResult['club'];
+
+      if (myClubsResult['success'] &&
+          clubData != null &&
+          clubData['id'] != null) {
+        setState(() {
+          _club = clubData;
+          _myClubId = clubData['id'];
+          _currentClubId = clubData['id'];
+        });
+        await _loadRating();
+      } else {
+        setState(() {
+          _club = null;
+          _myClubId = null;
+          _currentClubId = null;
+          _hasClub = false;
+        });
+      }
+    }
+
+    setState(() => _isLoading = false);
+  }
+
+  Future<void> _loadRating() async {
+    if (_club == null || _club!['id'] == null) return;
+
+    final result = await ClubService.getClubRating(
+      clubId: _club!['id'],
+      month: _month,
+      year: _year,
+    );
+
+    if (result['success']) {
+      setState(() {
+        _hasGames = result['has_games'] ?? false;
+        _gamesCount = result['games_played'] ?? 0;
+        _ratingPlayers =
+            (result['players'] as List? ?? []).cast<Map<String, dynamic>>();
+      });
+    }
+  }
+
+  void _previousMonth() {
+    setState(() => _currentDate = DateTime(_year, _month - 1, 1));
+    _loadRating();
+  }
+
+  void _nextMonth() {
+    final nextDate = DateTime(_year, _month + 1, 1);
+    if (nextDate.isBefore(DateTime.now()) ||
+        (nextDate.month == DateTime.now().month &&
+            nextDate.year == DateTime.now().year)) {
+      setState(() => _currentDate = nextDate);
+      _loadRating();
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
+    if (_isLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    // 🔥 Если нет клуба — показываем только поиск
+    if (_club == null && !_showClubSearch) {
+      return Scaffold(
+        backgroundColor: theme.scaffoldBackgroundColor,
+        body: ClubSearchList(
+          isDark: isDark,
+          onClubSelected: _selectClub,
+        ),
+      );
+    }
+
+    return Scaffold(
+      backgroundColor: theme.scaffoldBackgroundColor,
+      body: Column(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(4),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                ClubHeader(
+                  club: _club,
+                  myClubId: _myClubId, // 🔥 Передаём ID моего клуба
+                  gamesCount: _gamesCount,
+                  onRefresh: () => _loadData(clubId: _currentClubId),
+                ),
+                const SizedBox(height: 2),
+                AppCard(
+                  isDark: isDark,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'РЕЙТИНГ КЛУБА',
+                        style: TextStyle(
+                          color: theme.primaryColor,
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      ClubStats(
+                        month: _month,
+                        year: _year,
+                        onPrevious: _previousMonth,
+                        onNext: _nextMonth,
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Expanded(
+            child: _showClubSearch
+                ? ClubSearchList(
+                    isDark: isDark,
+                    onClubSelected: _selectClub,
+                  )
+                : _hasGames
+                    ? SingleChildScrollView(
+                        padding: const EdgeInsets.symmetric(horizontal: 8),
+                        child: ClubRatingTable(players: _ratingPlayers),
+                      )
+                    : _buildNoGamesPlaceholder(isDark),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(12),
+            child: SizedBox(
+              width: double.infinity,
+              child: OutlinedButton.icon(
+                onPressed: () {
+                  setState(() => _showClubSearch = true);
+                },
+                icon: const Icon(Icons.search, size: 18),
+                label: const Text('Найти клуб'),
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: theme.primaryColor,
+                  side: BorderSide(color: theme.primaryColor, width: 0.8),
+                  padding: const EdgeInsets.symmetric(vertical: 10),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildNoGamesPlaceholder(bool isDark) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            Icons.sports_score,
+            size: 48,
+            color: isDark ? Colors.grey.shade600 : Colors.grey.shade400,
+          ),
+          const SizedBox(height: 16),
+          Text(
+            'В этом месяце игр не проводилось',
+            style: TextStyle(
+              color: isDark ? Colors.grey : Colors.grey.shade600,
+              fontSize: 16,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}

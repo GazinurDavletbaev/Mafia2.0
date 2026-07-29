@@ -1,0 +1,65 @@
+// lib/presentation/screens/lobby/lobby_bottom_nav.dart
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mafia_help/application/providers/notification_provider.dart';
+
+class LobbyBottomNav extends ConsumerWidget {
+  final int currentIndex;
+  final Function(int) onTap;
+
+  const LobbyBottomNav({
+    super.key,
+    required this.currentIndex,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
+
+    return BottomNavigationBar(
+      currentIndex: currentIndex,
+      onTap: (index) {
+        onTap(index);
+        ref.invalidate(pendingRequestsProvider);
+      },
+      backgroundColor: theme.bottomNavigationBarTheme.backgroundColor,
+      selectedItemColor: theme.bottomNavigationBarTheme.selectedItemColor,
+      unselectedItemColor: theme.bottomNavigationBarTheme.unselectedItemColor,
+      type: BottomNavigationBarType.fixed,
+      items: [
+        _buildNavItem(context, Icons.person, 'Клуб', 0),    // ← context
+        _buildNavItem(context, Icons.add_circle_outline, 'Судья', 1),
+        _buildNavItem(context, Icons.people, 'Игроки', 2),
+        _buildNavItem(context, Icons.gamepad, 'Игра', 3),
+        _buildNavItem(context, Icons.emoji_events, 'Протокол', 4),
+      ],
+    );
+  }
+
+  BottomNavigationBarItem _buildNavItem(
+    BuildContext context,  // ← добавил context
+    IconData icon,
+    String label,
+    int index,
+  ) {
+    final theme = Theme.of(context);
+    final isSelected = currentIndex == index;
+
+    return BottomNavigationBarItem(
+      icon: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+        decoration: BoxDecoration(
+          color: isSelected ? theme.primaryColor.withOpacity(0.15) : Colors.transparent,
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Icon(
+          icon,
+          size: 24,
+          color: isSelected ? theme.primaryColor : theme.bottomNavigationBarTheme.unselectedItemColor,
+        ),
+      ),
+      label: label,
+    );
+  }
+}
