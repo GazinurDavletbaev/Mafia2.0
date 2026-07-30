@@ -400,37 +400,19 @@ class SeatSetupNotifier extends StateNotifier<SeatSetupState> {
       }
 
       final newAvatarUrls = List<String>.from(state.avatarUrls);
-      final newSelectedPlayers =
-          List<Map<String, dynamic>?>.from(state.selectedPlayers);
 
       if (foundMember != null) {
         newAvatarUrls[index] = foundMember['avatar_url'] ?? '';
-        newSelectedPlayers[index] = foundMember; // 🔥 СОХРАНЯЕМ ИГРОКА
       } else {
         newAvatarUrls[index] = '';
-        newSelectedPlayers[index] = null; // 🔥 ОЧИЩАЕМ
       }
 
-      state = state.copyWith(
-        avatarUrls: newAvatarUrls,
-        selectedPlayers: newSelectedPlayers,
-      );
+      state = state.copyWith(avatarUrls: newAvatarUrls);
     } else {
       final newAvatarUrls = List<String>.from(state.avatarUrls);
-      final newSelectedPlayers =
-          List<Map<String, dynamic>?>.from(state.selectedPlayers);
-
       newAvatarUrls[index] = '';
-      newSelectedPlayers[index] = null;
-
-      state = state.copyWith(
-        avatarUrls: newAvatarUrls,
-        selectedPlayers: newSelectedPlayers,
-      );
+      state = state.copyWith(avatarUrls: newAvatarUrls);
     }
-
-    // 🔥 ВСЕГДА ВЫЗЫВАЕМ notifyChanges()
-    notifyChanges();
 
     updateFilteredList();
     if (SeatSearchOverlay.isVisible) {

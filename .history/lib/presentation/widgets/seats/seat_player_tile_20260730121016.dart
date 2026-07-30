@@ -8,6 +8,7 @@ class SeatPlayerTile extends StatelessWidget {
   final VoidCallback onTap;
   final ValueChanged<String> onChanged;
   final String avatarUrl;
+  final bool hasPlayer; // 🔥 ЕСТЬ ЛИ ИГРОК
 
   const SeatPlayerTile({
     super.key,
@@ -18,31 +19,31 @@ class SeatPlayerTile extends StatelessWidget {
     required this.onTap,
     required this.onChanged,
     this.avatarUrl = '',
+    this.hasPlayer = false, // 🔥 ПО УМОЛЧАНИЮ НЕТ ИГРОКА
   });
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    final bool hasText =
-        controller.text.trim().isNotEmpty; // 🔥 ПРОВЕРЯЕМ КОНТРОЛЛЕР
 
     return Row(
       children: [
+        // 🔥 КОНТЕЙНЕР: НОМЕР ИЛИ АВАТАРКА
         Container(
-          width: 35,
-          height: 35,
+          width: 26,
+          height: 26,
           decoration: BoxDecoration(
-            color: hasText ? Colors.transparent : Colors.grey,
+            color: hasPlayer ? Colors.transparent : Colors.grey,
             shape: BoxShape.circle,
-            image: hasText && avatarUrl.isNotEmpty
+            image: hasPlayer && avatarUrl.isNotEmpty
                 ? DecorationImage(
                     image: NetworkImage(avatarUrl),
                     fit: BoxFit.cover,
                   )
                 : null,
           ),
-          child: hasText
+          child: hasPlayer
               ? (avatarUrl.isEmpty
                   ? Image.asset(
                       'assets/mafia_logo.png',

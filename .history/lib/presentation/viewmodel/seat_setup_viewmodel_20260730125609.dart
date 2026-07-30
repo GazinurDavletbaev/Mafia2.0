@@ -331,54 +331,56 @@ class SeatSetupNotifier extends StateNotifier<SeatSetupState> {
   }
 
   void onPlayerTap(int index, BuildContext context) {
-    state = state.copyWith(
-      focusedIndex: index,
-      searchQuery: state.nameControllers[index].text,
-    );
-    updateFilteredList();
+  state = state.copyWith(
+    focusedIndex: index,
+    searchQuery: state.nameControllers[index].text,
+  );
+  updateFilteredList();
 
-    // 🔥 Закрываем старый оверлей, если открыт
-    if (SeatSearchOverlay.isVisible) {
-      SeatSearchOverlay.close();
-    }
-
-    // Открываем новый
-    SeatSearchOverlay.show(
-      context: context,
-      textFieldKey: state.textFieldKeys[index],
-      members: state.filteredMembers,
-      onSelect: (member) {
-        final newSelectedPlayers =
-            List<Map<String, dynamic>?>.from(state.selectedPlayers);
-        newSelectedPlayers[index] = member;
-        state.nameControllers[index].text = member['username'] ?? '';
-
-        // 🔥 ДОБАВЛЯЕМ АВАТАРКУ
-        final newAvatarUrls = List<String>.from(state.avatarUrls);
-        newAvatarUrls[index] = member['avatar_url'] ?? '';
-
-        print(
-            '🔥 avatarUrl для места ${index + 1}: ${member['avatar_url']}'); // 👈 ЛОГ
-
-        state = state.copyWith(
-          selectedPlayers: newSelectedPlayers,
-          avatarUrls: newAvatarUrls, // 🔥 СОХРАНЯЕМ
-          filteredMembers: [],
-          focusedIndex: -1,
-          searchQuery: '',
-        );
-        SeatSearchOverlay.close();
-        notifyChanges();
-      },
-      onClose: () {
-        state = state.copyWith(
-          filteredMembers: [],
-          focusedIndex: -1,
-          searchQuery: '',
-        );
-      },
-    );
+  if (SeatSearchOverlay.isVisible) {
+    SeatSearchOverlay.close();
   }
+
+  SeatSearchOverlay.show(
+    context: context,
+    textFieldKey: state.textFieldKeys[index],
+    members: state.filteredMembers,
+    onSelect: (member) {
+      selectPlayer(index, member);  // 🔥 ВЫЗЫВАЕМ МЕТОД
+    },
+    onClose: () {
+      state = state.copyWith(
+        filteredMembers: [],
+        focusedIndex: -1,
+        searchQuery: '',
+      );
+    },
+  );
+}
+
+void selectPlayer(int index, Map<String, dynamic> member) {
+  // Обновляем выбранного игрока
+  final newSelectedPlayers = List<Map<String, dynamic>?>.from(state.selectedPlayers);
+  newSelectedPlayers[index] = member;
+  
+  // Обновляем текст в поле
+  state.nameControllers[index].text = member['username'] ?? '';
+  
+  // Обновляем аватарку
+  final newAvatarUrls = List<String>.from(state.avatarUrls);
+  newAvatarUrls[index] = member['avatar_url'] ?? '';
+  
+  state = state.copyWith(
+    selectedPlayers: newSelectedPlayers,
+    avatarUrls: newAvatarUrls,
+    filteredMembers: [],
+    focusedIndex: -1,
+    searchQuery: '',
+  );
+  
+  SeatSearchOverlay.close();
+  notifyChanges();
+}
 
   void onPlayerChanged(int index, String value) {
     state = state.copyWith(
@@ -400,37 +402,19 @@ class SeatSetupNotifier extends StateNotifier<SeatSetupState> {
       }
 
       final newAvatarUrls = List<String>.from(state.avatarUrls);
-      final newSelectedPlayers =
-          List<Map<String, dynamic>?>.from(state.selectedPlayers);
 
       if (foundMember != null) {
         newAvatarUrls[index] = foundMember['avatar_url'] ?? '';
-        newSelectedPlayers[index] = foundMember; // 🔥 СОХРАНЯЕМ ИГРОКА
       } else {
         newAvatarUrls[index] = '';
-        newSelectedPlayers[index] = null; // 🔥 ОЧИЩАЕМ
       }
 
-      state = state.copyWith(
-        avatarUrls: newAvatarUrls,
-        selectedPlayers: newSelectedPlayers,
-      );
+      state = state.copyWith(avatarUrls: newAvatarUrls);
     } else {
       final newAvatarUrls = List<String>.from(state.avatarUrls);
-      final newSelectedPlayers =
-          List<Map<String, dynamic>?>.from(state.selectedPlayers);
-
       newAvatarUrls[index] = '';
-      newSelectedPlayers[index] = null;
-
-      state = state.copyWith(
-        avatarUrls: newAvatarUrls,
-        selectedPlayers: newSelectedPlayers,
-      );
+      state = state.copyWith(avatarUrls: newAvatarUrls);
     }
-
-    // 🔥 ВСЕГДА ВЫЗЫВАЕМ notifyChanges()
-    notifyChanges();
 
     updateFilteredList();
     if (SeatSearchOverlay.isVisible) {

@@ -381,62 +381,59 @@ class SeatSetupNotifier extends StateNotifier<SeatSetupState> {
   }
 
   void onPlayerChanged(int index, String value) {
-    state = state.copyWith(
-      searchQuery: value,
-      focusedIndex: index,
-    );
+  state = state.copyWith(
+    searchQuery: value,
+    focusedIndex: index,
+  );
 
-    // 🔥 ИЩЕМ АВАТАРКУ ПРИ ВВОДЕ
-    if (value.trim().isNotEmpty) {
-      Map<String, dynamic>? foundMember;
+  // 🔥 ИЩЕМ АВАТАРКУ ПРИ ВВОДЕ
+  if (value.trim().isNotEmpty) {
+    Map<String, dynamic>? foundMember;
 
-      try {
-        foundMember = state.clubMembers.firstWhere(
-          (m) =>
-              (m['username'] ?? '').toLowerCase() == value.trim().toLowerCase(),
-        );
-      } catch (e) {
-        foundMember = null;
-      }
-
-      final newAvatarUrls = List<String>.from(state.avatarUrls);
-      final newSelectedPlayers =
-          List<Map<String, dynamic>?>.from(state.selectedPlayers);
-
-      if (foundMember != null) {
-        newAvatarUrls[index] = foundMember['avatar_url'] ?? '';
-        newSelectedPlayers[index] = foundMember; // 🔥 СОХРАНЯЕМ ИГРОКА
-      } else {
-        newAvatarUrls[index] = '';
-        newSelectedPlayers[index] = null; // 🔥 ОЧИЩАЕМ
-      }
-
-      state = state.copyWith(
-        avatarUrls: newAvatarUrls,
-        selectedPlayers: newSelectedPlayers,
+    try {
+      foundMember = state.clubMembers.firstWhere(
+        (m) => (m['username'] ?? '').toLowerCase() == value.trim().toLowerCase(),
       );
+    } catch (e) {
+      foundMember = null;
+    }
+
+    final newAvatarUrls = List<String>.from(state.avatarUrls);
+    final newSelectedPlayers = List<Map<String, dynamic>?>.from(state.selectedPlayers);
+
+    if (foundMember != null) {
+      newAvatarUrls[index] = foundMember['avatar_url'] ?? '';
+      newSelectedPlayers[index] = foundMember;  // 🔥 СОХРАНЯЕМ ИГРОКА
     } else {
-      final newAvatarUrls = List<String>.from(state.avatarUrls);
-      final newSelectedPlayers =
-          List<Map<String, dynamic>?>.from(state.selectedPlayers);
-
       newAvatarUrls[index] = '';
-      newSelectedPlayers[index] = null;
-
-      state = state.copyWith(
-        avatarUrls: newAvatarUrls,
-        selectedPlayers: newSelectedPlayers,
-      );
+      newSelectedPlayers[index] = null;  // 🔥 ОЧИЩАЕМ
     }
 
-    // 🔥 ВСЕГДА ВЫЗЫВАЕМ notifyChanges()
-    notifyChanges();
-
-    updateFilteredList();
-    if (SeatSearchOverlay.isVisible) {
-      SeatSearchOverlay.update(members: state.filteredMembers);
-    }
+    state = state.copyWith(
+      avatarUrls: newAvatarUrls,
+      selectedPlayers: newSelectedPlayers,
+    );
+  } else {
+    final newAvatarUrls = List<String>.from(state.avatarUrls);
+    final newSelectedPlayers = List<Map<String, dynamic>?>.from(state.selectedPlayers);
+    
+    newAvatarUrls[index] = '';
+    newSelectedPlayers[index] = null;
+    
+    state = state.copyWith(
+      avatarUrls: newAvatarUrls,
+      selectedPlayers: newSelectedPlayers,
+    );
   }
+
+  // 🔥 ВСЕГДА ВЫЗЫВАЕМ notifyChanges()
+  notifyChanges();
+
+  updateFilteredList();
+  if (SeatSearchOverlay.isVisible) {
+    SeatSearchOverlay.update(members: state.filteredMembers);
+  }
+}
 
   void updateControllersFromData() {
     for (int i = 0; i < 10; i++) {

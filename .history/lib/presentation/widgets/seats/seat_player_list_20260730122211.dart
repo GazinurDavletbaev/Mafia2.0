@@ -6,7 +6,6 @@ class SeatPlayerList extends StatelessWidget {
   final bool isLeft;
   final List<TextEditingController> controllers;
   final List<GlobalKey> textFieldKeys;
-  final List<String> avatarUrls;  // 🔥 ДОБАВЛЯЕМ
   final Function(int) onTap;
   final Function(int, String) onChanged;
 
@@ -16,7 +15,6 @@ class SeatPlayerList extends StatelessWidget {
     required this.isLeft,
     required this.controllers,
     required this.textFieldKeys,
-    required this.avatarUrls,  // 🔥 ДОБАВЛЯЕМ
     required this.onTap,
     required this.onChanged,
   });
@@ -33,7 +31,7 @@ class SeatPlayerList extends StatelessWidget {
               seatNumber: seat,
               controller: controllers[index],
               textFieldKey: textFieldKeys[index],
-              avatarUrl: avatarUrls.length > index ? avatarUrls[index] : '',
+              
               isLeft: isLeft,
               onTap: () => onTap(index),
               onChanged: (value) => onChanged(index, value),

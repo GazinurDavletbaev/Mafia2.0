@@ -69,7 +69,7 @@ class _SeatSetupScreenState extends ConsumerState<SeatSetupScreen> {
                       isLeft: true,
                       controllers: state.nameControllers,
                       textFieldKeys: state.textFieldKeys,
-                      avatarUrls: state.avatarUrls, // 🔥 ПЕРЕДАЁМ
+                        avatarUrls: state.avatarUrls,  // 🔥 ПЕРЕДАЁМ
 
                       onTap: (index) => notifier.onPlayerTap(index, context),
                       onChanged: notifier.onPlayerChanged,
@@ -82,7 +82,7 @@ class _SeatSetupScreenState extends ConsumerState<SeatSetupScreen> {
                       isLeft: false,
                       controllers: state.nameControllers,
                       textFieldKeys: state.textFieldKeys,
-                      avatarUrls: state.avatarUrls, // 🔥 ПЕРЕДАЁМ
+                        avatarUrls: state.avatarUrls,  // 🔥 ПЕРЕДАЁМ
 
                       onTap: (index) => notifier.onPlayerTap(index, context),
                       onChanged: notifier.onPlayerChanged,

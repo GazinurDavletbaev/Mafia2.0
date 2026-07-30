@@ -7,7 +7,7 @@ class SeatPlayerTile extends StatelessWidget {
   final bool isLeft;
   final VoidCallback onTap;
   final ValueChanged<String> onChanged;
-  final String avatarUrl;
+  final String avatarUrl;  // 🔥 ДОБАВЛЯЕМ
 
   const SeatPlayerTile({
     super.key,
@@ -17,41 +17,34 @@ class SeatPlayerTile extends StatelessWidget {
     required this.isLeft,
     required this.onTap,
     required this.onChanged,
-    this.avatarUrl = '',
+    this.avatarUrl = '',  // 🔥 ПО УМОЛЧАНИЮ ПУСТО
   });
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    final bool hasText =
-        controller.text.trim().isNotEmpty; // 🔥 ПРОВЕРЯЕМ КОНТРОЛЛЕР
 
     return Row(
       children: [
+        // 🔥 КОНТЕЙНЕР С НОМЕРОМ ИЛИ АВАТАРКОЙ
         Container(
-          width: 35,
-          height: 35,
+          width: 26,
+          height: 26,
           decoration: BoxDecoration(
-            color: hasText ? Colors.transparent : Colors.grey,
+            color: avatarUrl.isNotEmpty 
+                ? Colors.transparent 
+                : Colors.grey,
             shape: BoxShape.circle,
-            image: hasText && avatarUrl.isNotEmpty
+            image: avatarUrl.isNotEmpty
                 ? DecorationImage(
                     image: NetworkImage(avatarUrl),
                     fit: BoxFit.cover,
                   )
                 : null,
           ),
-          child: hasText
-              ? (avatarUrl.isEmpty
-                  ? Image.asset(
-                      'assets/mafia_logo.png',
-                      width: 20,
-                      height: 20,
-                      fit: BoxFit.contain,
-                    )
-                  : null)
-              : Center(
+          child: avatarUrl.isEmpty
+              ? Center(
                   child: Text(
                     '$seatNumber',
                     style: const TextStyle(
@@ -60,7 +53,8 @@ class SeatPlayerTile extends StatelessWidget {
                       fontSize: 12,
                     ),
                   ),
-                ),
+                )
+              : null,
         ),
         const SizedBox(width: 6),
         Expanded(

@@ -30,8 +30,8 @@ class SeatPlayerTile extends StatelessWidget {
     return Row(
       children: [
         Container(
-          width: 35,
-          height: 35,
+          width: ,
+          height: 26,
           decoration: BoxDecoration(
             color: hasText ? Colors.transparent : Colors.grey,
             shape: BoxShape.circle,

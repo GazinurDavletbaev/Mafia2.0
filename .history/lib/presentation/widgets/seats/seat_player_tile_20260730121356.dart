@@ -13,7 +13,7 @@ class SeatPlayerTile extends StatelessWidget {
     super.key,
     required this.seatNumber,
     required this.controller,
-    required this.textFieldKey,
+   required this.textFieldKey,
     required this.isLeft,
     required this.onTap,
     required this.onChanged,
@@ -24,14 +24,13 @@ class SeatPlayerTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    final bool hasText =
-        controller.text.trim().isNotEmpty; // 🔥 ПРОВЕРЯЕМ КОНТРОЛЛЕР
+    final bool hasText = controller.text.trim().isNotEmpty; // 🔥 ПРОВЕРЯЕМ КОНТРОЛЛЕР
 
     return Row(
       children: [
         Container(
-          width: 35,
-          height: 35,
+          width: 26,
+          height: 26,
           decoration: BoxDecoration(
             color: hasText ? Colors.transparent : Colors.grey,
             shape: BoxShape.circle,

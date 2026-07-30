@@ -24,14 +24,15 @@ class SeatPlayerTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    final bool hasText =
-        controller.text.trim().isNotEmpty; // 🔥 ПРОВЕРЯЕМ КОНТРОЛЛЕР
+    final bool hasText = controller.text.trim().isNotEmpty;
 
-    return Row(
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
       children: [
+        // 🔥 АВАТАРКА СВЕРХУ
         Container(
-          width: 35,
-          height: 35,
+          width: 30,
+          height: 30,
           decoration: BoxDecoration(
             color: hasText ? Colors.transparent : Colors.grey,
             shape: BoxShape.circle,
@@ -46,8 +47,8 @@ class SeatPlayerTile extends StatelessWidget {
               ? (avatarUrl.isEmpty
                   ? Image.asset(
                       'assets/mafia_logo.png',
-                      width: 20,
-                      height: 20,
+                      width: 22,
+                      height: 22,
                       fit: BoxFit.contain,
                     )
                   : null)
@@ -62,37 +63,36 @@ class SeatPlayerTile extends StatelessWidget {
                   ),
                 ),
         ),
-        const SizedBox(width: 6),
-        Expanded(
-          child: Container(
-            key: textFieldKey,
-            child: TextField(
-              controller: controller,
-              style: TextStyle(
-                color: theme.textTheme.bodyLarge?.color ?? Colors.white,
-                fontSize: 13,
+        const SizedBox(height: 4),
+        // 🔥 ПОЛЕ ВВОДА СНИЗУ
+        Container(
+          key: textFieldKey,
+          child: TextField(
+            controller: controller,
+            style: TextStyle(
+              color: theme.textTheme.bodyLarge?.color ?? Colors.white,
+              fontSize: 12,
+            ),
+            onChanged: onChanged,
+            onTap: onTap,
+            textAlign: TextAlign.center,
+            decoration: InputDecoration(
+              hintText: '$seatNumber',
+              hintStyle: TextStyle(
+                color: isDark ? Colors.grey.shade600 : Colors.grey.shade400,
+                fontSize: 10,
               ),
-              onChanged: onChanged,
-              onTap: onTap,
-              decoration: InputDecoration(
-                hintText: 'Игрок $seatNumber',
-                hintStyle: TextStyle(
-                  color: isDark ? Colors.grey.shade600 : Colors.grey.shade400,
-                  fontSize: 12,
-                ),
-                filled: true,
-                fillColor: isDark ? Colors.grey.shade800 : Colors.grey.shade200,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(6),
-                  borderSide: BorderSide.none,
-                ),
-                contentPadding: const EdgeInsets.symmetric(
-                  horizontal: 8,
-                  vertical: 4,
-                ),
-                isDense: true,
+              filled: true,
+              fillColor: isDark ? Colors.grey.shade800 : Colors.grey.shade200,
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(6),
+                borderSide: BorderSide.none,
               ),
-              textAlign: isLeft ? TextAlign.left : TextAlign.right,
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 4,
+                vertical: 2,
+              ),
+              isDense: true,
             ),
           ),
         ),
