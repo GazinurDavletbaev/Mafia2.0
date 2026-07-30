@@ -53,7 +53,7 @@ class SeatSearchOverlay {
     if (renderBox == null) return;
 
     final offset = renderBox.localToGlobal(Offset.zero);
-    final width = renderBox.size.width * 1.5;
+    final width = renderBox.size.width;
     final isDark = Theme.of(_context!).brightness == Brightness.dark;
 
     _overlayEntry = OverlayEntry(
@@ -71,9 +71,8 @@ class SeatSearchOverlay {
                 color: isDark ? Colors.grey.shade800 : Colors.white,
                 borderRadius: BorderRadius.circular(8),
                 child: Container(
-                  constraints: const BoxConstraints(
-                    maxHeight: 250,
-                  ),
+                  constraints:
+                      const BoxConstraints(maxHeight: 250,),
                   child: ListView.builder(
                     padding: EdgeInsets.zero,
                     shrinkWrap: true,

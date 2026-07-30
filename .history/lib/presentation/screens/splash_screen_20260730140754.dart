@@ -69,45 +69,45 @@ class _SplashScreenState extends State<SplashScreen> {
               const SizedBox(height: 16),
               // 🔥 НАЗВАНИЕ
               Text(
-                'СПОРТИВНАЯ',
-                style: TextStyle(
-                  fontSize: 32,
-                  fontWeight: FontWeight.w900,
-                  color: isDark ? Colors.white : Colors.black87,
-                  letterSpacing: 3,
-                  fontFamily: 'Roboto', // или 'Montserrat'
-                ),
-              ),
-              const SizedBox(height: 2),
-              // 🔥 "МАФИЯ" — оранжевая
-              Text(
-                'МАФИЯ',
-                style: TextStyle(
-                  fontSize: 32,
-                  fontWeight: FontWeight.w900,
-                  color: isDark ? Colors.white : Colors.black87,
-                  letterSpacing: 3,
-                  fontFamily: 'Roboto',
-                  shadows: [
-                    Shadow(
-                      blurRadius: 8,
-                      color: Colors.orange.withOpacity(0.3),
-                      offset: Offset(0, 2),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 4),
-              // 🔥 подзаголовок
-              Text(
-                'по правилам ФСМ',
-                style: TextStyle(
-                  fontSize: 14,
-                  color: isDark ? Colors.grey.shade400 : Colors.grey.shade600,
-                  letterSpacing: 3,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
+      'СПОРТИВНАЯ',
+      style: TextStyle(
+        fontSize: 32,
+        fontWeight: FontWeight.w900,
+        color: isDark ? Colors.white : Colors.black87,
+        letterSpacing: 3,
+        fontFamily: 'Roboto', // или 'Montserrat'
+      ),
+    ),
+    const SizedBox(height: 2),
+    // 🔥 "МАФИЯ" — оранжевая
+    Text(
+      'МАФИЯ',
+      style: TextStyle(
+        fontSize: 40,
+        fontWeight: FontWeight.w900,
+        color: Colors.orange,
+        letterSpacing: 4,
+        fontFamily: 'Roboto',
+        shadows: [
+          Shadow(
+            blurRadius: 8,
+            color: Colors.orange.withOpacity(0.3),
+            offset: Offset(0, 2),
+          ),
+        ],
+      ),
+    ),
+    const SizedBox(height: 4),
+    // 🔥 подзаголовок
+    Text(
+      'по правилам ФСМ',
+      style: TextStyle(
+        fontSize: 14,
+        color: isDark ? Colors.grey.shade400 : Colors.grey.shade600,
+        letterSpacing: 3,
+        fontWeight: FontWeight.w500,
+      ),
+    ),
             ],
           ),
         ),

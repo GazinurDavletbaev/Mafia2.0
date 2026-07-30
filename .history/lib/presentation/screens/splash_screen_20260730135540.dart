@@ -16,7 +16,7 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    _timer = Timer(const Duration(seconds: 5), _navigateToNext);
+    _timer = Timer(const Duration(seconds: 2), _navigateToNext);
   }
 
   Future<void> _navigateToNext() async {
@@ -69,44 +69,35 @@ class _SplashScreenState extends State<SplashScreen> {
               const SizedBox(height: 16),
               // 🔥 НАЗВАНИЕ
               Text(
-                'СПОРТИВНАЯ',
+                'Спортивная мафия',
                 style: TextStyle(
-                  fontSize: 32,
-                  fontWeight: FontWeight.w900,
+                  fontSize: 28,
+                  fontWeight: FontWeight.bold,
                   color: isDark ? Colors.white : Colors.black87,
-                  letterSpacing: 3,
-                  fontFamily: 'Roboto', // или 'Montserrat'
-                ),
-              ),
-              const SizedBox(height: 2),
-              // 🔥 "МАФИЯ" — оранжевая
-              Text(
-                'МАФИЯ',
-                style: TextStyle(
-                  fontSize: 32,
-                  fontWeight: FontWeight.w900,
-                  color: isDark ? Colors.white : Colors.black87,
-                  letterSpacing: 3,
-                  fontFamily: 'Roboto',
-                  shadows: [
-                    Shadow(
-                      blurRadius: 8,
-                      color: Colors.orange.withOpacity(0.3),
-                      offset: Offset(0, 2),
-                    ),
-                  ],
+                  letterSpacing: 1.5,
                 ),
               ),
               const SizedBox(height: 4),
-              // 🔥 подзаголовок
               Text(
                 'по правилам ФСМ',
                 style: TextStyle(
-                  fontSize: 14,
+                  fontSize: 16,
                   color: isDark ? Colors.grey.shade400 : Colors.grey.shade600,
-                  letterSpacing: 3,
-                  fontWeight: FontWeight.w500,
+                  letterSpacing: 2,
                 ),
+              ),
+              const SizedBox(height: 32),
+              // 🔥 ДОПОЛНИТЕЛЬНАЯ ИКОНКА (вместо второй картинки)
+              Image.asset(
+  'assets/mafia_icon.png', // своя картинка
+  width: 60,
+  height: 60,
+  fit: BoxFit.contain,
+),
+              const SizedBox(height: 48),
+              // 🔥 ЛОАДЕР
+              const CircularProgressIndicator(
+                valueColor: AlwaysStoppedAnimation<Color>(Colors.orange),
               ),
             ],
           ),

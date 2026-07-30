@@ -112,7 +112,7 @@ class PlayerCard extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           SizedBox(
-            height: 60,
+            height: 0,
             child: Stack(
               clipBehavior: Clip.none,
               children: [

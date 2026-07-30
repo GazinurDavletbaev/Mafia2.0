@@ -1,6 +1,7 @@
 // lib/presentation/widgets/app_bottom_nav.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mafia_help/application/providers/notification_provider.dart';
 
 class AppBottomNav extends ConsumerWidget {
   final int currentIndex;
@@ -15,6 +16,14 @@ class AppBottomNav extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
+
+    // 🔥 ПОДПИСЫВАЕМСЯ НА КОЛИЧЕСТВО ЗАЯВОК
+    final pendingRequestsAsync = ref.watch(pendingRequestsProvider);
+    final pendingCount = pendingRequestsAsync.when(
+      data: (count) => count,
+      loading: () => 0,
+      error: (_, __) => 0,
+    );
 
     return Container(
       height: 55,
@@ -33,7 +42,8 @@ class AppBottomNav extends ConsumerWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          _buildNavItem(context, Icons.person, 'Клуб', 0),
+          _buildNavItem(context, Icons.person, 'Клуб', 0,
+              badgeCount: pendingCount),
           _buildNavItem(context, Icons.people, 'Рассадка', 1),
           _buildNavItem(context, Icons.gamepad, 'Игра', 2),
           _buildNavItem(context, Icons.emoji_events, 'Протокол', 3),
@@ -46,8 +56,9 @@ class AppBottomNav extends ConsumerWidget {
     BuildContext context,
     IconData icon,
     String label,
-    int index,
-  ) {
+    int index, {
+    int badgeCount = 0,
+  }) {
     final theme = Theme.of(context);
     final isSelected = currentIndex == index;
     final Color itemColor = isSelected
@@ -68,7 +79,38 @@ class AppBottomNav extends ConsumerWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(icon, size: 20, color: itemColor),
+            // 🔥 ИКОНКА С БЕЙДЖЕМ
+            Stack(
+              children: [
+                Icon(icon, size: 20, color: itemColor),
+                if (badgeCount > 0)
+                  Positioned(
+                    right: -6,
+                    top: -4,
+                    child: Container(
+                      padding: const EdgeInsets.all(2),
+                      constraints: const BoxConstraints(
+                        minWidth: 14,
+                        minHeight: 14,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.red,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Text(
+                        '$badgeCount',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 9,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+            const SizedBox(height: 2),
             Text(
               label,
               style: TextStyle(

@@ -196,7 +196,7 @@ class PlayerCard extends StatelessWidget {
                     child: TimerOverlay(
                       seconds: timerSeconds!,
                       onComplete: onTimerComplete,
-                      radius: 28,
+                      radius: 5,
                     ),
                   ),
               ],

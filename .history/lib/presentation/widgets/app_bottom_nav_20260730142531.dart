@@ -18,7 +18,7 @@ class AppBottomNav extends ConsumerWidget {
 
     return Container(
       height: 55,
-      margin: const EdgeInsets.symmetric(horizontal: 50, vertical: 8),
+      margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
       decoration: BoxDecoration(
         color: theme.colorScheme.surface,
         borderRadius: BorderRadius.circular(50),

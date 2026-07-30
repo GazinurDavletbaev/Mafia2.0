@@ -53,7 +53,7 @@ class SeatSearchOverlay {
     if (renderBox == null) return;
 
     final offset = renderBox.localToGlobal(Offset.zero);
-    final width = renderBox.size.width * 1.5;
+    final width = renderBox.size.width ;
     final isDark = Theme.of(_context!).brightness == Brightness.dark;
 
     _overlayEntry = OverlayEntry(

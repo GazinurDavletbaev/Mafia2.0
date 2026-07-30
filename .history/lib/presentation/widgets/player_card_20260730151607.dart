@@ -131,7 +131,7 @@ class PlayerCard extends StatelessWidget {
                                 player.avatarUrl!.isEmpty
                             ? Icon(
                                 Icons.person,
-                                size: 50,
+                                size: ,
                                 color: Colors.grey.shade400,
                               )
                             : null,

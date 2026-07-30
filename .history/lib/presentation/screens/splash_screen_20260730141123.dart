@@ -86,7 +86,8 @@ class _SplashScreenState extends State<SplashScreen> {
                   fontSize: 32,
                   fontWeight: FontWeight.w900,
                   color: isDark ? Colors.white : Colors.black87,
-                  letterSpacing: 3,
+                                    letterSpacing: 3,
+
                   fontFamily: 'Roboto',
                   shadows: [
                     Shadow(

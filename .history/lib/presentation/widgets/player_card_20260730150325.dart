@@ -93,7 +93,7 @@ class PlayerCard extends StatelessWidget {
     } else if (isDon) {
       backgroundColor = Colors.teal.shade800;
     } else if (isSpeaking) {
-      backgroundColor = Colors.grey.shade200;
+      backgroundColor = Colors.green.shade800;
     } else {
       backgroundColor = isDark ? Colors.black : Colors.white;
     }
@@ -106,45 +106,44 @@ class PlayerCard extends StatelessWidget {
       padding: const EdgeInsets.all(8.0),
       decoration: BoxDecoration(
         color: backgroundColor,
-        borderRadius: BorderRadius.circular(50),
+        borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           SizedBox(
-            height: 60,
+            height: 56,
             child: Stack(
               clipBehavior: Clip.none,
               children: [
-                // 🔥 АВАТАРКА С БЕЙДЖАМИ
+                // 🔥 АВАТАРКА С БЕЙДЖЕМ
                 Center(
                   child: Stack(
-                    clipBehavior: Clip.none,
                     children: [
                       CircleAvatar(
                         radius: 28,
-                        backgroundImage: player.avatarUrl != null &&
-                                player.avatarUrl!.isNotEmpty
-                            ? NetworkImage(player.avatarUrl!)
-                            : null,
-                        child: player.avatarUrl == null ||
-                                player.avatarUrl!.isEmpty
-                            ? Icon(
-                                Icons.person,
-                                size: 50,
-                                color: Colors.grey.shade400,
+                        backgroundImage:
+                            player.avatarUrl != null && player.avatarUrl!.isNotEmpty
+                                ? NetworkImage(player.avatarUrl!)
+                                : null,
+                        child: player.avatarUrl == null || player.avatarUrl!.isEmpty
+                            ? Image.asset(
+                                'assets/mafia_logo.png',
+                                width: 30,
+                                height: 30,
+                                fit: BoxFit.contain,
                               )
                             : null,
                       ),
-                      // 🔥 БЕЙДЖ С НОМЕРОМ МЕСТА (ВВЕРХУ СЛЕВА)
+                      // 🔥 БЕЙДЖ С НОМЕРОМ МЕСТА
                       Positioned(
-                        top: -12,
-                        left: -12,
+                        bottom: -4,
+                        right: -4,
                         child: Container(
-                          width: 35,
-                          height: 35,
+                          width: 22,
+                          height: 22,
                           decoration: BoxDecoration(
-                            color: theme.primaryColor, // 🔥 ИЗ ТЕМЫ
+                            color: Colors.orange,
                             shape: BoxShape.circle,
                             border: Border.all(
                               color: isDark ? Colors.black : Colors.white,
@@ -155,7 +154,7 @@ class PlayerCard extends StatelessWidget {
                             child: Text(
                               '${player.seatNumber}',
                               style: const TextStyle(
-                                fontSize: 15,
+                                fontSize: 11,
                                 fontWeight: FontWeight.bold,
                                 color: Colors.white,
                               ),
@@ -163,7 +162,7 @@ class PlayerCard extends StatelessWidget {
                           ),
                         ),
                       ),
-                      // 🔥 БЕЙДЖ С ФОЛАМИ (ВВЕРХУ СПРАВА)
+                      // 🔥 БЕЙДЖ С ФОЛАМИ (если есть)
                       if (player.fouls > 0)
                         Positioned(
                           top: -4,

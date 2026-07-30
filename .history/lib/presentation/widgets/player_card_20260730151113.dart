@@ -129,10 +129,11 @@ class PlayerCard extends StatelessWidget {
                             : null,
                         child: player.avatarUrl == null ||
                                 player.avatarUrl!.isEmpty
-                            ? Icon(
-                                Icons.person,
-                                size: 50,
-                                color: Colors.grey.shade400,
+                            ? Image.asset(
+                                'assets/mafia_logo.png',
+                                width: 30,
+                                height: 30,
+                                fit: BoxFit.contain,
                               )
                             : null,
                       ),

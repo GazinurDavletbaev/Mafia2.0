@@ -69,44 +69,23 @@ class _SplashScreenState extends State<SplashScreen> {
               const SizedBox(height: 16),
               // 🔥 НАЗВАНИЕ
               Text(
-                'СПОРТИВНАЯ',
+                'Спортивная мафия',
                 style: TextStyle(
-                  fontSize: 32,
-                  fontWeight: FontWeight.w900,
+                  fontSize: 28,
+                  fontWeight: FontWeight.bold,
                   color: isDark ? Colors.white : Colors.black87,
-                  letterSpacing: 3,
-                  fontFamily: 'Roboto', // или 'Montserrat'
+                  letterSpacing: 1.5,
                 ),
               ),
-              const SizedBox(height: 2),
-              // 🔥 "МАФИЯ" — оранжевая
-              Text(
-                'МАФИЯ',
-                style: TextStyle(
-                  fontSize: 32,
-                  fontWeight: FontWeight.w900,
-                  color: isDark ? Colors.white : Colors.black87,
-                  letterSpacing: 3,
-                  fontFamily: 'Roboto',
-                  shadows: [
-                    Shadow(
-                      blurRadius: 8,
-                      color: Colors.orange.withOpacity(0.3),
-                      offset: Offset(0, 2),
-                    ),
-                  ],
-                ),
+
+              Image.asset(
+                'assets/fsm.jpeg', // своя картинка
+                width: 100,
+                height: 100,
+                fit: BoxFit.contain,
               ),
-              const SizedBox(height: 4),
-              // 🔥 подзаголовок
-              Text(
-                'по правилам ФСМ',
-                style: TextStyle(
-                  fontSize: 14,
-                  color: isDark ? Colors.grey.shade400 : Colors.grey.shade600,
-                  letterSpacing: 3,
-                  fontWeight: FontWeight.w500,
-                ),
+              const CircularProgressIndicator(
+                valueColor: AlwaysStoppedAnimation<Color>(Colors.orange),
               ),
             ],
           ),

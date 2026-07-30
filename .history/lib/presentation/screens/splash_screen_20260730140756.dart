@@ -83,10 +83,10 @@ class _SplashScreenState extends State<SplashScreen> {
               Text(
                 'МАФИЯ',
                 style: TextStyle(
-                  fontSize: 32,
+                  fontSize: 40,
                   fontWeight: FontWeight.w900,
-                  color: isDark ? Colors.white : Colors.black87,
-                  letterSpacing: 3,
+                  color: Colors.orange,
+                  letterSpacing: 4,
                   fontFamily: 'Roboto',
                   shadows: [
                     Shadow(

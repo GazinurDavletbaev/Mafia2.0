@@ -93,7 +93,7 @@ class PlayerCard extends StatelessWidget {
     } else if (isDon) {
       backgroundColor = Colors.teal.shade800;
     } else if (isSpeaking) {
-      backgroundColor = Colors.grey.shade200;
+      backgroundColor = Colors.green.shade800;
     } else {
       backgroundColor = isDark ? Colors.black : Colors.white;
     }
@@ -106,7 +106,7 @@ class PlayerCard extends StatelessWidget {
       padding: const EdgeInsets.all(8.0),
       decoration: BoxDecoration(
         color: backgroundColor,
-        borderRadius: BorderRadius.circular(50),
+        borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -129,17 +129,18 @@ class PlayerCard extends StatelessWidget {
                             : null,
                         child: player.avatarUrl == null ||
                                 player.avatarUrl!.isEmpty
-                            ? Icon(
-                                Icons.person,
-                                size: 50,
-                                color: Colors.grey.shade400,
+                            ? Image.asset(
+                                'assets/mafia_logo.png',
+                                width: 30,
+                                height: 30,
+                                fit: BoxFit.contain,
                               )
                             : null,
                       ),
                       // 🔥 БЕЙДЖ С НОМЕРОМ МЕСТА (ВВЕРХУ СЛЕВА)
                       Positioned(
-                        top: -12,
-                        left: -12,
+                        top: -8,
+                        left: -8,
                         child: Container(
                           width: 35,
                           height: 35,
@@ -155,7 +156,7 @@ class PlayerCard extends StatelessWidget {
                             child: Text(
                               '${player.seatNumber}',
                               style: const TextStyle(
-                                fontSize: 15,
+                                fontSize: 11,
                                 fontWeight: FontWeight.bold,
                                 color: Colors.white,
                               ),

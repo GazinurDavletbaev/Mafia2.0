@@ -93,9 +93,9 @@ class PlayerCard extends StatelessWidget {
     } else if (isDon) {
       backgroundColor = Colors.teal.shade800;
     } else if (isSpeaking) {
-      backgroundColor = Colors.grey.shade200;
+      backgroundColor = Colors.green.shade800;
     } else {
-      backgroundColor = isDark ? Colors.black : Colors.white;
+      backgroundColor = isDark ? Colors. : Colors.grey.shade200;
     }
 
     final textColor = isDark ? Colors.white : Colors.black87;
@@ -106,91 +106,84 @@ class PlayerCard extends StatelessWidget {
       padding: const EdgeInsets.all(8.0),
       decoration: BoxDecoration(
         color: backgroundColor,
-        borderRadius: BorderRadius.circular(50),
+        borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           SizedBox(
-            height: 60,
+            height: 56,
             child: Stack(
               clipBehavior: Clip.none,
               children: [
-                // 🔥 АВАТАРКА С БЕЙДЖАМИ
                 Center(
-                  child: Stack(
-                    clipBehavior: Clip.none,
-                    children: [
-                      CircleAvatar(
-                        radius: 28,
-                        backgroundImage: player.avatarUrl != null &&
-                                player.avatarUrl!.isNotEmpty
+                  child: CircleAvatar(
+                    radius: 28,
+                    backgroundImage:
+                        player.avatarUrl != null && player.avatarUrl!.isNotEmpty
                             ? NetworkImage(player.avatarUrl!)
                             : null,
-                        child: player.avatarUrl == null ||
-                                player.avatarUrl!.isEmpty
-                            ? Icon(
-                                Icons.person,
-                                size: 50,
-                                color: Colors.grey.shade400,
-                              )
-                            : null,
-                      ),
-                      // 🔥 БЕЙДЖ С НОМЕРОМ МЕСТА (ВВЕРХУ СЛЕВА)
-                      Positioned(
-                        top: -12,
-                        left: -12,
-                        child: Container(
-                          width: 35,
-                          height: 35,
-                          decoration: BoxDecoration(
-                            color: theme.primaryColor, // 🔥 ИЗ ТЕМЫ
-                            shape: BoxShape.circle,
-                            border: Border.all(
-                              color: isDark ? Colors.black : Colors.white,
-                              width: 2,
-                            ),
-                          ),
-                          child: Center(
-                            child: Text(
-                              '${player.seatNumber}',
-                              style: const TextStyle(
-                                fontSize: 15,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                      // 🔥 БЕЙДЖ С ФОЛАМИ (ВВЕРХУ СПРАВА)
-                      if (player.fouls > 0)
-                        Positioned(
-                          top: -4,
-                          right: -4,
-                          child: Container(
-                            width: 22,
-                            height: 22,
-                            decoration: const BoxDecoration(
-                              color: Colors.red,
-                              shape: BoxShape.circle,
-                            ),
-                            child: Center(
-                              child: Text(
-                                '${player.fouls}',
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                    ],
+                    child: player.avatarUrl == null || player.avatarUrl!.isEmpty
+                        ? Image.asset(
+                            'assets/mafia_logo.png',
+                            width: 30,
+                            height: 30,
+                            fit: BoxFit.contain,
+                          )
+                        : null,
                   ),
                 ),
-                // 🔥 ТАЙМЕР
+                Positioned(
+                  top: 0,
+                  left: isLeftColumn ? 0 : null,
+                  right: isLeftColumn ? null : 0,
+                  child: Container(
+                    width: 24,
+                    height: 24,
+                    decoration: BoxDecoration(
+                      color: isDark
+                          ? Colors.black.withOpacity(0.7)
+                          : Colors.black.withOpacity(0.3),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Center(
+                      child: Text(
+                        '${player.seatNumber}',
+                        style: const TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                Positioned(
+                  top: 28,
+                  left: isLeftColumn ? 0 : null,
+                  right: isLeftColumn ? null : 0,
+                  child: Visibility(
+                    visible: player.fouls > 0,
+                    child: Container(
+                      width: 24,
+                      height: 24,
+                      decoration: const BoxDecoration(
+                        color: Colors.red,
+                        shape: BoxShape.circle,
+                      ),
+                      child: Center(
+                        child: Text(
+                          '${player.fouls}',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 10,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
                 if (isSpeaking && timerSeconds != null)
                   Positioned.fill(
                     child: TimerOverlay(
