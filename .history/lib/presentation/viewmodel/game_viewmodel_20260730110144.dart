@@ -503,7 +503,7 @@ class GameViewModel extends StateNotifier<GameState> {
     state = GameState.initial();
     _history.clear(); // если есть
     _history.push(state);
-    print("resetgame");
+    print("resetgame")
   }
 
   void updateState(GameState newState) {

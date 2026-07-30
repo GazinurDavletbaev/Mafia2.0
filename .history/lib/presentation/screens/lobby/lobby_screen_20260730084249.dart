@@ -126,7 +126,7 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
               child: pages[_selectedIndex],
             ),
             Positioned(
-              bottom: 3,
+              bottom: 1,
               left: 0,
               right: 0,
               child: AppBottomNav(

@@ -22,22 +22,21 @@ class SeatSetupScreen extends ConsumerStatefulWidget {
 }
 
 class _SeatSetupScreenState extends ConsumerState<SeatSetupScreen> {
-  late SeatSetupParams _params;
+  late SeatSetupViewModel _viewModel;
 
   @override
   void initState() {
     super.initState();
-    _params = SeatSetupParams(
+    _viewModel = SeatSetupViewModel(
+      ref: ref,
       initialData: widget.initialData,
       onNamesChanged: widget.onNamesChanged,
     );
-    ref.read(seatSetupProviderFamily(_params));
   }
 
   @override
   void dispose() {
-    final notifier = ref.read(seatSetupProviderFamily(_params).notifier);
-    notifier.dispose();
+    _viewModel.dispose();
     super.dispose();
   }
 
@@ -47,11 +46,8 @@ class _SeatSetupScreenState extends ConsumerState<SeatSetupScreen> {
     final leftSeats = [5, 4, 3, 2, 1];
     final rightSeats = [6, 7, 8, 9, 10];
 
-    final state = ref.watch(seatSetupProviderFamily(_params));
-    final notifier = ref.read(seatSetupProviderFamily(_params).notifier);
-
-    // 🔥 УБИРАЕМ вызов updateControllersFromData() из build
-    // notifier.updateControllersFromData();
+    // Обновляем контроллеры если изменились данные
+    _viewModel.updateControllersFromData();
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
@@ -60,6 +56,7 @@ class _SeatSetupScreenState extends ConsumerState<SeatSetupScreen> {
         child: Column(
           children: [
             const SizedBox(height: 20),
+            // ===== ИГРОКИ =====
             Expanded(
               child: Row(
                 children: [
@@ -67,10 +64,10 @@ class _SeatSetupScreenState extends ConsumerState<SeatSetupScreen> {
                     child: SeatPlayerList(
                       seats: leftSeats,
                       isLeft: true,
-                      controllers: state.nameControllers,
-                      textFieldKeys: state.textFieldKeys,
-                      onTap: (index) => notifier.onPlayerTap(index, context),
-                      onChanged: notifier.onPlayerChanged,
+                      controllers: _viewModel.nameControllers,
+                      textFieldKeys: _viewModel.textFieldKeys,
+                      onTap: (index) => _viewModel.onPlayerTap(index, context),
+                      onChanged: _viewModel.onPlayerChanged,
                     ),
                   ),
                   const SizedBox(width: 20),
@@ -78,31 +75,33 @@ class _SeatSetupScreenState extends ConsumerState<SeatSetupScreen> {
                     child: SeatPlayerList(
                       seats: rightSeats,
                       isLeft: false,
-                      controllers: state.nameControllers,
-                      textFieldKeys: state.textFieldKeys,
-                      onTap: (index) => notifier.onPlayerTap(index, context),
-                      onChanged: notifier.onPlayerChanged,
+                      controllers: _viewModel.nameControllers,
+                      textFieldKeys: _viewModel.textFieldKeys,
+                      onTap: (index) => _viewModel.onPlayerTap(index, context),
+                      onChanged: _viewModel.onPlayerChanged,
                     ),
                   ),
                 ],
               ),
             ),
+            // ===== НАСТРОЙКИ =====
             const SizedBox(height: 8),
             SeatSettingsRow(
-              tournamentController: state.tournamentController,
-              stageController: state.stageController,
-              tableController: state.tableController,
-              gameController: state.gameController,
-              selectedDate: state.selectedDate,
-              months: state.months,
-              onDateTap: () => _selectDateTime(context, state, notifier),
-              onChanged: notifier.notifyChanges,
+              tournamentController: _viewModel.tournamentController,
+              stageController: _viewModel.stageController,
+              tableController: _viewModel.tableController,
+              gameController: _viewModel.gameController,
+              selectedDate: _viewModel.selectedDate,
+              months: _viewModel.months,
+              onDateTap: () => _selectDateTime(context),
+              onChanged: _viewModel.notifyChanges,
             ),
             const SizedBox(height: 8),
+            // ===== КНОПКА НОВАЯ ИГРА =====
             GameNewButton(
               label: 'СОЗДАТЬ НОВУЮ ИГРУ',
               isFullWidth: true,
-              onNewGame: notifier.resetSeats,
+              onNewGame: _viewModel.resetSeats,
             ),
             const SizedBox(height: 20),
           ],
@@ -111,16 +110,11 @@ class _SeatSetupScreenState extends ConsumerState<SeatSetupScreen> {
     );
   }
 
-  Future<void> _selectDateTime(
-    BuildContext context,
-    SeatSetupState state,
-    SeatSetupNotifier notifier,
-  ) async {
+  Future<void> _selectDateTime(BuildContext context) async {
     final theme = Theme.of(context);
-
     final picked = await showDatePicker(
       context: context,
-      initialDate: state.selectedDate,
+      initialDate: _viewModel.selectedDate,
       firstDate: DateTime(2020),
       lastDate: DateTime.now(),
       builder: (context, child) {
@@ -137,11 +131,10 @@ class _SeatSetupScreenState extends ConsumerState<SeatSetupScreen> {
         );
       },
     );
-
     if (picked != null) {
       final time = await showTimePicker(
         context: context,
-        initialTime: TimeOfDay.fromDateTime(state.selectedDate),
+        initialTime: TimeOfDay.fromDateTime(_viewModel.selectedDate),
         builder: (context, child) {
           return Theme(
             data: theme.copyWith(
@@ -156,9 +149,8 @@ class _SeatSetupScreenState extends ConsumerState<SeatSetupScreen> {
           );
         },
       );
-
       if (time != null) {
-        notifier.selectDateTime(picked, time);
+        _viewModel.selectDateTime(picked, time);
       }
     }
   }

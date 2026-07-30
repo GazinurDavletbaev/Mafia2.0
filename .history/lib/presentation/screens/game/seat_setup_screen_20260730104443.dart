@@ -22,6 +22,7 @@ class SeatSetupScreen extends ConsumerStatefulWidget {
 }
 
 class _SeatSetupScreenState extends ConsumerState<SeatSetupScreen> {
+  // 🔥 Инициализируем сразу, чтобы не было null
   late SeatSetupParams _params;
 
   @override
@@ -31,6 +32,7 @@ class _SeatSetupScreenState extends ConsumerState<SeatSetupScreen> {
       initialData: widget.initialData,
       onNamesChanged: widget.onNamesChanged,
     );
+    // 🔥 Инициализируем провайдер
     ref.read(seatSetupProviderFamily(_params));
   }
 
@@ -47,11 +49,12 @@ class _SeatSetupScreenState extends ConsumerState<SeatSetupScreen> {
     final leftSeats = [5, 4, 3, 2, 1];
     final rightSeats = [6, 7, 8, 9, 10];
 
+    // 🔥 Подписываемся на состояние
     final state = ref.watch(seatSetupProviderFamily(_params));
     final notifier = ref.read(seatSetupProviderFamily(_params).notifier);
 
-    // 🔥 УБИРАЕМ вызов updateControllersFromData() из build
-    // notifier.updateControllersFromData();
+    // Обновляем контроллеры если изменились данные
+    notifier.updateControllersFromData();
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
@@ -60,6 +63,7 @@ class _SeatSetupScreenState extends ConsumerState<SeatSetupScreen> {
         child: Column(
           children: [
             const SizedBox(height: 20),
+            // ===== ИГРОКИ =====
             Expanded(
               child: Row(
                 children: [
@@ -87,6 +91,7 @@ class _SeatSetupScreenState extends ConsumerState<SeatSetupScreen> {
                 ],
               ),
             ),
+            // ===== НАСТРОЙКИ =====
             const SizedBox(height: 8),
             SeatSettingsRow(
               tournamentController: state.tournamentController,
@@ -99,6 +104,7 @@ class _SeatSetupScreenState extends ConsumerState<SeatSetupScreen> {
               onChanged: notifier.notifyChanges,
             ),
             const SizedBox(height: 8),
+            // ===== КНОПКА НОВАЯ ИГРА =====
             GameNewButton(
               label: 'СОЗДАТЬ НОВУЮ ИГРУ',
               isFullWidth: true,

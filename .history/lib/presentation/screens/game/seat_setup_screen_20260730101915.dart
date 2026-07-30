@@ -31,11 +31,11 @@ class _SeatSetupScreenState extends ConsumerState<SeatSetupScreen> {
       initialData: widget.initialData,
       onNamesChanged: widget.onNamesChanged,
     );
-    ref.read(seatSetupProviderFamily(_params));
   }
 
   @override
   void dispose() {
+    // 🔥 Удаляем notifier через provider
     final notifier = ref.read(seatSetupProviderFamily(_params).notifier);
     notifier.dispose();
     super.dispose();
@@ -47,11 +47,12 @@ class _SeatSetupScreenState extends ConsumerState<SeatSetupScreen> {
     final leftSeats = [5, 4, 3, 2, 1];
     final rightSeats = [6, 7, 8, 9, 10];
 
+    // 🔥 Подписываемся на состояние
     final state = ref.watch(seatSetupProviderFamily(_params));
     final notifier = ref.read(seatSetupProviderFamily(_params).notifier);
 
-    // 🔥 УБИРАЕМ вызов updateControllersFromData() из build
-    // notifier.updateControllersFromData();
+    // Обновляем контроллеры если изменились данные
+    notifier.updateControllersFromData();
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
@@ -60,6 +61,7 @@ class _SeatSetupScreenState extends ConsumerState<SeatSetupScreen> {
         child: Column(
           children: [
             const SizedBox(height: 20),
+            // ===== ИГРОКИ =====
             Expanded(
               child: Row(
                 children: [
@@ -87,6 +89,7 @@ class _SeatSetupScreenState extends ConsumerState<SeatSetupScreen> {
                 ],
               ),
             ),
+            // ===== НАСТРОЙКИ =====
             const SizedBox(height: 8),
             SeatSettingsRow(
               tournamentController: state.tournamentController,
@@ -95,10 +98,11 @@ class _SeatSetupScreenState extends ConsumerState<SeatSetupScreen> {
               gameController: state.gameController,
               selectedDate: state.selectedDate,
               months: state.months,
-              onDateTap: () => _selectDateTime(context, state, notifier),
-              onChanged: notifier.notifyChanges,
+              onDateTap: () => _selectDateTime(context),
+              onChanged: notifier._notifyChanges,
             ),
             const SizedBox(height: 8),
+            // ===== КНОПКА НОВАЯ ИГРА =====
             GameNewButton(
               label: 'СОЗДАТЬ НОВУЮ ИГРУ',
               isFullWidth: true,
@@ -111,12 +115,10 @@ class _SeatSetupScreenState extends ConsumerState<SeatSetupScreen> {
     );
   }
 
-  Future<void> _selectDateTime(
-    BuildContext context,
-    SeatSetupState state,
-    SeatSetupNotifier notifier,
-  ) async {
+  Future<void> _selectDateTime(BuildContext context) async {
     final theme = Theme.of(context);
+    final state = ref.read(seatSetupProviderFamily(_params));
+    final notifier = ref.read(seatSetupProviderFamily(_params).notifier);
 
     final picked = await showDatePicker(
       context: context,
@@ -137,7 +139,6 @@ class _SeatSetupScreenState extends ConsumerState<SeatSetupScreen> {
         );
       },
     );
-
     if (picked != null) {
       final time = await showTimePicker(
         context: context,
@@ -156,7 +157,6 @@ class _SeatSetupScreenState extends ConsumerState<SeatSetupScreen> {
           );
         },
       );
-
       if (time != null) {
         notifier.selectDateTime(picked, time);
       }
