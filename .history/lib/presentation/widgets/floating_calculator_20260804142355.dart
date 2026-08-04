@@ -15,7 +15,7 @@ class FloatingCalculator extends ConsumerStatefulWidget {
 }
 
 class _FloatingCalculatorState extends ConsumerState<FloatingCalculator> {
-  Offset _position = const Offset(130, 450);
+  Offset _position = const Offset(150, 450);
   bool _isDragging = false;
   bool _isMinimized = false;
 
@@ -199,10 +199,12 @@ class _FloatingCalculatorState extends ConsumerState<FloatingCalculator> {
 
     return Expanded(
       child: Container(
-        margin: const EdgeInsets.all(1),
+        margin: const EdgeInsets.all(2),
         decoration: BoxDecoration(
-          color: isDark ? Colors.grey.shade800.withOpacity(0.7) : Colors.white,
-          borderRadius: BorderRadius.circular(8),
+          color: isDark
+              ? Colors.grey.shade800.withOpacity(0.7)
+              : Colors.wh,
+          borderRadius: BorderRadius.circular(12),
           border: Border.all(
             color: isDark ? Colors.grey.shade700 : Colors.grey.shade300,
             width: 1,

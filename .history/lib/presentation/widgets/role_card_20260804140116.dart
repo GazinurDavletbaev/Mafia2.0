@@ -121,18 +121,16 @@ class RoleCard extends StatelessWidget {
   Widget? _buildIcon() {
     switch (role) {
       case 'sheriff':
-        return const Text(
-          '⭐',
-          style: TextStyle(
-            fontSize: 140,
-            color: Colors.white,
-          ),
+        return const Icon(
+          Mdi.red,
+          color: Colors.white,
+          size: 80,
         );
       case 'don':
         return const Icon(
-          Mdi.redhat,
+          Icons.emoji_events,
           color: Colors.white,
-          size: 200,
+          size: 80,
         );
       case 'citizen':
       case 'mafia':

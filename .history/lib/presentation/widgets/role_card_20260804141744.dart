@@ -124,7 +124,7 @@ class RoleCard extends StatelessWidget {
         return const Text(
           '⭐',
           style: TextStyle(
-            fontSize: 140,
+            fontSize: 150,
             color: Colors.white,
           ),
         );

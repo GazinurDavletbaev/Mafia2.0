@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:mdi_plus/mdi_plus.dart';
 
 class RoleCard extends StatelessWidget {
   final String role;
@@ -106,13 +105,13 @@ class RoleCard extends StatelessWidget {
   Color _getBackgroundColor() {
     switch (role) {
       case 'citizen':
-        return const Color.fromARGB(255, 255, 17, 0);
+        return const Color.fromARGB(255, 245, 20, 4);
       case 'sheriff':
-        return const Color.fromARGB(255, 255, 17, 0);
+        return Colors.red;
       case 'mafia':
-        return Colors.black;
+        return Colors.grey.shade900;
       case 'don':
-        return Colors.black;
+        return Colors.grey.shade900;
       default:
         return Colors.grey.shade800;
     }
@@ -121,18 +120,16 @@ class RoleCard extends StatelessWidget {
   Widget? _buildIcon() {
     switch (role) {
       case 'sheriff':
-        return const Text(
-          '⭐',
-          style: TextStyle(
-            fontSize: 140,
-            color: Colors.white,
-          ),
+        return const Icon(
+          Icons.star,
+          color: Colors.white,
+          size: 80,
         );
       case 'don':
         return const Icon(
-          Mdi.redhat,
+          Icons.emoji_events,
           color: Colors.white,
-          size: 200,
+          size: 80,
         );
       case 'citizen':
       case 'mafia':

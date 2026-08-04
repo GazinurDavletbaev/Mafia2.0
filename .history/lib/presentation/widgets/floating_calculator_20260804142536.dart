@@ -15,7 +15,7 @@ class FloatingCalculator extends ConsumerStatefulWidget {
 }
 
 class _FloatingCalculatorState extends ConsumerState<FloatingCalculator> {
-  Offset _position = const Offset(130, 450);
+  Offset _position = const Offset(150, 450);
   bool _isDragging = false;
   bool _isMinimized = false;
 
@@ -114,7 +114,7 @@ class _FloatingCalculatorState extends ConsumerState<FloatingCalculator> {
     final maxTop = screenHeight - (_isMinimized ? 60 : 280);
 
     return Positioned(
-      left: _position.dx.clamp(0, screenWidth - 150),
+      left: _position.dx.clamp(0, screenWidth - 200),
       top: _position.dy.clamp(0, maxTop),
       child: GestureDetector(
         onPanStart: (_) => setState(() => _isDragging = true),

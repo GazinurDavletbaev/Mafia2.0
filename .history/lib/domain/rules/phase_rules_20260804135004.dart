@@ -154,7 +154,7 @@ class PhaseRules {
             print('3344 $nwNightActions');
 
             return currentState.copyWith(
-              nightActions: nwNightActions,
+              nightActions: newNightActions,
               currentSubPhase: SubPhase.donCheck,
               currentSpeakerTimer: PlayerTimerType.seconds10,
               currentSpeakerSeat: don.seatNumber,

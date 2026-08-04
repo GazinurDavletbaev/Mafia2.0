@@ -15,7 +15,7 @@ class FloatingCalculator extends ConsumerStatefulWidget {
 }
 
 class _FloatingCalculatorState extends ConsumerState<FloatingCalculator> {
-  Offset _position = const Offset(130, 450);
+  Offset _position = const Offset(100, 450);
   bool _isDragging = false;
   bool _isMinimized = false;
 
