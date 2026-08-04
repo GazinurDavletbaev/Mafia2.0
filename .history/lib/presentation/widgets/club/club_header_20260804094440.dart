@@ -156,7 +156,7 @@ class ClubHeader extends StatelessWidget {
             children: [
               _buildStatItem(
                 context,
-                icon: MdiIcons.clipboardList,
+                icon: Mdi.clipboardList,
                 count: gamesCount,
                 label: 'Игры',
                 route: '/club-games-list',
@@ -164,7 +164,7 @@ class ClubHeader extends StatelessWidget {
               const SizedBox(width: 12),
               _buildStatItem(
                 context,
-                icon: MdiIcons.mem,
+                icon: Mdi.mem,
                 count: club?['members_count'] ?? 0,
                 label: 'Резиденты',
                 route: '/club-members-list',

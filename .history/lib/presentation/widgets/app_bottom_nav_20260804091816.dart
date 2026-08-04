@@ -51,7 +51,7 @@ class AppBottomNav extends ConsumerWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              _buildNavItem(context, MdiIcons.home, 'Клуб', 0,
+              _buildNavItem(context, Mdi.home, 'Клуб', 0,
                   badgeCount: pendingCount),
               _buildNavItem(context, Icons.people, 'Рассадка', 1),
               _buildNavItem(context, Icons.gamepad, 'Игра', 2),

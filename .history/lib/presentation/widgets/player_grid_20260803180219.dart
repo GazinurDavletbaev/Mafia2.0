@@ -181,7 +181,7 @@ class PlayerGrid extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.only(top: 10),
             child: Icon(
-              MdiIcons.pistol,
+              Mdi.pistol,
               color: isMafiaActive
                   ? Colors.red
                   : (isDark ? Colors.white : Colors.black),
@@ -195,7 +195,7 @@ class PlayerGrid extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.only(top: 16),
             child: Icon(
-              MdiIcons.hatFedora,
+              Mdi.hatFedora,
               color: isDonActive
                   ? Colors.red
                   : (isDark ? Colors.white : Colors.black),
@@ -209,7 +209,7 @@ class PlayerGrid extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.only(top: 16),
             child: Icon(
-              MdiIcons.accountCowboyHat,
+              Mdi.accountCowboyHat,
               color: isSheriffActive
                   ? Colors.red
                   : (isDark ? Colors.white : Colors.black),
@@ -250,11 +250,11 @@ class PlayerGrid extends StatelessWidget {
         tooltip = 'Свободная посадка';
         break;
       case SubPhase.speeches:
-        icon = MdiIcons.microphone;
+        icon = Mdi.microphone;
         tooltip = 'Речи';
         break;
       case SubPhase.voting:
-        icon = MdiIcons.thumbUp;
+        icon = Mdi.thumbUp;
         tooltip = 'Голосование';
         break;
       case SubPhase.revote:
@@ -262,23 +262,23 @@ class PlayerGrid extends StatelessWidget {
         tooltip = 'Переголосование';
         break;
       case SubPhase.tieBreak:
-        icon = MdiIcons.accountMultiple;
+        icon = Mdi.accountMultiple;
         tooltip = 'Перестрелка';
         break;
       case SubPhase.eliminationVote:
-        icon = MdiIcons.arrowUpBold;
+        icon = Mdi.arrowUpBold;
         tooltip = 'Голосование за подъём';
         break;
       case SubPhase.finalWord:
-        icon = MdiIcons.walk;
+        icon = Mdi.walk;
         tooltip = 'Заключительная минута';
         break;
       case SubPhase.finalWordKill:
-        icon = MdiIcons.cross;
+        icon = Mdi.cross;
         tooltip = 'Заключительная минута убитого';
         break;
       case SubPhase.bestMove:
-        icon = MdiIcons.pencil;
+        icon = Mdi.pencil;
         tooltip = 'Лучший ход';
         break;
       default:

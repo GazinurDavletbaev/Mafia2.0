@@ -5,7 +5,6 @@ import 'package:mafia_help/application/providers/notification_provider.dart';
 import 'package:mafia_help/data/local/models/phase.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
-
 class AppBottomNav extends ConsumerWidget {
   final int currentIndex;
   final Function(int) onTap;
@@ -52,7 +51,7 @@ class AppBottomNav extends ConsumerWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              _buildNavItem(context, MdiIcons.autoMode, 'Клуб', 0,
+              _buildNavItem(context, Mdi.autoMode, 'Клуб', 0,
                   badgeCount: pendingCount),
               _buildNavItem(context, Icons.people, 'Рассадка', 1),
               _buildNavItem(context, Icons.gamepad, 'Игра', 2),

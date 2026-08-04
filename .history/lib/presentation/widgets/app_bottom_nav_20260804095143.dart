@@ -51,12 +51,11 @@ class AppBottomNav extends ConsumerWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              _buildNavItem(context, MdiIcons.home, 'Клуб', 0,
+              _buildNavItem(context, Mdi.home, 'Клуб', 0,
                   badgeCount: pendingCount),
-              _buildNavItem(
-                  context, MdiIcons.accountGroupOutline, 'Рассадка', 1),
-              _buildNavItem(context, MdiIcons.brain, 'Игра', 2),
-              _buildNavItem(context, MdiIcons.listBox, 'Протокол', 3),
+              _buildNavItem(context, Mdi.accountGroupOutline, 'Рассадка', 1),
+              _buildNavItem(context, Mdi.brain, 'Игра', 2),
+              _buildNavItem(context, Mdi.listBox, 'Протокол', 3),
             ],
           ),
         ),

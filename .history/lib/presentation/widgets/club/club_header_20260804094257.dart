@@ -156,7 +156,7 @@ class ClubHeader extends StatelessWidget {
             children: [
               _buildStatItem(
                 context,
-                icon: MdiIcons.li,
+                icon: Mdi.li,
                 count: gamesCount,
                 label: 'Игры',
                 route: '/club-games-list',

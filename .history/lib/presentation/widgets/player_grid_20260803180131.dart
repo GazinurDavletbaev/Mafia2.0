@@ -181,7 +181,7 @@ class PlayerGrid extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.only(top: 10),
             child: Icon(
-              MdiIcons.pistol,
+              Mdi.pistol,
               color: isMafiaActive
                   ? Colors.red
                   : (isDark ? Colors.white : Colors.black),
@@ -195,7 +195,7 @@ class PlayerGrid extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.only(top: 16),
             child: Icon(
-              MdiIcons.hatFedora,
+              Mdi.hatFedora,
               color: isDonActive
                   ? Colors.red
                   : (isDark ? Colors.white : Colors.black),
@@ -209,7 +209,7 @@ class PlayerGrid extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.only(top: 16),
             child: Icon(
-              MdiIcons.accountCowboyHat,
+              Mdi.accountCowboyHat,
               color: isSheriffActive
                   ? Colors.red
                   : (isDark ? Colors.white : Colors.black),
@@ -250,7 +250,7 @@ class PlayerGrid extends StatelessWidget {
         tooltip = 'Свободная посадка';
         break;
       case SubPhase.speeches:
-        icon = MdiIcons.microphone;
+        icon = Mdi.microphone;
         tooltip = 'Речи';
         break;
       case SubPhase.voting:

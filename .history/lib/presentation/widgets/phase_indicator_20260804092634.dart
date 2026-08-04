@@ -27,7 +27,7 @@ class PhaseIndicator extends StatelessWidget {
     final Color iconColor =
         isNight ? Colors.yellow.shade300 : Colors.orange.shade700;
 
-    final String icon = isNight ? MdiIcons.sun : '☀️';
+    final String icon = isNight ? Mdi.sun : '☀️';
     final String dayNumber = '$currentDay';
 
     return Container(

@@ -46,7 +46,7 @@ class PhaseIndicator extends StatelessWidget {
         alignment: Alignment.center,
         children: 
           Icon(
-            MdiIcons.sunAngle),
+            Mdi.sunAngle),
           ),
           Positioned(
             bottom: 23,

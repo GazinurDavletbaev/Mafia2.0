@@ -5,7 +5,6 @@ import 'package:mafia_help/presentation/widgets/app_text.dart';
 import 'club_join_button.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
-
 class ClubHeader extends StatelessWidget {
   final Map<String, dynamic>? club;
   final int? myClubId;
@@ -39,7 +38,8 @@ class ClubHeader extends StatelessWidget {
                   decoration: BoxDecoration(
                     color: isDark ? Colors.grey.shade700 : Colors.grey.shade200,
                     borderRadius: BorderRadius.circular(14),
-                    image: club?['logo_url'] != null && club!['logo_url'].isNotEmpty
+                    image: club?['logo_url'] != null &&
+                            club!['logo_url'].isNotEmpty
                         ? DecorationImage(
                             image: NetworkImage(club!['logo_url']),
                             fit: BoxFit.cover,
@@ -100,7 +100,8 @@ class ClubHeader extends StatelessWidget {
         children: [
           CircleAvatar(
             radius: 21,
-            backgroundColor: isDark ? Colors.grey.shade700 : Colors.grey.shade300,
+            backgroundColor:
+                isDark ? Colors.grey.shade700 : Colors.grey.shade300,
             backgroundImage: club?['president_avatar'] != null &&
                     club!['president_avatar'].toString().isNotEmpty
                 ? NetworkImage(club!['president_avatar'])
@@ -108,7 +109,8 @@ class ClubHeader extends StatelessWidget {
             child: club?['president_avatar'] == null ||
                     club!['president_avatar'].toString().isEmpty
                 ? Text(
-                    club?['president_name']?.substring(0, 1).toUpperCase() ?? '?',
+                    club?['president_name']?.substring(0, 1).toUpperCase() ??
+                        '?',
                     style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
@@ -154,7 +156,7 @@ class ClubHeader extends StatelessWidget {
             children: [
               _buildStatItem(
                 context,
-                icon: MdiIcons.autoMode,
+                icon: Mdi.autoMode,
                 count: gamesCount,
                 label: 'Игры',
                 route: '/club-games-list',
