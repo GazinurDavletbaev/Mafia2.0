@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mafia_help/presentation/screens/lobby/lobby_data.dart';
-import 'package:mafia_help/presentation/widgets/tip_manager.dart';
 import 'package:mdi_plus/mdi_plus.dart';
 import 'package:pie_menu/pie_menu.dart';
 import '../../state/game_state.dart';
@@ -12,7 +11,7 @@ import '../../widgets/pie_menu_dialog.dart';
 import '../../widgets/role_card.dart';
 import '../../widgets/player_timer_type.dart';
 import '../../widgets/floating_calculator.dart';
-
+import '../../widgets/tip_manager.dart';
 class GameScreen extends ConsumerStatefulWidget {
   final GameData initialData;
   final Function(GameData) onGameStateChanged;
@@ -43,7 +42,13 @@ class _GameScreenState extends ConsumerState<GameScreen> {
       print('playerNames: ${widget.initialData.playerNames}');
       print(
           'gameState.players: ${widget.initialData.gameState.players.map((p) => p.name)}');
-
+TipManager.showTip(
+      context: context,
+      ref: ref,
+      tipId: 'game_first_open',
+      message: '👆 Нажмите на игрока, чтобы поставить фол. Свайп для действий.',
+      icon: Icons.touch_app,
+    );
       final players = widget.initialData.gameState.players;
       final namesFromData = widget.initialData.playerNames;
       final avatars = players.map((p) => p.avatarUrl).toList(); // ✅

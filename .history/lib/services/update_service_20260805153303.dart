@@ -59,19 +59,36 @@ class UpdateService {
 
   static void _showUpdateDialog(
       BuildContext context, String apkUrl, String latestVersion) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final primaryColor = theme.primaryColor;
+
     showDialog(
       context: context,
       barrierDismissible: false,
       builder: (context) => AlertDialog(
-        backgroundColor: Colors.grey.shade900,
-        title: const Text('Доступно обновление!',
-            style: TextStyle(color: Colors.white)),
-        content: Text('Новая версия $latestVersion готова к установке.',
-            style: TextStyle(color: Colors.white70)),
+        backgroundColor: isDark ? Colors.grey.shade900 : Colors.white,
+        title: Text(
+          'Доступно обновление!',
+          style: TextStyle(
+            color: isDark ? Colors.white : Colors.black87,
+          ),
+        ),
+        content: Text(
+          'Новая версия $latestVersion готова к установке.',
+          style: TextStyle(
+            color: isDark ? Colors.white70 : Colors.black54,
+          ),
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Позже', style: TextStyle(color: Colors.grey)),
+            child: Text(
+              'Позже',
+              style: TextStyle(
+                color: isDark ? Colors.grey : Colors.grey.shade600,
+              ),
+            ),
           ),
           ElevatedButton(
             onPressed: () async {
@@ -80,7 +97,9 @@ class UpdateService {
                   mode: LaunchMode.externalApplication);
             },
             style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.orange.shade800),
+              backgroundColor: primaryColor,
+              foregroundColor: Colors.white,
+            ),
             child: const Text('Обновить'),
           ),
         ],

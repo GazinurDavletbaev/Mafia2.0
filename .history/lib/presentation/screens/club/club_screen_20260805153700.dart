@@ -33,6 +33,7 @@ class _ClubScreenState extends ConsumerState<ClubScreen> {
   void initState() {
     super.initState();
     _loadData();
+    
   }
 
   void _selectClub(int clubId) {

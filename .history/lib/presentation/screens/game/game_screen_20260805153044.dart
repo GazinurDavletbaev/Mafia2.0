@@ -43,7 +43,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
       print('playerNames: ${widget.initialData.playerNames}');
       print(
           'gameState.players: ${widget.initialData.gameState.players.map((p) => p.name)}');
-
+    
       final players = widget.initialData.gameState.players;
       final namesFromData = widget.initialData.playerNames;
       final avatars = players.map((p) => p.avatarUrl).toList(); // ✅

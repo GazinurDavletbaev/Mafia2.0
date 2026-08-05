@@ -43,7 +43,13 @@ class _GameScreenState extends ConsumerState<GameScreen> {
       print('playerNames: ${widget.initialData.playerNames}');
       print(
           'gameState.players: ${widget.initialData.gameState.players.map((p) => p.name)}');
-
+TipManager.showTip(
+      context: context,
+      ref: ref,
+      tipId: 'game_first_open',
+      message: '👆 Нажмите на игрока, чтобы поставить фол. Свайп для действий.',
+      icon: Icons.touch_app,
+    );
       final players = widget.initialData.gameState.players;
       final namesFromData = widget.initialData.playerNames;
       final avatars = players.map((p) => p.avatarUrl).toList(); // ✅

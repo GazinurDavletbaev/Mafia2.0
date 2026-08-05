@@ -104,7 +104,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             _buildSettingsTile(
               context,
               title: 'О приложении',
-              subtitle: 'Версия 1.8.5',
+              subtitle: 'Версия 1.8.4',
               icon: Icons.info_outline,
               isDark: isDark,
               onTap: () {

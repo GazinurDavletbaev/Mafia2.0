@@ -1,7 +1,10 @@
 // lib/presentation/screens/settings_screen.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import '../../application/providers/theme_provider.dart';
+import '../../application/providers/tip_provider.dart';
+import '../../services/auth_service.dart';
 
 class SettingsScreen extends ConsumerStatefulWidget {
   const SettingsScreen({super.key});
@@ -11,11 +14,10 @@ class SettingsScreen extends ConsumerStatefulWidget {
 }
 
 class _SettingsScreenState extends ConsumerState<SettingsScreen> {
-  bool _showHints = true;
-
   @override
   Widget build(BuildContext context) {
     final isDark = ref.watch(themeProvider);
+    final hintsEnabled = ref.watch(tipsEnabledProvider);
 
     return Scaffold(
       backgroundColor: isDark ? Colors.black87 : Colors.grey.shade100,
@@ -23,11 +25,22 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         title: const Text('Настройки'),
         backgroundColor: isDark ? Colors.grey.shade900 : Colors.white,
         foregroundColor: isDark ? Colors.white : Colors.black,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              if (context.mounted) {
+                context.go('/lobby');
+              }
+            });
+          },
+        ),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
+            // Тёмная тема
             _buildSettingsTile(
               context,
               title: 'Тёмная тема',
@@ -45,6 +58,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 ref.read(themeProvider.notifier).state = !isDark;
               },
             ),
+            // Подсказки
             _buildSettingsTile(
               context,
               title: 'Подсказки',
@@ -52,20 +66,25 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               icon: Icons.lightbulb_outline,
               isDark: isDark,
               trailing: Switch(
-                value: _showHints,
+                value: hintsEnabled,
                 onChanged: (value) {
-                  setState(() {
-                    _showHints = value;
-                  });
+                  ref.read(tipsEnabledProvider.notifier).state = value;
+                  // Если выключили — очищаем список скрытых подсказок
+                  if (!value) {
+                    ref.read(dismissedTipsProvider.notifier).state = {};
+                  }
                 },
                 activeColor: Colors.orange,
               ),
               onTap: () {
-                setState(() {
-                  _showHints = !_showHints;
-                });
+                final current = ref.read(tipsEnabledProvider.notifier);
+                current.state = !current.state;
+                if (!current.state) {
+                  ref.read(dismissedTipsProvider.notifier).state = {};
+                }
               },
             ),
+            // Проверить обновления
             _buildSettingsTile(
               context,
               title: 'Проверить обновления',
@@ -81,14 +100,40 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 );
               },
             ),
+            // О приложении
             _buildSettingsTile(
               context,
               title: 'О приложении',
-              subtitle: 'Версия 1.7.4',
+              subtitle: 'Версия 1.8.5',
               icon: Icons.info_outline,
               isDark: isDark,
               onTap: () {
                 _showAboutDialog(context, isDark);
+              },
+            ),
+            // Сменить пароль
+            _buildSettingsTile(
+              context,
+              title: 'Сменить пароль',
+              subtitle: 'Изменить текущий пароль',
+              icon: Icons.lock_outline,
+              isDark: isDark,
+              onTap: () {
+                context.go('/change-password');
+              },
+            ),
+            const Divider(color: Colors.grey, height: 32),
+            // Выйти
+            _buildSettingsTile(
+              context,
+              title: 'Выйти',
+              subtitle: 'Выйти из аккаунта',
+              icon: Icons.logout,
+              isDark: isDark,
+              iconColor: Colors.red,
+              textColor: Colors.red,
+              onTap: () {
+                _showLogoutDialog(context);
               },
             ),
           ],
@@ -105,21 +150,31 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     required bool isDark,
     Widget? trailing,
     required VoidCallback onTap,
+    Color? iconColor,
+    Color? textColor,
   }) {
     return Card(
       color: isDark ? Colors.grey.shade800 : Colors.white,
       margin: const EdgeInsets.only(bottom: 8),
       child: ListTile(
-        leading: Icon(icon, color: Colors.orange),
+        leading: Icon(
+          icon,
+          color: iconColor ?? Colors.orange,
+        ),
         title: Text(
           title,
-          style: TextStyle(color: isDark ? Colors.white : Colors.black87),
+          style: TextStyle(
+            color: textColor ?? (isDark ? Colors.white : Colors.black87),
+          ),
         ),
         subtitle: Text(
           subtitle,
-          style: TextStyle(color: isDark ? Colors.grey.shade400 : Colors.grey.shade600),
+          style: TextStyle(
+            color: isDark ? Colors.grey.shade400 : Colors.grey.shade600,
+          ),
         ),
-        trailing: trailing ?? const Icon(Icons.arrow_forward_ios, color: Colors.grey),
+        trailing:
+            trailing ?? const Icon(Icons.arrow_forward_ios, color: Colors.grey),
         onTap: onTap,
       ),
     );
@@ -164,6 +219,53 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             child: const Text(
               'Закрыть',
               style: TextStyle(color: Colors.orange),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showLogoutDialog(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: isDark ? Colors.grey.shade800 : Colors.white,
+        title: Text(
+          'Выйти из аккаунта?',
+          style: TextStyle(
+            color: isDark ? Colors.white : Colors.black87,
+          ),
+        ),
+        content: Text(
+          'Вы уверены, что хотите выйти?',
+          style: TextStyle(
+            color: isDark ? Colors.white70 : Colors.black54,
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(
+              'Отмена',
+              style: TextStyle(
+                color: isDark ? Colors.grey : Colors.grey.shade600,
+              ),
+            ),
+          ),
+          TextButton(
+            onPressed: () async {
+              Navigator.pop(context);
+              await AuthService.logout();
+              if (context.mounted) {
+                context.go('/login');
+              }
+            },
+            child: const Text(
+              'Выйти',
+              style: TextStyle(color: Colors.red),
             ),
           ),
         ],

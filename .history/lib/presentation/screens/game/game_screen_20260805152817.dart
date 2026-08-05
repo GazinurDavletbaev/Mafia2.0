@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mafia_help/presentation/screens/lobby/lobby_data.dart';
-import 'package:mafia_help/presentation/widgets/tip_manager.dart';
 import 'package:mdi_plus/mdi_plus.dart';
 import 'package:pie_menu/pie_menu.dart';
 import '../../state/game_state.dart';
