@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../application/providers/theme_provider.dart';
+import '../../application/providers/tip_provider.dart';
 import '../../services/auth_service.dart';
 
 class SettingsScreen extends ConsumerStatefulWidget {
@@ -13,11 +14,10 @@ class SettingsScreen extends ConsumerStatefulWidget {
 }
 
 class _SettingsScreenState extends ConsumerState<SettingsScreen> {
-  bool _showHints = true;
-
   @override
   Widget build(BuildContext context) {
     final isDark = ref.watch(themeProvider);
+    final hintsEnabled = ref.watch(tipsEnabledProvider);
 
     return Scaffold(
       backgroundColor: isDark ? Colors.black87 : Colors.grey.shade100,
@@ -25,11 +25,22 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         title: const Text('Настройки'),
         backgroundColor: isDark ? Colors.grey.shade900 : Colors.white,
         foregroundColor: isDark ? Colors.white : Colors.black,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              if (context.mounted) {
+                context.go('/lobby');
+              }
+            });
+          },
+        ),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
+            // Тёмная тема
             _buildSettingsTile(
               context,
               title: 'Тёмная тема',
@@ -39,14 +50,15 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               trailing: Switch(
                 value: isDark,
                 onChanged: (value) {
-                  ref.read(themeProvider.notifier).state = value;
+                  ref.read(themeProvider.notifier).setTheme(value);
                 },
                 activeColor: Colors.orange,
               ),
               onTap: () {
-                ref.read(themeProvider.notifier).state = !isDark;
+                ref.read(themeProvider.notifier).toggleTheme();
               },
             ),
+            // Подсказки
             _buildSettingsTile(
               context,
               title: 'Подсказки',
@@ -54,20 +66,24 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               icon: Icons.lightbulb_outline,
               isDark: isDark,
               trailing: Switch(
-                value: _showHints,
+                value: hintsEnabled,
                 onChanged: (value) {
-                  setState(() {
-                    _showHints = value;
-                  });
+                  ref.read(tipsEnabledProvider.notifier).setTips(value);
+                  if (!value) {
+                    ref.read(dismissedTipsProvider.notifier).state = {};
+                  }
                 },
                 activeColor: Colors.orange,
               ),
               onTap: () {
-                setState(() {
-                  _showHints = !_showHints;
-                });
+                final current = ref.read(tipsEnabledProvider.notifier);
+                current.toggleTips();
+                if (!current.state) {
+                  ref.read(dismissedTipsProvider.notifier).state = {};
+                }
               },
             ),
+            // Проверить обновления
             _buildSettingsTile(
               context,
               title: 'Проверить обновления',
@@ -83,17 +99,18 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 );
               },
             ),
+            // О приложении
             _buildSettingsTile(
               context,
               title: 'О приложении',
-              subtitle: 'Версия 1.7.4',
+              subtitle: 'Версия 1.8.5',
               icon: Icons.info_outline,
               isDark: isDark,
               onTap: () {
                 _showAboutDialog(context, isDark);
               },
             ),
-            // ✅ СМЕНА ПАРОЛЯ
+            // Сменить пароль
             _buildSettingsTile(
               context,
               title: 'Сменить пароль',
@@ -105,7 +122,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               },
             ),
             const Divider(color: Colors.grey, height: 32),
-            // ✅ КНОПКА ВЫХОДА
+            // Выйти
             _buildSettingsTile(
               context,
               title: 'Выйти',
@@ -162,6 +179,52 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     );
   }
 
+  void _showAboutDialog(BuildContext context, bool isDark) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: isDark ? Colors.grey.shade800 : Colors.white,
+        title: Text(
+          'О приложении',
+          style: TextStyle(color: isDark ? Colors.white : Colors.black87),
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Mafia Help',
+              style: TextStyle(
+                color: isDark ? Colors.white : Colors.black87,
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Версия: 1.7.4',
+              style: TextStyle(color: isDark ? Colors.white70 : Colors.black54),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Приложение для судьи спортивной мафии',
+              style: TextStyle(color: isDark ? Colors.white70 : Colors.black54),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text(
+              'Закрыть',
+              style: TextStyle(color: Colors.orange),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   void _showLogoutDialog(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
@@ -202,52 +265,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             child: const Text(
               'Выйти',
               style: TextStyle(color: Colors.red),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _showAboutDialog(BuildContext context, bool isDark) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: isDark ? Colors.grey.shade800 : Colors.white,
-        title: Text(
-          'О приложении',
-          style: TextStyle(color: isDark ? Colors.white : Colors.black87),
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Mafia Help',
-              style: TextStyle(
-                color: isDark ? Colors.white : Colors.black87,
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Версия: 1.7.4',
-              style: TextStyle(color: isDark ? Colors.white70 : Colors.black54),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Приложение для судьи спортивной мафии',
-              style: TextStyle(color: isDark ? Colors.white70 : Colors.black54),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text(
-              'Закрыть',
-              style: TextStyle(color: Colors.orange),
             ),
           ),
         ],

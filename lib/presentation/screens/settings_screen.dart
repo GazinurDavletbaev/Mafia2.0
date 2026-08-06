@@ -50,12 +50,12 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               trailing: Switch(
                 value: isDark,
                 onChanged: (value) {
-                  ref.read(themeProvider.notifier).state = value;
+                  ref.read(themeProvider.notifier).setTheme(value);
                 },
                 activeColor: Colors.orange,
               ),
               onTap: () {
-                ref.read(themeProvider.notifier).state = !isDark;
+                ref.read(themeProvider.notifier).toggleTheme();
               },
             ),
             // Подсказки
@@ -68,8 +68,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               trailing: Switch(
                 value: hintsEnabled,
                 onChanged: (value) {
-                  ref.read(tipsEnabledProvider.notifier).state = value;
-                  // Если выключили — очищаем список скрытых подсказок
+                  ref.read(tipsEnabledProvider.notifier).setTips(value);
                   if (!value) {
                     ref.read(dismissedTipsProvider.notifier).state = {};
                   }
@@ -78,7 +77,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               ),
               onTap: () {
                 final current = ref.read(tipsEnabledProvider.notifier);
-                current.state = !current.state;
+                current.toggleTips();
                 if (!current.state) {
                   ref.read(dismissedTipsProvider.notifier).state = {};
                 }

@@ -84,7 +84,7 @@ class _SplashScreenState extends State<SplashScreen> {
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
                 colors: isDark
-                    ? [Colors.black, Colors.black]
+                    ? [Colors.black, Colors.]
                     : [Colors.white, Colors.grey.shade100],
               ),
             ),
