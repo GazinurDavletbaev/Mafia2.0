@@ -34,39 +34,36 @@ class _TimerOverlayState extends ConsumerState<TimerOverlay>
     super.initState();
     _currentSeconds = widget.seconds;
 
-    print('🔥🔥🔥 TimerOverlay INIT: секунды = ${widget.seconds}'); // 👈 ЛОГ
-
     _controller = TimerController(
       totalSeconds: widget.seconds,
       onTick: () {
         final remaining = _controller.remaining;
-        print('🔥🔥🔥 TimerOverlay TICK: remaining = $remaining'); // 👈 ЛОГ
         setState(() {
           _currentSeconds = remaining;
         });
+        // 🔥 Отложенное обновление
         WidgetsBinding.instance.addPostFrameCallback((_) {
           if (mounted) {
-            print(
-                '🔥🔥🔥 обновляем floatingTimerProvider: $remaining'); // 👈 ЛОГ
             ref.read(floatingTimerProvider.notifier).state = remaining;
           }
         });
       },
       onComplete: () {
-        print('🔥🔥🔥 TimerOverlay COMPLETE'); // 👈 ЛОГ
+        // 🔥 Отложенное скрытие
         WidgetsBinding.instance.addPostFrameCallback((_) {
           if (mounted) {
             ref.read(floatingTimerProvider.notifier).state = null;
           }
         });
+        
         widget.onComplete?.call();
       },
     );
     _controller.start();
 
+    // 🔥 Показать таймер после сборки
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
-        print('🔥🔥🔥 показать floatingTimer: ${widget.seconds}'); // 👈 ЛОГ
         ref.read(floatingTimerProvider.notifier).state = widget.seconds;
       }
     });

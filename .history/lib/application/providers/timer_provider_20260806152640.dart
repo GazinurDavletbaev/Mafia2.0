@@ -1,8 +1,7 @@
+// lib/application/providers/timer_provider.dart
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-final floatingTimerProvider = StateProvider<int?>((ref) => null);
-
-// Состояние таймера
 class TimerState {
   final int remainingSeconds;
   final bool isRunning;
@@ -71,8 +70,23 @@ class TimerNotifier extends StateNotifier<TimerState> {
   void reset() {
     state = TimerState.initial();
   }
+
+  // 🔥 СИНХРОНИЗАЦИЯ (для возврата на GameScreen)
+  void syncFromGlobal(int seconds) {
+    state = state.copyWith(
+      remainingSeconds: seconds,
+      isRunning: true,
+    );
+  }
+
+  // 🔥 СОХРАНЯЕМ ТЕКУЩЕЕ СОСТОЯНИЕ ДЛЯ ГЛОБАЛЬНОГО ТАЙМЕРА
+  int get currentSeconds => state.remainingSeconds;
+  bool get isRunning => state.isRunning;
 }
 
 final timerProvider = StateNotifierProvider<TimerNotifier, TimerState>((ref) {
   return TimerNotifier();
 });
+
+// 🔥 ПРОВАЙДЕР ДЛЯ ПОКАЗА ГЛОБАЛЬНОГО ТАЙМЕРА
+final globalTimerVisibleProvider = StateProvider<bool>((ref) => false);

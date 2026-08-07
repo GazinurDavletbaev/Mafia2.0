@@ -1,7 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-final floatingTimerProvider = StateProvider<int?>((ref) => null);
-
 // Состояние таймера
 class TimerState {
   final int remainingSeconds;
@@ -34,7 +32,21 @@ class TimerState {
     );
   }
 }
+final floatingTimerProvider = StateNotifierProvider<FloatingTimerNotifier, int?>((ref) {
+  return FloatingTimerNotifier();
+});
 
+class FloatingTimerNotifier extends StateNotifier<int?> {
+  FloatingTimerNotifier() : super(null);
+
+  void show(int seconds) {
+    state = seconds;
+  }
+
+  void hide() {
+    state = null;
+  }
+}
 class TimerNotifier extends StateNotifier<TimerState> {
   TimerNotifier() : super(TimerState.initial());
 

@@ -30,47 +30,46 @@ class _TimerOverlayState extends ConsumerState<TimerOverlay>
   int _currentSeconds = 0;
 
   @override
-  void initState() {
-    super.initState();
-    _currentSeconds = widget.seconds;
+void initState() {
+  super.initState();
+  _currentSeconds = widget.seconds;
+  
+  print('🔥🔥🔥 TimerOverlay INIT: секунды = ${widget.seconds}'); // 👈 ЛОГ
 
-    print('🔥🔥🔥 TimerOverlay INIT: секунды = ${widget.seconds}'); // 👈 ЛОГ
-
-    _controller = TimerController(
-      totalSeconds: widget.seconds,
-      onTick: () {
-        final remaining = _controller.remaining;
-        print('🔥🔥🔥 TimerOverlay TICK: remaining = $remaining'); // 👈 ЛОГ
-        setState(() {
-          _currentSeconds = remaining;
-        });
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          if (mounted) {
-            print(
-                '🔥🔥🔥 обновляем floatingTimerProvider: $remaining'); // 👈 ЛОГ
-            ref.read(floatingTimerProvider.notifier).state = remaining;
-          }
-        });
-      },
-      onComplete: () {
-        print('🔥🔥🔥 TimerOverlay COMPLETE'); // 👈 ЛОГ
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          if (mounted) {
-            ref.read(floatingTimerProvider.notifier).state = null;
-          }
-        });
-        widget.onComplete?.call();
-      },
-    );
-    _controller.start();
-
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) {
-        print('🔥🔥🔥 показать floatingTimer: ${widget.seconds}'); // 👈 ЛОГ
-        ref.read(floatingTimerProvider.notifier).state = widget.seconds;
-      }
-    });
-  }
+  _controller = TimerController(
+    totalSeconds: widget.seconds,
+    onTick: () {
+      final remaining = _controller.remaining;
+      print('🔥🔥🔥 TimerOverlay TICK: remaining = $remaining'); // 👈 ЛОГ
+      setState(() {
+        _currentSeconds = remaining;
+      });
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          print('🔥🔥🔥 обновляем floatingTimerProvider: $remaining'); // 👈 ЛОГ
+          ref.read(floatingTimerProvider.notifier).state = remaining;
+        }
+      });
+    },
+    onComplete: () {
+      print('🔥🔥🔥 TimerOverlay COMPLETE'); // 👈 ЛОГ
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          ref.read(floatingTimerProvider.notifier).state = null;
+        }
+      });
+      widget.onComplete?.call();
+    },
+  );
+  _controller.start();
+  
+  WidgetsBinding.instance.addPostFrameCallback((_) {
+    if (mounted) {
+      print('🔥🔥🔥 показать floatingTimer: ${widget.seconds}'); // 👈 ЛОГ
+      ref.read(floatingTimerProvider.notifier).state = widget.seconds;
+    }
+  });
+}
 
   @override
   void didUpdateWidget(covariant TimerOverlay oldWidget) {

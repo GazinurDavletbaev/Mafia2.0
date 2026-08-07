@@ -1,8 +1,12 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-final floatingTimerProvider = StateProvider<int?>((ref) => null);
+// 🔥 ПРОВАЙДЕР ДЛЯ ТАЙМЕРА НАВБАРА
+final navBarTimerProvider = StateProvider<int?>); // null = нет таймера
 
-// Состояние таймера
+// ============================================================
+// СОСТОЯНИЕ ТАЙМЕРА (для GameScreen)
+// ============================================================
+
 class TimerState {
   final int remainingSeconds;
   final bool isRunning;

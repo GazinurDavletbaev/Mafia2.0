@@ -1,12 +1,12 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-final floatingTimerProvider = StateProvider<int?>((ref) => null);
-
 // Состояние таймера
 class TimerState {
   final int remainingSeconds;
   final bool isRunning;
   final int initialSeconds;
+  final navBarTimerProvider = StateProvider<int?>((ref) => null); // null = нет таймера
+
 
   const TimerState({
     required this.remainingSeconds,

@@ -33,43 +33,25 @@ class _TimerOverlayState extends ConsumerState<TimerOverlay>
   void initState() {
     super.initState();
     _currentSeconds = widget.seconds;
-
-    print('🔥🔥🔥 TimerOverlay INIT: секунды = ${widget.seconds}'); // 👈 ЛОГ
-
     _controller = TimerController(
       totalSeconds: widget.seconds,
       onTick: () {
         final remaining = _controller.remaining;
-        print('🔥🔥🔥 TimerOverlay TICK: remaining = $remaining'); // 👈 ЛОГ
         setState(() {
           _currentSeconds = remaining;
         });
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          if (mounted) {
-            print(
-                '🔥🔥🔥 обновляем floatingTimerProvider: $remaining'); // 👈 ЛОГ
-            ref.read(floatingTimerProvider.notifier).state = remaining;
-          }
-        });
+        // 🔥 ОБНОВЛЯЕМ ПЛАВАЮЩИЙ ТАЙМЕР
+        ref.read(floatingTimerProvider.notifier).state = remaining;
       },
       onComplete: () {
-        print('🔥🔥🔥 TimerOverlay COMPLETE'); // 👈 ЛОГ
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          if (mounted) {
-            ref.read(floatingTimerProvider.notifier).state = null;
-          }
-        });
+        // 🔥 СКРЫВАЕМ ПЛАВАЮЩИЙ ТАЙМЕР
+        ref.read(floatingTimerProvider.notifier).state = null;
         widget.onComplete?.call();
       },
     );
     _controller.start();
-
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) {
-        print('🔥🔥🔥 показать floatingTimer: ${widget.seconds}'); // 👈 ЛОГ
-        ref.read(floatingTimerProvider.notifier).state = widget.seconds;
-      }
-    });
+    // 🔥 ПОКАЗЫВАЕМ ПЛАВАЮЩИЙ ТАЙМЕР
+    ref.read(floatingTimerProvider.notifier).state = widget.seconds;
   }
 
   @override
@@ -84,38 +66,22 @@ class _TimerOverlayState extends ConsumerState<TimerOverlay>
           setState(() {
             _currentSeconds = remaining;
           });
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            if (mounted) {
-              ref.read(floatingTimerProvider.notifier).state = remaining;
-            }
-          });
+          ref.read(floatingTimerProvider.notifier).state = remaining;
         },
         onComplete: () {
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            if (mounted) {
-              ref.read(floatingTimerProvider.notifier).state = null;
-            }
-          });
+          ref.read(floatingTimerProvider.notifier).state = null;
           widget.onComplete?.call();
         },
       );
       _controller.start();
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted) {
-          ref.read(floatingTimerProvider.notifier).state = widget.seconds;
-        }
-      });
+      ref.read(floatingTimerProvider.notifier).state = widget.seconds;
     }
   }
 
   @override
   void dispose() {
     _controller.dispose();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) {
-        ref.read(floatingTimerProvider.notifier).state = null;
-      }
-    });
+    ref.read(floatingTimerProvider.notifier).state = null;
     super.dispose();
   }
 
