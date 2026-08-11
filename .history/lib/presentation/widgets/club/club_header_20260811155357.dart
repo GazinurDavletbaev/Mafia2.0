@@ -176,20 +176,7 @@ class ClubHeader extends StatelessWidget {
                     const SizedBox(height: 4),
 
                     // 🔥 ИМЯ ПРЕЗИДЕНТА
-                    Row(
-                      children: [
-                        Icon(
-                          Icons.star,
-                          color: Colors.orange,
-                          size: 14,
-                        ),
-                        const SizedBox(width: 4),
-                        Text(
-                          club?['president_name'] ?? 'Президент не указан',
-                          style: TextStyle(
-                            color: isDark
-                                ? Colors.grey.shade300
-                                : Colors.grey.shade700,
+                    lors.grey.shade700,
                             fontSize: 13,
                             fontWeight: FontWeight.w500,
                           ),
@@ -221,7 +208,20 @@ class ClubHeader extends StatelessWidget {
                         color: isDark
                             ? Colors.grey.shade400
                             : Colors.grey.shade600,
-                        fontSize: 13,
+                        fontSize: 13,Row(
+                      children: [
+                        Icon(
+                          Icons.star,
+                          color: Colors.orange,
+                          size: 14,
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          club?['president_name'] ?? 'Президент не указан',
+                          style: TextStyle(
+                            color: isDark
+                                ? Colors.grey.shade300
+                                : Co
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,

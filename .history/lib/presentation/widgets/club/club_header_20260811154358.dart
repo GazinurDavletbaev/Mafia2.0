@@ -43,8 +43,7 @@ class ClubHeader extends StatelessWidget {
                     width: 180,
                     height: 180,
                     decoration: BoxDecoration(
-                      color:
-                          isDark ? Colors.grey.shade700 : Colors.grey.shade200,
+                      color: isDark ? Colors.grey.shade700 : Colors.grey.shade200,
                       borderRadius: BorderRadius.circular(100),
                       image: club?['logo_url'] != null &&
                               club!['logo_url'].isNotEmpty
@@ -54,15 +53,14 @@ class ClubHeader extends StatelessWidget {
                             )
                           : null,
                     ),
-                    child:
-                        club?['logo_url'] == null || club!['logo_url'].isEmpty
-                            ? Image.asset(
-                                'assets/mafia_logo.png',
-                                width: 50,
-                                height: 50,
-                                fit: BoxFit.contain,
-                              )
-                            : null,
+                    child: club?['logo_url'] == null || club!['logo_url'].isEmpty
+                        ? Image.asset(
+                            'assets/mafia_logo.png',
+                            width: 50,
+                            height: 50,
+                            fit: BoxFit.contain,
+                          )
+                        : null,
                   ),
                   // 🔥 БЕЙДЖ ПРЕЗИДЕНТА (сверху справа)
                   Positioned(
@@ -89,13 +87,10 @@ class ClubHeader extends StatelessWidget {
                         ),
                         child: CircleAvatar(
                           radius: 37,
-                          backgroundColor: isDark
-                              ? Colors.grey.shade700
-                              : Colors.grey.shade300,
+                          backgroundColor:
+                              isDark ? Colors.grey.shade700 : Colors.grey.shade300,
                           backgroundImage: club?['president_avatar'] != null &&
-                                  club!['president_avatar']
-                                      .toString()
-                                      .isNotEmpty
+                                  club!['president_avatar'].toString().isNotEmpty
                               ? NetworkImage(club!['president_avatar'])
                               : null,
                           child: club?['president_avatar'] == null ||
@@ -108,8 +103,7 @@ class ClubHeader extends StatelessWidget {
                                   style: TextStyle(
                                     fontSize: 12,
                                     fontWeight: FontWeight.bold,
-                                    color:
-                                        isDark ? Colors.white : Colors.black87,
+                                    color: isDark ? Colors.white : Colors.black87,
                                   ),
                                 )
                               : null,
@@ -187,9 +181,7 @@ class ClubHeader extends StatelessWidget {
                         Text(
                           club?['president_name'] ?? 'Президент не указан',
                           style: TextStyle(
-                            color: isDark
-                                ? Colors.grey.shade300
-                                : Colors.grey.shade700,
+                            color: isDark ? Colors.grey.shade300 : Colors.grey.shade700,
                             fontSize: 13,
                             fontWeight: FontWeight.w500,
                           ),
@@ -204,9 +196,7 @@ class ClubHeader extends StatelessWidget {
                       Text(
                         club!['description'],
                         style: TextStyle(
-                          color: isDark
-                              ? Colors.grey.shade400
-                              : Colors.grey.shade600,
+                          color: isDark ? Colors.grey.shade400 : Colors.grey.shade600,
                           fontSize: 13,
                         ),
                         maxLines: 2,
@@ -218,9 +208,7 @@ class ClubHeader extends StatelessWidget {
                     Text(
                       '📍 ${club?['city'] ?? 'Город не указан'}',
                       style: TextStyle(
-                        color: isDark
-                            ? Colors.grey.shade400
-                            : Colors.grey.shade600,
+                        color: isDark ? Colors.grey.shade400 : Colors.grey.shade600,
                         fontSize: 13,
                       ),
                       maxLines: 1,
