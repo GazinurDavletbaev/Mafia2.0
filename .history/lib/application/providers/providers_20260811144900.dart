@@ -1,0 +1,12 @@
+// lib/application/providers/providers.dart
+export 'repository_provider.dart';
+export 'usecase_providers.dart';
+export 'timer_provider.dart';
+export 'notification_provider.dart';
+export 'tip_provider.dart';
+export 'game_provider.dart';
+export 'club_provider.dart';
+export 'user_provider.dart';
+export 'theme_provider.dart';
+export 'rules_providers.dart';
+export 'show_timer_provider.dart';  // 🔥 ДОБАВИТЬ

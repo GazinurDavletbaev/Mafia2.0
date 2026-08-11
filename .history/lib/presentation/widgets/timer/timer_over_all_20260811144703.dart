@@ -1,15 +1,32 @@
+// lib/presentation/widgets/timer/timer_over_all.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mafia_help/application/providers/timer_provider.dart';
+import 'package:go_router/go_router.dart';
 
 class TimerOverAll extends ConsumerWidget {
   const TimerOverAll({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final seconds = ref.watch(floatingTimerProvider);
-    print('🔍 TimerOverAll: seconds = $seconds');
-    if (seconds == null || seconds <= 0) {
+    final timerState = ref.watch(timerProvider);
+    final seconds = timerState.remainingSeconds;
+    final isRunning = timerState.isRunning;
+
+    // 🔥 ПРОВЕРЯЕМ ТЕКУЩИЙ МАРШРУТ
+    final currentRoute = GoRouterState.of(context).uri.path;
+    final isGameScreen =
+        currentRoute == '/game' || currentRoute.contains('game');
+
+    print(
+        '🔍 TimerOverAll: seconds = $seconds, isRunning = $isRunning, route = $currentRoute');
+
+    // 🔥 ЕСЛИ МЫ НА GAME_SCREEN — СКРЫВАЕМ
+    if (isGameScreen) {
+      return const SizedBox.shrink();
+    }
+
+    if (seconds <= 0 || !isRunning) {
       return const SizedBox.shrink();
     }
 
@@ -26,14 +43,12 @@ class TimerOverAll extends ConsumerWidget {
         child: Stack(
           alignment: Alignment.center,
           children: [
-            // 🔥 КРУГОВОЙ ПРОГРЕСС
             CircularProgressIndicator(
               value: seconds / 60,
               strokeWidth: 4,
               backgroundColor: Colors.grey.withOpacity(0.3),
               valueColor: const AlwaysStoppedAnimation<Color>(Colors.red),
             ),
-            // 🔥 ЦИФРЫ
             Text(
               '$seconds',
               style: const TextStyle(
