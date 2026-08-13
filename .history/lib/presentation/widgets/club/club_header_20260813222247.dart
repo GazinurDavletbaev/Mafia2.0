@@ -27,7 +27,6 @@ class ClubHeader extends StatelessWidget {
 
     final bool isMyClub = myClubId == club?['id'];
     final bool hasPendingRequest = club?['has_pending_request'] ?? false;
-    final bool userHasClub = myClubId != null;
 
     return Column(
       children: [
@@ -122,14 +121,14 @@ class ClubHeader extends StatelessWidget {
                     ),
                   ),
 
-                  // 🔥 БЕЙДЖ 2: ИГРЫ КЛУБА (СПРАВА ПО ЦЕНТРУ)
+                  // 🔥 БЕЙДЖ 2: ИГРЫ КЛУБА (СПРАВА ПО ЦЕНТРУ) — КРУГЛЫЙ
                   Positioned(
-                    top: 100,
-                    right: -15,
+                    top: 60,
+                    right: -8,
                     child: _buildCircleBadge(
                       context,
-                      icon: Mdi.clipboardList,
                       count: gamesCount,
+                      label: 'Игр',
                       color: theme.primaryColor,
                       onTap: () {
                         context.push(
@@ -143,14 +142,14 @@ class ClubHeader extends StatelessWidget {
                     ),
                   ),
 
-                  // 🔥 БЕЙДЖ 3: РЕЗИДЕНТЫ (СПРАВА СНИЗУ)
+                  // 🔥 БЕЙДЖ 3: РЕЗИДЕНТЫ (СПРАВА СНИЗУ) — КРУГЛЫЙ
                   Positioned(
-                    bottom: -7,
-                    right: 10,
+                    bottom: -8,
+                    right: -8,
                     child: _buildCircleBadge(
                       context,
-                      icon: Mdi.accountGroup,
                       count: club?['members_count'] ?? 0,
+                      label: 'Уч.',
                       color: theme.primaryColor,
                       onTap: () {
                         context.push(
@@ -164,11 +163,101 @@ class ClubHeader extends StatelessWidget {
                     ),
                   ),
 
-                  // 🔥 БЕЙДЖ 4: ПОДАТЬ ЗАЯВКУ — С ЛОГИКОЙ ИЗ ClubJoinButton
+                  // 🔥 БЕЙДЖ 4: ПОДАТЬ ЗАЯВКУ (СНИЗУ ПО ЦЕНТРУ)
                   Positioned(
-                    bottom: -22,
-                    left: 74,
-                    child: _buildJoinButton(context),
+                    bottom: -8,
+                    left: 50,
+                    child: GestureDetector(
+                      onTap: () async {
+                        if (isMyClub) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Это ваш клуб'),
+                              backgroundColor: Colors.green,
+                            ),
+                          );
+                          return;
+                        }
+
+                        if (hasPendingRequest) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Заявка уже отправлена'),
+                              backgroundColor: Colors.orange,
+                            ),
+                          );
+                          return;
+                        }
+
+                        final result = await ClubService.joinClub(club!['id']);
+                        if (result['success']) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('✅ Заявка отправлена!'),
+                              backgroundColor: Colors.green,
+                            ),
+                          );
+                          onRefresh();
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(result['error'] ?? 'Ошибка'),
+                              backgroundColor: Colors.red,
+                            ),
+                          );
+                        }
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 6),
+                        decoration: BoxDecoration(
+                          color: isMyClub
+                              ? Colors.green
+                              : hasPendingRequest
+                                  ? Colors.orange
+                                  : theme.primaryColor,
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            color: theme.scaffoldBackgroundColor,
+                            width: 2,
+                          ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.2),
+                              blurRadius: 4,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              isMyClub
+                                  ? Icons.check
+                                  : hasPendingRequest
+                                      ? Icons.hourglass_top
+                                      : Icons.add,
+                              color: Colors.white,
+                              size: 16,
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              isMyClub
+                                  ? 'Ваш'
+                                  : hasPendingRequest
+                                      ? 'Заявка'
+                                      : 'Заявка',
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 11,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
                   ),
                 ],
               ),
@@ -242,19 +331,18 @@ class ClubHeader extends StatelessWidget {
     );
   }
 
-  // 🔥 КРУГЛЫЙ БЕЙДЖ С ИКОНКОЙ
+  // 🔥 КРУГЛЫЙ БЕЙДЖ (БЕЗ ИКОНКИ)
   Widget _buildCircleBadge(
     BuildContext context, {
-    required IconData icon,
     required int count,
+    required String label,
     required Color color,
     required VoidCallback onTap,
   }) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        width: 42,
-        height: 42,
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
         decoration: BoxDecoration(
           color: color,
           shape: BoxShape.circle,
@@ -270,181 +358,26 @@ class ClubHeader extends StatelessWidget {
             ),
           ],
         ),
-        child: Stack(
-          alignment: Alignment.center,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(
-              icon,
-              color: Colors.white,
-              size: 23,
-            ),
-            Positioned(
-              bottom: 10,
-              right: 0,
-              child: Container(
-                padding: const EdgeInsets.all(4),
-                decoration: const BoxDecoration(
-                  color: Colors.red,
-                  shape: BoxShape.circle,
-                ),
-                child: Text(
-                  '$count',
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 15,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
+            Text(
+              '$count',
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
               ),
             ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  // 🔥 КНОПКА "ПОДАТЬ ЗАЯВКУ" — ПОЛНАЯ ЛОГИКА ИЗ ClubJoinButton
-  Widget _buildJoinButton(BuildContext context) {
-    final theme = Theme.of(context);
-    final int? currentClubId = club?['id'];
-
-    final bool isMyClub = myClubId == currentClubId;
-    final bool hasPendingRequest = club?['has_pending_request'] ?? false;
-
-    // 1️⃣ Если это мой клуб
-    if (isMyClub) {
-      return Container(
-        width: 42,
-        height: 42,
-        decoration: BoxDecoration(
-          color: Colors.green,
-          shape: BoxShape.circle,
-          border: Border.all(
-            color: Theme.of(context).scaffoldBackgroundColor,
-            width: 2,
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.2),
-              blurRadius: 4,
-              offset: const Offset(0, 2),
-            ),
-          ],
-        ),
-        child: const Icon(
-          Icons.check,
-          color: Colors.white,
-          size: 28,
-        ),
-      );
-    }
-
-    // 2️⃣ Если заявка уже отправлена
-    if (hasPendingRequest) {
-      return Container(
-        width: 42,
-        height: 42,
-        decoration: BoxDecoration(
-          color: Colors.orange,
-          shape: BoxShape.circle,
-          border: Border.all(
-            color: Theme.of(context).scaffoldBackgroundColor,
-            width: 2,
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.2),
-              blurRadius: 4,
-              offset: const Offset(0, 2),
-            ),
-          ],
-        ),
-        child: const Icon(
-          Icons.hourglass_top,
-          color: Colors.white,
-          size: 28,
-        ),
-      );
-    }
-
-    // 3️⃣ Кнопка активна
-    return GestureDetector(
-      onTap: () async {
-        final int? currentClubId = club?['id'];
-        final bool userHasClub = myClubId != null;
-
-        if (userHasClub) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text(
-                  'ℹ️ Вы уже состоите в другом клубе. Выйдите из него, чтобы подать заявку.'),
-              backgroundColor: Colors.orange,
-              duration: Duration(seconds: 3),
-            ),
-          );
-          return;
-        }
-
-        if (hasPendingRequest) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('⏳ Вы уже отправили заявку в этот клуб'),
-              backgroundColor: Colors.orange,
-            ),
-          );
-          return;
-        }
-
-        try {
-          final result = await ClubService.joinClub(currentClubId!);
-          if (result['success']) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('✅ Заявка отправлена!'),
-                backgroundColor: Colors.green,
+            Text(
+              label,
+              style: TextStyle(
+                color: Colors.white.withOpacity(0.9),
+                fontSize: 8,
               ),
-            );
-            onRefresh();
-          } else {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text('❌ ${result['error'] ?? 'Неизвестная ошибка'}'),
-                backgroundColor: Colors.red,
-              ),
-            );
-          }
-        } catch (e) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('⚠️ Ошибка соединения. Проверьте интернет.'),
-              backgroundColor: Colors.red,
-              duration: Duration(seconds: 4),
-            ),
-          );
-        }
-      },
-      child: Container(
-        width: 42,
-        height: 42,
-        decoration: BoxDecoration(
-          color: theme.primaryColor,
-          shape: BoxShape.circle,
-          border: Border.all(
-            color: Theme.of(context).scaffoldBackgroundColor,
-            width: 2,
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.2),
-              blurRadius: 4,
-              offset: const Offset(0, 2),
+              textAlign: TextAlign.center,
             ),
           ],
-        ),
-        child: const Icon(
-          Icons.add,
-          color: Colors.white,
-          size: 28,
         ),
       ),
     );

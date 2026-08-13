@@ -146,6 +146,8 @@ class _ClubScreenState extends ConsumerState<ClubScreen> {
                 onRefresh: () => _loadData(clubId: _club?['id']),
               ),
 
+              const Divider(height: 1),
+
               // 🔥 ТАБЛИЦА РЕЙТИНГА (СО СВАЙПОМ)
               Expanded(
                 child: _showClubSearch
@@ -166,8 +168,8 @@ class _ClubScreenState extends ConsumerState<ClubScreen> {
                         },
                         child: _hasGames
                             ? SingleChildScrollView(
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 8),
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 8),
                                 child: ClubRatingTable(players: _ratingPlayers),
                               )
                             : _buildNoGamesPlaceholder(isDark),

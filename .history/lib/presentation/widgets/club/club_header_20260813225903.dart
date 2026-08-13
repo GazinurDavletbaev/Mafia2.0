@@ -46,8 +46,7 @@ class ClubHeader extends StatelessWidget {
                     width: 180,
                     height: 180,
                     decoration: BoxDecoration(
-                      color:
-                          isDark ? Colors.grey.shade700 : Colors.grey.shade200,
+                      color: isDark ? Colors.grey.shade700 : Colors.grey.shade200,
                       borderRadius: BorderRadius.circular(100),
                       image: club?['logo_url'] != null &&
                               club!['logo_url'].isNotEmpty
@@ -57,15 +56,14 @@ class ClubHeader extends StatelessWidget {
                             )
                           : null,
                     ),
-                    child:
-                        club?['logo_url'] == null || club!['logo_url'].isEmpty
-                            ? Image.asset(
-                                'assets/mafia_logo.png',
-                                width: 50,
-                                height: 50,
-                                fit: BoxFit.contain,
-                              )
-                            : null,
+                    child: club?['logo_url'] == null || club!['logo_url'].isEmpty
+                        ? Image.asset(
+                            'assets/mafia_logo.png',
+                            width: 50,
+                            height: 50,
+                            fit: BoxFit.contain,
+                          )
+                        : null,
                   ),
 
                   // 🔥 БЕЙДЖ 1: ПРЕЗИДЕНТ (СВЕРХУ СПРАВА)
@@ -97,9 +95,7 @@ class ClubHeader extends StatelessWidget {
                               ? Colors.grey.shade700
                               : Colors.grey.shade300,
                           backgroundImage: club?['president_avatar'] != null &&
-                                  club!['president_avatar']
-                                      .toString()
-                                      .isNotEmpty
+                                  club!['president_avatar'].toString().isNotEmpty
                               ? NetworkImage(club!['president_avatar'])
                               : null,
                           child: club?['president_avatar'] == null ||
@@ -112,8 +108,7 @@ class ClubHeader extends StatelessWidget {
                                   style: TextStyle(
                                     fontSize: 14,
                                     fontWeight: FontWeight.bold,
-                                    color:
-                                        isDark ? Colors.white : Colors.black87,
+                                    color: isDark ? Colors.white : Colors.black87,
                                   ),
                                 )
                               : null,
@@ -376,8 +371,7 @@ class ClubHeader extends StatelessWidget {
         if (userHasClub) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
-              content: Text(
-                  'ℹ️ Вы уже состоите в другом клубе. Выйдите из него, чтобы подать заявку.'),
+              content: Text('ℹ️ Вы уже состоите в другом клубе. Выйдите из него, чтобы подать заявку.'),
               backgroundColor: Colors.orange,
               duration: Duration(seconds: 3),
             ),

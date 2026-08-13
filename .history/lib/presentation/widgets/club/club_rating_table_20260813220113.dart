@@ -135,7 +135,8 @@ class ClubRatingTable extends StatelessWidget {
                             total.toString(),
                             align: TextAlign.center,
                             isTop: isTop,
-                            color: Colors.amber.shade700,
+                                                        color: Colors.amber.shade700,
+
                             fontWeight: FontWeight.bold,
                           ),
                         ],

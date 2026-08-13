@@ -112,6 +112,7 @@ class ClubRatingTable extends StatelessWidget {
                             '${player['wins'] ?? 0}',
                             align: TextAlign.center,
                             isTop: isTop,
+                            color: Colors.amber.shade700,
                           ),
                           _cell(
                             context,
@@ -135,7 +136,6 @@ class ClubRatingTable extends StatelessWidget {
                             total.toString(),
                             align: TextAlign.center,
                             isTop: isTop,
-                            color: Colors.amber.shade700,
                             fontWeight: FontWeight.bold,
                           ),
                         ],

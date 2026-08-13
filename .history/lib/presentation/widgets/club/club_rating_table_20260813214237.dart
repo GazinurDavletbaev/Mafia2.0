@@ -38,9 +38,9 @@ class ClubRatingTable extends StatelessWidget {
 
     return Card(
       color: theme.cardColor,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(50)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: Padding(
-        padding: const EdgeInsets.all(4),
+        padding: const EdgeInsets.all(12),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -56,30 +56,28 @@ class ClubRatingTable extends StatelessWidget {
                     width: 0.5,
                   ),
                   columnWidths: {
-                    0: const FlexColumnWidth(0.5), // № — минимально
-                    1: const FlexColumnWidth(3), // Никнейм — растягивается
-                    2: const FlexColumnWidth(0.5), // И — минимально
-                    3: const FlexColumnWidth(0.5), // П — минимально
-                    4: const FlexColumnWidth(0.5), // Б — минимально
-                    5: const FlexColumnWidth(0.7), // Д — чуть больше
-                    6: const FlexColumnWidth(0.6), // О — чуть больше
+                    0: const FixedColumnWidth(30),
+                    1: FixedColumnWidth(nameWidth > 80 ? nameWidth : 80),
+                    2: const FixedColumnWidth(50),
+                    3: const FixedColumnWidth(50),
+                    4: const FixedColumnWidth(50),
+                    5: const FixedColumnWidth(50),
+                    6: const FixedColumnWidth(50),
                   },
                   children: [
                     TableRow(
                       children: [
-                        _cell(context, '№',
-                            isHeader: true, align: TextAlign.center),
-                        _cell(context, 'Никнейм',
-                            isHeader: true, align: TextAlign.center),
+                        _cell(context, '№', isHeader: true),
+                        _cell(context, 'Никнейм', isHeader: true),
                         _cell(context, 'И',
                             isHeader: true, align: TextAlign.center),
                         _cell(context, 'П',
                             isHeader: true, align: TextAlign.center),
-                        _cell(context, 'Б',
-                            isHeader: true, align: TextAlign.center),
-                        _cell(context, 'Д',
-                            isHeader: true, align: TextAlign.center),
                         _cell(context, 'О',
+                            isHeader: true, align: TextAlign.center),
+                        _cell(context, 'Бонус',
+                            isHeader: true, align: TextAlign.center),
+                        _cell(context, 'Всего',
                             isHeader: true, align: TextAlign.center),
                       ],
                     ),
@@ -92,8 +90,7 @@ class ClubRatingTable extends StatelessWidget {
 
                       return TableRow(
                         children: [
-                          _cell(context, '${index + 1}',
-                              isTop: isTop, align: TextAlign.center),
+                          _cell(context, '${index + 1}', isTop: isTop),
                           _cell(
                             context,
                             player['username'] ?? 'Игрок',
@@ -112,6 +109,7 @@ class ClubRatingTable extends StatelessWidget {
                             '${player['wins'] ?? 0}',
                             align: TextAlign.center,
                             isTop: isTop,
+                            color: Colors.amber.shade700,
                           ),
                           _cell(
                             context,
@@ -135,7 +133,6 @@ class ClubRatingTable extends StatelessWidget {
                             total.toString(),
                             align: TextAlign.center,
                             isTop: isTop,
-                            color: Colors.amber.shade700,
                             fontWeight: FontWeight.bold,
                           ),
                         ],

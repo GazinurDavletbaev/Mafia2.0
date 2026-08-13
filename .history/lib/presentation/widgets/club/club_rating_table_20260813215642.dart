@@ -56,13 +56,14 @@ class ClubRatingTable extends StatelessWidget {
                     width: 0.5,
                   ),
                   columnWidths: {
-                    0: const FlexColumnWidth(0.5), // № — минимально
-                    1: const FlexColumnWidth(3), // Никнейм — растягивается
-                    2: const FlexColumnWidth(0.5), // И — минимально
-                    3: const FlexColumnWidth(0.5), // П — минимально
-                    4: const FlexColumnWidth(0.5), // Б — минимально
-                    5: const FlexColumnWidth(0.7), // Д — чуть больше
-                    6: const FlexColumnWidth(0.6), // О — чуть больше
+                    0: const FixedColumnWidth(30), // № — фиксированная
+                    1: const FlexColumnWidth(
+                        3), // Никнейм — растягивается (3 части)
+                    2: const FixedColumnWidth(30), // И — минимальная
+                    3: const FixedColumnWidth(30), // П — минимальная
+                    4: const FixedColumnWidth(30), // Б — минимальная
+                    5: const FixedColumnWidth(30), // Д — минимальная
+                    6: const FixedColumnWidth(35), // О — минимальная
                   },
                   children: [
                     TableRow(
@@ -112,6 +113,7 @@ class ClubRatingTable extends StatelessWidget {
                             '${player['wins'] ?? 0}',
                             align: TextAlign.center,
                             isTop: isTop,
+                            color: Colors.amber.shade700,
                           ),
                           _cell(
                             context,
@@ -135,7 +137,6 @@ class ClubRatingTable extends StatelessWidget {
                             total.toString(),
                             align: TextAlign.center,
                             isTop: isTop,
-                            color: Colors.amber.shade700,
                             fontWeight: FontWeight.bold,
                           ),
                         ],

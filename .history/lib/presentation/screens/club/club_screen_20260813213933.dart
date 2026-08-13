@@ -146,6 +146,8 @@ class _ClubScreenState extends ConsumerState<ClubScreen> {
                 onRefresh: () => _loadData(clubId: _club?['id']),
               ),
 
+              const Divider(height: 1),
+
               // 🔥 ТАБЛИЦА РЕЙТИНГА (СО СВАЙПОМ)
               Expanded(
                 child: _showClubSearch

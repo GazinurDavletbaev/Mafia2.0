@@ -24,6 +24,11 @@ class _ClubScreenState extends ConsumerState<ClubScreen> {
   bool _hasGames = false;
   int _gamesCount = 0;
 
+  // 🔥 МЕСЯЦА
+  late PageController _pageController;
+  int _currentPage = 0;
+  final List<DateTime> _months = [];
+
   DateTime _currentDate = DateTime.now();
   int get _month => _currentDate.month;
   int get _year => _currentDate.year;
@@ -31,7 +36,33 @@ class _ClubScreenState extends ConsumerState<ClubScreen> {
   @override
   void initState() {
     super.initState();
+    _pageController = PageController();
+    _generateMonths();
     _loadData();
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  void _generateMonths() {
+    _months.clear();
+    final now = DateTime.now();
+    for (int i = 0; i < 12; i++) {
+      _months.add(DateTime(now.year, now.month - i, 1));
+    }
+    _months.sort((a, b) => a.compareTo(b));
+
+    final current = DateTime(_year, _month, 1);
+    final index = _months.indexOf(current);
+    if (index != -1) {
+      _currentPage = index;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _pageController.jumpToPage(index);
+      });
+    }
   }
 
   void _selectClub(int clubId) {
@@ -87,13 +118,14 @@ class _ClubScreenState extends ConsumerState<ClubScreen> {
     setState(() => _isLoading = false);
   }
 
-  Future<void> _loadRating() async {
+  Future<void> _loadRating({DateTime? date}) async {
     if (_club == null) return;
 
+    final targetDate = date ?? _currentDate;
     final result = await ClubService.getClubRating(
       clubId: _club!['id'],
-      month: _month,
-      year: _year,
+      month: targetDate.month,
+      year: targetDate.year,
     );
 
     if (result['success']) {
@@ -106,20 +138,32 @@ class _ClubScreenState extends ConsumerState<ClubScreen> {
     }
   }
 
-  // 🔥 СЛЕДУЮЩИЙ МЕСЯЦ
-  void _nextMonth() {
+  void _onPageChanged(int index) {
+    if (index < 0 || index >= _months.length) return;
+    final date = _months[index];
     setState(() {
-      _currentDate = DateTime(_year, _month + 1, 1);
+      _currentDate = date;
+      _currentPage = index;
     });
-    _loadRating();
+    _loadRating(date: date);
   }
 
-  // 🔥 ПРЕДЫДУЩИЙ МЕСЯЦ
-  void _previousMonth() {
-    setState(() {
-      _currentDate = DateTime(_year, _month - 1, 1);
-    });
-    _loadRating();
+  String _getMonthName(int month) {
+    const months = [
+      'Янв',
+      'Фев',
+      'Мар',
+      'Апр',
+      'Май',
+      'Июн',
+      'Июл',
+      'Авг',
+      'Сен',
+      'Окт',
+      'Ноя',
+      'Дек'
+    ];
+    return months[month - 1];
   }
 
   @override
@@ -146,32 +190,80 @@ class _ClubScreenState extends ConsumerState<ClubScreen> {
                 onRefresh: () => _loadData(clubId: _club?['id']),
               ),
 
-              // 🔥 ТАБЛИЦА РЕЙТИНГА (СО СВАЙПОМ)
+              // 🔥 СТРОКА МЕСЯЦЕВ (горизонтальный скролл)
+              Container(
+                height: 46,
+                margin: const EdgeInsets.symmetric(vertical: 4),
+                child: ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  itemCount: _months.length,
+                  itemBuilder: (context, index) {
+                    final date = _months[index];
+                    final isActive = index == _currentPage;
+
+                    return GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          _currentPage = index;
+                          _currentDate = date;
+                        });
+                        _loadRating(date: date);
+                        _pageController.jumpToPage(index);
+                      },
+                      child: AnimatedContainer(
+                        duration: const Duration(milliseconds: 200),
+                        margin: const EdgeInsets.symmetric(horizontal: 4),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 8,
+                        ),
+                        decoration: BoxDecoration(
+                          color: isActive ? primaryColor : Colors.transparent,
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(
+                            color: isActive
+                                ? primaryColor
+                                : (isDark
+                                    ? Colors.grey.shade700
+                                    : Colors.grey.shade300),
+                            width: 1,
+                          ),
+                        ),
+                        child: Text(
+                          '${_getMonthName(date.month)} ${date.year}',
+                          style: TextStyle(
+                            fontSize: 13,
+                            fontWeight:
+                                isActive ? FontWeight.w700 : FontWeight.w400,
+                            color: isActive
+                                ? Colors.white
+                                : (isDark
+                                    ? Colors.grey.shade400
+                                    : Colors.grey.shade600),
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
+
+              const Divider(height: 1),
+
+              // 🔥 ОСНОВНОЙ КОНТЕНТ
               Expanded(
                 child: _showClubSearch
                     ? ClubSearchList(
                         isDark: isDark,
                         onClubSelected: _selectClub,
                       )
-                    : GestureDetector(
-                        onHorizontalDragEnd: (details) {
-                          // 🔥 СВАЙП ВЛЕВО → СЛЕДУЮЩИЙ МЕСЯЦ
-                          if (details.primaryVelocity! < -100) {
-                            _nextMonth();
-                          }
-                          // 🔥 СВАЙП ВПРАВО → ПРЕДЫДУЩИЙ МЕСЯЦ
-                          else if (details.primaryVelocity! > 100) {
-                            _previousMonth();
-                          }
-                        },
-                        child: _hasGames
-                            ? SingleChildScrollView(
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 8),
-                                child: ClubRatingTable(players: _ratingPlayers),
-                              )
-                            : _buildNoGamesPlaceholder(isDark),
-                      ),
+                    : _hasGames
+                        ? SingleChildScrollView(
+                            padding: const EdgeInsets.symmetric(horizontal: 8),
+                            child: ClubRatingTable(players: _ratingPlayers),
+                          )
+                        : _buildNoGamesPlaceholder(isDark),
               ),
             ],
           ),

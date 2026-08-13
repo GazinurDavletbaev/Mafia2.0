@@ -24,14 +24,45 @@ class _ClubScreenState extends ConsumerState<ClubScreen> {
   bool _hasGames = false;
   int _gamesCount = 0;
 
+  // 🔥 ДЛЯ ПЕРЕКЛЮЧЕНИЯ МЕСЯЦЕВ
+  late PageController _pageController;
+  int _currentPage = 0;
+  final List<DateTime> _months = [];
+
   DateTime _currentDate = DateTime.now();
-  int get _month => _currentDate.month;
-  int get _year => _currentDate.year;
 
   @override
   void initState() {
     super.initState();
+    _pageController = PageController();
+    _generateMonths();
     _loadData();
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  void _generateMonths() {
+    _months.clear();
+    final now = DateTime.now();
+    // 12 месяцев назад и 12 месяцев вперёд
+    for (int i = -12; i <= 12; i++) {
+      _months.add(DateTime(now.year, now.month + i, 1));
+    }
+    _months.sort((a, b) => a.compareTo(b));
+
+    // Находим текущий месяц
+    final current = DateTime(now.year, now.month, 1);
+    final index = _months.indexOf(current);
+    if (index != -1) {
+      _currentPage = index;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _pageController.jumpToPage(index);
+      });
+    }
   }
 
   void _selectClub(int clubId) {
@@ -87,13 +118,14 @@ class _ClubScreenState extends ConsumerState<ClubScreen> {
     setState(() => _isLoading = false);
   }
 
-  Future<void> _loadRating() async {
+  Future<void> _loadRating({DateTime? date}) async {
     if (_club == null) return;
 
+    final targetDate = date ?? _currentDate;
     final result = await ClubService.getClubRating(
       clubId: _club!['id'],
-      month: _month,
-      year: _year,
+      month: targetDate.month,
+      year: targetDate.year,
     );
 
     if (result['success']) {
@@ -106,20 +138,22 @@ class _ClubScreenState extends ConsumerState<ClubScreen> {
     }
   }
 
-  // 🔥 СЛЕДУЮЩИЙ МЕСЯЦ
-  void _nextMonth() {
+  void _onPageChanged(int index) {
+    if (index < 0 || index >= _months.length) return;
+    final date = _months[index];
     setState(() {
-      _currentDate = DateTime(_year, _month + 1, 1);
+      _currentDate = date;
+      _currentPage = index;
     });
-    _loadRating();
+    _loadRating(date: date);
   }
 
-  // 🔥 ПРЕДЫДУЩИЙ МЕСЯЦ
-  void _previousMonth() {
-    setState(() {
-      _currentDate = DateTime(_year, _month - 1, 1);
-    });
-    _loadRating();
+  String _getMonthName(int month) {
+    const months = [
+      'Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь',
+      'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'
+    ];
+    return months[month - 1];
   }
 
   @override
@@ -146,31 +180,151 @@ class _ClubScreenState extends ConsumerState<ClubScreen> {
                 onRefresh: () => _loadData(clubId: _club?['id']),
               ),
 
-              // 🔥 ТАБЛИЦА РЕЙТИНГА (СО СВАЙПОМ)
+              // 🔥 КРАСИВЫЙ ХЕДЕР С МЕСЯЦЕМ (как в Telegram/Instagram)
+              Container(
+                padding: const EdgeInsets.symmetric(vertical: 8),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    // 🔥 СТРЕЛКА ВЛЕВО
+                    GestureDetector(
+                      onTap: () {
+                        if (_currentPage > 0) {
+                          _pageController.previousPage(
+                            duration: const Duration(milliseconds: 300),
+                            curve: Curves.easeInOut,
+                          );
+                        }
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: _currentPage > 0
+                              ? primaryColor.withOpacity(0.1)
+                              : Colors.transparent,
+                        ),
+                        child: Icon(
+                          Icons.chevron_left,
+                          color: _currentPage > 0
+                              ? primaryColor
+                              : Colors.grey.shade400,
+                          size: 28,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+
+                    // 🔥 МЕСЯЦ (с анимацией)
+                    AnimatedSwitcher(
+                      duration: const Duration(milliseconds: 200),
+                      child: Text(
+                        '${_getMonthName(_currentDate.month)} ${_currentDate.year}',
+                        key: ValueKey('${_currentDate.month}${_currentDate.year}'),
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.w700,
+                          color: isDark ? Colors.white : Colors.black87,
+                          letterSpacing: 0.5,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+
+                    // 🔥 СТРЕЛКА ВПРАВО
+                    GestureDetector(
+                      onTap: () {
+                        if (_currentPage < _months.length - 1) {
+                          _pageController.nextPage(
+                            duration: const Duration(milliseconds: 300),
+                            curve: Curves.easeInOut,
+                          );
+                        }
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: _currentPage < _months.length - 1
+                              ? primaryColor.withOpacity(0.1)
+                              : Colors.transparent,
+                        ),
+                        child: Icon(
+                          Icons.chevron_right,
+                          color: _currentPage < _months.length - 1
+                              ? primaryColor
+                              : Colors.grey.shade400,
+                          size: 28,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              // 🔥 ИНДИКАТОР ТОЧЕК (как в Instagram)
+              Container(
+                height: 6,
+                margin: const EdgeInsets.symmetric(vertical: 4),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: List.generate(
+                    _months.length > 7 ? 7 : _months.length,
+                    (index) {
+                      // Показываем точки вокруг текущей страницы
+                      final int actualIndex;
+                      if (_months.length <= 7) {
+                        actualIndex = index;
+                      } else {
+                        final int start = (_currentPage - 3).clamp(0, _months.length - 7);
+                        actualIndex = start + index;
+                      }
+                      final bool isActive = actualIndex == _currentPage;
+                      return AnimatedContainer(
+                        duration: const Duration(milliseconds: 200),
+                        margin: const EdgeInsets.symmetric(horizontal: 3),
+                        width: isActive ? 10 : 6,
+                        height: 6,
+                        decoration: BoxDecoration(
+                          color: isActive
+                              ? primaryColor
+                              : isDark
+                                  ? Colors.grey.shade600
+                                  : Colors.grey.shade300,
+                          borderRadius: BorderRadius.circular(3),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ),
+
+              const Divider(height: 1),
+
+              // 🔥 ТАБЛИЦА РЕЙТИНГА (PageView для свайпа)
               Expanded(
                 child: _showClubSearch
                     ? ClubSearchList(
                         isDark: isDark,
                         onClubSelected: _selectClub,
                       )
-                    : GestureDetector(
-                        onHorizontalDragEnd: (details) {
-                          // 🔥 СВАЙП ВЛЕВО → СЛЕДУЮЩИЙ МЕСЯЦ
-                          if (details.primaryVelocity! < -100) {
-                            _nextMonth();
-                          }
-                          // 🔥 СВАЙП ВПРАВО → ПРЕДЫДУЩИЙ МЕСЯЦ
-                          else if (details.primaryVelocity! > 100) {
-                            _previousMonth();
-                          }
+                    : PageView.builder(
+                        controller: _pageController,
+                        onPageChanged: _onPageChanged,
+                        itemCount: _months.length,
+                        itemBuilder: (context, index) {
+                          final date = _months[index];
+                          // Загружаем данные для этого месяца
+                          // Используем текущие _ratingPlayers
+                          return _hasGames
+                              ? SingleChildScrollView(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 8),
+                                  child: ClubRatingTable(
+                                      players: _ratingPlayers),
+                                )
+                              : _buildNoGamesPlaceholder(isDark);
                         },
-                        child: _hasGames
-                            ? SingleChildScrollView(
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 8),
-                                child: ClubRatingTable(players: _ratingPlayers),
-                              )
-                            : _buildNoGamesPlaceholder(isDark),
                       ),
               ),
             ],

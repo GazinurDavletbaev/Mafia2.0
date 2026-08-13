@@ -24,9 +24,13 @@ class _ClubScreenState extends ConsumerState<ClubScreen> {
   bool _hasGames = false;
   int _gamesCount = 0;
 
+  // 🔥 ТЕКУЩАЯ ДАТА
   DateTime _currentDate = DateTime.now();
   int get _month => _currentDate.month;
   int get _year => _currentDate.year;
+
+  // 🔥 ДЛЯ АНИМАЦИИ
+  final GlobalKey _tableKey = GlobalKey();
 
   @override
   void initState() {
@@ -122,6 +126,14 @@ class _ClubScreenState extends ConsumerState<ClubScreen> {
     _loadRating();
   }
 
+  String _getMonthName(int month) {
+    const months = [
+      'Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь',
+      'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'
+    ];
+    return months[month - 1];
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -146,6 +158,26 @@ class _ClubScreenState extends ConsumerState<ClubScreen> {
                 onRefresh: () => _loadData(clubId: _club?['id']),
               ),
 
+              // 🔥 МЕСЯЦ И ГОД (КРУПНО)
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                child: AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 200),
+                  child: Text(
+                    '${_getMonthName(_month)} $_year',
+                    key: ValueKey('$_month$_year'),
+                    style: TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.w700,
+                      color: isDark ? Colors.white : Colors.black87,
+                      letterSpacing: 0.5,
+                    ),
+                  ),
+                ),
+              ),
+
+              const Divider(height: 1),
+
               // 🔥 ТАБЛИЦА РЕЙТИНГА (СО СВАЙПОМ)
               Expanded(
                 child: _showClubSearch
@@ -154,23 +186,29 @@ class _ClubScreenState extends ConsumerState<ClubScreen> {
                         onClubSelected: _selectClub,
                       )
                     : GestureDetector(
+                        key: _tableKey,
                         onHorizontalDragEnd: (details) {
                           // 🔥 СВАЙП ВЛЕВО → СЛЕДУЮЩИЙ МЕСЯЦ
-                          if (details.primaryVelocity! < -100) {
+                          if (details.primaryVelocity! < 0) {
                             _nextMonth();
                           }
                           // 🔥 СВАЙП ВПРАВО → ПРЕДЫДУЩИЙ МЕСЯЦ
-                          else if (details.primaryVelocity! > 100) {
+                          else if (details.primaryVelocity! > 0) {
                             _previousMonth();
                           }
                         },
-                        child: _hasGames
-                            ? SingleChildScrollView(
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 8),
-                                child: ClubRatingTable(players: _ratingPlayers),
-                              )
-                            : _buildNoGamesPlaceholder(isDark),
+                        child: AnimatedSwitcher(
+                          duration: const Duration(milliseconds: 250),
+                          child: _hasGames
+                              ? SingleChildScrollView(
+                                  key: ValueKey('$_month$_year'),
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 8),
+                                  child: ClubRatingTable(
+                                      players: _ratingPlayers),
+                                )
+                              : _buildNoGamesPlaceholder(isDark),
+                        ),
                       ),
               ),
             ],
@@ -302,6 +340,7 @@ class _ClubScreenState extends ConsumerState<ClubScreen> {
 
   Widget _buildNoGamesPlaceholder(bool isDark) {
     return Center(
+      key: ValueKey('empty'),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [

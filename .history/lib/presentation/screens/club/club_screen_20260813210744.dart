@@ -1,11 +1,14 @@
 // lib/presentation/screens/club/club_screen.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mafia_help/presentation/widgets/app_card.dart';
 import 'package:mafia_help/presentation/widgets/club/club_header.dart';
 import 'package:mafia_help/presentation/widgets/club/club_rating_table.dart';
 import 'package:mafia_help/presentation/widgets/club/club_search_list.dart';
+import 'package:mafia_help/presentation/widgets/club/club_stats.dart';
 import 'package:mdi_plus/mdi_plus.dart';
 import '../../../services/club_service.dart';
+import '../../../services/update_service.dart';
 
 class ClubScreen extends ConsumerStatefulWidget {
   const ClubScreen({super.key});
@@ -51,6 +54,8 @@ class _ClubScreenState extends ConsumerState<ClubScreen> {
     try {
       if (clubId != null) {
         final result = await ClubService.getClub(clubId);
+        print('🔥 getClub result: $result');
+
         if (result['success']) {
           final clubData = result['club'] ?? result;
           _club = clubData;
@@ -66,6 +71,8 @@ class _ClubScreenState extends ConsumerState<ClubScreen> {
         }
       } else {
         final myClubsResult = await ClubService.getMyClub();
+        print('🔥 getMyClub result: $myClubsResult');
+
         final clubData = myClubsResult['club'];
         if (myClubsResult['success'] &&
             clubData != null &&
@@ -80,6 +87,7 @@ class _ClubScreenState extends ConsumerState<ClubScreen> {
         }
       }
     } catch (e) {
+      print('❌ _loadData exception: $e');
       _hasClub = false;
       _club = null;
     }
@@ -106,20 +114,19 @@ class _ClubScreenState extends ConsumerState<ClubScreen> {
     }
   }
 
-  // 🔥 СЛЕДУЮЩИЙ МЕСЯЦ
-  void _nextMonth() {
-    setState(() {
-      _currentDate = DateTime(_year, _month + 1, 1);
-    });
+  void _previousMonth() {
+    setState(() => _currentDate = DateTime(_year, _month - 1, 1));
     _loadRating();
   }
 
-  // 🔥 ПРЕДЫДУЩИЙ МЕСЯЦ
-  void _previousMonth() {
-    setState(() {
-      _currentDate = DateTime(_year, _month - 1, 1);
-    });
-    _loadRating();
+  void _nextMonth() {
+    final nextDate = DateTime(_year, _month + 1, 1);
+    if (nextDate.isBefore(DateTime.now()) ||
+        (nextDate.month == DateTime.now().month &&
+            nextDate.year == DateTime.now().year)) {
+      setState(() => _currentDate = nextDate);
+      _loadRating();
+    }
   }
 
   @override
@@ -136,47 +143,52 @@ class _ClubScreenState extends ConsumerState<ClubScreen> {
       backgroundColor: theme.scaffoldBackgroundColor,
       body: Stack(
         children: [
+          // 🔥 ОСНОВНОЙ КОНТЕНТ
           Column(
             children: [
-              // 🔥 ХЕДЕР КЛУБА
-              ClubHeader(
-                club: _club,
-                myClubId: _myClubId,
-                gamesCount: _gamesCount,
-                onRefresh: () => _loadData(clubId: _club?['id']),
+              Container(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    ClubHeader(
+                      club: _club,
+                      myClubId: _myClubId,
+                      gamesCount: _gamesCount,
+                      onRefresh: () => _loadData(clubId: _club?['id']),
+                    ),
+                       AppCard(
+                        isDark: isDark,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            ClubStats(
+                              month: _month,
+                              year: _year,
+                              onPrevious: _previousMonth,
+                              onNext: _nextMonth,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
-
-              // 🔥 ТАБЛИЦА РЕЙТИНГА (СО СВАЙПОМ)
               Expanded(
                 child: _showClubSearch
                     ? ClubSearchList(
                         isDark: isDark,
                         onClubSelected: _selectClub,
                       )
-                    : GestureDetector(
-                        onHorizontalDragEnd: (details) {
-                          // 🔥 СВАЙП ВЛЕВО → СЛЕДУЮЩИЙ МЕСЯЦ
-                          if (details.primaryVelocity! < -100) {
-                            _nextMonth();
-                          }
-                          // 🔥 СВАЙП ВПРАВО → ПРЕДЫДУЩИЙ МЕСЯЦ
-                          else if (details.primaryVelocity! > 100) {
-                            _previousMonth();
-                          }
-                        },
-                        child: _hasGames
-                            ? SingleChildScrollView(
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 8),
-                                child: ClubRatingTable(players: _ratingPlayers),
-                              )
-                            : _buildNoGamesPlaceholder(isDark),
-                      ),
+                    : _hasGames
+                        ? SingleChildScrollView(
+                            padding: const EdgeInsets.symmetric(horizontal: 8),
+                            child: ClubRatingTable(players: _ratingPlayers),
+                          )
+                        : _buildNoGamesPlaceholder(isDark),
               ),
             ],
           ),
-
-          // 🔥 КНОПКА "КЛУБЫ"
           if (!_showClubSearch)
             Positioned(
               bottom: 24,
@@ -214,7 +226,7 @@ class _ClubScreenState extends ConsumerState<ClubScreen> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Icon(
-                              Mdi.magnify,
+                              Mdi.homeGroup,
                               color: isDark ? Colors.white : Colors.black87,
                               size: 20,
                             ),
@@ -235,8 +247,7 @@ class _ClubScreenState extends ConsumerState<ClubScreen> {
                 ],
               ),
             ),
-
-          // 🔥 КНОПКА "СВОЙ"
+          // 🔥 КНОПКА "ЗАКРЫТЬ" С НАДПИСЬЮ "Свой"
           if (_showClubSearch)
             Positioned(
               bottom: 24,
@@ -252,7 +263,7 @@ class _ClubScreenState extends ConsumerState<ClubScreen> {
                           isDark ? Colors.grey.shade800 : Colors.grey.shade200,
                       borderRadius: BorderRadius.circular(50),
                       border: Border.all(
-                        color: Colors.red,
+                        color: primaryColor,
                         width: 1,
                       ),
                       boxShadow: [
@@ -274,7 +285,7 @@ class _ClubScreenState extends ConsumerState<ClubScreen> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Icon(
-                              Icons.close,
+                              Icons.home,
                               color: isDark ? Colors.white : Colors.black87,
                               size: 20,
                             ),

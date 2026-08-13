@@ -1,11 +1,14 @@
 // lib/presentation/screens/club/club_screen.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mafia_help/presentation/widgets/app_card.dart';
 import 'package:mafia_help/presentation/widgets/club/club_header.dart';
 import 'package:mafia_help/presentation/widgets/club/club_rating_table.dart';
 import 'package:mafia_help/presentation/widgets/club/club_search_list.dart';
+import 'package:mafia_help/presentation/widgets/club/club_stats.dart';
 import 'package:mdi_plus/mdi_plus.dart';
 import '../../../services/club_service.dart';
+import '../../../services/update_service.dart';
 
 class ClubScreen extends ConsumerStatefulWidget {
   const ClubScreen({super.key});
@@ -24,6 +27,11 @@ class _ClubScreenState extends ConsumerState<ClubScreen> {
   bool _hasGames = false;
   int _gamesCount = 0;
 
+  // 🔥 ДЛЯ КАРУСЕЛИ
+  late PageController _pageController;
+  int _currentPage = 0;
+  final List<DateTime> _months = [];
+
   DateTime _currentDate = DateTime.now();
   int get _month => _currentDate.month;
   int get _year => _currentDate.year;
@@ -31,7 +39,35 @@ class _ClubScreenState extends ConsumerState<ClubScreen> {
   @override
   void initState() {
     super.initState();
+    _pageController = PageController();
+    _generateMonths();
     _loadData();
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  void _generateMonths() {
+    _months.clear();
+    final now = DateTime.now();
+    // Последние 12 месяцев
+    for (int i = 0; i < 12; i++) {
+      _months.add(DateTime(now.year, now.month - i, 1));
+    }
+    _months.sort((a, b) => a.compareTo(b));
+
+    // Находим текущий месяц
+    final current = DateTime(_year, _month, 1);
+    final index = _months.indexOf(current);
+    if (index != -1) {
+      _currentPage = index;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _pageController.jumpToPage(index);
+      });
+    }
   }
 
   void _selectClub(int clubId) {
@@ -51,6 +87,8 @@ class _ClubScreenState extends ConsumerState<ClubScreen> {
     try {
       if (clubId != null) {
         final result = await ClubService.getClub(clubId);
+        print('🔥 getClub result: $result');
+
         if (result['success']) {
           final clubData = result['club'] ?? result;
           _club = clubData;
@@ -66,6 +104,8 @@ class _ClubScreenState extends ConsumerState<ClubScreen> {
         }
       } else {
         final myClubsResult = await ClubService.getMyClub();
+        print('🔥 getMyClub result: $myClubsResult');
+
         final clubData = myClubsResult['club'];
         if (myClubsResult['success'] &&
             clubData != null &&
@@ -80,6 +120,7 @@ class _ClubScreenState extends ConsumerState<ClubScreen> {
         }
       }
     } catch (e) {
+      print('❌ _loadData exception: $e');
       _hasClub = false;
       _club = null;
     }
@@ -87,13 +128,14 @@ class _ClubScreenState extends ConsumerState<ClubScreen> {
     setState(() => _isLoading = false);
   }
 
-  Future<void> _loadRating() async {
+  Future<void> _loadRating({DateTime? date}) async {
     if (_club == null) return;
 
+    final targetDate = date ?? _currentDate;
     final result = await ClubService.getClubRating(
       clubId: _club!['id'],
-      month: _month,
-      year: _year,
+      month: targetDate.month,
+      year: targetDate.year,
     );
 
     if (result['success']) {
@@ -106,20 +148,33 @@ class _ClubScreenState extends ConsumerState<ClubScreen> {
     }
   }
 
-  // 🔥 СЛЕДУЮЩИЙ МЕСЯЦ
-  void _nextMonth() {
+  void _onPageChanged(int index) {
+    if (index < 0 || index >= _months.length) return;
+
+    final date = _months[index];
     setState(() {
-      _currentDate = DateTime(_year, _month + 1, 1);
+      _currentDate = date;
+      _currentPage = index;
     });
-    _loadRating();
+    _loadRating(date: date);
   }
 
-  // 🔥 ПРЕДЫДУЩИЙ МЕСЯЦ
-  void _previousMonth() {
-    setState(() {
-      _currentDate = DateTime(_year, _month - 1, 1);
-    });
-    _loadRating();
+  String _getMonthName(int month) {
+    const months = [
+      'Янв',
+      'Фев',
+      'Мар',
+      'Апр',
+      'Май',
+      'Июн',
+      'Июл',
+      'Авг',
+      'Сен',
+      'Окт',
+      'Ноя',
+      'Дек'
+    ];
+    return months[month - 1];
   }
 
   @override
@@ -138,7 +193,6 @@ class _ClubScreenState extends ConsumerState<ClubScreen> {
         children: [
           Column(
             children: [
-              // 🔥 ХЕДЕР КЛУБА
               ClubHeader(
                 club: _club,
                 myClubId: _myClubId,
@@ -146,37 +200,108 @@ class _ClubScreenState extends ConsumerState<ClubScreen> {
                 onRefresh: () => _loadData(clubId: _club?['id']),
               ),
 
-              // 🔥 ТАБЛИЦА РЕЙТИНГА (СО СВАЙПОМ)
+              // 🔥 КРАСИВАЯ КАРУСЕЛЬ МЕСЯЦЕВ
+              Container(
+                padding: const EdgeInsets.symmetric(vertical: 6),
+                child: Column(
+                  children: [
+                    // 🔥 ПОЛОСКИ-ИНДИКАТОРЫ (как в Instagram)
+                    Container(
+                      height: 3,
+                      margin: const EdgeInsets.symmetric(horizontal: 12),
+                      child: Row(
+                        children: List.generate(
+                          _months.length,
+                          (index) => Expanded(
+                            child: Container(
+                              margin: const EdgeInsets.symmetric(horizontal: 2),
+                              decoration: BoxDecoration(
+                                color: index == _currentPage
+                                    ? primaryColor
+                                    : isDark
+                                        ? Colors.grey.shade700
+                                        : Colors.grey.shade300,
+                                borderRadius: BorderRadius.circular(2),
+                              ),
+                              height: 3,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+
+                    // 🔥 КАРУСЕЛЬ МЕСЯЦЕВ (со свайпом)
+                    SizedBox(
+                      height: 44,
+                      child: PageView.builder(
+                        controller: _pageController,
+                        onPageChanged: _onPageChanged,
+                        itemCount: _months.length,
+                        itemBuilder: (context, index) {
+                          final date = _months[index];
+                          final isActive = index == _currentPage;
+                          return Center(
+                            child: AnimatedContainer(
+                              duration: const Duration(milliseconds: 200),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 18,
+                                vertical: 6,
+                              ),
+                              decoration: BoxDecoration(
+                                color: isActive
+                                    ? primaryColor.withOpacity(0.12)
+                                    : Colors.transparent,
+                                borderRadius: BorderRadius.circular(20),
+                                border: Border.all(
+                                  color: isActive
+                                      ? primaryColor
+                                      : Colors.transparent,
+                                  width: 1.5,
+                                ),
+                              ),
+                              child: Text(
+                                '${_getMonthName(date.month)} ${date.year}',
+                                style: TextStyle(
+                                  fontSize: isActive ? 16 : 14,
+                                  fontWeight: isActive
+                                      ? FontWeight.w700
+                                      : FontWeight.w400,
+                                  color: isActive
+                                      ? primaryColor
+                                      : isDark
+                                          ? Colors.grey.shade400
+                                          : Colors.grey.shade600,
+                                ),
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              const Divider(height: 1),
+
               Expanded(
                 child: _showClubSearch
                     ? ClubSearchList(
                         isDark: isDark,
                         onClubSelected: _selectClub,
                       )
-                    : GestureDetector(
-                        onHorizontalDragEnd: (details) {
-                          // 🔥 СВАЙП ВЛЕВО → СЛЕДУЮЩИЙ МЕСЯЦ
-                          if (details.primaryVelocity! < -100) {
-                            _nextMonth();
-                          }
-                          // 🔥 СВАЙП ВПРАВО → ПРЕДЫДУЩИЙ МЕСЯЦ
-                          else if (details.primaryVelocity! > 100) {
-                            _previousMonth();
-                          }
-                        },
-                        child: _hasGames
-                            ? SingleChildScrollView(
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 8),
-                                child: ClubRatingTable(players: _ratingPlayers),
-                              )
-                            : _buildNoGamesPlaceholder(isDark),
-                      ),
+                    : _hasGames
+                        ? SingleChildScrollView(
+                            padding: const EdgeInsets.symmetric(horizontal: 8),
+                            child: ClubRatingTable(players: _ratingPlayers),
+                          )
+                        : _buildNoGamesPlaceholder(isDark),
               ),
             ],
           ),
 
-          // 🔥 КНОПКА "КЛУБЫ"
+          // 🔥 КНОПКА "КЛУБЫ" (когда поиск закрыт)
           if (!_showClubSearch)
             Positioned(
               bottom: 24,
@@ -236,7 +361,7 @@ class _ClubScreenState extends ConsumerState<ClubScreen> {
               ),
             ),
 
-          // 🔥 КНОПКА "СВОЙ"
+          // 🔥 КНОПКА "СВОЙ" (когда поиск открыт)
           if (_showClubSearch)
             Positioned(
               bottom: 24,

@@ -51,10 +51,6 @@ class ClubRatingTable extends StatelessWidget {
                 final nameWidth = totalWidth - fixedWidths - 10;
 
                 return Table(
-                  border: TableBorder.all(
-                    color: isDark ? Colors.grey.shade600 : Colors.grey.shade300,
-                    width: 0.5,
-                  ),
                   columnWidths: {
                     0: const FlexColumnWidth(0.5), // № — минимально
                     1: const FlexColumnWidth(3), // Никнейм — растягивается

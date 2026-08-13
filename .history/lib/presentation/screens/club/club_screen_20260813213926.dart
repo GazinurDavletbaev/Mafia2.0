@@ -122,6 +122,14 @@ class _ClubScreenState extends ConsumerState<ClubScreen> {
     _loadRating();
   }
 
+  String _getMonthName(int month) {
+    const months = [
+      'Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь',
+      'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'
+    ];
+    return months[month - 1];
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -146,6 +154,8 @@ class _ClubScreenState extends ConsumerState<ClubScreen> {
                 onRefresh: () => _loadData(clubId: _club?['id']),
               ),
 
+              const Divider(height: 1),
+
               // 🔥 ТАБЛИЦА РЕЙТИНГА (СО СВАЙПОМ)
               Expanded(
                 child: _showClubSearch
@@ -155,25 +165,69 @@ class _ClubScreenState extends ConsumerState<ClubScreen> {
                       )
                     : GestureDetector(
                         onHorizontalDragEnd: (details) {
-                          // 🔥 СВАЙП ВЛЕВО → СЛЕДУЮЩИЙ МЕСЯЦ
                           if (details.primaryVelocity! < -100) {
                             _nextMonth();
-                          }
-                          // 🔥 СВАЙП ВПРАВО → ПРЕДЫДУЩИЙ МЕСЯЦ
-                          else if (details.primaryVelocity! > 100) {
+                          } else if (details.primaryVelocity! > 100) {
                             _previousMonth();
                           }
                         },
                         child: _hasGames
                             ? SingleChildScrollView(
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 8),
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 8),
                                 child: ClubRatingTable(players: _ratingPlayers),
                               )
                             : _buildNoGamesPlaceholder(isDark),
                       ),
               ),
             ],
+          ),
+
+          // 🔥 МЕСЯЦ И ГОД (ПОВЕРХ ВСЕГО)
+          Positioned(
+            top: 100,
+            left: 16,
+            child: Row(
+              children: [
+                // 🔥 МЕСЯЦ (КРУПНЫЙ, ЖИРНЫЙ)
+                Text(
+                  _getMonthName(_month),
+                  style: TextStyle(
+                    fontSize: 28,
+                    fontWeight: FontWeight.w800,
+                    color: isDark ? Colors.white : Colors.black87,
+                    letterSpacing: 0.5,
+                  ),
+                ),
+                const SizedBox(width: 10),
+                // 🔥 ГОД В КРУЖКЕ
+                Container(
+                  width: 44,
+                  height: 44,
+                  decoration: BoxDecoration(
+                    color: primaryColor,
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: primaryColor.withOpacity(0.3),
+                        blurRadius: 8,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  child: Center(
+                    child: Text(
+                      '$_year',
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w700,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
 
           // 🔥 КНОПКА "КЛУБЫ"

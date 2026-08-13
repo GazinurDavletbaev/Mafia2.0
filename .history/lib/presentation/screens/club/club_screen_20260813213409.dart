@@ -24,9 +24,13 @@ class _ClubScreenState extends ConsumerState<ClubScreen> {
   bool _hasGames = false;
   int _gamesCount = 0;
 
+  // 🔥 ТЕКУЩАЯ ДАТА
   DateTime _currentDate = DateTime.now();
   int get _month => _currentDate.month;
   int get _year => _currentDate.year;
+
+  // 🔥 ДЛЯ АНИМАЦИИ
+  final GlobalKey _tableKey = GlobalKey();
 
   @override
   void initState() {
@@ -122,6 +126,14 @@ class _ClubScreenState extends ConsumerState<ClubScreen> {
     _loadRating();
   }
 
+  String _getMonthName(int month) {
+    const months = [
+      'Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь',
+      'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'
+    ];
+    return months[month - 1];
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -146,6 +158,38 @@ class _ClubScreenState extends ConsumerState<ClubScreen> {
                 onRefresh: () => _loadData(clubId: _club?['id']),
               ),
 
+              // 🔥 МЕСЯЦ И ГОД (С АНИМАЦИЕЙ)
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                child: AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 200),
+                  child: Row(
+                    key: ValueKey('$_month$_year'),
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.calendar_today,
+                        size: 18,
+                        color: isDark
+                            ? Colors.grey.shade400
+                            : Colors.grey.shade600,
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        '${_getMonthName(_month)} $_year',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w600,
+                          color: isDark ? Colors.white : Colors.black87,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+
+              const Divider(height: 1),
+
               // 🔥 ТАБЛИЦА РЕЙТИНГА (СО СВАЙПОМ)
               Expanded(
                 child: _showClubSearch
@@ -154,6 +198,7 @@ class _ClubScreenState extends ConsumerState<ClubScreen> {
                         onClubSelected: _selectClub,
                       )
                     : GestureDetector(
+                        key: _tableKey,
                         onHorizontalDragEnd: (details) {
                           // 🔥 СВАЙП ВЛЕВО → СЛЕДУЮЩИЙ МЕСЯЦ
                           if (details.primaryVelocity! < -100) {
@@ -164,13 +209,18 @@ class _ClubScreenState extends ConsumerState<ClubScreen> {
                             _previousMonth();
                           }
                         },
-                        child: _hasGames
-                            ? SingleChildScrollView(
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 8),
-                                child: ClubRatingTable(players: _ratingPlayers),
-                              )
-                            : _buildNoGamesPlaceholder(isDark),
+                        child: AnimatedSwitcher(
+                          duration: const Duration(milliseconds: 250),
+                          child: _hasGames
+                              ? SingleChildScrollView(
+                                  key: ValueKey('$_month$_year'),
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 8),
+                                  child: ClubRatingTable(
+                                      players: _ratingPlayers),
+                                )
+                              : _buildNoGamesPlaceholder(isDark),
+                        ),
                       ),
               ),
             ],
@@ -302,6 +352,7 @@ class _ClubScreenState extends ConsumerState<ClubScreen> {
 
   Widget _buildNoGamesPlaceholder(bool isDark) {
     return Center(
+      key: const ValueKey('empty'),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [

@@ -24,14 +24,43 @@ class _ClubScreenState extends ConsumerState<ClubScreen> {
   bool _hasGames = false;
   int _gamesCount = 0;
 
+  // 🔥 ДЛЯ КОЛЕСА МЕСЯЦЕВ
+  late PageController _pageController;
+  int _currentPage = 0;
+  final List<DateTime> _months = [];
+
   DateTime _currentDate = DateTime.now();
-  int get _month => _currentDate.month;
-  int get _year => _currentDate.year;
 
   @override
   void initState() {
     super.initState();
+    _pageController = PageController(viewportFraction: 0.3);
+    _generateMonths();
     _loadData();
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  void _generateMonths() {
+    _months.clear();
+    final now = DateTime.now();
+    for (int i = -24; i <= 24; i++) {
+      _months.add(DateTime(now.year, now.month + i, 1));
+    }
+    _months.sort((a, b) => a.compareTo(b));
+
+    final current = DateTime(now.year, now.month, 1);
+    final index = _months.indexOf(current);
+    if (index != -1) {
+      _currentPage = index;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _pageController.jumpToPage(index);
+      });
+    }
   }
 
   void _selectClub(int clubId) {
@@ -87,13 +116,14 @@ class _ClubScreenState extends ConsumerState<ClubScreen> {
     setState(() => _isLoading = false);
   }
 
-  Future<void> _loadRating() async {
+  Future<void> _loadRating({DateTime? date}) async {
     if (_club == null) return;
 
+    final targetDate = date ?? _currentDate;
     final result = await ClubService.getClubRating(
       clubId: _club!['id'],
-      month: _month,
-      year: _year,
+      month: targetDate.month,
+      year: targetDate.year,
     );
 
     if (result['success']) {
@@ -106,20 +136,32 @@ class _ClubScreenState extends ConsumerState<ClubScreen> {
     }
   }
 
-  // 🔥 СЛЕДУЮЩИЙ МЕСЯЦ
-  void _nextMonth() {
+  void _onPageChanged(int index) {
+    if (index < 0 || index >= _months.length) return;
+    final date = _months[index];
     setState(() {
-      _currentDate = DateTime(_year, _month + 1, 1);
+      _currentDate = date;
+      _currentPage = index;
     });
-    _loadRating();
+    _loadRating(date: date);
   }
 
-  // 🔥 ПРЕДЫДУЩИЙ МЕСЯЦ
-  void _previousMonth() {
-    setState(() {
-      _currentDate = DateTime(_year, _month - 1, 1);
-    });
-    _loadRating();
+  String _getMonthName(int month) {
+    const months = [
+      'Янв',
+      'Фев',
+      'Мар',
+      'Апр',
+      'Май',
+      'Июн',
+      'Июл',
+      'Авг',
+      'Сен',
+      'Окт',
+      'Ноя',
+      'Дек'
+    ];
+    return months[month - 1];
   }
 
   @override
@@ -146,32 +188,74 @@ class _ClubScreenState extends ConsumerState<ClubScreen> {
                 onRefresh: () => _loadData(clubId: _club?['id']),
               ),
 
-              // 🔥 ТАБЛИЦА РЕЙТИНГА (СО СВАЙПОМ)
+              // 🔥 КОЛЕСО МЕСЯЦЕВ (как крутилка)
+              SizedBox(
+                height: 80,
+                child: PageView.builder(
+                  controller: _pageController,
+                  onPageChanged: _onPageChanged,
+                  itemCount: _months.length,
+                  padEnds: false,
+                  itemBuilder: (context, index) {
+                    final date = _months[index];
+                    final isActive = index == _currentPage;
+                    final distance = (index - _currentPage).abs();
+
+                    double scale = 1.0;
+                    double opacity = 1.0;
+                    double fontSize = 22;
+
+                    if (distance == 1) {
+                      scale = 0.8;
+                      opacity = 0.6;
+                      fontSize = 18;
+                    } else if (distance >= 2) {
+                      scale = 0.6;
+                      opacity = 0.3;
+                      fontSize = 14;
+                    }
+
+                    return AnimatedContainer(
+                      duration: const Duration(milliseconds: 300),
+                      curve: Curves.easeInOut,
+                      alignment: Alignment.center,
+                      transform: Matrix4.identity()..scale(scale),
+                      child: Opacity(
+                        opacity: opacity,
+                        child: Text(
+                          '${_getMonthName(date.month)} ${date.year}',
+                          style: TextStyle(
+                            fontSize: fontSize,
+                            fontWeight:
+                                isActive ? FontWeight.w700 : FontWeight.w400,
+                            color: isActive
+                                ? primaryColor
+                                : (isDark
+                                    ? Colors.grey.shade400
+                                    : Colors.grey.shade600),
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
+
+              const Divider(height: 1),
+
+              // 🔥 ТАБЛИЦА РЕЙТИНГА
               Expanded(
                 child: _showClubSearch
                     ? ClubSearchList(
                         isDark: isDark,
                         onClubSelected: _selectClub,
                       )
-                    : GestureDetector(
-                        onHorizontalDragEnd: (details) {
-                          // 🔥 СВАЙП ВЛЕВО → СЛЕДУЮЩИЙ МЕСЯЦ
-                          if (details.primaryVelocity! < -100) {
-                            _nextMonth();
-                          }
-                          // 🔥 СВАЙП ВПРАВО → ПРЕДЫДУЩИЙ МЕСЯЦ
-                          else if (details.primaryVelocity! > 100) {
-                            _previousMonth();
-                          }
-                        },
-                        child: _hasGames
-                            ? SingleChildScrollView(
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 8),
-                                child: ClubRatingTable(players: _ratingPlayers),
-                              )
-                            : _buildNoGamesPlaceholder(isDark),
-                      ),
+                    : _hasGames
+                        ? SingleChildScrollView(
+                            padding: const EdgeInsets.symmetric(horizontal: 8),
+                            child: ClubRatingTable(players: _ratingPlayers),
+                          )
+                        : _buildNoGamesPlaceholder(isDark),
               ),
             ],
           ),

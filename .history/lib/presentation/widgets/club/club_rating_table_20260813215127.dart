@@ -56,13 +56,13 @@ class ClubRatingTable extends StatelessWidget {
                     width: 0.5,
                   ),
                   columnWidths: {
-                    0: const FlexColumnWidth(0.5), // № — минимально
-                    1: const FlexColumnWidth(3), // Никнейм — растягивается
-                    2: const FlexColumnWidth(0.5), // И — минимально
-                    3: const FlexColumnWidth(0.5), // П — минимально
-                    4: const FlexColumnWidth(0.5), // Б — минимально
-                    5: const FlexColumnWidth(0.7), // Д — чуть больше
-                    6: const FlexColumnWidth(0.6), // О — чуть больше
+                    0: const FixedColumnWidth(30),
+                    1: FixedColumnWidth(nameWidth > 80 ? nameWidth : 80),
+                    2: const FixedColumnWidth(50),
+                    3: const FixedColumnWidth(50),
+                    4: const FixedColumnWidth(50),
+                    5: const FixedColumnWidth(50),
+                    6: const FixedColumnWidth(50),
                   },
                   children: [
                     TableRow(
@@ -93,7 +93,9 @@ class ClubRatingTable extends StatelessWidget {
                       return TableRow(
                         children: [
                           _cell(context, '${index + 1}',
-                              isTop: isTop, align: TextAlign.center),
+                              isTop: isTop,
+                              align: TextAlign.center,
+                              color: theme.primaryColor, fontWeight: 20),
                           _cell(
                             context,
                             player['username'] ?? 'Игрок',
@@ -112,6 +114,7 @@ class ClubRatingTable extends StatelessWidget {
                             '${player['wins'] ?? 0}',
                             align: TextAlign.center,
                             isTop: isTop,
+                            color: Colors.amber.shade700,
                           ),
                           _cell(
                             context,
@@ -135,7 +138,6 @@ class ClubRatingTable extends StatelessWidget {
                             total.toString(),
                             align: TextAlign.center,
                             isTop: isTop,
-                            color: Colors.amber.shade700,
                             fontWeight: FontWeight.bold,
                           ),
                         ],
