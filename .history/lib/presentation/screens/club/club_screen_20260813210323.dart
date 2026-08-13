@@ -275,7 +275,7 @@ class _ClubScreenState extends ConsumerState<ClubScreen> {
                           isDark ? Colors.grey.shade800 : Colors.grey.shade200,
                       borderRadius: BorderRadius.circular(50),
                       border: Border.all(
-                        color: primaryColor,
+                        color: Colors.red,
                         width: 1,
                       ),
                       boxShadow: [

@@ -275,7 +275,7 @@ class _ClubScreenState extends ConsumerState<ClubScreen> {
                           isDark ? Colors.grey.shade800 : Colors.grey.shade200,
                       borderRadius: BorderRadius.circular(50),
                       border: Border.all(
-                        color: primaryColor,
+                        color: Colors.red,
                         width: 1,
                       ),
                       boxShadow: [
@@ -297,7 +297,7 @@ class _ClubScreenState extends ConsumerState<ClubScreen> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Icon(
-                              Icons.home,
+                              Icons.,
                               color: isDark ? Colors.white : Colors.black87,
                               size: 20,
                             ),

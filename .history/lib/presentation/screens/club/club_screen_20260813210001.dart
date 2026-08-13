@@ -201,127 +201,122 @@ class _ClubScreenState extends ConsumerState<ClubScreen> {
           ),
           // 🔥 ПЛАВАЮЩАЯ КНОПКА "НАЙТИ КЛУБ"
           // 🔥 ПЛАВАЮЩАЯ КНОПКА "НАЙТИ КЛУБ" С НАДПИСЬЮ ВНУТРИ
-          if (!_showClubSearch)
-            Positioned(
-              bottom: 24,
-              right: 20,
+if (!_showClubSearch)
+  Positioned(
+    bottom: 24,
+    right: 20,
+    child: Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          width: 44,
+          height: 44,
+          decoration: BoxDecoration(
+            color: isDark ? Colors.grey.shade800 : Colors.grey.shade200,
+            borderRadius: BorderRadius.circular(50),
+            border: Border.all(
+              color: primaryColor,
+              width: 1,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.2),
+                blurRadius: 8,
+                offset: const Offset(0, 2),
+              ),
+            ],
+          ),
+          child: Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: () {
+                setState(() => _showClubSearch = true);
+              },
+              borderRadius: BorderRadius.circular(50),
               child: Column(
-                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Container(
-                    width: 44,
-                    height: 44,
-                    decoration: BoxDecoration(
-                      color:
-                          isDark ? Colors.grey.shade800 : Colors.grey.shade200,
-                      borderRadius: BorderRadius.circular(50),
-                      border: Border.all(
-                        color: primaryColor,
-                        width: 1,
-                      ),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.2),
-                          blurRadius: 8,
-                          offset: const Offset(0, 2),
-                        ),
-                      ],
-                    ),
-                    child: Material(
-                      color: Colors.transparent,
-                      child: InkWell(
-                        onTap: () {
-                          setState(() => _showClubSearch = true);
-                        },
-                        borderRadius: BorderRadius.circular(50),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(
-                              Mdi.homeGroup,
-                              color: isDark ? Colors.white : Colors.black87,
-                              size: 20,
-                            ),
-                            const SizedBox(height: 1),
-                            Text(
-                              'Клубы',
-                              style: TextStyle(
-                                fontSize: 8,
-                                color: isDark ? Colors.white70 : Colors.black54,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
+                  Icon(
+                    Mdi.magnify,
+                    color: isDark ? Colors.white : Colors.black87,
+                    size: 20,
+                  ),
+                  const SizedBox(height: 1),
+                  Text(
+                    'Клубы',
+                    style: TextStyle(
+                      fontSize: 8,
+                      color: isDark ? Colors.white70 : Colors.black54,
+                      fontWeight: FontWeight.w500,
                     ),
                   ),
                 ],
               ),
             ),
+          ),
+        ),
+      ],
+    ),
+  ),
           // 🔥 КНОПКА "ЗАКРЫТЬ" С НАДПИСЬЮ "Свой"
-          if (_showClubSearch)
-            Positioned(
-              bottom: 24,
-              right: 20,
+if (_showClubSearch)
+  Positioned(
+    bottom: 24,
+    right: 20,
+    child: Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          width: 44,
+          height: 44,
+          decoration: BoxDecoration(
+            color: isDark ? Colors.grey.shade800 : Colors.grey.shade200,
+            borderRadius: BorderRadius.circular(50),
+            border: Border.all(
+              color: Colors.red,
+              width: 1,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.2),
+                blurRadius: 8,
+                offset: const Offset(0, 2),
+              ),
+            ],
+          ),
+          child: Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: () {
+                setState(() => _showClubSearch = false);
+              },
+              borderRadius: BorderRadius.circular(50),
               child: Column(
-                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Container(
-                    width: 44,
-                    height: 44,
-                    decoration: BoxDecoration(
-                      color:
-                          isDark ? Colors.grey.shade800 : Colors.grey.shade200,
-                      borderRadius: BorderRadius.circular(50),
-                      border: Border.all(
-                        color: primaryColor,
-                        width: 1,
-                      ),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.2),
-                          blurRadius: 8,
-                          offset: const Offset(0, 2),
-                        ),
-                      ],
-                    ),
-                    child: Material(
-                      color: Colors.transparent,
-                      child: InkWell(
-                        onTap: () {
-                          setState(() => _showClubSearch = false);
-                        },
-                        borderRadius: BorderRadius.circular(50),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(
-                              Icons.home,
-                              color: isDark ? Colors.white : Colors.black87,
-                              size: 20,
-                            ),
-                            const SizedBox(height: 1),
-                            Text(
-                              'Свой',
-                              style: TextStyle(
-                                fontSize: 8,
-                                color: isDark ? Colors.white70 : Colors.black54,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
+                  Icon(
+                    Icons.close,
+                    color: isDark ? Colors.white : Colors.black87,
+                    size: 20,
+                  ),
+                  const SizedBox(height: 1),
+                  Text(
+                    'Свой',
+                    style: TextStyle(
+                      fontSize: 8,
+                      color: isDark ? Colors.white70 : Colors.black54,
+                      fontWeight: FontWeight.w500,
                     ),
                   ),
                 ],
               ),
             ),
-        ],
-      ),
-    );
-  }
+          ),
+        ),
+      ],
+    ),
+  ),
+      )
 
   Widget _buildNoGamesPlaceholder(bool isDark) {
     return Center(
