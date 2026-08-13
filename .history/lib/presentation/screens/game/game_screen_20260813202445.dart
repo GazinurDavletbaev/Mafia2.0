@@ -34,55 +34,53 @@ class _GameScreenState extends ConsumerState<GameScreen> {
   bool _dialogShown = false;
 
   @override
-  void initState() {
-    super.initState();
-    _vm = ref.read(gameViewModelProvider.notifier);
+void initState() {
+  super.initState();
+  _vm = ref.read(gameViewModelProvider.notifier);
 
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      print('=== GAME SCREEN INIT ===');
+  WidgetsBinding.instance.addPostFrameCallback((_) {
+    print('=== GAME SCREEN INIT ===');
 
-      // 🔥 1. СНАЧАЛА ПРОВЕРЯЕМ АКТИВНУЮ ИГРУ!
-      final hasActiveGame =
-          _vm.state.players.any((p) => p.role != 'unknown' && p.role != '');
+    // 🔥 1. СНАЧАЛА ПРОВЕРЯЕМ АКТИВНУЮ ИГРУ!
+    final hasActiveGame = _vm.state.players.any((p) => p.role != 'unknown' && p.role != '');
+    
+    if (hasActiveGame) {
+      print('✅ Игра уже идёт, продолжаем');
+      return;  // 🔥 ВЫХОДИМ, НИЧЕГО НЕ ДЕЛАЕМ
+    }
 
-      if (hasActiveGame) {
-        print('✅ Игра уже идёт, продолжаем');
-        return; // 🔥 ВЫХОДИМ, НИЧЕГО НЕ ДЕЛАЕМ
-      }
+    // 🔥 2. ИГРЫ НЕТ — ТОЛЬКО ТЕПЕРЬ ПРОВЕРЯЕМ ИМЕНА
+    final players = widget.initialData.gameState.players;
+    final namesFromData = widget.initialData.playerNames;
+    final avatars = players.map((p) => p.avatarUrl).toList();
 
-      // 🔥 2. ИГРЫ НЕТ — ТОЛЬКО ТЕПЕРЬ ПРОВЕРЯЕМ ИМЕНА
-      final players = widget.initialData.gameState.players;
-      final namesFromData = widget.initialData.playerNames;
-      final avatars = players.map((p) => p.avatarUrl).toList();
+    final allNamesFilled = namesFromData.every((name) => name.trim().isNotEmpty);
 
-      final allNamesFilled =
-          namesFromData.every((name) => name.trim().isNotEmpty);
-
-      if (!allNamesFilled) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Игра не начнется пока не посадите всех за стол!'),
-            backgroundColor: Colors.red,
-            duration: Duration(seconds: 3),
-          ),
-        );
-        return;
-      }
-
-      // ✅ 3. ВСЕ 10 ИМЁН ЗАПОЛНЕНЫ — ИНИЦИАЛИЗИРУЕМ ИГРУ
-      _vm.initializeGame(
-        playerNames: namesFromData,
-        avatars: avatars,
-        tableNumber: widget.initialData.tableNumber,
-        gameNumber: widget.initialData.gameNumber,
-        gameDate: widget.initialData.date,
-        judgeName: widget.initialData.judgeName,
-        tournamentName: widget.initialData.tournamentName,
-        stageName: widget.initialData.stageName,
+    if (!allNamesFilled) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Игра не начнется пока не посадите всех за стол!'),
+          backgroundColor: Colors.red,
+          duration: Duration(seconds: 3),
+        ),
       );
-      _notifyGameStateChanged();
-    });
-  }
+      return;
+    }
+
+    // ✅ 3. ВСЕ 10 ИМЁН ЗАПОЛНЕНЫ — ИНИЦИАЛИЗИРУЕМ ИГРУ
+    _vm.initializeGame(
+      playerNames: namesFromData,
+      avatars: avatars,
+      tableNumber: widget.initialData.tableNumber,
+      gameNumber: widget.initialData.gameNumber,
+      gameDate: widget.initialData.date,
+      judgeName: widget.initialData.judgeName,
+      tournamentName: widget.initialData.tournamentName,
+      stageName: widget.initialData.stageName,
+    );
+    _notifyGameStateChanged();
+  });
+}
 
   @override
   void didUpdateWidget(covariant GameScreen oldWidget) {

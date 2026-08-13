@@ -33,18 +33,7 @@ class PlayerActions {
     final isSpeaking = _vm.state.currentSpeakerSeat == seatNumber;
 
     if (hasDied) {
-      // 🔥 ДОБАВЛЯЕМ В REMOVED_PLAYERS
-      final newRemoved = List<PlayerModel>.from(_vm.state.removedPlayers);
-      final deadPlayer =
-          newPlayers.firstWhere((p) => p.seatNumber == seatNumber);
-      if (!newRemoved.any((p) => p.seatNumber == seatNumber)) {
-        newRemoved.add(deadPlayer);
-      }
-
-      _vm.state = _vm.state.copyWith(
-        players: newPlayers,
-        removedPlayers: newRemoved, // ← ДОБАВЛЯЕМ!
-      );
+      _vm.state = _vm.state.copyWith(players: newPlayers);
       await _killPlayer(seatNumber);
       return;
     }
