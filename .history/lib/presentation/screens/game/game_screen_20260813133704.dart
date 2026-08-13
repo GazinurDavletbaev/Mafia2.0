@@ -52,7 +52,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
         // ❌ ПОКАЗЫВАЕМ УВЕДОМЛЕНИЕ
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Игра не начнется пока не посадите всех за стол!'),
+            content: Text('Buhf'),
             backgroundColor: Colors.red,
             duration: Duration(seconds: 3),
           ),

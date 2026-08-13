@@ -42,31 +42,15 @@ class _GameScreenState extends ConsumerState<GameScreen> {
       print('=== GAME SCREEN INIT ===');
       final players = widget.initialData.gameState.players;
       final namesFromData = widget.initialData.playerNames;
-      final avatars = players.map((p) => p.avatarUrl).toList();
+      final avatars = players.map((p) => p.avatarUrl).toList(); // ✅
 
-      // 🔥 ПРОВЕРКА: ВСЕ ЛИ 10 ИМЁН ЗАПОЛНЕНЫ
-      final allNamesFilled =
-          namesFromData.every((name) => name.trim().isNotEmpty);
 
-      if (!allNamesFilled) {
-        // ❌ ПОКАЗЫВАЕМ УВЕДОМЛЕНИЕ
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Игра не начнется пока не посадите всех за стол!'),
-            backgroundColor: Colors.red,
-            duration: Duration(seconds: 3),
-          ),
-        );
-        return;
-      }
-
-      // ✅ ВСЕ 10 ИМЁН ЗАПОЛНЕНЫ — ИНИЦИАЛИЗИРУЕМ ИГРУ
       final hasNames = namesFromData.any((name) => name.isNotEmpty);
 
       if (hasNames) {
         _vm.initializeGame(
           playerNames: namesFromData,
-          avatars: avatars,
+          avatars: avatars, // ✅
           tableNumber: widget.initialData.tableNumber,
           gameNumber: widget.initialData.gameNumber,
           gameDate: widget.initialData.date,
@@ -95,7 +79,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
           );
           _vm.initializeGame(
             playerNames: playerNamesFromState,
-            avatars: avatars,
+            avatars: avatars, // ✅ ДОБАВИТЬ
             tableNumber: widget.initialData.tableNumber,
             gameNumber: widget.initialData.gameNumber,
             gameDate: widget.initialData.date,
