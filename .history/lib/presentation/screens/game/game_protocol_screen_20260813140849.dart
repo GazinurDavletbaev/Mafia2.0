@@ -1,4 +1,3 @@
-// lib/presentation/screens/game/game_protocol_screen.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mafia_help/presentation/screens/game/saved_protocols_screen.dart';
@@ -54,7 +53,7 @@ class _GameProtocolScreenState extends ConsumerState<GameProtocolScreen> {
       backgroundColor: theme.scaffoldBackgroundColor,
       body: Stack(
         children: [
-          // 🔥 ОСНОВНОЙ КОНТЕНТ
+          // 🔥 ОСНОВНОЙ КОНТЕНТ (без AppBar)
           ListView(
             padding: const EdgeInsets.only(
               top: 16,
@@ -67,7 +66,8 @@ class _GameProtocolScreenState extends ConsumerState<GameProtocolScreen> {
               const SizedBox(height: 2),
               ProtocolPlayersTable(
                 gameState: widget.gameState,
-                bonusPoints: _saveLogic.bonusPoints,
+                bonusPoints: _saveLogic.bonusPoints, // 🔥 ДОБАВИТЬ
+
                 onRemovedRuleChanged: _saveLogic.updateRemovedRule,
                 onBonusChanged: _saveLogic.updateBonus,
                 onNoteAdded: _saveLogic.addRemovedNote,
@@ -84,102 +84,89 @@ class _GameProtocolScreenState extends ConsumerState<GameProtocolScreen> {
               ),
             ],
           ),
-          // 🔥 ПЛАВАЮЩИЕ КНОПКИ
+          // 🔥 ПЛАВАЮЩИЕ КНОПКИ (СНИЗУ СПРАВА)
           Positioned(
             bottom: 24,
             right: 20,
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                // 🔥 1. СОХРАНИТЬ НА СЕРВЕР
-                _buildFloatingButton(
-                  icon: Mdi.cloudUpload,
-                  onTap: () => _saveLogic.saveProtocol(context),
-                  isDark: isDark,
-                  primaryColor: primaryColor,
-                  tooltip: 'Сохранить на сервер',
-                ),
-                const SizedBox(height: 12),
-                // 🔥 2. СОХРАНИТЬ ЛОКАЛЬНО
-                _buildFloatingButton(
-                  icon: Mdi.contentSave,
-                  onTap: () => _saveLogic.saveLocalProtocol(context),
-                  isDark: isDark,
-                  primaryColor: primaryColor,
-                  tooltip: 'Сохранить локально',
-                ),
-                const SizedBox(height: 12),
-                // 🔥 3. ЭКСПОРТ В EXCEL
-                _buildFloatingButton(
-                  icon: Mdi.fileExcel,
-                  onTap: () => _saveLogic.exportExcel(context),
-                  isDark: isDark,
-                  primaryColor: primaryColor,
-                  tooltip: 'Экспорт в Excel',
-                ),
-                const SizedBox(height: 12),
-                // 🔥 4. ПАПКА
-                _buildFloatingButton(
-                  icon: Mdi.folderOpen,
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const SavedProtocolsScreen(),
+                // 🔥 КНОПКА "СОХРАНИТЬ"
+                Container(
+                  width: 44,
+                  height: 44,
+                  decoration: BoxDecoration(
+                    color: isDark ? Colors.grey.shade800 : Colors.grey.shade200,
+                    borderRadius: BorderRadius.circular(50),
+                    border: Border.all(
+                      color: primaryColor,
+                      width: 1,
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.2),
+                        blurRadius: 8,
+                        offset: const Offset(0, 2),
                       ),
-                    );
-                  },
-                  isDark: isDark,
-                  primaryColor: primaryColor,
-                  tooltip: 'Сохранённые игры',
+                    ],
+                  ),
+                  child: Material(
+                    color: Colors.transparent,
+                    child: InkWell(
+                      onTap: () => _saveLogic.saveProtocol(context),
+                      borderRadius: BorderRadius.circular(50),
+                      child: Icon(
+                        Mdi.contentSave,
+                        color: isDark ? Colors.white : Colors.black87,
+                        size: 24,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                // 🔥 КНОПКА "ПАПКА"
+                Container(
+                  width: 44,
+                  height: 44,
+                  decoration: BoxDecoration(
+                    color: isDark ? Colors.grey.shade800 : Colors.grey.shade200,
+                    borderRadius: BorderRadius.circular(50),
+                    border: Border.all(
+                      color: primaryColor,
+                      width: 1,
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.2),
+                        blurRadius: 8,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  child: Material(
+                    color: Colors.transparent,
+                    child: InkWell(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const SavedProtocolsScreen(),
+                          ),
+                        );
+                      },
+                      borderRadius: BorderRadius.circular(50),
+                      child: Icon(
+                        Mdi.folderOpen,
+                        color: isDark ? Colors.white : Colors.black87,
+                        size: 24,
+                      ),
+                    ),
+                  ),
                 ),
               ],
             ),
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _buildFloatingButton({
-    required IconData icon,
-    required VoidCallback onTap,
-    required bool isDark,
-    required Color primaryColor,
-    required String tooltip,
-  }) {
-    return Tooltip(
-      message: tooltip,
-      child: Container(
-        width: 44,
-        height: 44,
-        decoration: BoxDecoration(
-          color: isDark ? Colors.grey.shade800 : Colors.grey.shade200,
-          borderRadius: BorderRadius.circular(50),
-          border: Border.all(
-            color: primaryColor,
-            width: 1,
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.2),
-              blurRadius: 8,
-              offset: const Offset(0, 2),
-            ),
-          ],
-        ),
-        child: Material(
-          color: Colors.transparent,
-          child: InkWell(
-            onTap: onTap,
-            borderRadius: BorderRadius.circular(50),
-            child: Icon(
-              icon,
-              color: isDark ? Colors.white : Colors.black87,
-              size: 24,
-            ),
-          ),
-        ),
       ),
     );
   }

@@ -249,10 +249,11 @@ class ProtocolSaveLogic {
 
     try {
       final directory = await getApplicationDocumentsDirectory();
-      final fileName = 'protocol_${DateTime.now().millisecondsSinceEpoch}.json';
+      final fileName =
+          'protocol_${DateTime.now().millisecondsSinceEpoch}.json';
       final path = '${directory.path}/$fileName';
       final file = File(path);
-
+      
       final jsonString = jsonEncode(data);
       await file.writeAsString(jsonString);
 

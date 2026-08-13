@@ -1,8 +1,6 @@
-import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mafia_help/presentation/screens/game/game_protocol_view_screen.dart';
 import 'package:open_file/open_file.dart';
 import 'package:path_provider/path_provider.dart';
 
@@ -178,47 +176,45 @@ class _SavedProtocolsScreenState extends ConsumerState<SavedProtocolsScreen> {
                           onPressed: () => _showDeleteDialog(file),
                         ),
                         onTap: () async {
-                          final fileName = file.path.split('/').last;
-
-                          if (fileName.endsWith('.json')) {
-                            try {
-                              final jsonString =
-                                  await File(file.path).readAsString();
-                              final data = jsonDecode(jsonString);
-
-                              if (context.mounted) {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) =>
-                                        GameProtocolViewScreen(
-                                      gameData: data, // 🔥 ПЕРЕДАЁМ JSON
-                                    ),
-                                  ),
-                                );
-                              }
-                            } catch (e) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text('❌ Ошибка чтения файла: $e'),
-                                  backgroundColor: Colors.red,
-                                ),
-                              );
-                            }
-                          } else {
-                            try {
-                              await OpenFile.open(file.path);
-                            } catch (e) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content:
-                                      Text('❌ Не удалось открыть файл: $e'),
-                                  backgroundColor: Colors.red,
-                                ),
-                              );
-                            }
-                          }
-                        },
+  final fileName = file.path.split('/').last;
+  
+  // 🔥 ЕСЛИ JSON — ОТКРЫВАЕМ ЭКРАН ПРОСМОТРА
+  if (fileName.endsWith('.json')) {
+    try {
+      final jsonString = await File(file.path).readAsString();
+      final data = jsonDecode(jsonString);
+      
+      // 🔥 ПЕРЕХОДИМ НА ЭКРАН ПРОСМОТРА ПРОТОКОЛА
+      if (context.mounted) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ProtocolViewScreen(data: data),
+          ),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('❌ Ошибка чтения файла: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  } else {
+    // 🔥 ЕСЛИ EXCEL — ОТКРЫВАЕМ ФАЙЛ
+    try {
+      await OpenFile.open(file.path);
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('❌ Не удалось открыть файл: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+},
                       ),
                     );
                   },

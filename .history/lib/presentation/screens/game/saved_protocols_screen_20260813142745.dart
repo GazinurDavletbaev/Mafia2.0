@@ -1,8 +1,6 @@
-import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mafia_help/presentation/screens/game/game_protocol_view_screen.dart';
 import 'package:open_file/open_file.dart';
 import 'package:path_provider/path_provider.dart';
 
@@ -180,20 +178,20 @@ class _SavedProtocolsScreenState extends ConsumerState<SavedProtocolsScreen> {
                         onTap: () async {
                           final fileName = file.path.split('/').last;
 
+                          // 🔥 ЕСЛИ JSON — ОТКРЫВАЕМ ЭКРАН ПРОСМОТРА
                           if (fileName.endsWith('.json')) {
                             try {
                               final jsonString =
                                   await File(file.path).readAsString();
                               final data = jsonDecode(jsonString);
 
+                              // 🔥 ПЕРЕХОДИМ НА ЭКРАН ПРОСМОТРА ПРОТОКОЛА
                               if (context.mounted) {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
                                     builder: (context) =>
-                                        GameProtocolViewScreen(
-                                      gameData: data, // 🔥 ПЕРЕДАЁМ JSON
-                                    ),
+                                        ProtocolViewScreen(data: data),
                                   ),
                                 );
                               }
@@ -206,6 +204,7 @@ class _SavedProtocolsScreenState extends ConsumerState<SavedProtocolsScreen> {
                               );
                             }
                           } else {
+                            // 🔥 ЕСЛИ EXCEL — ОТКРЫВАЕМ ФАЙЛ
                             try {
                               await OpenFile.open(file.path);
                             } catch (e) {
