@@ -39,7 +39,7 @@ class UpdateService {
         _showUpdateDialog(context, apkUrl, latestVersion);
       } else {
         //_showSnackBar(
-        //    context, '✅ У вас последняя версия $currentVersion', Colors.green);
+            context, '✅ У вас последняя версия $currentVersion', Colors.green);
       }
     } catch (e) {
       print('Update check failed: $e');

@@ -2,7 +2,7 @@ name: mafia_help
 description: "A new Flutter project."
 publish_to: 'none'
 
-version: 1.7.20
+version: 1.8.7
 
 environment:
   sdk: '>=3.0.0 <4.0.0'
@@ -38,7 +38,7 @@ dependencies:
   url_launcher: ^6.3.0
   image_picker: ^1.2.3
   http_parser: ^4.1.2
-  
+  mdi_plus: ^7.0.1
 
 
 dev_dependencies:
@@ -68,3 +68,22 @@ flutter:
     - assets/mafia.png
     - assets/don.png
     - assets/mafia_logo.png
+    - assets/background.jpeg
+    - assets/fsm.png
+    - assets/logo_new.png
+    - assets/fsmtext.png
+    - assets/fsmtext.jpeg
+    - assets/donborder.png
+    - assets/presidentborder1.png
+    - assets/presidentborder2.png
+    - assets/presidentborder3.png
+    - assets/residentborder1.png
+    - assets/residentborder2.png
+    - assets/sheriffborder.png
+    - assets/mafiaborder.png
+    - assets/citizenborder.png
+    - assets/clubborder1.png
+    - assets/clubborder2.png
+    - assets/gamesborder.png
+    - assets/splashsheriffhat.png
+    - assets/splashsheriffhattext.png
