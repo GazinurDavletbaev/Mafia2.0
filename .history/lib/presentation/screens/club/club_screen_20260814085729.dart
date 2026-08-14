@@ -192,10 +192,7 @@ class _ClubScreenState extends ConsumerState<ClubScreen> {
       case 2:
         return _isLoadingMembers
             ? const Center(child: CircularProgressIndicator())
-            : ClubMembersTable(
-                members: _members, isDark: isDark,
-                clubId: _club!['id'], // 🔥 ПЕРЕДАЁМ clubId
-              );
+            : ClubMembersTable(members: _members, isDark: isDark);
       default:
         return const SizedBox.shrink();
     }
@@ -217,25 +214,19 @@ class _ClubScreenState extends ConsumerState<ClubScreen> {
         children: [
           Column(
             children: [
-              ClubHeader(
+              nGamesTap: () {
+                  setState(() {
+                  ClubHeader(
                 club: _club,
                 myClubId: _myClubId,
                 gamesCount: _gamesCount,
                 onRefresh: () => _loadData(clubId: _club?['id']),
-                onGamesTap: () {
-                  setState(() {
-                    _currentTab = 1;
+                o  _currentTab = 1;
                   });
                 },
                 onMembersTap: () {
                   setState(() {
                     _currentTab = 2;
-                  });
-                },
-                onMyClubTap: () {
-                  // 🔥 ДОБАВИТЬ
-                  setState(() {
-                    _currentTab = 0; // Возврат на рейтинг
                   });
                 },
               ),

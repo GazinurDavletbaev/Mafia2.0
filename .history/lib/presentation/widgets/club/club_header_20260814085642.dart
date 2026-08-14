@@ -13,7 +13,7 @@ class ClubHeader extends StatelessWidget {
   final VoidCallback onRefresh;
   final VoidCallback onGamesTap;
   final VoidCallback onMembersTap;
-  final VoidCallback onMyClubTap;
+  final VoidCallback onMyClubTap;  // 🔥 ДОБАВИТЬ
 
   const ClubHeader({
     super.key,
@@ -23,7 +23,7 @@ class ClubHeader extends StatelessWidget {
     required this.onRefresh,
     required this.onGamesTap,
     required this.onMembersTap,
-    required this.onMyClubTap,
+    required this.onMyClubTap,  // 🔥 ДОБАВИТЬ
   });
 
   @override
@@ -154,17 +154,19 @@ class ClubHeader extends StatelessWidget {
                     ),
                   ),
 
-                  // 🔥 БЕЙДЖ 4: ПОДАТЬ ЗАЯВКУ
+                  // 🔥 БЕЙДЖ 4: ПОДАТЬ ЗАЯВКУ — С ЛОГИКОЙ ИЗ ClubJoinButton
+                  // ЕСЛИ ЭТО МОЙ КЛУБ — ГАЛОЧКА, ПРИ НАЖАТИИ ВОЗВРАТ НА РЕЙТИНГ
                   Positioned(
                     bottom: -22,
                     left: 74,
                     child: GestureDetector(
                       onTap: () {
-                        // 🔥 ЕСЛИ ГАЛОЧКА (МОЙ КЛУБ) — ВОЗВРАТ НА РЕЙТИНГ
+                        // 🔥 ПРИ НАЖАТИИ НА ГАЛОЧКУ — ВОЗВРАТ НА РЕЙТИНГ
                         if (isMyClub) {
                           onMyClubTap();
                           return;
                         }
+                        // 🔥 ИНАЧЕ — ОБЫЧНАЯ ЛОГИКА ЗАЯВКИ
                         _handleJoinButtonTap(context);
                       },
                       child: _buildJoinButtonContent(context),
@@ -354,8 +356,15 @@ class ClubHeader extends StatelessWidget {
   // 🔥 ЛОГИКА НАЖАТИЯ НА ЗАЯВКУ
   void _handleJoinButtonTap(BuildContext context) async {
     final int? currentClubId = club?['id'];
+    final bool isMyClub = myClubId == currentClubId;
     final bool hasPendingRequest = club?['has_pending_request'] ?? false;
     final bool userHasClub = myClubId != null;
+
+    // Если это мой клуб — возврат на рейтинг
+    if (isMyClub) {
+      onMyClubTap();
+      return;
+    }
 
     if (userHasClub) {
       ScaffoldMessenger.of(context).showSnackBar(

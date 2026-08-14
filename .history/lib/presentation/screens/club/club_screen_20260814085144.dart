@@ -192,10 +192,7 @@ class _ClubScreenState extends ConsumerState<ClubScreen> {
       case 2:
         return _isLoadingMembers
             ? const Center(child: CircularProgressIndicator())
-            : ClubMembersTable(
-                members: _members, isDark: isDark,
-                clubId: _club!['id'], // 🔥 ПЕРЕДАЁМ clubId
-              );
+            : ClubMembersTable(members: _members, isDark: isDark);
       default:
         return const SizedBox.shrink();
     }
@@ -232,13 +229,8 @@ class _ClubScreenState extends ConsumerState<ClubScreen> {
                     _currentTab = 2;
                   });
                 },
-                onMyClubTap: () {
-                  // 🔥 ДОБАВИТЬ
-                  setState(() {
-                    _currentTab = 0; // Возврат на рейтинг
-                  });
-                },
               ),
+
               Expanded(
                 child: _showClubSearch
                     ? ClubSearchList(
@@ -258,6 +250,7 @@ class _ClubScreenState extends ConsumerState<ClubScreen> {
               ),
             ],
           ),
+
           if (!_showClubSearch)
             Positioned(
               bottom: 24,
@@ -316,6 +309,7 @@ class _ClubScreenState extends ConsumerState<ClubScreen> {
                 ],
               ),
             ),
+
           if (_showClubSearch)
             Positioned(
               bottom: 24,

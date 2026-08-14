@@ -1,10 +1,10 @@
 // lib/presentation/screens/club/club_screen.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mafia_help/presentation/widgets/club/club_game_table.dart';
 import 'package:mafia_help/presentation/widgets/club/club_header.dart';
 import 'package:mafia_help/presentation/widgets/club/club_rating_table.dart';
 import 'package:mafia_help/presentation/widgets/club/club_search_list.dart';
+import 'package:mafia_help/presentation/widgets/club/club_games_table.dart';
 import 'package:mafia_help/presentation/widgets/club/club_members_table.dart';
 import 'package:mdi_plus/mdi_plus.dart';
 import '../../../services/club_service.dart';
@@ -192,10 +192,7 @@ class _ClubScreenState extends ConsumerState<ClubScreen> {
       case 2:
         return _isLoadingMembers
             ? const Center(child: CircularProgressIndicator())
-            : ClubMembersTable(
-                members: _members, isDark: isDark,
-                clubId: _club!['id'], // 🔥 ПЕРЕДАЁМ clubId
-              );
+            : ClubMembersTable(members: _members, isDark: isDark);
       default:
         return const SizedBox.shrink();
     }
@@ -232,13 +229,8 @@ class _ClubScreenState extends ConsumerState<ClubScreen> {
                     _currentTab = 2;
                   });
                 },
-                onMyClubTap: () {
-                  // 🔥 ДОБАВИТЬ
-                  setState(() {
-                    _currentTab = 0; // Возврат на рейтинг
-                  });
-                },
               ),
+
               Expanded(
                 child: _showClubSearch
                     ? ClubSearchList(
@@ -258,6 +250,7 @@ class _ClubScreenState extends ConsumerState<ClubScreen> {
               ),
             ],
           ),
+
           if (!_showClubSearch)
             Positioned(
               bottom: 24,
@@ -316,6 +309,7 @@ class _ClubScreenState extends ConsumerState<ClubScreen> {
                 ],
               ),
             ),
+
           if (_showClubSearch)
             Positioned(
               bottom: 24,

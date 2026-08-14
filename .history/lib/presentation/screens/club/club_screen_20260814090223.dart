@@ -192,10 +192,8 @@ class _ClubScreenState extends ConsumerState<ClubScreen> {
       case 2:
         return _isLoadingMembers
             ? const Center(child: CircularProgressIndicator())
-            : ClubMembersTable(
-                members: _members, isDark: isDark,
-                clubId: _club!['id'], // 🔥 ПЕРЕДАЁМ clubId
-              );
+            : ClubMembersTable(members: _members, isDark: isDark,          clubId: _club!['id'],  // 🔥 ПЕРЕДАЁМ clubId
+);
       default:
         return const SizedBox.shrink();
     }

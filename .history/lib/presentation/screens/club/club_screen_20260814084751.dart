@@ -1,11 +1,9 @@
 // lib/presentation/screens/club/club_screen.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mafia_help/presentation/widgets/club/club_game_table.dart';
 import 'package:mafia_help/presentation/widgets/club/club_header.dart';
 import 'package:mafia_help/presentation/widgets/club/club_rating_table.dart';
 import 'package:mafia_help/presentation/widgets/club/club_search_list.dart';
-import 'package:mafia_help/presentation/widgets/club/club_members_table.dart';
 import 'package:mdi_plus/mdi_plus.dart';
 import '../../../services/club_service.dart';
 
@@ -25,13 +23,7 @@ class _ClubScreenState extends ConsumerState<ClubScreen> {
   List<Map<String, dynamic>> _ratingPlayers = [];
   bool _hasGames = false;
   int _gamesCount = 0;
-  int _currentTab = 0;
-
-  // 🔥 ДАННЫЕ ДЛЯ ИГР И УЧАСТНИКОВ
-  List<Map<String, dynamic>> _games = [];
-  List<Map<String, dynamic>> _members = [];
-  bool _isLoadingGames = false;
-  bool _isLoadingMembers = false;
+  int _currentTab = 0; // 🔥 ДОБАВИТЬ: 0 = Рейтинг, 1 = Игры, 2 = Участники
 
   DateTime _currentDate = DateTime.now();
   int get _month => _currentDate.month;
@@ -50,9 +42,6 @@ class _ClubScreenState extends ConsumerState<ClubScreen> {
       _ratingPlayers = [];
       _hasGames = false;
       _gamesCount = 0;
-      _games = [];
-      _members = [];
-      _currentTab = 0;
     });
     _loadData(clubId: clubId);
   }
@@ -68,8 +57,6 @@ class _ClubScreenState extends ConsumerState<ClubScreen> {
           _club = clubData;
           _hasClub = true;
           await _loadRating();
-          await _loadGames();
-          await _loadMembers();
         } else {
           setState(() {
             _isLoading = false;
@@ -88,8 +75,6 @@ class _ClubScreenState extends ConsumerState<ClubScreen> {
           _myClubId = clubData['id'];
           _hasClub = true;
           await _loadRating();
-          await _loadGames();
-          await _loadMembers();
         } else {
           _hasClub = false;
           _club = null;
@@ -122,43 +107,7 @@ class _ClubScreenState extends ConsumerState<ClubScreen> {
     }
   }
 
-  Future<void> _loadGames() async {
-    if (_club == null) return;
-    setState(() => _isLoadingGames = true);
-
-    final result = await ClubService.getClubGames(_club!['id']);
-    if (result['success']) {
-      List data = [];
-      if (result['data'] != null) {
-        data = result['data'] as List;
-      } else if (result['clubs'] != null) {
-        data = result['clubs'] as List;
-      }
-      setState(() {
-        _games = data.cast<Map<String, dynamic>>();
-        _isLoadingGames = false;
-      });
-    } else {
-      setState(() => _isLoadingGames = false);
-    }
-  }
-
-  Future<void> _loadMembers() async {
-    if (_club == null) return;
-    setState(() => _isLoadingMembers = true);
-
-    final result = await ClubService.getClubMembers(_club!['id']);
-    if (result['success']) {
-      setState(() {
-        _members =
-            (result['members'] as List? ?? []).cast<Map<String, dynamic>>();
-        _isLoadingMembers = false;
-      });
-    } else {
-      setState(() => _isLoadingMembers = false);
-    }
-  }
-
+  // 🔥 СЛЕДУЮЩИЙ МЕСЯЦ
   void _nextMonth() {
     setState(() {
       _currentDate = DateTime(_year, _month + 1, 1);
@@ -166,39 +115,12 @@ class _ClubScreenState extends ConsumerState<ClubScreen> {
     _loadRating();
   }
 
+  // 🔥 ПРЕДЫДУЩИЙ МЕСЯЦ
   void _previousMonth() {
     setState(() {
       _currentDate = DateTime(_year, _month - 1, 1);
     });
     _loadRating();
-  }
-
-  Widget _buildContent() {
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
-
-    switch (_currentTab) {
-      case 0:
-        return _hasGames
-            ? SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(horizontal: 8),
-                child: ClubRatingTable(players: _ratingPlayers),
-              )
-            : _buildNoGamesPlaceholder(isDark);
-      case 1:
-        return _isLoadingGames
-            ? const Center(child: CircularProgressIndicator())
-            : ClubGamesTable(games: _games, isDark: isDark);
-      case 2:
-        return _isLoadingMembers
-            ? const Center(child: CircularProgressIndicator())
-            : ClubMembersTable(
-                members: _members, isDark: isDark,
-                clubId: _club!['id'], // 🔥 ПЕРЕДАЁМ clubId
-              );
-      default:
-        return const SizedBox.shrink();
-    }
   }
 
   @override
@@ -217,28 +139,15 @@ class _ClubScreenState extends ConsumerState<ClubScreen> {
         children: [
           Column(
             children: [
+              // 🔥 ХЕДЕР КЛУБА
               ClubHeader(
                 club: _club,
                 myClubId: _myClubId,
                 gamesCount: _gamesCount,
                 onRefresh: () => _loadData(clubId: _club?['id']),
-                onGamesTap: () {
-                  setState(() {
-                    _currentTab = 1;
-                  });
-                },
-                onMembersTap: () {
-                  setState(() {
-                    _currentTab = 2;
-                  });
-                },
-                onMyClubTap: () {
-                  // 🔥 ДОБАВИТЬ
-                  setState(() {
-                    _currentTab = 0; // Возврат на рейтинг
-                  });
-                },
               ),
+
+              // 🔥 ТАБЛИЦА РЕЙТИНГА (СО СВАЙПОМ)
               Expanded(
                 child: _showClubSearch
                     ? ClubSearchList(
@@ -247,17 +156,28 @@ class _ClubScreenState extends ConsumerState<ClubScreen> {
                       )
                     : GestureDetector(
                         onHorizontalDragEnd: (details) {
+                          // 🔥 СВАЙП ВЛЕВО → СЛЕДУЮЩИЙ МЕСЯЦ
                           if (details.primaryVelocity! < -100) {
                             _nextMonth();
-                          } else if (details.primaryVelocity! > 100) {
+                          }
+                          // 🔥 СВАЙП ВПРАВО → ПРЕДЫДУЩИЙ МЕСЯЦ
+                          else if (details.primaryVelocity! > 100) {
                             _previousMonth();
                           }
                         },
-                        child: _buildContent(),
+                        child: _hasGames
+                            ? SingleChildScrollView(
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 8),
+                                child: ClubRatingTable(players: _ratingPlayers),
+                              )
+                            : _buildNoGamesPlaceholder(isDark),
                       ),
               ),
             ],
           ),
+
+          // 🔥 КНОПКА "КЛУБЫ"
           if (!_showClubSearch)
             Positioned(
               bottom: 24,
@@ -316,6 +236,8 @@ class _ClubScreenState extends ConsumerState<ClubScreen> {
                 ],
               ),
             ),
+
+          // 🔥 КНОПКА "СВОЙ"
           if (_showClubSearch)
             Positioned(
               bottom: 24,

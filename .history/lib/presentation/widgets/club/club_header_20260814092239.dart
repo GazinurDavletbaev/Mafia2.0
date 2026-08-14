@@ -162,6 +162,7 @@ class ClubHeader extends StatelessWidget {
                       onTap: () {
                         // 🔥 ЕСЛИ ГАЛОЧКА (МОЙ КЛУБ) — ВОЗВРАТ НА РЕЙТИНГ
                         if (isMyClub) {
+                          print('ismy');
                           onMyClubTap();
                           return;
                         }
