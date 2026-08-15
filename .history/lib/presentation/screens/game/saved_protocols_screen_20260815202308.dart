@@ -7,7 +7,6 @@ import 'package:http/http.dart' as http;
 import 'package:mafia_help/core/themes/app_theme.dart';
 import 'package:mafia_help/presentation/screens/game/game_protocol_view_screen.dart';
 import 'package:mafia_help/services/auth_service.dart';
-import 'package:mdi_plus/mdi_plus.dart';
 import 'package:open_file/open_file.dart';
 import 'package:path_provider/path_provider.dart';
 
@@ -209,7 +208,7 @@ class _SavedProtocolsScreenState extends ConsumerState<SavedProtocolsScreen> {
                   ),
                 )
               : ListView.builder(
-                  padding: const EdgeInsets.all(8),
+                  padding: const EdgeInsets.all(4),
                   itemCount: _files.length,
                   itemBuilder: (context, index) {
                     final file = _files[index];
@@ -228,22 +227,22 @@ class _SavedProtocolsScreenState extends ConsumerState<SavedProtocolsScreen> {
                         leading: Icon(
                           isJson ? Icons.code : Icons.description,
                           color: isJson ? Colors.green : Colors.deepPurple,
-                          size: 22,
+                          size: 15,
                         ),
                         title: Text(
                           _getDisplayName(fileName),
                           style: TextStyle(
                             color: isDark ? Colors.white : Colors.black87,
-                            fontSize: 12,
+                            fontSize: 14,
                           ),
                         ),
                         subtitle: Text(
-                          '${_formatFileSize(fileSize)}  •  ${isJson ? "JSON" : "Excel"}',
+                          '${_formatFileSize(fileSize)}  •  ${_formatDate(modifiedTime)}  •  ${isJson ? "JSON" : "Excel"}',
                           style: TextStyle(
                             color: isDark
                                 ? Colors.grey.shade400
                                 : Colors.grey.shade600,
-                            fontSize: 10,
+                            fontSize: 12,
                           ),
                         ),
                         trailing: Row(
@@ -252,9 +251,8 @@ class _SavedProtocolsScreenState extends ConsumerState<SavedProtocolsScreen> {
                             if (isJson)
                               IconButton(
                                 icon: const Icon(
-                                  Mdi.fileExcel,
+                                  Icons.file_download,
                                   color: Colors.green,
-                                  size: 22,
                                 ),
                                 onPressed: () => _exportToExcel(file),
                                 tooltip: 'Экспорт в Excel',
@@ -265,7 +263,6 @@ class _SavedProtocolsScreenState extends ConsumerState<SavedProtocolsScreen> {
                                 icon: const Icon(
                                   Icons.cloud_upload,
                                   color: Colors.blue,
-                                  size: 22,
                                 ),
                                 onPressed: () => _sendToServer(file),
                                 tooltip: 'Отправить на сервер',
@@ -273,9 +270,8 @@ class _SavedProtocolsScreenState extends ConsumerState<SavedProtocolsScreen> {
                             // 🔥 КНОПКА "УДАЛИТЬ"
                             IconButton(
                               icon: const Icon(
-                                Icons.delete,
+                                Icons.delete_outline,
                                 color: Colors.red,
-                                size: 22,
                               ),
                               onPressed: () => _showDeleteDialog(file),
                             ),

@@ -7,7 +7,6 @@ import 'package:http/http.dart' as http;
 import 'package:mafia_help/core/themes/app_theme.dart';
 import 'package:mafia_help/presentation/screens/game/game_protocol_view_screen.dart';
 import 'package:mafia_help/services/auth_service.dart';
-import 'package:mdi_plus/mdi_plus.dart';
 import 'package:open_file/open_file.dart';
 import 'package:path_provider/path_provider.dart';
 
@@ -209,7 +208,7 @@ class _SavedProtocolsScreenState extends ConsumerState<SavedProtocolsScreen> {
                   ),
                 )
               : ListView.builder(
-                  padding: const EdgeInsets.all(8),
+                  padding: const EdgeInsets.all(4),
                   itemCount: _files.length,
                   itemBuilder: (context, index) {
                     final file = _files[index];
@@ -252,7 +251,7 @@ class _SavedProtocolsScreenState extends ConsumerState<SavedProtocolsScreen> {
                             if (isJson)
                               IconButton(
                                 icon: const Icon(
-                                  Mdi.fileExcel,
+                                  Mdi,
                                   color: Colors.green,
                                   size: 22,
                                 ),

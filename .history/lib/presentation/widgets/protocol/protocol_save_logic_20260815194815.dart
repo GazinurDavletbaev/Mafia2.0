@@ -115,54 +115,20 @@ class ProtocolSaveLogic {
     );
   }
 
-  // 🔥 ПРОВЕРКА: ЕСТЬ ЛИ УЖЕ ТАКАЯ ИГРА ЛОКАЛЬНО (по дате + стол + игра)
-  Future<bool> _checkLocalDuplicate(DateTime date, int table, int game) async {
-    print('🔍 _checkLocalDuplicate: date=$date, table=$table, game=$game');
-
-    final directory = await getApplicationDocumentsDirectory();
-    final files = directory.listSync();
-
-    print('📁 Найдено файлов: ${files.length}');
-
-    for (final file in files) {
-      if (file is File && file.path.endsWith('.json')) {
-        print('📄 Проверяем файл: ${file.path}');
-        try {
-          final jsonString = await file.readAsString();
-          final data = jsonDecode(jsonString);
-
-          final fileDate = DateTime.parse(data['date']);
-          final fileTable = data['table'];
-          final fileGame = data['game'];
-
-          print('  Файл: date=$fileDate, table=$fileTable, game=$fileGame');
-
-          if (fileDate.year == date.year &&
-              fileDate.month == date.month &&
-              fileDate.day == date.day &&
-              fileTable == table &&
-              fileGame == game) {
-            print('❌ ДУБЛИКАТ НАЙДЕН!');
-            return true;
-          }
-        } catch (e) {
-          print('❌ Ошибка чтения файла: $e');
-        }
-      }
-    }
-
-    print('✅ Дубликатов не найдено');
-    return false;
-  }
-
-  // 🔥 ОБЩИЙ МЕТОД: ПРОВЕРКА И ФОРМИРОВАНИЕ JSON
-  Future<Map<String, dynamic>> _prepareData() async {
-    // 1️⃣ ПРОВЕРКА: ИГРА ЗАВЕРШЕНА?
+  // ============================================================
+  // 1. СОХРАНИТЬ НА СЕРВЕР
+  // ============================================================
+  Future<void> saveProtocol(BuildContext context) async {
+    // 🔥 ПРОВЕРКА: ИГРА ЗАВЕРШЕНА?
     if (!_isGameEnded()) {
-      throw Exception('Игра не завершена');
+      _showGameNotEndedSnackBar(context);
+      return;
     }
 
-    // 2️⃣ ПРОВЕРКА: ДУБЛИКАТЫ ИМЁН
+    final notes = noteControllers.map((c) => c.text).toList();
+    final protestComment = protestCommentController.text;
+
+    // Проверка на дубликаты
     final playerNames = gameState.players.map((p) => p.name.trim()).toList();
     final duplicates = <String>[];
     final seen = <String>{};
@@ -175,11 +141,17 @@ class ProtocolSaveLogic {
       }
     }
     if (duplicates.isNotEmpty) {
-      throw Exception(
-          'Не может быть двух игроков с одинаковым именем: ${duplicates.join(", ")}');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+              '❌ Не может быть двух игроков с одинаковым именем: ${duplicates.join(", ")}'),
+          backgroundColor: Colors.red,
+          duration: const Duration(seconds: 4),
+        ),
+      );
+      return;
     }
 
-    // 3️⃣ БЕРЁМ club_id ИЗ ПРОВАЙДЕРА
     final clubAsync = ref.watch(clubProvider);
     final clubId = clubAsync.when(
       data: (club) => club?['id'],
@@ -187,10 +159,245 @@ class ProtocolSaveLogic {
       error: (_, __) => null,
     );
 
-    // 4️⃣ ФОРМИРУЕМ ДАННЫЕ
+    final data = _buildProtocolData(notes, protestComment, clubId);
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => const Center(child: CircularProgressIndicator()),
+    );
+
+    try {
+      final token = await AuthService.getToken();
+      if (token == null) {
+        Navigator.pop(context);
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+              content: Text('❌ Не авторизован'), backgroundColor: Colors.red),
+        );
+        return;
+      }
+
+      bool savedToClub = false;
+      if (clubId != null && clubId != 0) {
+        final savedGameId = ref.read(savedGameIdProvider);
+        final savedGameIdNotifier = ref.read(savedGameIdProvider.notifier);
+
+        String url;
+        if (savedGameId != null) {
+          url =
+              'http://161.104.46.234:8001/games/update/$savedGameId?token=$token';
+        } else {
+          url = 'http://161.104.46.234:8001/games/save?token=$token';
+        }
+
+        final saveResponse = await http.post(
+          Uri.parse(url),
+          headers: {'Content-Type': 'application/json'},
+          body: jsonEncode(data),
+        );
+
+        if (saveResponse.statusCode == 200) {
+          final responseData = jsonDecode(saveResponse.body);
+          savedGameIdNotifier.state = responseData['game_id'];
+          savedToClub = true;
+        } else {
+          final errorData = jsonDecode(saveResponse.body);
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                  '⚠️ Игра не сохранена в клуб: ${errorData['detail'] ?? 'Неизвестная ошибка'}'),
+              backgroundColor: Colors.orange,
+            ),
+          );
+        }
+      }
+
+      Navigator.pop(context);
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(savedToClub
+              ? '✅ Игра сохранена в клуб!'
+              : '✅ Игра сохранена локально!'),
+          backgroundColor: Colors.green,
+        ),
+      );
+    } catch (e) {
+      Navigator.pop(context);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('❌ Ошибка: $e'), backgroundColor: Colors.red),
+      );
+    }
+  }
+
+  // ============================================================
+  // 2. СОХРАНИТЬ ЛОКАЛЬНО (JSON)
+  // ============================================================
+  Future<void> saveLocalProtocol(BuildContext context) async {
+    // 🔥 ПРОВЕРКА: ИГРА ЗАВЕРШЕНА?
+    if (!_isGameEnded()) {
+      _showGameNotEndedSnackBar(context);
+      return;
+    }
+
     final notes = noteControllers.map((c) => c.text).toList();
     final protestComment = protestCommentController.text;
 
+    final playerNames = gameState.players.map((p) => p.name.trim()).toList();
+    final duplicates = <String>[];
+    final seen = <String>{};
+    for (final name in playerNames) {
+      if (name.isEmpty) continue;
+      if (seen.contains(name)) {
+        duplicates.add(name);
+      } else {
+        seen.add(name);
+      }
+    }
+    if (duplicates.isNotEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+              '❌ Не может быть двух игроков с одинаковым именем: ${duplicates.join(", ")}'),
+          backgroundColor: Colors.red,
+          duration: const Duration(seconds: 4),
+        ),
+      );
+      return;
+    }
+
+    final data = _buildProtocolData(notes, protestComment, null);
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => const Center(child: CircularProgressIndicator()),
+    );
+
+    try {
+      final directory = await getApplicationDocumentsDirectory();
+      final fileName = 'protocol_${DateTime.now().millisecondsSinceEpoch}.json';
+      final path = '${directory.path}/$fileName';
+      final file = File(path);
+
+      final jsonString = jsonEncode(data);
+      await file.writeAsString(jsonString);
+
+      Navigator.pop(context);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('✅ Протокол сохранён локально!'),
+          backgroundColor: Colors.green,
+        ),
+      );
+    } catch (e) {
+      Navigator.pop(context);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('❌ Ошибка сохранения: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
+  // ============================================================
+  // 3. ЭКСПОРТ В EXCEL
+  // ============================================================
+  Future<void> exportExcel(BuildContext context) async {
+    // 🔥 ПРОВЕРКА: ИГРА ЗАВЕРШЕНА?
+    if (!_isGameEnded()) {
+      _showGameNotEndedSnackBar(context);
+      return;
+    }
+
+    final notes = noteControllers.map((c) => c.text).toList();
+    final protestComment = protestCommentController.text;
+
+    final playerNames = gameState.players.map((p) => p.name.trim()).toList();
+    final duplicates = <String>[];
+    final seen = <String>{};
+    for (final name in playerNames) {
+      if (name.isEmpty) continue;
+      if (seen.contains(name)) {
+        duplicates.add(name);
+      } else {
+        seen.add(name);
+      }
+    }
+    if (duplicates.isNotEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+              '❌ Не может быть двух игроков с одинаковым именем: ${duplicates.join(", ")}'),
+          backgroundColor: Colors.red,
+          duration: const Duration(seconds: 4),
+        ),
+      );
+      return;
+    }
+
+    final data = _buildProtocolData(notes, protestComment, null);
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => const Center(child: CircularProgressIndicator()),
+    );
+
+    try {
+      final response = await http.post(
+        Uri.parse('http://161.104.46.234:8001/protocol/generate'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode(data),
+      );
+
+      Navigator.pop(context);
+
+      if (response.statusCode == 200) {
+        final bytes = response.bodyBytes;
+        final directory = await getApplicationDocumentsDirectory();
+        final fileName =
+            '${_dateString()}_${_formatTime(DateTime.now()).replaceAll(':', '-')}_${gameState.tableNumber ?? 1}_${gameState.gameNumber ?? 1}.xlsx';
+        final path = '${directory.path}/$fileName';
+        final file = File(path);
+        await file.writeAsBytes(bytes);
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('✅ Excel создан!'),
+            backgroundColor: Colors.green,
+          ),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('⚠️ Excel не создан: ${response.statusCode}'),
+            backgroundColor: Colors.orange,
+          ),
+        );
+      }
+    } catch (e) {
+      Navigator.pop(context);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('❌ Ошибка: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
+  // ============================================================
+  // ВСПОМОГАТЕЛЬНЫЕ МЕТОДЫ
+  // ============================================================
+
+  Map<String, dynamic> _buildProtocolData(
+    List<String> notes,
+    String protestComment,
+    int? clubId,
+  ) {
     final isRedWon = gameState.winner == 'red';
     final points = gameState.players.map((p) {
       if (isRedWon) {
@@ -255,195 +462,6 @@ class ProtocolSaveLogic {
       'notes': notes,
     };
   }
-
-  // ============================================================
-  // 1. СОХРАНИТЬ НА СЕРВЕР
-  // ============================================================
-  Future<void> saveProtocol(BuildContext context) async {
-    try {
-      final data = await _prepareData();
-
-      showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (context) => const Center(child: CircularProgressIndicator()),
-      );
-
-      final token = await AuthService.getToken();
-      if (token == null) {
-        Navigator.pop(context);
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-              content: Text('❌ Не авторизован'), backgroundColor: Colors.red),
-        );
-        return;
-      }
-
-      bool savedToClub = false;
-      final clubId = data['club_id'];
-
-      if (clubId != null && clubId != 0) {
-        // 🔥 ВСЕГДА СОЗДАЁМ НОВУЮ ИГРУ (без проверки savedGameId)
-        final url = 'http://161.104.46.234:8001/games/save?token=$token';
-
-        final saveResponse = await http.post(
-          Uri.parse(url),
-          headers: {'Content-Type': 'application/json'},
-          body: jsonEncode(data),
-        );
-
-        if (saveResponse.statusCode == 200) {
-          final responseData = jsonDecode(saveResponse.body);
-          ref.read(savedGameIdProvider.notifier).state =
-              responseData['game_id'];
-          savedToClub = true;
-        } else {
-          final errorData = jsonDecode(saveResponse.body);
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                  '⚠️ Игра не сохранена в клуб: ${errorData['detail'] ?? 'Неизвестная ошибка'}'),
-              backgroundColor: Colors.orange,
-            ),
-          );
-        }
-      }
-
-      Navigator.pop(context);
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(savedToClub
-              ? '✅ Игра сохранена в клуб!'
-              : '✅ Игра сохранена локально!'),
-          backgroundColor: Colors.green,
-        ),
-      );
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('⚠️ ${e.toString()}'),
-          backgroundColor: Colors.orange,
-        ),
-      );
-    }
-  }
-
-  // ============================================================
-  // 2. СОХРАНИТЬ ЛОКАЛЬНО (JSON)
-  // ============================================================
-  Future<void> saveLocalProtocol(BuildContext context) async {
-    try {
-      // 🔥 ПРОВЕРКА: ДУБЛИКАТ ПО ДАТЕ + СТОЛ + ИГРА
-      final exists = await _checkLocalDuplicate(
-        gameState.gameDate ?? DateTime.now(),
-        gameState.tableNumber ?? 1,
-        gameState.gameNumber ?? 1,
-      );
-
-      if (exists) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content:
-                Text('⚠️ Игра с такими параметрами уже существует локально!'),
-            backgroundColor: Colors.orange,
-            duration: Duration(seconds: 3),
-          ),
-        );
-        return;
-      }
-
-      final data = await _prepareData();
-
-      showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (context) => const Center(child: CircularProgressIndicator()),
-      );
-
-      final directory = await getApplicationDocumentsDirectory();
-      final fileName =
-          '${_dateString()}_${_formatTime(DateTime.now()).replaceAll(':', '-')}_${gameState.tableNumber ?? 1}_${gameState.gameNumber ?? 1}.json';
-      final path = '${directory.path}/$fileName';
-      final file = File(path);
-
-      final jsonString = jsonEncode(data);
-      await file.writeAsString(jsonString);
-
-      Navigator.pop(context);
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('✅ Протокол сохранён локально!'),
-          backgroundColor: Colors.green,
-        ),
-      );
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('⚠️ ${e.toString()}'),
-          backgroundColor: Colors.orange,
-        ),
-      );
-    }
-  }
-
-  // ============================================================
-  // 3. ЭКСПОРТ В EXCEL
-  // ============================================================
-  Future<void> exportExcel(BuildContext context) async {
-    try {
-      final data = await _prepareData();
-
-      showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (context) => const Center(child: CircularProgressIndicator()),
-      );
-
-      final response = await http.post(
-        Uri.parse('http://161.104.46.234:8001/protocol/generate'),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode(data),
-      );
-
-      Navigator.pop(context);
-
-      if (response.statusCode == 200) {
-        final bytes = response.bodyBytes;
-        final directory = await getApplicationDocumentsDirectory();
-        final fileName =
-            '${_dateString()}_${_formatTime(DateTime.now()).replaceAll(':', '-')}_${gameState.tableNumber ?? 1}_${gameState.gameNumber ?? 1}.xlsx';
-        final path = '${directory.path}/$fileName';
-        final file = File(path);
-        await file.writeAsBytes(bytes);
-
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('✅ Excel создан!'),
-            backgroundColor: Colors.green,
-          ),
-        );
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('⚠️ Excel не создан: ${response.statusCode}'),
-            backgroundColor: Colors.orange,
-          ),
-        );
-      }
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('⚠️ ${e.toString()}'),
-          backgroundColor: Colors.orange,
-        ),
-      );
-    }
-  }
-
-  // ============================================================
-  // ВСПОМОГАТЕЛЬНЫЕ МЕТОДЫ
-  // ============================================================
 
   String _formatTime(DateTime time) {
     return '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}';

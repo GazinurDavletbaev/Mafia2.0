@@ -116,44 +116,44 @@ class ProtocolSaveLogic {
   }
 
   // 🔥 ПРОВЕРКА: ЕСТЬ ЛИ УЖЕ ТАКАЯ ИГРА ЛОКАЛЬНО (по дате + стол + игра)
-  Future<bool> _checkLocalDuplicate(DateTime date, int table, int game) async {
-    print('🔍 _checkLocalDuplicate: date=$date, table=$table, game=$game');
+ Future<bool> _checkLocalDuplicate(DateTime date, int table, int game) async {
+  print('🔍 _checkLocalDuplicate: date=$date, table=$table, game=$game');
+  
+  final directory = await getApplicationDocumentsDirectory();
+  final files = directory.listSync();
+  
+  print('📁 Найдено файлов: ${files.length}');
 
-    final directory = await getApplicationDocumentsDirectory();
-    final files = directory.listSync();
-
-    print('📁 Найдено файлов: ${files.length}');
-
-    for (final file in files) {
-      if (file is File && file.path.endsWith('.json')) {
-        print('📄 Проверяем файл: ${file.path}');
-        try {
-          final jsonString = await file.readAsString();
-          final data = jsonDecode(jsonString);
-
-          final fileDate = DateTime.parse(data['date']);
-          final fileTable = data['table'];
-          final fileGame = data['game'];
-
-          print('  Файл: date=$fileDate, table=$fileTable, game=$fileGame');
-
-          if (fileDate.year == date.year &&
-              fileDate.month == date.month &&
-              fileDate.day == date.day &&
-              fileTable == table &&
-              fileGame == game) {
-            print('❌ ДУБЛИКАТ НАЙДЕН!');
-            return true;
-          }
-        } catch (e) {
-          print('❌ Ошибка чтения файла: $e');
+  for (final file in files) {
+    if (file is File && file.path.endsWith('.json')) {
+      print('📄 Проверяем файл: ${file.path}');
+      try {
+        final jsonString = await file.readAsString();
+        final data = jsonDecode(jsonString);
+        
+        final fileDate = DateTime.parse(data['date']);
+        final fileTable = data['table'];
+        final fileGame = data['game'];
+        
+        print('  Файл: date=$fileDate, table=$fileTable, game=$fileGame');
+        
+        if (fileDate.year == date.year &&
+            fileDate.month == date.month &&
+            fileDate.day == date.day &&
+            fileTable == table &&
+            fileGame == game) {
+          print('❌ ДУБЛИКАТ НАЙДЕН!');
+          return true;
         }
+      } catch (e) {
+        print('❌ Ошибка чтения файла: $e');
       }
     }
-
-    print('✅ Дубликатов не найдено');
-    return false;
   }
+  
+  print('✅ Дубликатов не найдено');
+  return false;
+}
 
   // 🔥 ОБЩИЙ МЕТОД: ПРОВЕРКА И ФОРМИРОВАНИЕ JSON
   Future<Map<String, dynamic>> _prepareData() async {
@@ -283,8 +283,16 @@ class ProtocolSaveLogic {
       final clubId = data['club_id'];
 
       if (clubId != null && clubId != 0) {
-        // 🔥 ВСЕГДА СОЗДАЁМ НОВУЮ ИГРУ (без проверки savedGameId)
-        final url = 'http://161.104.46.234:8001/games/save?token=$token';
+        final savedGameId = ref.read(savedGameIdProvider);
+        final savedGameIdNotifier = ref.read(savedGameIdProvider.notifier);
+
+        String url;
+        if (savedGameId != null) {
+          url =
+              'http://161.104.46.234:8001/games/update/$savedGameId?token=$token';
+        } else {
+          url = 'http://161.104.46.234:8001/games/save?token=$token';
+        }
 
         final saveResponse = await http.post(
           Uri.parse(url),
@@ -294,8 +302,7 @@ class ProtocolSaveLogic {
 
         if (saveResponse.statusCode == 200) {
           final responseData = jsonDecode(saveResponse.body);
-          ref.read(savedGameIdProvider.notifier).state =
-              responseData['game_id'];
+          savedGameIdNotifier.state = responseData['game_id'];
           savedToClub = true;
         } else {
           final errorData = jsonDecode(saveResponse.body);
@@ -344,8 +351,7 @@ class ProtocolSaveLogic {
       if (exists) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content:
-                Text('⚠️ Игра с такими параметрами уже существует локально!'),
+            content: Text('⚠️ Игра с такими параметрами уже существует локально!'),
             backgroundColor: Colors.orange,
             duration: Duration(seconds: 3),
           ),

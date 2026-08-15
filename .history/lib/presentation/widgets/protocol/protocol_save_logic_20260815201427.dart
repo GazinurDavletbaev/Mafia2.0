@@ -259,75 +259,74 @@ class ProtocolSaveLogic {
   // ============================================================
   // 1. СОХРАНИТЬ НА СЕРВЕР
   // ============================================================
-  Future<void> saveProtocol(BuildContext context) async {
-    try {
-      final data = await _prepareData();
+Future<void> saveProtocol(BuildContext context) async {
+  try {
+    final data = await _prepareData();
 
-      showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (context) => const Center(child: CircularProgressIndicator()),
-      );
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => const Center(child: CircularProgressIndicator()),
+    );
 
-      final token = await AuthService.getToken();
-      if (token == null) {
-        Navigator.pop(context);
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-              content: Text('❌ Не авторизован'), backgroundColor: Colors.red),
-        );
-        return;
-      }
-
-      bool savedToClub = false;
-      final clubId = data['club_id'];
-
-      if (clubId != null && clubId != 0) {
-        // 🔥 ВСЕГДА СОЗДАЁМ НОВУЮ ИГРУ (без проверки savedGameId)
-        final url = 'http://161.104.46.234:8001/games/save?token=$token';
-
-        final saveResponse = await http.post(
-          Uri.parse(url),
-          headers: {'Content-Type': 'application/json'},
-          body: jsonEncode(data),
-        );
-
-        if (saveResponse.statusCode == 200) {
-          final responseData = jsonDecode(saveResponse.body);
-          ref.read(savedGameIdProvider.notifier).state =
-              responseData['game_id'];
-          savedToClub = true;
-        } else {
-          final errorData = jsonDecode(saveResponse.body);
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                  '⚠️ Игра не сохранена в клуб: ${errorData['detail'] ?? 'Неизвестная ошибка'}'),
-              backgroundColor: Colors.orange,
-            ),
-          );
-        }
-      }
-
+    final token = await AuthService.getToken();
+    if (token == null) {
       Navigator.pop(context);
-
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(savedToClub
-              ? '✅ Игра сохранена в клуб!'
-              : '✅ Игра сохранена локально!'),
-          backgroundColor: Colors.green,
-        ),
+        const SnackBar(
+            content: Text('❌ Не авторизован'), backgroundColor: Colors.red),
       );
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('⚠️ ${e.toString()}'),
-          backgroundColor: Colors.orange,
-        ),
-      );
+      return;
     }
+
+    bool savedToClub = false;
+    final clubId = data['club_id'];
+
+    if (clubId != null && clubId != 0) {
+      // 🔥 ВСЕГДА СОЗДАЁМ НОВУЮ ИГРУ (без проверки savedGameId)
+      final url = 'http://161.104.46.234:8001/games/save?token=$token';
+      
+      final saveResponse = await http.post(
+        Uri.parse(url),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode(data),
+      );
+
+      if (saveResponse.statusCode == 200) {
+        final responseData = jsonDecode(saveResponse.body);
+        ref.read(savedGameIdProvider.notifier).state = responseData['game_id'];
+        savedToClub = true;
+      } else {
+        final errorData = jsonDecode(saveResponse.body);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+                '⚠️ Игра не сохранена в клуб: ${errorData['detail'] ?? 'Неизвестная ошибка'}'),
+            backgroundColor: Colors.orange,
+          ),
+        );
+      }
+    }
+
+    Navigator.pop(context);
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(savedToClub
+            ? '✅ Игра сохранена в клуб!'
+            : '✅ Игра сохранена локально!'),
+        backgroundColor: Colors.green,
+      ),
+    );
+  } catch (e) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('⚠️ ${e.toString()}'),
+        backgroundColor: Colors.orange,
+      ),
+    );
   }
+}
 
   // ============================================================
   // 2. СОХРАНИТЬ ЛОКАЛЬНО (JSON)

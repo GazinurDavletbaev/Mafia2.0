@@ -259,75 +259,100 @@ class ProtocolSaveLogic {
   // ============================================================
   // 1. СОХРАНИТЬ НА СЕРВЕР
   // ============================================================
-  Future<void> saveProtocol(BuildContext context) async {
-    try {
-      final data = await _prepareData();
+Future<void> saveProtocol(BuildContext context) async {
+  try {
+    final data = await _prepareData();
 
-      showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (context) => const Center(child: CircularProgressIndicator()),
-      );
+    // 🔥 ПРИНТ: ЧТО ОТПРАВЛЯЕМ
+    print('=== ОТПРАВКА НА СЕРВЕР ===');
+    print('club_id: ${data['club_id']}');
+    print('table: ${data['table']}');
+    print('game: ${data['game']}');
+    print('date: ${data['date']}');
+    print('Полный JSON: ${jsonEncode(data)}');
+    print('=============================');
 
-      final token = await AuthService.getToken();
-      if (token == null) {
-        Navigator.pop(context);
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-              content: Text('❌ Не авторизован'), backgroundColor: Colors.red),
-        );
-        return;
-      }
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => const Center(child: CircularProgressIndicator()),
+    );
 
-      bool savedToClub = false;
-      final clubId = data['club_id'];
-
-      if (clubId != null && clubId != 0) {
-        // 🔥 ВСЕГДА СОЗДАЁМ НОВУЮ ИГРУ (без проверки savedGameId)
-        final url = 'http://161.104.46.234:8001/games/save?token=$token';
-
-        final saveResponse = await http.post(
-          Uri.parse(url),
-          headers: {'Content-Type': 'application/json'},
-          body: jsonEncode(data),
-        );
-
-        if (saveResponse.statusCode == 200) {
-          final responseData = jsonDecode(saveResponse.body);
-          ref.read(savedGameIdProvider.notifier).state =
-              responseData['game_id'];
-          savedToClub = true;
-        } else {
-          final errorData = jsonDecode(saveResponse.body);
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                  '⚠️ Игра не сохранена в клуб: ${errorData['detail'] ?? 'Неизвестная ошибка'}'),
-              backgroundColor: Colors.orange,
-            ),
-          );
-        }
-      }
-
+    final token = await AuthService.getToken();
+    if (token == null) {
       Navigator.pop(context);
-
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(savedToClub
-              ? '✅ Игра сохранена в клуб!'
-              : '✅ Игра сохранена локально!'),
-          backgroundColor: Colors.green,
-        ),
+        const SnackBar(
+            content: Text('❌ Не авторизован'), backgroundColor: Colors.red),
       );
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('⚠️ ${e.toString()}'),
-          backgroundColor: Colors.orange,
-        ),
-      );
+      return;
     }
+
+    bool savedToClub = false;
+    final clubId = data['club_id'];
+
+    if (clubId != null && clubId != 0) {
+      final savedGameId = ref.read(savedGameIdProvider);
+      final savedGameIdNotifier = ref.read(savedGameIdProvider.notifier);
+
+      String url;
+      if (savedGameId != null) {
+        url = 'http://161.104.46.234:8001/games/update/$savedGameId?token=$token';
+        print('🔄 Обновление игры ID: $savedGameId');
+      } else {
+        url = 'http://161.104.46.234:8001/games/save?token=$token';
+        print('🆕 Создание новой игры');
+      }
+
+      print('📤 URL: $url');
+
+      final saveResponse = await http.post(
+        Uri.parse(url),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode(data),
+      );
+
+      print('📥 Ответ сервера: ${saveResponse.statusCode}');
+      print('📥 Тело ответа: ${saveResponse.body}');
+
+      if (saveResponse.statusCode == 200) {
+        final responseData = jsonDecode(saveResponse.body);
+        savedGameIdNotifier.state = responseData['game_id'];
+        savedToClub = true;
+        print('✅ Сохранено! game_id: ${responseData['game_id']}');
+      } else {
+        final errorData = jsonDecode(saveResponse.body);
+        print('❌ Ошибка: ${errorData['detail']}');
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+                '⚠️ Игра не сохранена в клуб: ${errorData['detail'] ?? 'Неизвестная ошибка'}'),
+            backgroundColor: Colors.orange,
+          ),
+        );
+      }
+    }
+
+    Navigator.pop(context);
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(savedToClub
+            ? '✅ Игра сохранена в клуб!'
+            : '✅ Игра сохранена локально!'),
+        backgroundColor: Colors.green,
+      ),
+    );
+  } catch (e) {
+    print('❌ ИСКЛЮЧЕНИЕ: $e');
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('⚠️ ${e.toString()}'),
+        backgroundColor: Colors.orange,
+      ),
+    );
   }
+}
 
   // ============================================================
   // 2. СОХРАНИТЬ ЛОКАЛЬНО (JSON)

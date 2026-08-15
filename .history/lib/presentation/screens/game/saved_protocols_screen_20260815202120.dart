@@ -7,7 +7,6 @@ import 'package:http/http.dart' as http;
 import 'package:mafia_help/core/themes/app_theme.dart';
 import 'package:mafia_help/presentation/screens/game/game_protocol_view_screen.dart';
 import 'package:mafia_help/services/auth_service.dart';
-import 'package:mdi_plus/mdi_plus.dart';
 import 'package:open_file/open_file.dart';
 import 'package:path_provider/path_provider.dart';
 
@@ -234,38 +233,36 @@ class _SavedProtocolsScreenState extends ConsumerState<SavedProtocolsScreen> {
                           _getDisplayName(fileName),
                           style: TextStyle(
                             color: isDark ? Colors.white : Colors.black87,
-                            fontSize: 12,
+                            fontSize: 14,
                           ),
                         ),
                         subtitle: Text(
-                          '${_formatFileSize(fileSize)}  •  ${isJson ? "JSON" : "Excel"}',
+                          '${_formatFileSize(fileSize)}  •  ${_formatDate(modifiedTime)}  •  ${isJson ? "JSON" : "Excel"}',
                           style: TextStyle(
                             color: isDark
                                 ? Colors.grey.shade400
                                 : Colors.grey.shade600,
-                            fontSize: 10,
+                            fontSize: 12,
                           ),
                         ),
                         trailing: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             if (isJson)
-                              IconButton(
-                                icon: const Icon(
-                                  Mdi.fileExcel,
-                                  color: Colors.green,
-                                  size: 22,
-                                ),
-                                onPressed: () => _exportToExcel(file),
-                                tooltip: 'Экспорт в Excel',
-                              ),
+      IconButton(
+        icon: const Icon(
+          Icons.file_download,
+          color: Colors.green,
+        ),
+        onPressed: () => _exportToExcel(file),
+        tooltip: 'Экспорт в Excel',
+      ),
                             // 🔥 КНОПКА "ОТПРАВИТЬ НА СЕРВЕР" (только для JSON)
                             if (isJson)
                               IconButton(
                                 icon: const Icon(
                                   Icons.cloud_upload,
                                   color: Colors.blue,
-                                  size: 22,
                                 ),
                                 onPressed: () => _sendToServer(file),
                                 tooltip: 'Отправить на сервер',
@@ -273,9 +270,8 @@ class _SavedProtocolsScreenState extends ConsumerState<SavedProtocolsScreen> {
                             // 🔥 КНОПКА "УДАЛИТЬ"
                             IconButton(
                               icon: const Icon(
-                                Icons.delete,
+                                Icons.delete_outline,
                                 color: Colors.red,
-                                size: 22,
                               ),
                               onPressed: () => _showDeleteDialog(file),
                             ),
@@ -328,88 +324,6 @@ class _SavedProtocolsScreenState extends ConsumerState<SavedProtocolsScreen> {
                   },
                 ),
     );
-  }
-
-  Future<void> _exportToExcel(FileSystemEntity file) async {
-    final fileName = file.path.split('/').last;
-
-    if (!fileName.endsWith('.json')) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('❌ Только JSON-файлы можно экспортировать в Excel'),
-          backgroundColor: Colors.red,
-        ),
-      );
-      return;
-    }
-
-    try {
-      final jsonString = await File(file.path).readAsString();
-      final Map<String, dynamic> data = jsonDecode(jsonString);
-
-      // 🔥 ПРОВЕРЯЕМ: ЗАВЕРШЕНА ЛИ ИГРА
-      if (data['winner'] == null || data['winner'] == '') {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('⚠️ Игра не завершена! Нет победителя.'),
-            backgroundColor: Colors.orange,
-            duration: Duration(seconds: 3),
-          ),
-        );
-        return;
-      }
-
-      showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (context) => const Center(
-          child: CircularProgressIndicator(),
-        ),
-      );
-
-      // 🔥 ОТПРАВЛЯЕМ НА ГЕНЕРАЦИЮ EXCEL
-      final response = await http.post(
-        Uri.parse('http://161.104.46.234:8001/protocol/generate'),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode(data),
-      );
-
-      Navigator.pop(context);
-
-      if (response.statusCode == 200) {
-        final bytes = response.bodyBytes;
-        final directory = await getApplicationDocumentsDirectory();
-        final fileName =
-            '${data['date']}_${data['time'].replaceAll(':', '-')}_${data['table']}_${data['game']}.xlsx';
-        final path = '${directory.path}/$fileName';
-        final file = File(path);
-        await file.writeAsBytes(bytes);
-
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('✅ Excel создан!'),
-            backgroundColor: Colors.green,
-          ),
-        );
-
-        // 🔥 ОБНОВЛЯЕМ СПИСОК ФАЙЛОВ
-        _loadFiles();
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('⚠️ Excel не создан: ${response.statusCode}'),
-            backgroundColor: Colors.orange,
-          ),
-        );
-      }
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('❌ Ошибка: $e'),
-          backgroundColor: Colors.red,
-        ),
-      );
-    }
   }
 
   void _showDeleteDialog(FileSystemEntity file) {

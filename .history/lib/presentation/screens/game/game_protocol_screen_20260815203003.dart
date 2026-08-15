@@ -102,13 +102,13 @@ class _GameProtocolScreenState extends ConsumerState<GameProtocolScreen> {
                 const SizedBox(height: 12),
                 // 🔥 2. СОХРАНИТЬ ЛОКАЛЬНО
                 _buildFloatingButton(
-                  icon: Mdi.contentSavePlus,
+                  icon: Mdi.contentSave,
                   onTap: () => _saveLogic.saveLocalProtocol(context),
                   isDark: isDark,
                   primaryColor: primaryColor,
                   tooltip: 'Сохранить локально',
                 ),
-
+                
                 const SizedBox(height: 12),
                 // 🔥 4. ПАПКА
                 _buildFloatingButton(

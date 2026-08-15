@@ -263,6 +263,15 @@ class ProtocolSaveLogic {
     try {
       final data = await _prepareData();
 
+      // 🔥 ПРИНТ: ЧТО ОТПРАВЛЯЕМ
+      print('=== ОТПРАВКА НА СЕРВЕР ===');
+      print('club_id: ${data['club_id']}');
+      print('table: ${data['table']}');
+      print('game: ${data['game']}');
+      print('date: ${data['date']}');
+      print('Полный JSON: ${jsonEncode(data)}');
+      print('=============================');
+
       showDialog(
         context: context,
         barrierDismissible: false,
@@ -283,8 +292,20 @@ class ProtocolSaveLogic {
       final clubId = data['club_id'];
 
       if (clubId != null && clubId != 0) {
-        // 🔥 ВСЕГДА СОЗДАЁМ НОВУЮ ИГРУ (без проверки savedGameId)
-        final url = 'http://161.104.46.234:8001/games/save?token=$token';
+        final savedGameId = ref.read(savedGameIdProvider);
+        final savedGameIdNotifier = ref.read(savedGameIdProvider.notifier);
+
+        String url;
+        if (savedGameId != null) {
+          url =
+              'http://161.104.46.234:8001/games/update/$savedGameId?token=$token';
+          print('🔄 Обновление игры ID: $savedGameId');
+        } else {
+          url = 'http://161.104.46.234:8001/games/save?token=$token';
+          print('🆕 Создание новой игры');
+        }
+
+        print('📤 URL: $url');
 
         final saveResponse = await http.post(
           Uri.parse(url),
@@ -292,13 +313,17 @@ class ProtocolSaveLogic {
           body: jsonEncode(data),
         );
 
+        print('📥 Ответ сервера: ${saveResponse.statusCode}');
+        print('📥 Тело ответа: ${saveResponse.body}');
+
         if (saveResponse.statusCode == 200) {
           final responseData = jsonDecode(saveResponse.body);
-          ref.read(savedGameIdProvider.notifier).state =
-              responseData['game_id'];
+          savedGameIdNotifier.state = responseData['game_id'];
           savedToClub = true;
+          print('✅ Сохранено! game_id: ${responseData['game_id']}');
         } else {
           final errorData = jsonDecode(saveResponse.body);
+          print('❌ Ошибка: ${errorData['detail']}');
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(
@@ -320,6 +345,7 @@ class ProtocolSaveLogic {
         ),
       );
     } catch (e) {
+      print('❌ ИСКЛЮЧЕНИЕ: $e');
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('⚠️ ${e.toString()}'),

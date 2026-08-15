@@ -283,8 +283,16 @@ class ProtocolSaveLogic {
       final clubId = data['club_id'];
 
       if (clubId != null && clubId != 0) {
-        // 🔥 ВСЕГДА СОЗДАЁМ НОВУЮ ИГРУ (без проверки savedGameId)
-        final url = 'http://161.104.46.234:8001/games/save?token=$token';
+        final savedGameId = ref.read(savedGameIdProvider);
+        final savedGameIdNotifier = ref.read(savedGameIdProvider.notifier);
+
+        String url;
+        if (savedGameId != null) {
+          url =
+              'http://161.104.46.234:8001/games/update/$savedGameId?token=$token';
+        } else {
+          url = 'http://161.104.46.234:8001/games/save?token=$token';
+        }
 
         final saveResponse = await http.post(
           Uri.parse(url),
@@ -294,8 +302,7 @@ class ProtocolSaveLogic {
 
         if (saveResponse.statusCode == 200) {
           final responseData = jsonDecode(saveResponse.body);
-          ref.read(savedGameIdProvider.notifier).state =
-              responseData['game_id'];
+          savedGameIdNotifier.state = responseData['game_id'];
           savedToClub = true;
         } else {
           final errorData = jsonDecode(saveResponse.body);

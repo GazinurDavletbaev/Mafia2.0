@@ -209,7 +209,7 @@ class _SavedProtocolsScreenState extends ConsumerState<SavedProtocolsScreen> {
                   ),
                 )
               : ListView.builder(
-                  padding: const EdgeInsets.all(8),
+                  padding: const EdgeInsets.all(4),
                   itemCount: _files.length,
                   itemBuilder: (context, index) {
                     final file = _files[index];
