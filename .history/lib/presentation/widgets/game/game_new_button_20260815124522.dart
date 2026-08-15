@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mafia_help/application/providers/game_provider.dart';
-import 'package:mafia_help/application/providers/timer_provider.dart';
 import 'package:mafia_help/presentation/screens/lobby/lobby_data.dart';
 import 'package:mafia_help/presentation/viewmodel/game_viewmodel.dart';
 
@@ -108,7 +107,7 @@ class _GameNewButtonState extends ConsumerState<GameNewButton> {
     print('🔄 Создаём новую игру...');
 
     ref.read(savedGameIdProvider.notifier).state = null;
-    ref.read(timerProvider.notifier).stopTimer();
+  ref.read(timerProvider.notifier).stopTimer();
 
     final vm = ref.read(gameViewModelProvider.notifier);
     vm.resetGame();

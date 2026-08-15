@@ -108,7 +108,7 @@ class _GameNewButtonState extends ConsumerState<GameNewButton> {
     print('🔄 Создаём новую игру...');
 
     ref.read(savedGameIdProvider.notifier).state = null;
-    ref.read(timerProvider.notifier).stopTimer();
+  ref.read(timerProvider.notifier).stopTimer();
 
     final vm = ref.read(gameViewModelProvider.notifier);
     vm.resetGame();
