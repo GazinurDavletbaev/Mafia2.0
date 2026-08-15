@@ -235,76 +235,76 @@ class ProtocolSaveLogic {
   // 2. СОХРАНИТЬ ЛОКАЛЬНО (JSON)
   // ============================================================
   Future<void> saveLocalProtocol(BuildContext context) async {
-    // 🔥 ПРОВЕРКА: ИГРА ЗАВЕРШЕНА?
-    if (!_isGameEnded()) {
-      _showGameNotEndedSnackBar(context);
-      return;
-    }
+  // 🔥 ПРОВЕРКА: ИГРА ЗАВЕРШЕНА?
+  if (!_isGameEnded()) {
+    _showGameNotEndedSnackBar(context);
+    return;
+  }
 
-    final notes = noteControllers.map((c) => c.text).toList();
-    final protestComment = protestCommentController.text;
+  final notes = noteControllers.map((c) => c.text).toList();
+  final protestComment = protestCommentController.text;
 
-    final playerNames = gameState.players.map((p) => p.name.trim()).toList();
-    final duplicates = <String>[];
-    final seen = <String>{};
-    for (final name in playerNames) {
-      if (name.isEmpty) continue;
-      if (seen.contains(name)) {
-        duplicates.add(name);
-      } else {
-        seen.add(name);
-      }
-    }
-    if (duplicates.isNotEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-              '❌ Не может быть двух игроков с одинаковым именем: ${duplicates.join(", ")}'),
-          backgroundColor: Colors.red,
-          duration: const Duration(seconds: 4),
-        ),
-      );
-      return;
-    }
-
-    final data = _buildProtocolData(notes, protestComment, null);
-
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) => const Center(child: CircularProgressIndicator()),
-    );
-
-    try {
-      final directory = await getApplicationDocumentsDirectory();
-
-      // 🔥 НОВОЕ ИМЯ ФАЙЛА (КАК У EXCEL)
-      final fileName =
-          '${_dateString()}_${_formatTime(DateTime.now()).replaceAll(':', '-')}_${gameState.tableNumber ?? 1}_${gameState.gameNumber ?? 1}.json';
-
-      final path = '${directory.path}/$fileName';
-      final file = File(path);
-
-      final jsonString = jsonEncode(data);
-      await file.writeAsString(jsonString);
-
-      Navigator.pop(context);
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('✅ Протокол сохранён локально!'),
-          backgroundColor: Colors.green,
-        ),
-      );
-    } catch (e) {
-      Navigator.pop(context);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('❌ Ошибка сохранения: $e'),
-          backgroundColor: Colors.red,
-        ),
-      );
+  final playerNames = gameState.players.map((p) => p.name.trim()).toList();
+  final duplicates = <String>[];
+  final seen = <String>{};
+  for (final name in playerNames) {
+    if (name.isEmpty) continue;
+    if (seen.contains(name)) {
+      duplicates.add(name);
+    } else {
+      seen.add(name);
     }
   }
+  if (duplicates.isNotEmpty) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+            '❌ Не может быть двух игроков с одинаковым именем: ${duplicates.join(", ")}'),
+        backgroundColor: Colors.red,
+        duration: const Duration(seconds: 4),
+      ),
+    );
+    return;
+  }
+
+  final data = _buildProtocolData(notes, protestComment, null);
+
+  showDialog(
+    context: context,
+    barrierDismissible: false,
+    builder: (context) => const Center(child: CircularProgressIndicator()),
+  );
+
+  try {
+    final directory = await getApplicationDocumentsDirectory();
+    
+    // 🔥 НОВОЕ ИМЯ ФАЙЛА (КАК У EXCEL)
+    final fileName = 
+        '${_dateString()}_${_formatTime(DateTime.now()).replaceAll(':', '-')}_${gameState.tableNumber ?? 1}_${gameState.gameNumber ?? 1}.json';
+    
+    final path = '${directory.path}/$fileName';
+    final file = File(path);
+
+    final jsonString = jsonEncode(data);
+    await file.writeAsString(jsonString);
+
+    Navigator.pop(context);
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('✅ Протокол сохранён локально!'),
+        backgroundColor: Colors.green,
+      ),
+    );
+  } catch (e) {
+    Navigator.pop(context);
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('❌ Ошибка сохранения: $e'),
+        backgroundColor: Colors.red,
+      ),
+    );
+  }
+}
 
   // ============================================================
   // 3. ЭКСПОРТ В EXCEL

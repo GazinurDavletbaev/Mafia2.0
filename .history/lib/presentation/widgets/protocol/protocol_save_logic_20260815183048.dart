@@ -277,11 +277,7 @@ class ProtocolSaveLogic {
 
     try {
       final directory = await getApplicationDocumentsDirectory();
-
-      // 🔥 НОВОЕ ИМЯ ФАЙЛА (КАК У EXCEL)
-      final fileName =
-          '${_dateString()}_${_formatTime(DateTime.now()).replaceAll(':', '-')}_${gameState.tableNumber ?? 1}_${gameState.gameNumber ?? 1}.json';
-
+      final fileName = 'protocol_${DateTime.now().millisecondsSinceEpoch}.json';
       final path = '${directory.path}/$fileName';
       final file = File(path);
 
