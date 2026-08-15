@@ -33,51 +33,33 @@ class _GameScreenState extends ConsumerState<GameScreen> {
   late GameViewModel _vm;
   bool _dialogShown = false;
 
-  @override
-  void initState() {
-    super.initState();
-    _vm = ref.read(gameViewModelProvider.notifier);
+@override
+void initState() {
+  super.initState();
+  _vm = ref.read(gameViewModelProvider.notifier);
 
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      print('=== GAME SCREEN INIT ===');
+  WidgetsBinding.instance.addPostFrameCallback((_) {
+    final namesFromData = widget.initialData.playerNames;
+    final players = widget.initialData.gameState.players;
 
-      // 🔥 1. СНАЧАЛА ПРОВЕРЯЕМ АКТИВНУЮ ИГРУ!
-      final hasActiveGame = _vm.state.players.any((p) =>
-              p.role != 'unknown' &&
-              p.role != '' &&
-              p.name.trim().isNotEmpty // 🔥 ДОБАВИЛИ
-          );
+    // 🔥 ПРОВЕРЯЕМ: ВСЕ ЛИ 10 ИМЁН ЗАПОЛНЕНЫ В playerNames
+    final allNamesFilled = namesFromData.every((name) => name.trim().isNotEmpty);
 
-      print(hasActiveGame);
+    // 🔥 ПРОВЕРЯЕМ: ЕСТЬ ЛИ УЖЕ АКТИВНАЯ ИГРА (РОЛИ РАЗДАНЫ)
+    final hasActiveGame = _vm.state.players.any((p) => p.role != 'unknown' && p.role != '');
 
-      if (hasActiveGame) {
-        print('✅ Игра уже идёт, продолжаем');
-        return; // 🔥 ВЫХОДИМ, НИЧЕГО НЕ ДЕЛАЕМ
-      }
+    // 🔥 ЕСЛИ ИГРА УЖЕ ИДЁТ — НИЧЕГО НЕ ДЕЛАЕМ
+    if (hasActiveGame) {
+      print('✅ Игра уже идёт, продолжаем');
+      return;
+    }
 
-      // 🔥 2. ИГРЫ НЕТ — ТОЛЬКО ТЕПЕРЬ ПРОВЕРЯЕМ ИМЕНА
-      final players = widget.initialData.gameState.players;
-      final namesFromData = widget.initialData.playerNames;
-      final avatars = players.map((p) => p.avatarUrl).toList();
-
-      final allNamesFilled =
-          namesFromData.every((name) => name.trim().isNotEmpty);
-
-      if (namesFromData.isEmpty || !allNamesFilled) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Игра не начнется пока не посадите всех за стол!'),
-            backgroundColor: Colors.red,
-            duration: Duration(seconds: 3),
-          ),
-        );
-        return;
-      }
-
-      // ✅ 3. ВСЕ 10 ИМЁН ЗАПОЛНЕНЫ — ИНИЦИАЛИЗИРУЕМ ИГРУ
+    // 🔥 ЕСЛИ ВСЕ 10 ИМЁН ЗАПОЛНЕНЫ — НАЧИНАЕМ ИГРУ
+    if (allNamesFilled) {
+      print('🔥 Все 10 игроков заполнены, инициализируем игру');
       _vm.initializeGame(
         playerNames: namesFromData,
-        avatars: avatars,
+        avatars: players.map((p) => p.avatarUrl).toList(),
         tableNumber: widget.initialData.tableNumber,
         gameNumber: widget.initialData.gameNumber,
         gameDate: widget.initialData.date,
@@ -86,8 +68,11 @@ class _GameScreenState extends ConsumerState<GameScreen> {
         stageName: widget.initialData.stageName,
       );
       _notifyGameStateChanged();
-    });
-  }
+    } else {
+      print('❌ Не все 10 игроков заполнены, игра не начинается');
+    }
+  });
+}
 
   @override
   void didUpdateWidget(covariant GameScreen oldWidget) {

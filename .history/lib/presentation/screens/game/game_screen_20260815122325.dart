@@ -39,53 +39,40 @@ class _GameScreenState extends ConsumerState<GameScreen> {
     _vm = ref.read(gameViewModelProvider.notifier);
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      print('=== GAME SCREEN INIT ===');
-
-      // 🔥 1. СНАЧАЛА ПРОВЕРЯЕМ АКТИВНУЮ ИГРУ!
-      final hasActiveGame = _vm.state.players.any((p) =>
-              p.role != 'unknown' &&
-              p.role != '' &&
-              p.name.trim().isNotEmpty // 🔥 ДОБАВИЛИ
-          );
-
-      print(hasActiveGame);
-
-      if (hasActiveGame) {
-        print('✅ Игра уже идёт, продолжаем');
-        return; // 🔥 ВЫХОДИМ, НИЧЕГО НЕ ДЕЛАЕМ
-      }
-
-      // 🔥 2. ИГРЫ НЕТ — ТОЛЬКО ТЕПЕРЬ ПРОВЕРЯЕМ ИМЕНА
-      final players = widget.initialData.gameState.players;
       final namesFromData = widget.initialData.playerNames;
-      final avatars = players.map((p) => p.avatarUrl).toList();
+      final players = widget.initialData.gameState.players;
 
+      // 🔥 ПРОВЕРЯЕМ: ВСЕ ЛИ 10 ИМЁН ЗАПОЛНЕНЫ В playerNames
       final allNamesFilled =
           namesFromData.every((name) => name.trim().isNotEmpty);
 
-      if (namesFromData.isEmpty || !allNamesFilled) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Игра не начнется пока не посадите всех за стол!'),
-            backgroundColor: Colors.red,
-            duration: Duration(seconds: 3),
-          ),
-        );
+      // 🔥 ПРОВЕРЯЕМ: ЕСТЬ ЛИ УЖЕ АКТИВНАЯ ИГРА (РОЛИ РАЗДАНЫ)
+      final hasActiveGame =
+          _vm.state.players.any((p) => p.role != 'unknown' && p.role != '');
+
+      // 🔥 ЕСЛИ ИГРА УЖЕ ИДЁТ — НИЧЕГО НЕ ДЕЛАЕМ
+      if (hasActiveGame) {
+        print('✅ Игра уже идёт, продолжаем');
         return;
       }
 
-      // ✅ 3. ВСЕ 10 ИМЁН ЗАПОЛНЕНЫ — ИНИЦИАЛИЗИРУЕМ ИГРУ
-      _vm.initializeGame(
-        playerNames: namesFromData,
-        avatars: avatars,
-        tableNumber: widget.initialData.tableNumber,
-        gameNumber: widget.initialData.gameNumber,
-        gameDate: widget.initialData.date,
-        judgeName: widget.initialData.judgeName,
-        tournamentName: widget.initialData.tournamentName,
-        stageName: widget.initialData.stageName,
-      );
-      _notifyGameStateChanged();
+      // 🔥 ЕСЛИ ВСЕ 10 ИМЁН ЗАПОЛНЕНЫ — НАЧИНАЕМ ИГРУ
+      if (allNamesFilled) {
+        print('🔥 Все 10 игроков заполнены, инициализируем игру');
+        _vm.initializeGame(
+          playerNames: namesFromData,
+          avatars: players.map((p) => p.avatarUrl).toList(),
+          tableNumber: widget.initialData.tableNumber,
+          gameNumber: widget.initialData.gameNumber,
+          gameDate: widget.initialData.date,
+          judgeName: widget.initialData.judgeName,
+          tournamentName: widget.initialData.tournamentName,
+          stageName: widget.initialData.stageName,
+        );
+        _notifyGameStateChanged();
+      } else {
+        print('❌ Не все 10 игроков заполнены, игра не начинается');
+      }
     });
   }
 

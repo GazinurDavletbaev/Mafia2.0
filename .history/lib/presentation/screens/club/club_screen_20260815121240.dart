@@ -365,7 +365,7 @@ class _ClubScreenState extends ConsumerState<ClubScreen> {
                     width: 44,
                     height: 44,
                     decoration: BoxDecoration(
-                      color: isDark ? Colors.grey.shade900 : Colors.white,
+                      color: is Colors.grey.shade900,
                       borderRadius: BorderRadius.circular(50),
                       border: Border.all(
                         color: Colors.grey,
@@ -391,18 +391,15 @@ class _ClubScreenState extends ConsumerState<ClubScreen> {
                           children: [
                             Icon(
                               Mdi.magnify,
-                              color:
-                                  isDark ? Colors.white : Colors.grey.shade600,
+                              color: Colors.white,
                               size: 20,
                             ),
                             const SizedBox(height: 1),
                             Text(
                               'Клубы',
-                              style: TextStyle(
+                              style: const TextStyle(
                                 fontSize: 8,
-                                color: isDark
-                                    ? Colors.white
-                                    : Colors.grey.shade600,
+                                color: Colors.white70,
                                 fontWeight: FontWeight.w500,
                               ),
                             ),

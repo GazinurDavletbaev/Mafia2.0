@@ -402,7 +402,7 @@ class _ClubScreenState extends ConsumerState<ClubScreen> {
                                 fontSize: 8,
                                 color: isDark
                                     ? Colors.white
-                                    : Colors.grey.shade600,
+                                    : Colors.grey.shade900,
                                 fontWeight: FontWeight.w500,
                               ),
                             ),

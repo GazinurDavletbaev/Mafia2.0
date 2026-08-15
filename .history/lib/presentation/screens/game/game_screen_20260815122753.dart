@@ -42,13 +42,10 @@ class _GameScreenState extends ConsumerState<GameScreen> {
       print('=== GAME SCREEN INIT ===');
 
       // 🔥 1. СНАЧАЛА ПРОВЕРЯЕМ АКТИВНУЮ ИГРУ!
-      final hasActiveGame = _vm.state.players.any((p) =>
-              p.role != 'unknown' &&
-              p.role != '' &&
-              p.name.trim().isNotEmpty // 🔥 ДОБАВИЛИ
-          );
+      final hasActiveGame =
+          _vm.state.players.any((p) => p.role != 'unknown' && p.role != '');
 
-      print(hasActiveGame);
+print(hs)
 
       if (hasActiveGame) {
         print('✅ Игра уже идёт, продолжаем');
@@ -63,7 +60,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
       final allNamesFilled =
           namesFromData.every((name) => name.trim().isNotEmpty);
 
-      if (namesFromData.isEmpty || !allNamesFilled) {
+      if (!allNamesFilled) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Игра не начнется пока не посадите всех за стол!'),

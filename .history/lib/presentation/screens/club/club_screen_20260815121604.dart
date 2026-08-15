@@ -391,18 +391,15 @@ class _ClubScreenState extends ConsumerState<ClubScreen> {
                           children: [
                             Icon(
                               Mdi.magnify,
-                              color:
-                                  isDark ? Colors.white : Colors.grey.shade600,
+                              color: isDark ? Colors.white : Colors.black,
                               size: 20,
                             ),
                             const SizedBox(height: 1),
                             Text(
                               'Клубы',
-                              style: TextStyle(
+                              style: const TextStyle(
                                 fontSize: 8,
-                                color: isDark
-                                    ? Colors.white
-                                    : Colors.grey.shade600,
+                                color: isColors.white70,
                                 fontWeight: FontWeight.w500,
                               ),
                             ),

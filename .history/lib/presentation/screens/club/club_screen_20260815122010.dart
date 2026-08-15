@@ -392,7 +392,7 @@ class _ClubScreenState extends ConsumerState<ClubScreen> {
                             Icon(
                               Mdi.magnify,
                               color:
-                                  isDark ? Colors.white : Colors.grey.shade600,
+                                  isDark ? Colors.white : Colors.grey.shade900,
                               size: 20,
                             ),
                             const SizedBox(height: 1),
@@ -402,7 +402,7 @@ class _ClubScreenState extends ConsumerState<ClubScreen> {
                                 fontSize: 8,
                                 color: isDark
                                     ? Colors.white
-                                    : Colors.grey.shade600,
+                                    : Colors.grey.shade900,
                                 fontWeight: FontWeight.w500,
                               ),
                             ),

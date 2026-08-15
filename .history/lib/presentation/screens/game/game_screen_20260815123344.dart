@@ -63,7 +63,10 @@ class _GameScreenState extends ConsumerState<GameScreen> {
       final allNamesFilled =
           namesFromData.every((name) => name.trim().isNotEmpty);
 
-      if (namesFromData.isEmpty || !allNamesFilled) {
+      print();
+
+
+      if (!allNamesFilled) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Игра не начнется пока не посадите всех за стол!'),
