@@ -91,15 +91,6 @@ class ProtocolVotingTable extends StatelessWidget {
 
     // 🔥 ПРОВЕРЯЕМ: ЭТОТ ДЕНЬ ПУСТОЙ (НЕТ РАУНДОВ И РЕЗУЛЬТАТА)
     final isEmptyDay = !hasVoting && !hasResult;
-// 🔥 ПРИНТ: ВСЕ РАУНДЫ
-    print('=== ДЕНЬ $day (Голосование $voteNumber) ===');
-    print('Все раунды:');
-    for (int i = 0; i < dayData.rounds.length; i++) {
-      final round = dayData.rounds[i];
-      print('  Раунд $i: $round');
-    }
-    print('Результат: ${dayData.result}');
-    print('==========================================');
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 16),
@@ -172,40 +163,55 @@ class ProtocolVotingTable extends StatelessWidget {
 
             // 🔥 ОБЫЧНОЕ ГОЛОСОВАНИЕ
             else if (hasVoting && !isRemoval) ...[
-              ...dayData.rounds.asMap().entries.map((entry) {
-                final roundIndex = entry.key;
-                final round = entry.value;
-                final label = roundIndex == 0 ? 'Игрок' : 'Переголосование';
-                return Padding(
-                  padding: const EdgeInsets.only(bottom: 6),
-                  child:
-                      _buildVoteRow(context, label, round, roundIndex, isDark),
-                );
-              }),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    'Результат: ',
-                    style: TextStyle(
-                      color: isDark ? Colors.white70 : Colors.black54,
-                      fontSize: 12,
-                    ),
-                  ),
-                  Text(
-                    dayData.result.isNotEmpty ? dayData.result.join(', ') : '0',
-                    style: TextStyle(
-                      color: dayData.result.isNotEmpty
-                          ? Colors.green
-                          : (isDark ? Colors.white54 : Colors.black38),
-                      fontSize: 14,
-                      fontWeight: dayData.result.isNotEmpty
-                          ? FontWeight.bold
-                          : FontWeight.normal,
-                    ),
-                  ),
-                ],
-              ),
+  // 🔥 ФИЛЬТРУЕМ ПОВТОРЯЮЩИЕСЯ РАУНДЫ
+  final filteredRounds = <Map<int, int>>[];
+  final seen = <String>{};
+  
+  for (final round in dayData.rounds) {
+    final key = round.keys.toList()..sort();
+    final value = round.values.toList()..sort();
+    final roundKey = '$key-$value';
+    
+    if (!seen.contains(roundKey)) {
+      seen.add(roundKey);
+      filteredRounds.add(round);
+    }
+  }
+  
+  ...filteredRounds.asMap().entries.map((entry) {
+    final roundIndex = entry.key;
+    final round = entry.value;
+    final label = roundIndex == 0 ? 'Игрок' : 'Переголосование';
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 6),
+      child: _buildVoteRow(context, label, round, roundIndex, isDark),
+    );
+  }),
+  Row(
+    mainAxisAlignment: MainAxisAlignment.center,
+    children: [
+      Text(
+        'Результат: ',
+        style: TextStyle(
+          color: isDark ? Colors.white70 : Colors.black54,
+          fontSize: 12,
+        ),
+      ),
+      Text(
+        dayData.result.isNotEmpty ? dayData.result.join(', ') : '0',
+        style: TextStyle(
+          color: dayData.result.isNotEmpty
+              ? Colors.green
+              : (isDark ? Colors.white54 : Colors.black38),
+          fontSize: 14,
+          fontWeight: dayData.result.isNotEmpty
+              ? FontWeight.bold
+              : FontWeight.normal,
+        ),
+      ),
+    ],
+  ),
+],
             ] else ...[
               const SizedBox(height: 4),
               Text(

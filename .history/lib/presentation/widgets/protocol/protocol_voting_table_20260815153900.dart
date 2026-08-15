@@ -91,15 +91,6 @@ class ProtocolVotingTable extends StatelessWidget {
 
     // 🔥 ПРОВЕРЯЕМ: ЭТОТ ДЕНЬ ПУСТОЙ (НЕТ РАУНДОВ И РЕЗУЛЬТАТА)
     final isEmptyDay = !hasVoting && !hasResult;
-// 🔥 ПРИНТ: ВСЕ РАУНДЫ
-    print('=== ДЕНЬ $day (Голосование $voteNumber) ===');
-    print('Все раунды:');
-    for (int i = 0; i < dayData.rounds.length; i++) {
-      final round = dayData.rounds[i];
-      print('  Раунд $i: $round');
-    }
-    print('Результат: ${dayData.result}');
-    print('==========================================');
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 16),
@@ -171,7 +162,20 @@ class ProtocolVotingTable extends StatelessWidget {
             ]
 
             // 🔥 ОБЫЧНОЕ ГОЛОСОВАНИЕ
-            else if (hasVoting && !isRemoval) ...[
+               ),
+                  Text(
+                    dayData.result.isNotEmpty ? dayData.result.join(', ') : '0',
+                    style: TextStyle(
+                      color: dayData.result.isNotEmpty
+                          ? Colors.green
+                          : (isDark ? Colors.white54 : Colors.black38),
+                      fontSize: 14,
+                      fontWeight: dayData.result.isNotEmpty
+                          ? FontWeight.bold
+                          : FontWeight.normal,
+                    ),
+                  ),
+                else if (hasVoting && !isRemoval) ...[
               ...dayData.rounds.asMap().entries.map((entry) {
                 final roundIndex = entry.key;
                 final round = entry.value;
@@ -191,20 +195,7 @@ class ProtocolVotingTable extends StatelessWidget {
                       color: isDark ? Colors.white70 : Colors.black54,
                       fontSize: 12,
                     ),
-                  ),
-                  Text(
-                    dayData.result.isNotEmpty ? dayData.result.join(', ') : '0',
-                    style: TextStyle(
-                      color: dayData.result.isNotEmpty
-                          ? Colors.green
-                          : (isDark ? Colors.white54 : Colors.black38),
-                      fontSize: 14,
-                      fontWeight: dayData.result.isNotEmpty
-                          ? FontWeight.bold
-                          : FontWeight.normal,
-                    ),
-                  ),
-                ],
+               ],
               ),
             ] else ...[
               const SizedBox(height: 4),

@@ -15,23 +15,13 @@ class SpeechRules {
       for (int i = 0; i <= index; i++) {
         newQueue.add(queue[i]);
       }
+      print(
+          '  newQueue (с последним говорящим $lastSpeakerOfPreviousDay): $newQueue');
+
       return newQueue;
-    } else if (lastSpeakerOfPreviousDay != null &&
-        !queue.contains(lastSpeakerOfPreviousDay)) {
-      for (int i = 0; i < queue.length; i++) {
-        if (queue[i] > lastSpeakerOfPreviousDay) {
-          // ✅ НАШЛИ ПЕРВОГО ЖИВОГО С НОМЕРОМ БОЛЬШЕ
-          final newQueue = <int>[];
-          for (int j = i; j < queue.length; j++) {
-            newQueue.add(queue[j]);
-          }
-          for (int j = 0; j < i; j++) {
-            newQueue.add(queue[j]);
-          }
-          return newQueue;
-        }
-      }
     }
+    print('  queue (без lastSpeaker): $queue');
+
     return queue;
   }
 

@@ -272,11 +272,10 @@ class GameViewModel extends StateNotifier<GameState> {
             currentSpeakerSeat: remainingTied.first,
             tiedSeats: remainingTied,
           );
-          // послед подьема проверяет количесво мафий и мирныхъ
-          //if (winner != null) {
-          //  state = state.copyWith(
-          //      isGameEnded: true, winner: winner ? 'red' : 'black');
-          //}
+          ||if (winner != null) {
+          ||  state = state.copyWith(
+          ||      isGameEnded: true, winner: winner ? 'red' : 'black');
+          ||}
         } else {
           final newPhaseHistory = List<SubPhase>.from(state.phaseHistory)
             ..add(SubPhase.mafiaShoot);

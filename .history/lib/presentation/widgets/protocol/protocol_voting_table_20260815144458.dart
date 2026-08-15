@@ -16,6 +16,20 @@ class ProtocolVotingTable extends StatelessWidget {
     final primaryColor = theme.primaryColor;
     final voteHistory = gameState.voteHistory;
 
+    // 🔥 ПРИНТ: ЧТО ПРИХОДИТ
+    print('=== ProtocolVotingTable.build ===');
+    print('voteHistory: $voteHistory');
+    print('voteHistory keys: ${voteHistory.keys}');
+    print('voteHistory entries:');
+    voteHistory.forEach((day, dayData) {
+      print('  День $day:');
+      print('    rounds: ${dayData.rounds}');
+      print('    result: ${dayData.result}');
+      print('    eliminated: ${dayData.eliminated}');
+      print('    eliminationVotes: ${dayData.eliminationVotes}');
+    });
+    print('====================================');
+
     if (voteHistory.isEmpty) {
       return Card(
         color: theme.cardColor,
@@ -80,26 +94,25 @@ class ProtocolVotingTable extends StatelessWidget {
     int voteNumber,
     bool isDark,
   ) {
+    // 🔥 ПРИНТ: ЧТО ПРИХОДИТ В КАРТОЧКУ
+    print('=== _buildVoteDayCard для дня $day ===');
+    print('  dayData.rounds: ${dayData.rounds}');
+    print('  dayData.result: ${dayData.result}');
+    print('  dayData.eliminated: ${dayData.eliminated}');
+    print('  dayData.eliminationVotes: ${dayData.eliminationVotes}');
+    print('=======================================');
+
     final theme = Theme.of(context);
     final primaryColor = theme.primaryColor;
     final hasVoting = dayData.rounds.isNotEmpty;
     final hasResult = dayData.result.isNotEmpty;
-    final lastRoundPlayers =
-        hasVoting ? dayData.rounds.last.keys.toSet() : <int>{};
-    final isRemoval = hasResult &&
-        dayData.result.any((seat) => !lastRoundPlayers.contains(seat));
+    final bool isRemovalOnly = !hasVoting && hasResult;
 
-    // 🔥 ПРОВЕРЯЕМ: ЭТОТ ДЕНЬ ПУСТОЙ (НЕТ РАУНДОВ И РЕЗУЛЬТАТА)
-    final isEmptyDay = !hasVoting && !hasResult;
-// 🔥 ПРИНТ: ВСЕ РАУНДЫ
-    print('=== ДЕНЬ $day (Голосование $voteNumber) ===');
-    print('Все раунды:');
-    for (int i = 0; i < dayData.rounds.length; i++) {
-      final round = dayData.rounds[i];
-      print('  Раунд $i: $round');
-    }
-    print('Результат: ${dayData.result}');
-    print('==========================================');
+    // 🔥 ПРИНТ: РЕЗУЛЬТАТЫ ПРОВЕРОК
+    print('  hasVoting: $hasVoting');
+    print('  hasResult: $hasResult');
+    print('  isRemovalOnly: $isRemovalOnly');
+    print('=======================================');
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 16),
@@ -125,17 +138,9 @@ class ProtocolVotingTable extends StatelessWidget {
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 8),
-
-            // 🔥 ЕСЛИ ЭТОТ ДЕНЬ ПУСТОЙ
-            if (isEmptyDay) ...[
-              const Text(
-                'На голосование никто не выставлен',
-                style: TextStyle(
-                  color: Colors.orange,
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
+            if (!hasVoting && !hasResult) ...[
+              _buildEmptyVoteRow(isDark),
+              const Divider(color: Colors.grey),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -155,10 +160,7 @@ class ProtocolVotingTable extends StatelessWidget {
                   ),
                 ],
               ),
-            ]
-
-            // 🔥 УДАЛЕНИЕ БЕЗ ГОЛОСОВАНИЯ
-            else if (!hasVoting && hasResult) ...[
+            ] else if (isRemovalOnly) ...[
               const SizedBox(height: 4),
               Text(
                 'Удаление: ${dayData.result.join(", ")}',
@@ -168,10 +170,7 @@ class ProtocolVotingTable extends StatelessWidget {
                   fontWeight: FontWeight.bold,
                 ),
               ),
-            ]
-
-            // 🔥 ОБЫЧНОЕ ГОЛОСОВАНИЕ
-            else if (hasVoting && !isRemoval) ...[
+            ] else if (hasVoting) ...[
               ...dayData.rounds.asMap().entries.map((entry) {
                 final roundIndex = entry.key;
                 final round = entry.value;
@@ -182,6 +181,7 @@ class ProtocolVotingTable extends StatelessWidget {
                       _buildVoteRow(context, label, round, roundIndex, isDark),
                 );
               }),
+              const Divider(color: Colors.grey),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -209,16 +209,7 @@ class ProtocolVotingTable extends StatelessWidget {
             ] else ...[
               const SizedBox(height: 4),
               Text(
-                'Удалены:',
-                style: const TextStyle(
-                  color: Colors.red,
-                  fontSize: 14,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                dayData.result.isNotEmpty ? dayData.result.join(', ') : '0',
+                'Удалены: ${dayData.result.join(", ")}',
                 style: const TextStyle(
                   color: Colors.red,
                   fontSize: 14,
@@ -226,7 +217,6 @@ class ProtocolVotingTable extends StatelessWidget {
                 ),
               ),
             ],
-
             if (dayData.eliminationVotes > 0)
               Text(
                 'Голосование за подъём: ${dayData.eliminationVotes}',
@@ -241,7 +231,7 @@ class ProtocolVotingTable extends StatelessWidget {
     );
   }
 
-  // 🔥 ПУСТАЯ СТРОКА (НИКТО НЕ ВЫСТАВЛЕН)
+// 🔥 ВСПОМОГАТЕЛЬНЫЙ МЕТОД: ПУСТАЯ СТРОКА (НИКТО НЕ ВЫСТАВЛЕН)
   Widget _buildEmptyVoteRow(bool isDark) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 6),

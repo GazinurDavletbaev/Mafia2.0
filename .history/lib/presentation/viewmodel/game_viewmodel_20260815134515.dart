@@ -272,7 +272,7 @@ class GameViewModel extends StateNotifier<GameState> {
             currentSpeakerSeat: remainingTied.first,
             tiedSeats: remainingTied,
           );
-          // послед подьема проверяет количесво мафий и мирныхъ
+          // послед подьема проверяет количесво мафи
           //if (winner != null) {
           //  state = state.copyWith(
           //      isGameEnded: true, winner: winner ? 'red' : 'black');

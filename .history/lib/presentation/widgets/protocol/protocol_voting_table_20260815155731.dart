@@ -80,26 +80,34 @@ class ProtocolVotingTable extends StatelessWidget {
     int voteNumber,
     bool isDark,
   ) {
+    // 🔥 УДАЛЯЕМ ПОДРЯД ИДУЩИЕ ДУБЛИКАТЫ ИЗ dayData.rounds
+    final List<Map<int, int>> uniqueRounds = [];
+    final rounds = dayData.rounds;
+
+    for (int i = 0; i < rounds.length; i++) {
+      if (i == 0 || rounds[i] != rounds[i - 1]) {
+        uniqueRounds.add(rounds[i]);
+      }
+    }
+
+    // 🔥 СОЗДАЁМ НОВЫЙ dayData С ОТФИЛЬТРОВАННЫМИ РАУНДАМИ
+    final filteredDayData = VoteDay(
+      rounds: uniqueRounds,
+      eliminated: dayData.eliminated,
+      eliminationVotes: dayData.eliminationVotes,
+      result: dayData.result,
+    );
+
     final theme = Theme.of(context);
     final primaryColor = theme.primaryColor;
-    final hasVoting = dayData.rounds.isNotEmpty;
-    final hasResult = dayData.result.isNotEmpty;
+    final hasVoting = filteredDayData.rounds.isNotEmpty;
+    final hasResult = filteredDayData.result.isNotEmpty;
     final lastRoundPlayers =
-        hasVoting ? dayData.rounds.last.keys.toSet() : <int>{};
+        hasVoting ? filteredDayData.rounds.last.keys.toSet() : <int>{};
     final isRemoval = hasResult &&
-        dayData.result.any((seat) => !lastRoundPlayers.contains(seat));
+        filteredDayData.result.any((seat) => !lastRoundPlayers.contains(seat));
 
-    // 🔥 ПРОВЕРЯЕМ: ЭТОТ ДЕНЬ ПУСТОЙ (НЕТ РАУНДОВ И РЕЗУЛЬТАТА)
     final isEmptyDay = !hasVoting && !hasResult;
-// 🔥 ПРИНТ: ВСЕ РАУНДЫ
-    print('=== ДЕНЬ $day (Голосование $voteNumber) ===');
-    print('Все раунды:');
-    for (int i = 0; i < dayData.rounds.length; i++) {
-      final round = dayData.rounds[i];
-      print('  Раунд $i: $round');
-    }
-    print('Результат: ${dayData.result}');
-    print('==========================================');
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 16),
@@ -125,8 +133,6 @@ class ProtocolVotingTable extends StatelessWidget {
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 8),
-
-            // 🔥 ЕСЛИ ЭТОТ ДЕНЬ ПУСТОЙ
             if (isEmptyDay) ...[
               const Text(
                 'На голосование никто не выставлен',
@@ -155,24 +161,18 @@ class ProtocolVotingTable extends StatelessWidget {
                   ),
                 ],
               ),
-            ]
-
-            // 🔥 УДАЛЕНИЕ БЕЗ ГОЛОСОВАНИЯ
-            else if (!hasVoting && hasResult) ...[
+            ] else if (!hasVoting && hasResult) ...[
               const SizedBox(height: 4),
               Text(
-                'Удаление: ${dayData.result.join(", ")}',
+                'Удаление: ${filteredDayData.result.join(", ")}',
                 style: TextStyle(
                   color: Colors.red,
                   fontSize: 14,
                   fontWeight: FontWeight.bold,
                 ),
               ),
-            ]
-
-            // 🔥 ОБЫЧНОЕ ГОЛОСОВАНИЕ
-            else if (hasVoting && !isRemoval) ...[
-              ...dayData.rounds.asMap().entries.map((entry) {
+            ] else if (hasVoting && !isRemoval) ...[
+              ...filteredDayData.rounds.asMap().entries.map((entry) {
                 final roundIndex = entry.key;
                 final round = entry.value;
                 final label = roundIndex == 0 ? 'Игрок' : 'Переголосование';
@@ -193,13 +193,15 @@ class ProtocolVotingTable extends StatelessWidget {
                     ),
                   ),
                   Text(
-                    dayData.result.isNotEmpty ? dayData.result.join(', ') : '0',
+                    filteredDayData.result.isNotEmpty
+                        ? filteredDayData.result.join(', ')
+                        : '0',
                     style: TextStyle(
-                      color: dayData.result.isNotEmpty
+                      color: filteredDayData.result.isNotEmpty
                           ? Colors.green
                           : (isDark ? Colors.white54 : Colors.black38),
                       fontSize: 14,
-                      fontWeight: dayData.result.isNotEmpty
+                      fontWeight: filteredDayData.result.isNotEmpty
                           ? FontWeight.bold
                           : FontWeight.normal,
                     ),
@@ -218,7 +220,9 @@ class ProtocolVotingTable extends StatelessWidget {
               ),
               const SizedBox(height: 4),
               Text(
-                dayData.result.isNotEmpty ? dayData.result.join(', ') : '0',
+                filteredDayData.result.isNotEmpty
+                    ? filteredDayData.result.join(', ')
+                    : '0',
                 style: const TextStyle(
                   color: Colors.red,
                   fontSize: 14,
@@ -226,10 +230,9 @@ class ProtocolVotingTable extends StatelessWidget {
                 ),
               ),
             ],
-
-            if (dayData.eliminationVotes > 0)
+            if (filteredDayData.eliminationVotes > 0)
               Text(
-                'Голосование за подъём: ${dayData.eliminationVotes}',
+                'Голосование за подъём: ${filteredDayData.eliminationVotes}',
                 style: TextStyle(
                   color: primaryColor,
                   fontSize: 12,

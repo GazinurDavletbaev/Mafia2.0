@@ -89,18 +89,6 @@ class ProtocolVotingTable extends StatelessWidget {
     final isRemoval = hasResult &&
         dayData.result.any((seat) => !lastRoundPlayers.contains(seat));
 
-    // 🔥 ПРОВЕРЯЕМ: ЭТОТ ДЕНЬ ПУСТОЙ (НЕТ РАУНДОВ И РЕЗУЛЬТАТА)
-    final isEmptyDay = !hasVoting && !hasResult;
-// 🔥 ПРИНТ: ВСЕ РАУНДЫ
-    print('=== ДЕНЬ $day (Голосование $voteNumber) ===');
-    print('Все раунды:');
-    for (int i = 0; i < dayData.rounds.length; i++) {
-      final round = dayData.rounds[i];
-      print('  Раунд $i: $round');
-    }
-    print('Результат: ${dayData.result}');
-    print('==========================================');
-
     return Padding(
       padding: const EdgeInsets.only(bottom: 16),
       child: Container(
@@ -126,16 +114,10 @@ class ProtocolVotingTable extends StatelessWidget {
             ),
             const SizedBox(height: 8),
 
-            // 🔥 ЕСЛИ ЭТОТ ДЕНЬ ПУСТОЙ
-            if (isEmptyDay) ...[
-              const Text(
-                'На голосование никто не выставлен',
-                style: TextStyle(
-                  color: Colors.orange,
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
+            // 🔥 НИКТО НЕ ВЫСТАВЛЕН
+            if (!hasVoting && !hasResult) ...[
+              _buildEmptyVoteRow(isDark),
+              const Divider(color: Colors.grey),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -182,6 +164,7 @@ class ProtocolVotingTable extends StatelessWidget {
                       _buildVoteRow(context, label, round, roundIndex, isDark),
                 );
               }),
+              const Divider(color: Colors.grey),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [

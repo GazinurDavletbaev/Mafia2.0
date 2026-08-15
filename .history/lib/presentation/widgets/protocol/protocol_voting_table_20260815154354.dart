@@ -89,17 +89,7 @@ class ProtocolVotingTable extends StatelessWidget {
     final isRemoval = hasResult &&
         dayData.result.any((seat) => !lastRoundPlayers.contains(seat));
 
-    // 🔥 ПРОВЕРЯЕМ: ЭТОТ ДЕНЬ ПУСТОЙ (НЕТ РАУНДОВ И РЕЗУЛЬТАТА)
     final isEmptyDay = !hasVoting && !hasResult;
-// 🔥 ПРИНТ: ВСЕ РАУНДЫ
-    print('=== ДЕНЬ $day (Голосование $voteNumber) ===');
-    print('Все раунды:');
-    for (int i = 0; i < dayData.rounds.length; i++) {
-      final round = dayData.rounds[i];
-      print('  Раунд $i: $round');
-    }
-    print('Результат: ${dayData.result}');
-    print('==========================================');
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 16),
@@ -126,7 +116,6 @@ class ProtocolVotingTable extends StatelessWidget {
             ),
             const SizedBox(height: 8),
 
-            // 🔥 ЕСЛИ ЭТОТ ДЕНЬ ПУСТОЙ
             if (isEmptyDay) ...[
               const Text(
                 'На голосование никто не выставлен',
@@ -155,10 +144,7 @@ class ProtocolVotingTable extends StatelessWidget {
                   ),
                 ],
               ),
-            ]
-
-            // 🔥 УДАЛЕНИЕ БЕЗ ГОЛОСОВАНИЯ
-            else if (!hasVoting && hasResult) ...[
+            ] else if (!hasVoting && hasResult) ...[
               const SizedBox(height: 4),
               Text(
                 'Удаление: ${dayData.result.join(", ")}',
@@ -168,20 +154,32 @@ class ProtocolVotingTable extends StatelessWidget {
                   fontWeight: FontWeight.bold,
                 ),
               ),
-            ]
+            ] else if (hasVoting && !isRemoval) ...[
+              // 🔥 ФИЛЬТРУЕМ ПОВТОРЫ
+              List<Map<int, int>> filteredRounds = [];
+              final Set<String> seen = {};
 
-            // 🔥 ОБЫЧНОЕ ГОЛОСОВАНИЕ
-            else if (hasVoting && !isRemoval) ...[
-              ...dayData.rounds.asMap().entries.map((entry) {
-                final roundIndex = entry.key;
-                final round = entry.value;
-                final label = roundIndex == 0 ? 'Игрок' : 'Переголосование';
-                return Padding(
+              for (final round in dayData.rounds) {
+                final List<int> keys = round.keys.toList()..sort();
+                final List<int> values = round.values.toList()..sort();
+                final String roundKey = '$keys-$values';
+
+                if (!seen.contains(roundKey)) {
+                  seen.add(roundKey);
+                  filteredRounds.add(round);
+                }
+              }
+
+              // 🔥 РИСУЕМ ОТФИЛЬТРОВАННЫЕ РАУНДЫ
+              for (int i = 0; i < filteredRounds.length; i++) {
+                final round = filteredRounds[i];
+                final String label = i == 0 ? 'Игрок' : 'Переголосование';
+                Padding(
                   padding: const EdgeInsets.only(bottom: 6),
-                  child:
-                      _buildVoteRow(context, label, round, roundIndex, isDark),
+                  child: _buildVoteRow(context, label, round, i, isDark),
                 );
-              }),
+              }
+
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -241,7 +239,6 @@ class ProtocolVotingTable extends StatelessWidget {
     );
   }
 
-  // 🔥 ПУСТАЯ СТРОКА (НИКТО НЕ ВЫСТАВЛЕН)
   Widget _buildEmptyVoteRow(bool isDark) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 6),

@@ -3,10 +3,12 @@ class SpeechRules {
     required List<int> aliveSeats,
     required int? lastSpeakerOfPreviousDay,
   }) {
+    print('🔍 buildSpeechQueue:');
+    print('  aliveSeats: $aliveSeats');
+    print('  lastSpeakerOfPreviousDay: $lastSpeakerOfPreviousDay');
     final queue = List<int>.from(aliveSeats)..sort();
-
-    if (lastSpeakerOfPreviousDay != null &&
-        queue.contains(lastSpeakerOfPreviousDay)) {
+    
+    if (lastSpeakerOfPreviousDay != null && queue.contains(lastSpeakerOfPreviousDay)) {
       final index = queue.indexOf(lastSpeakerOfPreviousDay);
       final newQueue = <int>[];
       for (int i = index + 1; i < queue.length; i++) {
@@ -15,23 +17,11 @@ class SpeechRules {
       for (int i = 0; i <= index; i++) {
         newQueue.add(queue[i]);
       }
+            print('  newQueue (с последним говорящим $lastSpeakerOfPreviousDay): $newQueue');
+
       return newQueue;
-    } else if (lastSpeakerOfPreviousDay != null &&
-        !queue.contains(lastSpeakerOfPreviousDay)) {
-      for (int i = 0; i < queue.length; i++) {
-        if (queue[i] > lastSpeakerOfPreviousDay) {
-          // ✅ НАШЛИ ПЕРВОГО ЖИВОГО С НОМЕРОМ БОЛЬШЕ
-          final newQueue = <int>[];
-          for (int j = i; j < queue.length; j++) {
-            newQueue.add(queue[j]);
-          }
-          for (int j = 0; j < i; j++) {
-            newQueue.add(queue[j]);
-          }
-          return newQueue;
-        }
-      }
     }
+    
     return queue;
   }
 

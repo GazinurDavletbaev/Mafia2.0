@@ -91,15 +91,6 @@ class ProtocolVotingTable extends StatelessWidget {
 
     // 🔥 ПРОВЕРЯЕМ: ЭТОТ ДЕНЬ ПУСТОЙ (НЕТ РАУНДОВ И РЕЗУЛЬТАТА)
     final isEmptyDay = !hasVoting && !hasResult;
-// 🔥 ПРИНТ: ВСЕ РАУНДЫ
-    print('=== ДЕНЬ $day (Голосование $voteNumber) ===');
-    print('Все раунды:');
-    for (int i = 0; i < dayData.rounds.length; i++) {
-      final round = dayData.rounds[i];
-      print('  Раунд $i: $round');
-    }
-    print('Результат: ${dayData.result}');
-    print('==========================================');
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 16),
@@ -172,6 +163,8 @@ class ProtocolVotingTable extends StatelessWidget {
 
             // 🔥 ОБЫЧНОЕ ГОЛОСОВАНИЕ
             else if (hasVoting && !isRemoval) ...[
+                final filteredRounds = _filterDuplicateRounds(dayData.rounds);
+
               ...dayData.rounds.asMap().entries.map((entry) {
                 final roundIndex = entry.key;
                 final round = entry.value;
@@ -271,6 +264,25 @@ class ProtocolVotingTable extends StatelessWidget {
       ),
     );
   }
+
+// 🔥 ФУНКЦИЯ ДЛЯ ФИЛЬТРАЦИИ ПОВТОРЯЮЩИХСЯ РАУНДОВ
+List<Map<int, int>> _filterDuplicateRounds(List<Map<int, int>> rounds) {
+  final List<Map<int, int>> filtered = [];
+  final Set<String> seen = {};
+
+  for (final round in rounds) {
+    final List<int> keys = round.keys.toList()..sort();
+    final List<int> values = round.values.toList()..sort();
+    final String roundKey = '$keys-$values';
+
+    if (!seen.contains(roundKey)) {
+      seen.add(roundKey);
+      filtered.add(round);
+    }
+  }
+
+  return filtered;
+}
 
   Widget _buildVoteRow(
     BuildContext context,

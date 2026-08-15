@@ -89,18 +89,6 @@ class ProtocolVotingTable extends StatelessWidget {
     final isRemoval = hasResult &&
         dayData.result.any((seat) => !lastRoundPlayers.contains(seat));
 
-    // 🔥 ПРОВЕРЯЕМ: ЭТОТ ДЕНЬ ПУСТОЙ (НЕТ РАУНДОВ И РЕЗУЛЬТАТА)
-    final isEmptyDay = !hasVoting && !hasResult;
-// 🔥 ПРИНТ: ВСЕ РАУНДЫ
-    print('=== ДЕНЬ $day (Голосование $voteNumber) ===');
-    print('Все раунды:');
-    for (int i = 0; i < dayData.rounds.length; i++) {
-      final round = dayData.rounds[i];
-      print('  Раунд $i: $round');
-    }
-    print('Результат: ${dayData.result}');
-    print('==========================================');
-
     return Padding(
       padding: const EdgeInsets.only(bottom: 16),
       child: Container(
@@ -125,53 +113,7 @@ class ProtocolVotingTable extends StatelessWidget {
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 8),
-
-            // 🔥 ЕСЛИ ЭТОТ ДЕНЬ ПУСТОЙ
-            if (isEmptyDay) ...[
-              const Text(
-                'На голосование никто не выставлен',
-                style: TextStyle(
-                  color: Colors.orange,
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    'Результат: ',
-                    style: TextStyle(
-                      color: isDark ? Colors.white70 : Colors.black54,
-                      fontSize: 12,
-                    ),
-                  ),
-                  Text(
-                    '0',
-                    style: TextStyle(
-                      color: isDark ? Colors.white54 : Colors.black38,
-                      fontSize: 14,
-                    ),
-                  ),
-                ],
-              ),
-            ]
-
-            // 🔥 УДАЛЕНИЕ БЕЗ ГОЛОСОВАНИЯ
-            else if (!hasVoting && hasResult) ...[
-              const SizedBox(height: 4),
-              Text(
-                'Удаление: ${dayData.result.join(", ")}',
-                style: TextStyle(
-                  color: Colors.red,
-                  fontSize: 14,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ]
-
-            // 🔥 ОБЫЧНОЕ ГОЛОСОВАНИЕ
-            else if (hasVoting && !isRemoval) ...[
+            if (hasVoting && !isRemoval) ...[
               ...dayData.rounds.asMap().entries.map((entry) {
                 final roundIndex = entry.key;
                 final round = entry.value;
@@ -182,6 +124,7 @@ class ProtocolVotingTable extends StatelessWidget {
                       _buildVoteRow(context, label, round, roundIndex, isDark),
                 );
               }),
+              const Divider(color: Colors.grey),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -226,7 +169,6 @@ class ProtocolVotingTable extends StatelessWidget {
                 ),
               ),
             ],
-
             if (dayData.eliminationVotes > 0)
               Text(
                 'Голосование за подъём: ${dayData.eliminationVotes}',
@@ -237,37 +179,6 @@ class ProtocolVotingTable extends StatelessWidget {
               ),
           ],
         ),
-      ),
-    );
-  }
-
-  // 🔥 ПУСТАЯ СТРОКА (НИКТО НЕ ВЫСТАВЛЕН)
-  Widget _buildEmptyVoteRow(bool isDark) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 6),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SizedBox(
-            width: 60,
-            child: Text(
-              'Игрок',
-              style: TextStyle(
-                color: isDark ? Colors.white70 : Colors.black54,
-                fontSize: 12,
-              ),
-              textAlign: TextAlign.left,
-            ),
-          ),
-          const SizedBox(width: 8),
-          Text(
-            '—',
-            style: TextStyle(
-              color: isDark ? Colors.white70 : Colors.black54,
-              fontSize: 12,
-            ),
-          ),
-        ],
       ),
     );
   }
