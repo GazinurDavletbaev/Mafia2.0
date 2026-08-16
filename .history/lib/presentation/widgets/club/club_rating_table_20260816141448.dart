@@ -53,7 +53,7 @@ class ClubRatingTable extends StatelessWidget {
                 return Table(
                   columnWidths: {
                     0: const FlexColumnWidth(0.5), // №
-                    1: const FlexColumnWidth(3), // Никнейм + аватарка
+                    1: const FlexColumnWidth(3),   // Никнейм + аватарка
                     2: const FlexColumnWidth(0.5), // И
                     3: const FlexColumnWidth(0.5), // П
                     4: const FlexColumnWidth(0.5), // Б
@@ -163,8 +163,7 @@ class ClubRatingTable extends StatelessWidget {
           // 🔥 АВАТАРКА
           CircleAvatar(
             radius: 14,
-            backgroundColor:
-                isDark ? Colors.grey.shade700 : Colors.grey.shade300,
+            backgroundColor: isDark ? Colors.grey.shade700 : Colors.grey.shade300,
             backgroundImage: avatarUrl != null && avatarUrl.isNotEmpty
                 ? NetworkImage(avatarUrl)
                 : null,

@@ -265,6 +265,23 @@ class _GameProtocolViewScreenState
                       ),
                     ],
                   ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Судья: ${game['judge'] ?? 'Неизвестен'}',
+                    style: TextStyle(
+                      color: isDark ? Colors.white70 : Colors.black54,
+                      fontSize: 14,
+                    ),
+                  ),
+                  if (game['best_move'] != null &&
+                      game['best_move'].toString().isNotEmpty)
+                    Text(
+                      'Лучший ход: ${game['best_move']}',
+                      style: TextStyle(
+                        color: isDark ? Colors.white70 : Colors.black54,
+                        fontSize: 14,
+                      ),
+                    ),
                 ],
               ),
             ),
@@ -541,7 +558,7 @@ class _GameProtocolViewScreenState
       height: 24,
       decoration: BoxDecoration(
         color: bgColor,
-        borderRadius: BorderRadius.circular(6),
+        borderRadius: BorderRadius.circular(),
       ),
       child: Center(
         child: Text(

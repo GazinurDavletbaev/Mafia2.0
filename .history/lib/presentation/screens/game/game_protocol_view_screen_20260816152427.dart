@@ -135,6 +135,7 @@ class _GameProtocolViewScreenState
     final voteHistory = game['vote_history'] != null
         ? Map<String, dynamic>.from(game['vote_history'] as Map)
         : <String, dynamic>{};
+    final notes = game['notes'] as List? ?? [];
 
     final winner = game['winner'] == 'red'
         ? 'КРАСНЫЕ'
@@ -334,14 +335,13 @@ class _GameProtocolViewScreenState
                           ...players.map((p) {
                             final isRedWon = game['winner'] == 'red';
                             final points = (isRedWon &&
-                                        (p['role'] == 'citizen' ||
-                                            p['role'] == 'sheriff')) ||
-                                    (!isRedWon &&
-                                        (p['role'] == 'mafia' ||
-                                            p['role'] == 'don'))
+                                    (p['role'] == 'citizen' ||
+                                        p['role'] == 'sheriff')) ||
+                                (!isRedWon &&
+                                    (p['role'] == 'mafia' || p['role'] == 'don'))
                                 ? 1
                                 : 0;
-                            final bonus = (p['bonus'] ?? 0.0).toDouble();
+                            final bonus = p['bonus'] ?? 0.0;
                             final isRemoved = p['rule'] != null &&
                                 p['rule'].toString().isNotEmpty;
                             final hasPpk = false;
@@ -350,7 +350,7 @@ class _GameProtocolViewScreenState
                               children: [
                                 _tableCell(context, '${p['seat']}'),
                                 _tableCell(context, p['name'] ?? ''),
-                                _buildRoleCell(context, p['role'], isDark),
+                                _buildRoleCell(context, p['role']),
                                 _tableCell(context, '${p['fouls'] ?? 0}'),
                                 _tableCell(context, '$points'),
                                 _buildBonusCell(
@@ -358,7 +358,6 @@ class _GameProtocolViewScreenState
                                   bonus,
                                   isRemoved,
                                   hasPpk,
-                                  isDark,
                                 ),
                               ],
                             );
@@ -399,6 +398,15 @@ class _GameProtocolViewScreenState
                   Divider(
                     color: isDark ? Colors.grey.shade600 : Colors.grey.shade300,
                     height: 16,
+                  ),
+                  _infoRow(
+                    context,
+                    'ПРОТЕСТ     ',
+                    game['protest'] ?? 'Нет',
+                  ),
+                  Divider(
+                    color: isDark ? Colors.grey.shade600 : Colors.grey.shade300,
+                    height: 8,
                   ),
                   _infoRow(
                     context,
@@ -445,6 +453,85 @@ class _GameProtocolViewScreenState
           // VOTING TABLE
           // ============================================================
           _buildVotingTable(context, voteHistory, isDark),
+
+          const SizedBox(height: 2),
+
+          // ============================================================
+          // NOTES
+          // ============================================================
+          Card(
+            color: theme.cardColor,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+              side: BorderSide(
+                color: isDark ? Colors.grey.shade700 : Colors.grey.shade300,
+                width: 0.5,
+              ),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'ПОЯСНЕНИЯ К ДОПОЛНИТЕЛЬНЫМ БАЛЛАМ И ШТРАФАМ',
+                    style: TextStyle(
+                      color: primaryColor,
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  ...List.generate(10, (index) {
+                    final note = notes.length > index ? notes[index] ?? '' : '';
+                    if (note.toString().trim().isEmpty) return const SizedBox.shrink();
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 4),
+                      child: Row(
+                        children: [
+                          Text(
+                            '${index + 1}. ',
+                            style: TextStyle(
+                              color: isDark ? Colors.white70 : Colors.black54,
+                              fontSize: 12,
+                            ),
+                          ),
+                          Expanded(
+                            child: Text(
+                              note.toString(),
+                              style: TextStyle(
+                                color: isDark ? Colors.white : Colors.black87,
+                                fontSize: 12,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  }),
+                  const SizedBox(height: 16),
+                  const Divider(color: Colors.grey),
+                  const SizedBox(height: 8),
+                  Text(
+                    'КОММЕНТАРИЙ К ПРОТЕСТУ:',
+                    style: TextStyle(
+                      color: primaryColor,
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    game['protest_comment'] ?? 'Нет комментария',
+                    style: TextStyle(
+                      color: isDark ? Colors.white : Colors.black87,
+                      fontSize: 13,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
         ],
       ),
     );
@@ -486,8 +573,7 @@ class _GameProtocolViewScreenState
     );
   }
 
-  Widget _tableCell(BuildContext context, String text,
-      {bool isHeader = false}) {
+  Widget _tableCell(BuildContext context, String text, {bool isHeader = false}) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
     final primaryColor = theme.primaryColor;
@@ -508,61 +594,49 @@ class _GameProtocolViewScreenState
     );
   }
 
-  Widget _buildRoleCell(BuildContext context, String? role, bool isDark) {
-    Color bgColor;
+  Widget _buildRoleCell(BuildContext context, String? role) {
+    Color color;
     String short;
 
     switch (role) {
       case 'citizen':
-        bgColor = Colors.red.withOpacity(0.7);
+        color = Colors.red;
         short = 'К';
         break;
       case 'mafia':
-        bgColor = Colors.purple;
+        color = Colors.black;
         short = 'Ч';
         break;
       case 'sheriff':
-        bgColor = Colors.orange.withOpacity(0.8);
+        color = Colors.orange;
         short = 'Ш';
         break;
       case 'don':
-        bgColor = Colors.deepPurple.withOpacity(0.8);
+        color = Colors.purple;
         short = 'Д';
         break;
       default:
-        bgColor = Colors.grey;
+        color = Colors.grey;
         short = '?';
     }
 
-    final textColor = isDark ? Colors.white : Colors.black;
-
-    return Container(
-      width: 24,
-      height: 24,
-      decoration: BoxDecoration(
-        color: bgColor,
-        borderRadius: BorderRadius.circular(6),
-      ),
-      child: Center(
-        child: Text(
-          short,
-          style: TextStyle(
-            color: textColor,
-            fontWeight: FontWeight.bold,
-            fontSize: 12,
-          ),
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 4),
+      child: Text(
+        short,
+        style: TextStyle(
+          color: color,
+          fontWeight: FontWeight.bold,
+          fontSize: 12,
         ),
+        textAlign: TextAlign.center,
       ),
     );
   }
 
-  Widget _buildBonusCell(
-    BuildContext context,
-    double bonus,
-    bool isRemoved,
-    bool hasPpk,
-    bool isDark,
-  ) {
+  Widget _buildBonusCell(BuildContext context, double bonus, bool isRemoved, bool hasPpk) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     String text;
     Color? color;
 
@@ -594,8 +668,7 @@ class _GameProtocolViewScreenState
     );
   }
 
-  Widget _infoRow(BuildContext context, String label, String value,
-      {Color? color}) {
+  Widget _infoRow(BuildContext context, String label, String value, {Color? color}) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
     final primaryColor = theme.primaryColor;
@@ -652,29 +725,29 @@ class _GameProtocolViewScreenState
             ),
             children: [
               _tableCell(context, 'Ночь', isHeader: true),
-              ...nightActions.map(
-                  (n) => _tableCell(context, '${n['night']}', isHeader: true)),
+              ...nightActions.map((n) =>
+                  _tableCell(context, '${n['night']}', isHeader: true)),
             ],
           ),
           TableRow(
             children: [
               _tableCell(context, 'Стрельба', isHeader: true),
-              ...nightActions
-                  .map((n) => _tableCell(context, _getNightValue(n['kill']))),
+              ...nightActions.map((n) =>
+                  _tableCell(context, _getNightValue(n['kill']))),
             ],
           ),
           TableRow(
             children: [
               _tableCell(context, 'Дон', isHeader: true),
-              ...nightActions
-                  .map((n) => _tableCell(context, _getNightValue(n['don']))),
+              ...nightActions.map((n) =>
+                  _tableCell(context, _getNightValue(n['don']))),
             ],
           ),
           TableRow(
             children: [
               _tableCell(context, 'Шериф', isHeader: true),
-              ...nightActions.map(
-                  (n) => _tableCell(context, _getNightValue(n['sheriff']))),
+              ...nightActions.map((n) =>
+                  _tableCell(context, _getNightValue(n['sheriff']))),
             ],
           ),
         ],
@@ -717,8 +790,7 @@ class _GameProtocolViewScreenState
       );
     }
 
-    final days = voteHistory.keys.toList()
-      ..sort((a, b) => int.parse(a).compareTo(int.parse(b)));
+    final days = voteHistory.keys.toList()..sort((a, b) => int.parse(a).compareTo(int.parse(b)));
 
     return Card(
       color: Theme.of(context).cardColor,
@@ -758,8 +830,7 @@ class _GameProtocolViewScreenState
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
                     border: Border.all(
-                      color:
-                          isDark ? Colors.grey.shade600 : Colors.grey.shade300,
+                      color: isDark ? Colors.grey.shade600 : Colors.grey.shade300,
                     ),
                     borderRadius: BorderRadius.circular(8),
                   ),
@@ -809,8 +880,7 @@ class _GameProtocolViewScreenState
                         ...rounds.asMap().entries.map((entry) {
                           final roundIndex = entry.key;
                           final round = entry.value as Map<String, dynamic>;
-                          final label =
-                              roundIndex == 0 ? 'Игрок' : 'Переголосование';
+                          final label = roundIndex == 0 ? 'Игрок' : 'Переголосование';
                           return Padding(
                             padding: const EdgeInsets.only(bottom: 6),
                             child: _buildVoteRow(
@@ -838,9 +908,7 @@ class _GameProtocolViewScreenState
                               style: TextStyle(
                                 color: result.isNotEmpty
                                     ? Colors.green
-                                    : (isDark
-                                        ? Colors.white54
-                                        : Colors.black38),
+                                    : (isDark ? Colors.white54 : Colors.black38),
                                 fontSize: 14,
                                 fontWeight: result.isNotEmpty
                                     ? FontWeight.bold
@@ -876,8 +944,7 @@ class _GameProtocolViewScreenState
     int roundIndex,
     bool isDark,
   ) {
-    final sortedKeys = votes.keys.toList()
-      ..sort((a, b) => int.parse(a).compareTo(int.parse(b)));
+    final sortedKeys = votes.keys.toList()..sort((a, b) => int.parse(a).compareTo(int.parse(b)));
 
     final String firstRowLabel = roundIndex == 0 ? 'Игрок' : 'Пере-';
     final String secondRowLabel = roundIndex == 0 ? 'Голоса' : 'голос.';

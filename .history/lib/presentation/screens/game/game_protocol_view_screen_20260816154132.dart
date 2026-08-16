@@ -265,6 +265,23 @@ class _GameProtocolViewScreenState
                       ),
                     ],
                   ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Судья: ${game['judge'] ?? 'Неизвестен'}',
+                    style: TextStyle(
+                      color: isDark ? Colors.white70 : Colors.black54,
+                      fontSize: 14,
+                    ),
+                  ),
+                  if (game['best_move'] != null &&
+                      game['best_move'].toString().isNotEmpty)
+                    Text(
+                      'Лучший ход: ${game['best_move']}',
+                      style: TextStyle(
+                        color: isDark ? Colors.white70 : Colors.black54,
+                        fontSize: 14,
+                      ),
+                    ),
                 ],
               ),
             ),
@@ -334,11 +351,10 @@ class _GameProtocolViewScreenState
                           ...players.map((p) {
                             final isRedWon = game['winner'] == 'red';
                             final points = (isRedWon &&
-                                        (p['role'] == 'citizen' ||
-                                            p['role'] == 'sheriff')) ||
-                                    (!isRedWon &&
-                                        (p['role'] == 'mafia' ||
-                                            p['role'] == 'don'))
+                                    (p['role'] == 'citizen' ||
+                                        p['role'] == 'sheriff')) ||
+                                (!isRedWon &&
+                                    (p['role'] == 'mafia' || p['role'] == 'don'))
                                 ? 1
                                 : 0;
                             final bonus = (p['bonus'] ?? 0.0).toDouble();
@@ -486,8 +502,7 @@ class _GameProtocolViewScreenState
     );
   }
 
-  Widget _tableCell(BuildContext context, String text,
-      {bool isHeader = false}) {
+  Widget _tableCell(BuildContext context, String text, {bool isHeader = false}) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
     final primaryColor = theme.primaryColor;
@@ -514,19 +529,19 @@ class _GameProtocolViewScreenState
 
     switch (role) {
       case 'citizen':
-        bgColor = Colors.red.withOpacity(0.7);
+        bgColor = Colors.red;
         short = 'К';
         break;
       case 'mafia':
-        bgColor = Colors.purple;
+        bgColor = Colors.black;
         short = 'Ч';
         break;
       case 'sheriff':
-        bgColor = Colors.orange.withOpacity(0.8);
+        bgColor = Colors.orange;
         short = 'Ш';
         break;
       case 'don':
-        bgColor = Colors.deepPurple.withOpacity(0.8);
+        bgColor = Colors.purple;
         short = 'Д';
         break;
       default:
@@ -537,11 +552,11 @@ class _GameProtocolViewScreenState
     final textColor = isDark ? Colors.white : Colors.black;
 
     return Container(
-      width: 24,
+      width: 30,
       height: 24,
       decoration: BoxDecoration(
         color: bgColor,
-        borderRadius: BorderRadius.circular(6),
+        borderRadius: BorderRadius.circular(4),
       ),
       child: Center(
         child: Text(
@@ -652,29 +667,29 @@ class _GameProtocolViewScreenState
             ),
             children: [
               _tableCell(context, 'Ночь', isHeader: true),
-              ...nightActions.map(
-                  (n) => _tableCell(context, '${n['night']}', isHeader: true)),
+              ...nightActions.map((n) =>
+                  _tableCell(context, '${n['night']}', isHeader: true)),
             ],
           ),
           TableRow(
             children: [
               _tableCell(context, 'Стрельба', isHeader: true),
-              ...nightActions
-                  .map((n) => _tableCell(context, _getNightValue(n['kill']))),
+              ...nightActions.map((n) =>
+                  _tableCell(context, _getNightValue(n['kill']))),
             ],
           ),
           TableRow(
             children: [
               _tableCell(context, 'Дон', isHeader: true),
-              ...nightActions
-                  .map((n) => _tableCell(context, _getNightValue(n['don']))),
+              ...nightActions.map((n) =>
+                  _tableCell(context, _getNightValue(n['don']))),
             ],
           ),
           TableRow(
             children: [
               _tableCell(context, 'Шериф', isHeader: true),
-              ...nightActions.map(
-                  (n) => _tableCell(context, _getNightValue(n['sheriff']))),
+              ...nightActions.map((n) =>
+                  _tableCell(context, _getNightValue(n['sheriff']))),
             ],
           ),
         ],
@@ -758,8 +773,7 @@ class _GameProtocolViewScreenState
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
                     border: Border.all(
-                      color:
-                          isDark ? Colors.grey.shade600 : Colors.grey.shade300,
+                      color: isDark ? Colors.grey.shade600 : Colors.grey.shade300,
                     ),
                     borderRadius: BorderRadius.circular(8),
                   ),
@@ -838,9 +852,7 @@ class _GameProtocolViewScreenState
                               style: TextStyle(
                                 color: result.isNotEmpty
                                     ? Colors.green
-                                    : (isDark
-                                        ? Colors.white54
-                                        : Colors.black38),
+                                    : (isDark ? Colors.white54 : Colors.black38),
                                 fontSize: 14,
                                 fontWeight: result.isNotEmpty
                                     ? FontWeight.bold

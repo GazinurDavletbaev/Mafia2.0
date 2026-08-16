@@ -265,6 +265,23 @@ class _GameProtocolViewScreenState
                       ),
                     ],
                   ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Судья: ${game['judge'] ?? 'Неизвестен'}',
+                    style: TextStyle(
+                      color: isDark ? Colors.white70 : Colors.black54,
+                      fontSize: 14,
+                    ),
+                  ),
+                  if (game['best_move'] != null &&
+                      game['best_move'].toString().isNotEmpty)
+                    Text(
+                      'Лучший ход: ${game['best_move']}',
+                      style: TextStyle(
+                        color: isDark ? Colors.white70 : Colors.black54,
+                        fontSize: 14,
+                      ),
+                    ),
                 ],
               ),
             ),
@@ -518,15 +535,15 @@ class _GameProtocolViewScreenState
         short = 'К';
         break;
       case 'mafia':
-        bgColor = Colors.purple;
+        bgColor = Colors.black;
         short = 'Ч';
         break;
       case 'sheriff':
-        bgColor = Colors.orange.withOpacity(0.8);
+        bgColor = Colors.orange.wi;
         short = 'Ш';
         break;
       case 'don':
-        bgColor = Colors.deepPurple.withOpacity(0.8);
+        bgColor = Colors.purple;
         short = 'Д';
         break;
       default:
@@ -537,11 +554,11 @@ class _GameProtocolViewScreenState
     final textColor = isDark ? Colors.white : Colors.black;
 
     return Container(
-      width: 24,
+      width: 30,
       height: 24,
       decoration: BoxDecoration(
         color: bgColor,
-        borderRadius: BorderRadius.circular(6),
+        borderRadius: BorderRadius.circular(4),
       ),
       child: Center(
         child: Text(
