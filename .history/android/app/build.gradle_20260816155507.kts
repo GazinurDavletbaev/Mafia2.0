@@ -31,8 +31,8 @@ android {
         applicationId = "com.example.mafia_help"
         minSdk = flutter.minSdkVersion
         targetSdk = 36
-        versionCode = 27
-        versionName = "1.7.23"
+        versionCode = 43
+        versionName = "1.8.8"
     }
 
     signingConfigs {
