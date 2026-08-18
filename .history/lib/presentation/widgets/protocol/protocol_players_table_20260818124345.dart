@@ -263,19 +263,11 @@ class _ProtocolPlayersTableState extends State<ProtocolPlayersTable> {
           isExpanded: true,
           icon: const SizedBox.shrink(),
           items: ProtocolConstants.bonusValues.map((value) {
-            String label;
-            if (value == 0) {
-              label = '0';
-            } else if (value == 0.25) {
-              label = '0.25';
-            } else {
-              label = value.toStringAsFixed(1);
-            }
             return DropdownMenuItem<double>(
               value: value,
               child: Center(
                 child: Text(
-                  label,
+                  value == 0 ? '0' : value.toStringAsFixed(1),
                   style: TextStyle(
                     fontSize: 11,
                     color: isDark ? Colors.white : Colors.black87,

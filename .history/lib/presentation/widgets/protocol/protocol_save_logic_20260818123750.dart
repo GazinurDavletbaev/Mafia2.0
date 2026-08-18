@@ -81,12 +81,12 @@ class ProtocolSaveLogic {
     double bonus;
     switch (hits) {
       case 0:
-      case 1:
         bonus = 0.0;
         break;
-      case 2:
+      case 1:
         bonus = 0.25;
         break;
+      case 2:
       case 3:
         bonus = 0.4;
         break;
