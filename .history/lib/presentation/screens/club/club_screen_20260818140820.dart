@@ -285,7 +285,7 @@ class _ClubScreenState extends ConsumerState<ClubScreen> {
           // 🔥 ПЛАВАЮЩИЙ ВИДЖЕТ С МЕСЯЦЕМ И ГОДОМ
           Positioned(
             top: 210,
-            left: 290,
+            left: 160,
             child: Stack(
               clipBehavior: Clip.none,
               children: [
@@ -298,10 +298,8 @@ class _ClubScreenState extends ConsumerState<ClubScreen> {
                     borderRadius: BorderRadius.circular(16),
                     boxShadow: [
                       BoxShadow(
-                        color: isDark
-                            ? Colors.white.withOpacity(0.3)
-                            : Colors.black.withOpacity(0.3),
-                        blurRadius: isDark ? 10 : 7,
+                        color: Colors.white.withOpacity(0.3),
+                        blurRadius: 10,
                         spreadRadius: 1,
                         offset: const Offset(0, 2),
                       ),
@@ -319,17 +317,25 @@ class _ClubScreenState extends ConsumerState<ClubScreen> {
                 // 🔥 КРУГЛЫЙ БЕЙДЖ С ГОДОМ
                 Positioned(
                   top: -8,
-                  right: -10,
+                  right: -16,
                   child: Container(
                     width: 25,
                     height: 25,
                     decoration: BoxDecoration(
-                      color: primaryColor.withOpacity(0.7),
+                      color: primaryColor,
                       shape: BoxShape.circle,
                       border: Border.all(
                         color: isDark ? Colors.grey.shade900 : Colors.white,
                         width: 1,
                       ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.white.withOpacity(0.3),
+                          blurRadius: 8,
+                          spreadRadius: 2,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
                     ),
                     child: Center(
                       child: Text(

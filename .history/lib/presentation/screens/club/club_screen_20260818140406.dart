@@ -285,24 +285,26 @@ class _ClubScreenState extends ConsumerState<ClubScreen> {
           // 🔥 ПЛАВАЮЩИЙ ВИДЖЕТ С МЕСЯЦЕМ И ГОДОМ
           Positioned(
             top: 210,
-            left: 290,
+            left: 155,
             child: Stack(
-              clipBehavior: Clip.none,
+              clipBehavior: Clip.none, // 🔥 РАЗРЕШАЕТ ВЫХОДИТЬ ЗА ГРАНИЦЫ
               children: [
                 // 🔥 ОСНОВНОЙ КОНТЕЙНЕР С МЕСЯЦЕМ
                 Container(
                   padding:
                       const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
-                    color: isDark ? Colors.black : Colors.white,
+                    color: isDark ? Colors.grey.shade900 : Colors.white,
                     borderRadius: BorderRadius.circular(16),
+                    border: Border.all(
+                      color:
+                          isDark ? Colors.grey.shade700 : Colors.grey.shade300,
+                      width: 1,
+                    ),
                     boxShadow: [
                       BoxShadow(
-                        color: isDark
-                            ? Colors.white.withOpacity(0.3)
-                            : Colors.black.withOpacity(0.3),
-                        blurRadius: isDark ? 10 : 7,
-                        spreadRadius: 1,
+                        color: Colors.black.withOpacity(0.1),
+                        blurRadius: 10,
                         offset: const Offset(0, 2),
                       ),
                     ],
@@ -316,20 +318,27 @@ class _ClubScreenState extends ConsumerState<ClubScreen> {
                     ),
                   ),
                 ),
-                // 🔥 КРУГЛЫЙ БЕЙДЖ С ГОДОМ
+                // 🔥 КРУГЛЫЙ БЕЙДЖ С ГОДОМ (ВЫХОДИТ ЗА РАМКИ)
                 Positioned(
                   top: -8,
-                  right: -10,
+                  right: -16,
                   child: Container(
-                    width: 25,
-                    height: 25,
+                    width: 32,
+                    height: 32,
                     decoration: BoxDecoration(
-                      color: primaryColor.withOpacity(0.7),
+                      color: primaryColor,
                       shape: BoxShape.circle,
                       border: Border.all(
                         color: isDark ? Colors.grey.shade900 : Colors.white,
-                        width: 1,
+                        width: 2,
                       ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.2),
+                          blurRadius: 6,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
                     ),
                     child: Center(
                       child: Text(

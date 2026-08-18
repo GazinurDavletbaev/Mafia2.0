@@ -285,7 +285,7 @@ class _ClubScreenState extends ConsumerState<ClubScreen> {
           // 🔥 ПЛАВАЮЩИЙ ВИДЖЕТ С МЕСЯЦЕМ И ГОДОМ
           Positioned(
             top: 210,
-            left: 290,
+            left: 260,
             child: Stack(
               clipBehavior: Clip.none,
               children: [

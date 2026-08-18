@@ -142,7 +142,7 @@ class _ClubSearchListState extends State<ClubSearchList> {
                             child: Card(
                               color: theme.cardColor,
                               margin: const EdgeInsets.symmetric(
-                                  horizontal: 26, vertical: 8),
+                                  horizontal: 10, vertical: 8),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(25),
                                 side: BorderSide.none,
@@ -152,7 +152,7 @@ class _ClubSearchListState extends State<ClubSearchList> {
                                   ? Colors.amber.shade300.withOpacity(0.9)
                                   : Colors.white.withOpacity(0.3),
                               child: Padding(
-                                padding: const EdgeInsets.all(8),
+                                padding: const EdgeInsets.all(4),
                                 child: Row(
                                   children: [
                                     Container(
@@ -194,27 +194,31 @@ class _ClubSearchListState extends State<ClubSearchList> {
                                         children: [
                                           Row(
                                             children: [
+                                              Expanded(
+                                                child: Text(
+                                                  club['title'] ??
+                                                      'Без названия',
+                                                  style: TextStyle(
+                                                    fontSize: 16,
+                                                    fontWeight: FontWeight.w600,
+                                                    color: theme.textTheme
+                                                            .bodyLarge?.color ??
+                                                        Colors.white,
+                                                  ),
+                                                ),
+                                              ),
                                               if (isOfficial) ...[
+                                                const SizedBox(width: 4),
                                                 Icon(Icons.verified,
                                                     color: Colors.green,
-                                                    size: 20),
-                                                const SizedBox(width: 6),
+                                                    size: 30),
                                               ],
-                                              Text(
-                                                club['title'] ?? 'Без названия',
-                                                style: TextStyle(
-                                                  fontSize: 14,
-                                                  fontWeight: FontWeight.w600,
-                                                  color: theme.textTheme
-                                                          .bodyLarge?.color ??
-                                                      Colors.white,
-                                                ),
-                                                maxLines: 1,
-                                                overflow: TextOverflow.ellipsis,
-                                              ),
-                                              if (club['city'] != null &&
-                                                  club['city'].isNotEmpty) ...[
-                                                const SizedBox(width: 6),
+                                            ],
+                                          ),
+                                          if (club['city'] != null &&
+                                              club['city'].isNotEmpty)
+                                            Row(
+                                              children: [
                                                 Icon(
                                                   Icons.location_on,
                                                   size: 14,
@@ -222,22 +226,18 @@ class _ClubSearchListState extends State<ClubSearchList> {
                                                       ? Colors.grey.shade400
                                                       : Colors.grey.shade600,
                                                 ),
-                                                const SizedBox(width: 2),
+                                                const SizedBox(width: 4),
                                                 Text(
                                                   club['city'],
                                                   style: TextStyle(
                                                     color: isDark
                                                         ? Colors.grey.shade400
                                                         : Colors.grey.shade600,
-                                                    fontSize: 10,
+                                                    fontSize: 13,
                                                   ),
-                                                  maxLines: 1,
-                                                  overflow:
-                                                      TextOverflow.ellipsis,
                                                 ),
                                               ],
-                                            ],
-                                          ),
+                                            ),
                                           Row(
                                             children: [
                                               CircleAvatar(
@@ -334,7 +334,6 @@ class _ClubSearchListState extends State<ClubSearchList> {
           right: 0,
           child: Center(
             child: Container(
-              height: 40,
               width: MediaQuery.of(context).size.width * 0.6, // 🔥 90% ШИРИНЫ
               padding: const EdgeInsets.symmetric(horizontal: 3, vertical: 3),
               decoration: BoxDecoration(
@@ -365,7 +364,7 @@ class _ClubSearchListState extends State<ClubSearchList> {
                   hintText: 'Поиск по названию или городу...',
                   hintStyle: TextStyle(
                     color: isDark ? Colors.grey.shade500 : Colors.grey.shade500,
-                    fontSize: 10, // ← РАЗМЕР ТЕКСТА ПОДСКАЗКИ (ХИНТА)
+                    fontSize: 12, // ← РАЗМЕР ТЕКСТА ПОДСКАЗКИ (ХИНТА)
                   ),
                   filled: true,
                   fillColor:

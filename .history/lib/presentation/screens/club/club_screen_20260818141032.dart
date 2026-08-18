@@ -285,7 +285,7 @@ class _ClubScreenState extends ConsumerState<ClubScreen> {
           // 🔥 ПЛАВАЮЩИЙ ВИДЖЕТ С МЕСЯЦЕМ И ГОДОМ
           Positioned(
             top: 210,
-            left: 290,
+            left: 160,
             child: Stack(
               clipBehavior: Clip.none,
               children: [
@@ -300,8 +300,8 @@ class _ClubScreenState extends ConsumerState<ClubScreen> {
                       BoxShadow(
                         color: isDark
                             ? Colors.white.withOpacity(0.3)
-                            : Colors.black.withOpacity(0.3),
-                        blurRadius: isDark ? 10 : 7,
+                            : Colors.black,
+                        blurRadius: 104,
                         spreadRadius: 1,
                         offset: const Offset(0, 2),
                       ),
@@ -324,7 +324,7 @@ class _ClubScreenState extends ConsumerState<ClubScreen> {
                     width: 25,
                     height: 25,
                     decoration: BoxDecoration(
-                      color: primaryColor.withOpacity(0.7),
+                      color: primaryColor,
                       shape: BoxShape.circle,
                       border: Border.all(
                         color: isDark ? Colors.grey.shade900 : Colors.white,

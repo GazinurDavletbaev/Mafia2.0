@@ -334,7 +334,6 @@ class _ClubSearchListState extends State<ClubSearchList> {
           right: 0,
           child: Center(
             child: Container(
-              height: 40,
               width: MediaQuery.of(context).size.width * 0.6, // 🔥 90% ШИРИНЫ
               padding: const EdgeInsets.symmetric(horizontal: 3, vertical: 3),
               decoration: BoxDecoration(

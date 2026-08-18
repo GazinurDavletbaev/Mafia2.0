@@ -217,7 +217,7 @@ class _ClubSearchListState extends State<ClubSearchList> {
                                                 const SizedBox(width: 6),
                                                 Icon(
                                                   Icons.location_on,
-                                                  size: 14,
+                                                  size: 10,
                                                   color: isDark
                                                       ? Colors.grey.shade400
                                                       : Colors.grey.shade600,
@@ -229,7 +229,7 @@ class _ClubSearchListState extends State<ClubSearchList> {
                                                     color: isDark
                                                         ? Colors.grey.shade400
                                                         : Colors.grey.shade600,
-                                                    fontSize: 10,
+                                                    fontSize: 13,
                                                   ),
                                                   maxLines: 1,
                                                   overflow:
@@ -334,7 +334,6 @@ class _ClubSearchListState extends State<ClubSearchList> {
           right: 0,
           child: Center(
             child: Container(
-              height: 40,
               width: MediaQuery.of(context).size.width * 0.6, // 🔥 90% ШИРИНЫ
               padding: const EdgeInsets.symmetric(horizontal: 3, vertical: 3),
               decoration: BoxDecoration(
@@ -365,7 +364,7 @@ class _ClubSearchListState extends State<ClubSearchList> {
                   hintText: 'Поиск по названию или городу...',
                   hintStyle: TextStyle(
                     color: isDark ? Colors.grey.shade500 : Colors.grey.shade500,
-                    fontSize: 10, // ← РАЗМЕР ТЕКСТА ПОДСКАЗКИ (ХИНТА)
+                    fontSize: 12, // ← РАЗМЕР ТЕКСТА ПОДСКАЗКИ (ХИНТА)
                   ),
                   filled: true,
                   fillColor:
