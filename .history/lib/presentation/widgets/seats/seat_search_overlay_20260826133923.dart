@@ -90,7 +90,7 @@ class SeatSearchOverlay {
                                 : null,
                         child: avatarUrl == null || avatarUrl.toString().isEmpty
                             ? Icon(
-                                Mdi.imageOff,
+                                Mdi.account,
                                 color: isDark
                                     ? Colors.grey.shade500
                                     : Colors.grey.shade400,

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:mdi_plus/mdi_plus.dart';
 
 class SeatPlayerTile extends StatelessWidget {
   final int seatNumber;
@@ -42,16 +41,11 @@ class SeatPlayerTile extends StatelessWidget {
           ),
           child: hasText
               ? (avatarUrl.isEmpty
-                  ? Container(
-                      decoration: const BoxDecoration(
-                        color: Colors.grey,
-                        shape: BoxShape.circle,
-                      ),
-                      child: Icon(
-                        Mdi.imageOff,
-                        color: Colors.white,
-                        size: 20,
-                      ),
+                  ? Image.asset(
+                      'assets/mafia_logo.png',
+                      width: 20,
+                      height: 20,
+                      fit: BoxFit.contain,
                     )
                   : null)
               : Center(

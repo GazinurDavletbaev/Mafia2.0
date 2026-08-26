@@ -44,7 +44,7 @@ class SeatPlayerTile extends StatelessWidget {
               ? (avatarUrl.isEmpty
                   ? Container(
                       decoration: const BoxDecoration(
-                        color: Colors.grey,
+                        color: Colors.deepPurple,
                         shape: BoxShape.circle,
                       ),
                       child: Icon(

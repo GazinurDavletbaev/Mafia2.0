@@ -42,16 +42,11 @@ class SeatPlayerTile extends StatelessWidget {
           ),
           child: hasText
               ? (avatarUrl.isEmpty
-                  ? Container(
-                      decoration: const BoxDecoration(
-                        color: Colors.grey,
-                        shape: BoxShape.circle,
-                      ),
-                      child: Icon(
-                        Mdi.imageOff,
-                        color: Colors.white,
-                        size: 20,
-                      ),
+                  ? Icon(
+                      Mdi.image,
+                      color:
+                          isDark ? Colors.grey.shade500 : Colors.grey.shade400,
+                      size: 20,
                     )
                   : null)
               : Center(
