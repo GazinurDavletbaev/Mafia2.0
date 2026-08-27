@@ -81,25 +81,7 @@ class PlayerCard extends StatelessWidget {
 
     Color backgroundColor;
 
-    // 🔥 ЕСЛИ ВКЛЮЧЕН ПОКАЗ РОЛЕЙ — ПОДСВЕЧИВАЕМ ЦВЕТОМ РОЛИ
-    if (showRole && player.role != 'unknown' && player.role != '') {
-      switch (player.role) {
-        case 'citizen':
-          backgroundColor = Colors.red.withOpacity(0.5);
-          break;
-        case 'sheriff':
-          backgroundColor = Colors.red;
-          break;
-        case 'mafia':
-          backgroundColor = Colors.black.withOpacity(0.5);
-          break;
-        case 'don':
-          backgroundColor = Colors.black.withOpacity(0.8);
-          break;
-        default:
-          backgroundColor = isDark ? Colors.black : Colors.white;
-      }
-    } else if (isSelectedForBestMove) {
+    if (isSelectedForBestMove) {
       backgroundColor = Colors.blue.withOpacity(0.5);
     } else if (!player.isAlive) {
       backgroundColor = isDark ? Colors.black54 : Colors.white;
@@ -290,9 +272,89 @@ class PlayerCard extends StatelessWidget {
                 ],
               ),
             ),
+
+            // 🔥 МАЛЕНЬКАЯ КАРТОЧКА РОЛИ (ЕСЛИ ВКЛЮЧЕНА)
+            if (showRole && player.role != 'unknown' && player.role != '')
+              Positioned(
+                top: -4,
+                left: isLeftColumn ? 4 : null,
+                right: isLeftColumn ? null : 4,
+                child: _buildRoleBadge(player.role),
+              ),
           ],
         );
       },
+    );
+  }
+
+  Widget _buildRoleBadge(String role) {
+    Color color;
+    String label;
+    IconData icon;
+
+    switch (role) {
+      case 'sheriff':
+        color = Colors.orange;
+        label = 'Ш';
+        icon = Icons.star;
+        break;
+      case 'don':
+        color = Colors.deepPurple;
+        label = 'Д';
+        icon = Icons.emoji_events;
+        break;
+      case 'mafia':
+        color = Colors.red;
+        label = 'М';
+        icon = Icons.gavel;
+        break;
+      case 'citizen':
+        color = Colors.green;
+        label = 'М';
+        icon = Icons.people;
+        break;
+      default:
+        color = Colors.grey;
+        label = '?';
+        icon = Icons.help;
+    }
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+      decoration: BoxDecoration(
+        color: color,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(
+          color: Colors.white,
+          width: 1.5,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.3),
+            blurRadius: 4,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            icon,
+            size: 12,
+            color: Colors.white,
+          ),
+          const SizedBox(width: 2),
+          Text(
+            label,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 10,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

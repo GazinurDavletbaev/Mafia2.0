@@ -109,32 +109,28 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
   // 🔥 ВЫБОР ФОТО (УНИВЕРСАЛЬНЫЙ)
   // ============================================================
   Future<void> _pickImage() async {
-    print('🔥 _pickImage called');
-    print('🔥 kIsWeb = $kIsWeb');
-
     final ImagePicker picker = ImagePicker();
     final XFile? image = await picker.pickImage(source: ImageSource.gallery);
-
-    print('🔥 image = $image');
 
     if (image == null) return;
 
     if (kIsWeb) {
-      print('🔥 ВЕБ: читаем байты');
+      // 🔥 ВЕБ: читаем как байты и сразу загружаем
       try {
         final bytes = await image.readAsBytes();
-        print('🔥 bytes length = ${bytes.length}');
         setState(() {
           _avatarBytes = bytes;
           _avatarImage = null;
         });
+
+        // Сразу загружаем на сервер
         await _uploadAvatarForWeb(bytes);
       } catch (e) {
         print('❌ Ошибка: $e');
         _showSnackBar('Ошибка выбора фото', Colors.red);
       }
     } else {
-      print('🔥 МОБИЛКА: старый способ');
+      // 🔥 МОБИЛКА/ДЕСКТОП: старый способ
       setState(() {
         _avatarImage = File(image.path);
         _avatarBytes = null;

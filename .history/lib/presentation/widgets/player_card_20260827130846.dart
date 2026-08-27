@@ -94,7 +94,7 @@ class PlayerCard extends StatelessWidget {
           backgroundColor = Colors.black.withOpacity(0.5);
           break;
         case 'don':
-          backgroundColor = Colors.black.withOpacity(0.8);
+          backgroundColor = Colors.black.withOpacity(0.7);
           break;
         default:
           backgroundColor = isDark ? Colors.black : Colors.white;

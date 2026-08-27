@@ -105,13 +105,6 @@ class _FloatingCalculatorState extends ConsumerState<FloatingCalculator> {
     });
   }
 
-  void _toggleShowRoles() {
-    final currentState = _state;
-    _vm.updateState(currentState.copyWith(
-      showAllRoles: !currentState.showAllRoles,
-    ));
-  }
-
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -189,7 +182,7 @@ class _FloatingCalculatorState extends ConsumerState<FloatingCalculator> {
                 children: [
                   _buildNavKey('←', () => _vm.onPhaseBack(), context),
                   _buildNavKey(
-                      _isMinimized ? '🎭' : '🎭', _toggleShowRoles, context),
+                      _isMinimized ? '🎭' : '🎭', _toggleMinimize, context),
                   _buildNavKey('→', () => _vm.onPhaseForward(), context),
                 ],
               ),

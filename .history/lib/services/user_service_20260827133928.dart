@@ -1,14 +1,13 @@
 // lib/services/user_service.dart
 import 'dart:convert';
 import 'dart:io';
-import 'dart:typed_data';
 import 'package:http/http.dart' as http;
 import 'package:mafia_help/services/auth_service.dart';
 import 'package:http_parser/http_parser.dart';
-import 'package:mafia_help/core/config/app_config.dart';
+import 'package:mafia_help/core/config/app_config.dart'; // ← ДОБАВИТЬ
 
 class UserService {
-  static String get baseUrl => AppConfig.baseUrl;
+  static String get baseUrl => AppConfig.baseUrl; // ← ИСПОЛЬЗОВАТЬ
 
   // ============================================================
   // КОЛИЧЕСТВО ПОЛЬЗОВАТЕЛЕЙ
@@ -46,7 +45,7 @@ class UserService {
   }
 
   // ============================================================
-  // АВАТАРКА (ДЛЯ МОБИЛКИ/ДЕСКТОПА)
+  // АВАТАРКА
   // ============================================================
 
   static Future<Map<String, dynamic>> uploadAvatar(File image) async {
@@ -64,48 +63,6 @@ class UserService {
       await http.MultipartFile.fromPath(
         'file',
         image.path,
-        contentType: MediaType('image', 'jpeg'),
-      ),
-    );
-
-    var response = await request.send();
-    var responseData = await response.stream.toBytes();
-    var responseString = String.fromCharCodes(responseData);
-    var json = jsonDecode(responseString);
-
-    if (response.statusCode == 200) {
-      return {
-        'success': true,
-        'avatar_url': json['avatar_url'],
-      };
-    } else {
-      return {
-        'success': false,
-        'error': json['detail'] ?? 'Ошибка загрузки',
-      };
-    }
-  }
-
-  // ============================================================
-  // 🔥 АВАТАРКА (ДЛЯ ВЕБА) — НОВЫЙ МЕТОД
-  // ============================================================
-
-  static Future<Map<String, dynamic>> uploadAvatarBytes(Uint8List bytes) async {
-    final token = await AuthService.getToken();
-    if (token == null) {
-      return {'success': false, 'error': 'Не авторизован'};
-    }
-
-    var request = http.MultipartRequest(
-      'POST',
-      Uri.parse('$baseUrl/user/upload-avatar?token=$token'),
-    );
-
-    request.files.add(
-      http.MultipartFile.fromBytes(
-        'file',
-        bytes,
-        filename: 'avatar_${DateTime.now().millisecondsSinceEpoch}.jpg',
         contentType: MediaType('image', 'jpeg'),
       ),
     );

@@ -75,6 +75,21 @@ class PlayerCard extends StatelessWidget {
     }
   }
 
+  Color _getRoleColor(String role) {
+    switch (role) {
+      case 'citizen':
+        return Colors.red;
+      case 'sheriff':
+        return Colors.orange;
+      case 'mafia':
+        return Colors.grey.shade600;
+      case 'don':
+        return Colors.deepPurple;
+      default:
+        return Colors.transparent;
+    }
+  }
+
   Widget _buildCard(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
@@ -85,16 +100,16 @@ class PlayerCard extends StatelessWidget {
     if (showRole && player.role != 'unknown' && player.role != '') {
       switch (player.role) {
         case 'citizen':
-          backgroundColor = Colors.red.withOpacity(0.5);
+          backgroundColor = Colors.red.withOpacity(0.3);
           break;
         case 'sheriff':
-          backgroundColor = Colors.red;
+          backgroundColor = Colors.orange.withOpacity(0.3);
           break;
         case 'mafia':
-          backgroundColor = Colors.black.withOpacity(0.5);
+          backgroundColor = Colors.grey.withOpacity(0.3);
           break;
         case 'don':
-          backgroundColor = Colors.black.withOpacity(0.8);
+          backgroundColor = Colors.deepPurple.withOpacity(0.3);
           break;
         default:
           backgroundColor = isDark ? Colors.black : Colors.white;
@@ -135,6 +150,13 @@ class PlayerCard extends StatelessWidget {
               decoration: BoxDecoration(
                 color: backgroundColor,
                 borderRadius: BorderRadius.circular(150),
+                border:
+                    showRole && player.role != 'unknown' && player.role != ''
+                        ? Border.all(
+                            color: _getRoleColor(player.role),
+                            width: 2.5,
+                          )
+                        : null,
               ),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -290,9 +312,89 @@ class PlayerCard extends StatelessWidget {
                 ],
               ),
             ),
+
+            // 🔥 МАЛЕНЬКАЯ КАРТОЧКА РОЛИ (ЕСЛИ ВКЛЮЧЕНА)
+            if (showRole && player.role != 'unknown' && player.role != '')
+              Positioned(
+                top: -4,
+                left: isLeftColumn ? 4 : null,
+                right: isLeftColumn ? null : 4,
+                child: _buildRoleBadge(player.role),
+              ),
           ],
         );
       },
+    );
+  }
+
+  Widget _buildRoleBadge(String role) {
+    Color color;
+    String label;
+    IconData icon;
+
+    switch (role) {
+      case 'sheriff':
+        color = Colors.orange;
+        label = 'Ш';
+        icon = Icons.star;
+        break;
+      case 'don':
+        color = Colors.deepPurple;
+        label = 'Д';
+        icon = Icons.emoji_events;
+        break;
+      case 'mafia':
+        color = Colors.grey.shade700;
+        label = 'М';
+        icon = Icons.gavel;
+        break;
+      case 'citizen':
+        color = Colors.red;
+        label = 'М';
+        icon = Icons.people;
+        break;
+      default:
+        color = Colors.grey;
+        label = '?';
+        icon = Icons.help;
+    }
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+      decoration: BoxDecoration(
+        color: color,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(
+          color: Colors.white,
+          width: 1.5,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.3),
+            blurRadius: 4,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            icon,
+            size: 12,
+            color: Colors.white,
+          ),
+          const SizedBox(width: 2),
+          Text(
+            label,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 10,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

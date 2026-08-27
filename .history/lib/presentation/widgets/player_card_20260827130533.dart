@@ -85,16 +85,16 @@ class PlayerCard extends StatelessWidget {
     if (showRole && player.role != 'unknown' && player.role != '') {
       switch (player.role) {
         case 'citizen':
-          backgroundColor = Colors.red.withOpacity(0.5);
+          backgroundColor = Colors.red.withOpacity(0.3);
           break;
         case 'sheriff':
-          backgroundColor = Colors.red;
+          backgroundColor = Colors.orange.withOpacity(0.3);
           break;
         case 'mafia':
-          backgroundColor = Colors.black.withOpacity(0.5);
+          backgroundColor = Colors.grey.withOpacity(0.3);
           break;
         case 'don':
-          backgroundColor = Colors.black.withOpacity(0.8);
+          backgroundColor = Colors.deepPurple.withOpacity(0.3);
           break;
         default:
           backgroundColor = isDark ? Colors.black : Colors.white;
