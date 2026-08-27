@@ -350,9 +350,9 @@ class ClubService {
   }
 
 // ============================================================
-// ОТОЗВАТЬ ЗАЯВКУ ПО ID КЛУБА
+// ОТОЗВАТЬ ЗАЯВКУ
 // ============================================================
-  static Future<Map<String, dynamic>> cancelRequestByClub(int clubId) async {
+  static Future<Map<String, dynamic>> cancelRequest(int requestId) async {
     final token = await AuthService.getToken();
     if (token == null) {
       return {'success': false, 'error': 'Не авторизован'};
@@ -360,13 +360,12 @@ class ClubService {
 
     try {
       final response = await http.delete(
-        Uri.parse(
-            '$baseUrl/clubs/requests/cancel?club_id=$clubId&token=$token'),
+        Uri.parse('$baseUrl/clubs/requests/$requestId/cancel?token=$token'),
         headers: {'Content-Type': 'application/json'},
       );
 
-      print('📦 cancelRequestByClub status: ${response.statusCode}');
-      print('📦 cancelRequestByClub body: ${response.body}');
+      print('📦 cancelRequest status: ${response.statusCode}');
+      print('📦 cancelRequest body: ${response.body}');
 
       final data = jsonDecode(response.body);
       if (response.statusCode == 200) {
@@ -381,6 +380,7 @@ class ClubService {
       return {'success': false, 'error': 'Ошибка соединения: $e'};
     }
   }
+
   // ============================================================
   // УЧАСТНИКИ
   // ============================================================

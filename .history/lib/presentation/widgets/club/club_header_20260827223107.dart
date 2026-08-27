@@ -14,6 +14,7 @@ class ClubHeader extends StatelessWidget {
   final VoidCallback onGamesTap;
   final VoidCallback onMembersTap;
   final VoidCallback onMyClubTap;
+  final int? pendingRequestId;
 
   const ClubHeader({
     super.key,
@@ -24,6 +25,7 @@ class ClubHeader extends StatelessWidget {
     required this.onGamesTap,
     required this.onMembersTap,
     required this.onMyClubTap,
+    this.pendingRequestId,
   });
 
   @override
@@ -402,13 +404,13 @@ class ClubHeader extends StatelessWidget {
     }
   }
 
-  // 🔥 ОТОЗВАТЬ ЗАЯВКУ ПО ID КЛУБА
+  // 🔥 ОТОЗВАТЬ ЗАЯВКУ
   Future<void> _cancelRequest(BuildContext context) async {
-    final int? clubId = club?['id'];
-    if (clubId == null) {
+    final requestId = pendingRequestId;
+    if (requestId == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('❌ ID клуба не найден'),
+          content: Text('❌ ID заявки не найден'),
           backgroundColor: Colors.red,
         ),
       );
@@ -449,7 +451,7 @@ class ClubHeader extends StatelessWidget {
     if (confirm != true) return;
 
     // 🔥 ОТОЗВАТЬ ЗАЯВКУ
-    final result = await ClubService.cancelRequestByClub(clubId);
+    final result = await ClubService.cancelRequest(requestId);
 
     if (result['success']) {
       ScaffoldMessenger.of(context).showSnackBar(
