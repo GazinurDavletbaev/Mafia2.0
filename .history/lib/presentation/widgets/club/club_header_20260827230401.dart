@@ -309,6 +309,31 @@ class ClubHeader extends StatelessWidget {
                 icon: const Icon(Icons.add, size: 18),
                 label: const Text('Создать'),
               ),
+              const SizedBox(width: 12),
+              OutlinedButton.icon(
+                onPressed: () {
+                  // Открыть поиск клубов
+                  // Это можно сделать через callback или напрямую
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('🔍 Нажмите кнопку "Клубы" внизу экрана'),
+                      backgroundColor: Colors.orange,
+                      duration: Duration(seconds: 2),
+                    ),
+                  );
+                },
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: primaryColor,
+                  side: BorderSide(color: primaryColor),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                ),
+                icon: const Icon(Icons.search, size: 18),
+                label: const Text('Найти'),
+              ),
             ],
           ),
         ],
