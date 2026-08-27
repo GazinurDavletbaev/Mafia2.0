@@ -90,7 +90,9 @@ class _SplashScreenState extends State<SplashScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
+    final primaryColor = theme.primaryColor;
     final screenHeight = MediaQuery.of(context).size.height;
+    final screenWidth = MediaQuery.of(context).size.width;
 
     return Scaffold(
       body: Stack(
@@ -135,8 +137,8 @@ class _SplashScreenState extends State<SplashScreen> {
                 ),
                 Image.asset(
                   'assets/fsmtext.png',
-                  width: 250,
-                  height: 250,
+                  width: 150,
+                  height: 150,
                   fit: BoxFit.contain,
                 ),
               ],
@@ -144,12 +146,13 @@ class _SplashScreenState extends State<SplashScreen> {
           ),
 
           // ============================================================
-          // 🔥 КАРТИНКА С ДВУМЯ БЕЙДЖАМИ
+          // 🔥 КАРТИНКА С ДВУМЯ БЕЙДЖАМИ (ПОЗИЦИОНИРУЙ ГДЕ ХОЧЕШЬ)
           // ============================================================
           Positioned(
-            bottom: -90,
-            left: 0,
-            right: 0,
+            // 🔥 МЕНЯЙ ЭТИ ЦИФРЫ, ЧТОБЫ ДВИГАТЬ КАРТИНКУ
+            bottom: -90, // ← ОТСТУП СНИЗУ
+            left: 0, // ← ОТСТУП СЛЕВА
+            right: 0, // ← ОТСТУП СПРАВА
             child: Center(
               child: Stack(
                 clipBehavior: Clip.none,
@@ -164,20 +167,28 @@ class _SplashScreenState extends State<SplashScreen> {
 
                   // БЕЙДЖ 1: КЛУБЫ (СЛЕВА ВВЕРХУ)
                   Positioned(
-                    top: 265,
-                    left: 180,
+                    top: -100,
+                    left: 100,
                     child: Container(
                       padding: const EdgeInsets.all(6),
                       constraints: const BoxConstraints(
-                        minWidth: 34,
-                        minHeight: 34,
+                        minWidth: 28,
+                        minHeight: 28,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.deepPurple,
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: isDark ? Colors.black : Colors.white,
+                          width: 2,
+                        ),
                       ),
                       child: Center(
                         child: Text(
                           '${_clubCount}',
-                          style: TextStyle(
-                            color: isDark ? Colors.white : Colors.black,
-                            fontSize: 14,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 12,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
@@ -187,20 +198,28 @@ class _SplashScreenState extends State<SplashScreen> {
 
                   // БЕЙДЖ 2: ПОЛЬЗОВАТЕЛИ (СПРАВА ВВЕРХУ)
                   Positioned(
-                    top: 265,
-                    right: 155,
+                    top: -10,
+                    right: -10,
                     child: Container(
                       padding: const EdgeInsets.all(6),
                       constraints: const BoxConstraints(
-                        minWidth: 34,
-                        minHeight: 34,
+                        minWidth: 28,
+                        minHeight: 28,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.deepPurple,
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: isDark ? Colors.black : Colors.white,
+                          width: 2,
+                        ),
                       ),
                       child: Center(
                         child: Text(
                           '${_userCount}',
-                          style: TextStyle(
-                            color: isDark ? Colors.white : Colors.black,
-                            fontSize: 14,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 12,
                             fontWeight: FontWeight.bold,
                           ),
                         ),

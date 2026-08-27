@@ -135,8 +135,8 @@ class _SplashScreenState extends State<SplashScreen> {
                 ),
                 Image.asset(
                   'assets/fsmtext.png',
-                  width: 250,
-                  height: 250,
+                  width: 150,
+                  height: 150,
                   fit: BoxFit.contain,
                 ),
               ],
@@ -164,13 +164,13 @@ class _SplashScreenState extends State<SplashScreen> {
 
                   // БЕЙДЖ 1: КЛУБЫ (СЛЕВА ВВЕРХУ)
                   Positioned(
-                    top: 265,
-                    left: 180,
+                    top: 270,
+                    left: 30,
                     child: Container(
                       padding: const EdgeInsets.all(6),
                       constraints: const BoxConstraints(
-                        minWidth: 34,
-                        minHeight: 34,
+                        minWidth: 28,
+                        minHeight: 28,
                       ),
                       child: Center(
                         child: Text(
@@ -188,7 +188,7 @@ class _SplashScreenState extends State<SplashScreen> {
                   // БЕЙДЖ 2: ПОЛЬЗОВАТЕЛИ (СПРАВА ВВЕРХУ)
                   Positioned(
                     top: 265,
-                    right: 155,
+                    right: 320,
                     child: Container(
                       padding: const EdgeInsets.all(6),
                       constraints: const BoxConstraints(

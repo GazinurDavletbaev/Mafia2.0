@@ -135,8 +135,8 @@ class _SplashScreenState extends State<SplashScreen> {
                 ),
                 Image.asset(
                   'assets/fsmtext.png',
-                  width: 250,
-                  height: 250,
+                  width: 150,
+                  height: 150,
                   fit: BoxFit.contain,
                 ),
               ],
@@ -164,20 +164,30 @@ class _SplashScreenState extends State<SplashScreen> {
 
                   // БЕЙДЖ 1: КЛУБЫ (СЛЕВА ВВЕРХУ)
                   Positioned(
-                    top: 265,
-                    left: 180,
+                    top: 160,
+                    left: 100,
                     child: Container(
                       padding: const EdgeInsets.all(6),
                       constraints: const BoxConstraints(
-                        minWidth: 34,
-                        minHeight: 34,
+                        minWidth: 28,
+                        minHeight: 28,
+                      ),
+                      decoration: BoxDecoration(
+                        color: isDark
+                            ? Colors.deepPurple.shade300
+                            : Colors.pink.withOpacity(0.3),
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: isDark ? Colors.black : Colors.white,
+                          width: 2,
+                        ),
                       ),
                       child: Center(
                         child: Text(
                           '${_clubCount}',
                           style: TextStyle(
                             color: isDark ? Colors.white : Colors.black,
-                            fontSize: 14,
+                            fontSize: 12,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
@@ -187,20 +197,30 @@ class _SplashScreenState extends State<SplashScreen> {
 
                   // БЕЙДЖ 2: ПОЛЬЗОВАТЕЛИ (СПРАВА ВВЕРХУ)
                   Positioned(
-                    top: 265,
-                    right: 155,
+                    top: 180,
+                    right: 130,
                     child: Container(
                       padding: const EdgeInsets.all(6),
                       constraints: const BoxConstraints(
-                        minWidth: 34,
-                        minHeight: 34,
+                        minWidth: 28,
+                        minHeight: 28,
+                      ),
+                      decoration: BoxDecoration(
+                        color: isDark
+                            ? Colors.deepPurple.shade300
+                            : Colors.pink.withOpacity(0.3),
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: isDark ? Colors.black : Colors.black,
+                          width: 2,
+                        ),
                       ),
                       child: Center(
                         child: Text(
                           '${_userCount}',
                           style: TextStyle(
-                            color: isDark ? Colors.white : Colors.black,
-                            fontSize: 14,
+                            color: isDark ? Colors.white : Colors.white,
+                            fontSize: 12,
                             fontWeight: FontWeight.bold,
                           ),
                         ),

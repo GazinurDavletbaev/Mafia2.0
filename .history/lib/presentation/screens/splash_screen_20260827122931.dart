@@ -135,8 +135,8 @@ class _SplashScreenState extends State<SplashScreen> {
                 ),
                 Image.asset(
                   'assets/fsmtext.png',
-                  width: 250,
-                  height: 250,
+                  width: 150,
+                  height: 150,
                   fit: BoxFit.contain,
                 ),
               ],

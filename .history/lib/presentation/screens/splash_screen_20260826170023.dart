@@ -6,7 +6,7 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 import '../../services/auth_service.dart';
 import '../../services/user_service.dart';
 import '../../services/update_service.dart';
-import '../../services/club_service.dart';
+import '../../services/club_service.dart'; // ← ДОБАВИТЬ
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -28,6 +28,7 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   Future<void> _loadData() async {
+    // 🔥 ЗАГРУЖАЕМ КОЛИЧЕСТВО ПОЛЬЗОВАТЕЛЕЙ
     try {
       final result = await UserService.getUserCount();
       if (result['success']) {
@@ -39,6 +40,7 @@ class _SplashScreenState extends State<SplashScreen> {
       print('⚠️ Не удалось получить количество пользователей: $e');
     }
 
+    // 🔥 ЗАГРУЖАЕМ КОЛИЧЕСТВО КЛУБОВ
     try {
       final result = await ClubService.getAllClubs();
       if (result['success']) {
@@ -55,6 +57,7 @@ class _SplashScreenState extends State<SplashScreen> {
       _isLoading = false;
     });
 
+    // 🔥 ПРОВЕРКА ОБНОВЛЕНИЙ — ТОЛЬКО НЕ ДЛЯ ВЕБА!
     try {
       if (!kIsWeb) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -63,14 +66,19 @@ class _SplashScreenState extends State<SplashScreen> {
           }
         });
       }
-    } catch (e) {}
+    } catch (e) {
+      // Игнорируем ошибки обновлений
+    }
 
-    _timer = Timer(const Duration(seconds: 500), _navigateToNext);
+    // 🔥 ТАЙМЕР 5 СЕКУНД — ВСЕГДА ПЕРЕХОДИМ
+    _timer = Timer(const Duration(seconds: 400), _navigateToNext);
   }
 
   Future<void> _navigateToNext() async {
     if (!mounted) return;
+
     final token = await AuthService.getToken();
+
     if (mounted) {
       if (token != null && token.isNotEmpty) {
         context.go('/lobby');
@@ -90,12 +98,11 @@ class _SplashScreenState extends State<SplashScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    final screenHeight = MediaQuery.of(context).size.height;
+    final primaryColor = theme.primaryColor;
 
     return Scaffold(
       body: Stack(
         children: [
-          // ФОН
           Container(
             decoration: BoxDecoration(
               gradient: LinearGradient(
@@ -107,8 +114,6 @@ class _SplashScreenState extends State<SplashScreen> {
               ),
             ),
           ),
-
-          // FSM (правый верхний угол)
           Positioned(
             top: 50,
             right: 20,
@@ -119,14 +124,11 @@ class _SplashScreenState extends State<SplashScreen> {
               fit: BoxFit.contain,
             ),
           ),
-
-          // ЛОГОТИП (центр)
-          Positioned(
-            top: screenHeight * 0.15,
-            left: 0,
-            right: 0,
+          Center(
             child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
+                const SizedBox(height: 150),
                 Image.asset(
                   'assets/logo_new.png',
                   width: 300,
@@ -135,80 +137,58 @@ class _SplashScreenState extends State<SplashScreen> {
                 ),
                 Image.asset(
                   'assets/fsmtext.png',
-                  width: 250,
-                  height: 250,
+                  width: 150,
+                  height: 150,
                   fit: BoxFit.contain,
                 ),
+                const SizedBox(height: 50),
+
+                // ============================================================
+                // 🔥 НОВЫЙ БЛОК: ДВЕ КАРТИНКИ С БЕЙДЖАМИ
+                // ============================================================
+                // 🔥 КАРТИНКА 2: КЛУБЫ
+                Stack(
+                  clipBehavior: Clip.none,
+                  children: [
+                    Image.asset(
+                      'assets/clubs.png', // ← ЗАМЕНИ НА СВОЮ КАРТИНКУ
+                      width: 100,
+                      height: 100,
+                      fit: BoxFit.contain,
+                    ),
+                    // 🔥 БЕЙДЖ С КОЛИЧЕСТВОМ
+                    Positioned(
+                      top: -8,
+                      right: -8,
+                      child: Container(
+                        padding: const EdgeInsets.all(6),
+                        constraints: const BoxConstraints(
+                          minWidth: 28,
+                          minHeight: 28,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.deepPurple,
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: isDark ? Colors.black : Colors.white,
+                            width: 2,
+                          ),
+                        ),
+                        child: Center(
+                          child: Text(
+                            '${_clubCount}',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ],
-            ),
-          ),
-
-          // ============================================================
-          // 🔥 КАРТИНКА С ДВУМЯ БЕЙДЖАМИ
-          // ============================================================
-          Positioned(
-            bottom: -90,
-            left: 0,
-            right: 0,
-            child: Center(
-              child: Stack(
-                clipBehavior: Clip.none,
-                children: [
-                  // ОСНОВНАЯ КАРТИНКА
-                  Image.asset(
-                    'assets/clubs.png',
-                    width: 400,
-                    height: 400,
-                    fit: BoxFit.contain,
-                  ),
-
-                  // БЕЙДЖ 1: КЛУБЫ (СЛЕВА ВВЕРХУ)
-                  Positioned(
-                    top: 265,
-                    left: 180,
-                    child: Container(
-                      padding: const EdgeInsets.all(6),
-                      constraints: const BoxConstraints(
-                        minWidth: 34,
-                        minHeight: 34,
-                      ),
-                      child: Center(
-                        child: Text(
-                          '${_clubCount}',
-                          style: TextStyle(
-                            color: isDark ? Colors.white : Colors.black,
-                            fontSize: 14,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-
-                  // БЕЙДЖ 2: ПОЛЬЗОВАТЕЛИ (СПРАВА ВВЕРХУ)
-                  Positioned(
-                    top: 265,
-                    right: 155,
-                    child: Container(
-                      padding: const EdgeInsets.all(6),
-                      constraints: const BoxConstraints(
-                        minWidth: 34,
-                        minHeight: 34,
-                      ),
-                      child: Center(
-                        child: Text(
-                          '${_userCount}',
-                          style: TextStyle(
-                            color: isDark ? Colors.white : Colors.black,
-                            fontSize: 14,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
             ),
           ),
         ],
