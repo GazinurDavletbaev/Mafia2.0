@@ -4,10 +4,10 @@ import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:mafia_help/services/auth_service.dart';
 import 'package:http_parser/http_parser.dart';
-import 'package:mafia_help/core/config/app_config.dart'; // ← ДОБАВИТЬ
+import 'package:mafia_help/core/config/app_config.dart';
 
 class ClubService {
-  static String get baseUrl => AppConfig.baseUrl; // ← ИСПОЛЬЗОВАТЬ
+  static String get baseUrl => AppConfig.baseUrl;
 
   // ============================================================
   // БАЗОВЫЕ МЕТОДЫ
@@ -149,30 +149,35 @@ class ClubService {
       ),
     );
 
-    // 🔥 Приводим к тому же формату, что и getMyClub
     if (result['success']) {
-      // Убираем 'success' из данных
       final clubData = {...result};
       clubData.remove('success');
 
       return {
         'success': true,
-        'club': clubData, // ← данные кладём в 'club'
+        'club': clubData,
       };
     }
 
     return result;
   }
 
+  // ============================================================
+  // 🔥 СОЗДАНИЕ КЛУБА (С НОВЫМИ ПОЛЯМИ)
+  // ============================================================
   static Future<Map<String, dynamic>> createClub({
     required String title,
     String? city,
     String? description,
     String? country,
     String? region,
+    String? address,
     String? vk,
     String? telegram,
     String? twitch,
+    String? instagram,
+    String? youtube,
+    String? website,
   }) async {
     final token = await AuthService.getToken();
     if (token == null) {
@@ -188,9 +193,13 @@ class ClubService {
         'description': description,
         'country': country,
         'region': region,
+        'address': address,
         'vk': vk,
         'telegram': telegram,
         'twitch': twitch,
+        'instagram': instagram,
+        'youtube': youtube,
+        'website': website,
       }),
     );
 
@@ -349,9 +358,9 @@ class ClubService {
     );
   }
 
-// ============================================================
-// ОТОЗВАТЬ ЗАЯВКУ ПО ID КЛУБА
-// ============================================================
+  // ============================================================
+  // ОТОЗВАТЬ ЗАЯВКУ ПО ID КЛУБА
+  // ============================================================
   static Future<Map<String, dynamic>> cancelRequestByClub(int clubId) async {
     final token = await AuthService.getToken();
     if (token == null) {
@@ -381,6 +390,7 @@ class ClubService {
       return {'success': false, 'error': 'Ошибка соединения: $e'};
     }
   }
+
   // ============================================================
   // УЧАСТНИКИ
   // ============================================================
@@ -639,6 +649,9 @@ class ClubService {
     }
   }
 
+  // ============================================================
+  // 🔥 ОБНОВЛЕНИЕ КЛУБА (С НОВЫМИ ПОЛЯМИ)
+  // ============================================================
   static Future<Map<String, dynamic>> updateClub({
     required int clubId,
     String? title,
@@ -646,6 +659,13 @@ class ClubService {
     String? city,
     String? country,
     String? region,
+    String? address,
+    String? vk,
+    String? telegram,
+    String? twitch,
+    String? instagram,
+    String? youtube,
+    String? website,
     String? logoUrl,
   }) async {
     final token = await AuthService.getToken();
@@ -663,6 +683,13 @@ class ClubService {
           'city': city,
           'country': country,
           'region': region,
+          'address': address,
+          'vk': vk,
+          'telegram': telegram,
+          'twitch': twitch,
+          'instagram': instagram,
+          'youtube': youtube,
+          'website': website,
           'logo_url': logoUrl,
         }),
       ),

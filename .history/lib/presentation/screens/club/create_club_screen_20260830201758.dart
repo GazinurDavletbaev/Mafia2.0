@@ -1,24 +1,27 @@
-// lib/presentation/screens/edit_club_screen.dart
-import 'dart:io';
+// lib/presentation/screens/create_club_screen.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
-import '../../services/club_service.dart';
+import 'package:mafia_help/application/providers/club_provider.dart';
+import 'package:mafia_help/application/providers/user_provider.dart';
+import 'dart:io';
+import '../../../services/club_service.dart';
 
-class EditClubScreen extends ConsumerStatefulWidget {
-  final Map<String, dynamic> club;
-
-  const EditClubScreen({super.key, required this.club});
+class CreateClubScreen extends ConsumerStatefulWidget {
+  const CreateClubScreen({super.key});
 
   @override
-  ConsumerState<EditClubScreen> createState() => _EditClubScreenState();
+  ConsumerState<CreateClubScreen> createState() => _CreateClubScreenState();
 }
 
-class _EditClubScreenState extends ConsumerState<EditClubScreen> {
+class _CreateClubScreenState extends ConsumerState<CreateClubScreen> {
   final _titleController = TextEditingController();
   final _descriptionController = TextEditingController();
   final _cityController = TextEditingController();
+  final _vkController = TextEditingController();
+  final _telegramController = TextEditingController();
+  final _twitchController = TextEditingController();
 
   String? _selectedCountry;
   String? _selectedRegion;
@@ -37,9 +40,9 @@ class _EditClubScreenState extends ConsumerState<EditClubScreen> {
     'Россия': [
       'Москва',
       'Санкт-Петербург',
-      'Сибирь и Урал',
       'Республика Татарстан',
       'Краснодарский край',
+      'Свердловская область',
       'Другой',
     ],
     'Беларусь': ['Минск', 'Гомель', 'Другой'],
@@ -48,17 +51,14 @@ class _EditClubScreenState extends ConsumerState<EditClubScreen> {
   };
 
   @override
-  void initState() {
-    super.initState();
-    _loadClubData();
-  }
-
-  void _loadClubData() {
-    _titleController.text = widget.club['title'] ?? '';
-    _descriptionController.text = widget.club['description'] ?? '';
-    _cityController.text = widget.club['city'] ?? '';
-    _selectedCountry = widget.club['country'];
-    _selectedRegion = widget.club['region'];
+  void dispose() {
+    _titleController.dispose();
+    _descriptionController.dispose();
+    _cityController.dispose();
+    _vkController.dispose();
+    _telegramController.dispose();
+    _twitchController.dispose();
+    super.dispose();
   }
 
   Future<void> _pickImage() async {
@@ -71,8 +71,11 @@ class _EditClubScreenState extends ConsumerState<EditClubScreen> {
     }
   }
 
-  Future<void> _saveClub() async {
+  Future<void> _createClub() async {
     final title = _titleController.text.trim();
+    final description = _descriptionController.text.trim();
+    final city = _cityController.text.trim();
+
     if (title.isEmpty) {
       _showSnackBar('Введите название клуба', Colors.red);
       return;
@@ -80,45 +83,51 @@ class _EditClubScreenState extends ConsumerState<EditClubScreen> {
 
     setState(() => _isLoading = true);
 
-    String? newLogoUrl;
-
-    // ✅ 1. Загружаем логотип
-    if (_clubImage != null) {
-      final uploadResult = await ClubService.uploadClubLogo(
-        clubId: widget.club['id'],
-        image: _clubImage!,
-      );
-      print('📦 uploadResult: $uploadResult');
-      if (uploadResult['success']) {
-        newLogoUrl = uploadResult['logo_url'];
-        print('📦 newLogoUrl: $newLogoUrl');
-      }
-    }
-
-    // ✅ 2. Обновляем клуб
-    final result = await ClubService.updateClub(
-      clubId: widget.club['id'],
+    final result = await ClubService.createClub(
       title: title,
-      description: _descriptionController.text.trim(),
-      city: _cityController.text.trim(),
+      city: city.isNotEmpty ? city : null,
+      description: description.isNotEmpty ? description : null,
       country: _selectedCountry,
       region: _selectedRegion,
-      logoUrl: newLogoUrl,
+      vk: _vkController.text.trim().isNotEmpty
+          ? _vkController.text.trim()
+          : null,
+      telegram: _telegramController.text.trim().isNotEmpty
+          ? _telegramController.text.trim()
+          : null,
+      twitch: _twitchController.text.trim().isNotEmpty
+          ? _twitchController.text.trim()
+          : null,
     );
-    print(
-        '📦 Отправка: title=$title, description=${_descriptionController.text}, country=$_selectedCountry, region=$_selectedRegion');
-    print('📦 updateClub result: $result');
-
-    setState(() => _isLoading = false);
 
     if (result['success']) {
-      _showSnackBar('Клуб обновлён!', Colors.green);
+      final clubId = result['id'];
+      ref.invalidate(clubProvider);
+      ref.invalidate(userProvider);
+      if (_clubImage != null) {
+        final uploadResult = await ClubService.uploadClubLogo(
+          clubId: clubId,
+          image: _clubImage!,
+        );
+        if (uploadResult['success']) {
+          print('📦 Логотип загружен: ${uploadResult['logo_url']}');
+        } else {
+          print('❌ Ошибка загрузки логотипа: ${uploadResult['error']}');
+        }
+      }
+
+      _showSnackBar('Клуб успешно создан!', Colors.green);
       Future.delayed(const Duration(seconds: 1), () {
-        if (mounted) context.go('/profile');
+        if (mounted) {
+          ref.invalidate(clubProvider);
+          context.go('/lobby');
+        }
       });
     } else {
-      _showSnackBar(result['error'] ?? 'Ошибка', Colors.red);
+      _showSnackBar(result['error'] ?? 'Ошибка создания клуба', Colors.red);
     }
+
+    setState(() => _isLoading = false);
   }
 
   void _showSnackBar(String message, Color color) {
@@ -131,125 +140,19 @@ class _EditClubScreenState extends ConsumerState<EditClubScreen> {
     );
   }
 
-  void _showDeleteClubDialog() {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) => AlertDialog(
-        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-        ),
-        title: Row(
-          children: [
-            const Icon(Icons.warning_amber_rounded,
-                color: Colors.red, size: 28),
-            const SizedBox(width: 12),
-            Text(
-              '⚠️ Удалить клуб?',
-              style: TextStyle(
-                color: Theme.of(context).textTheme.titleLarge?.color ??
-                    Colors.white,
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ],
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Вы собираетесь удалить клуб "${widget.club['title']}".',
-              style: TextStyle(
-                color: Theme.of(context).textTheme.bodyLarge?.color ??
-                    Colors.white,
-                fontSize: 16,
-              ),
-            ),
-            const SizedBox(height: 12),
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: Colors.red.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: Colors.red.withOpacity(0.3)),
-              ),
-              child: const Text(
-                'Все данные клуба будут безвозвратно удалены:\n'
-                '• Все игры\n'
-                '• Статистика игроков\n'
-                '• Участники клуба\n'
-                '• Рейтинг',
-                style: TextStyle(
-                  color: Colors.red,
-                  fontSize: 14,
-                ),
-              ),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text(
-              'Отмена',
-              style: TextStyle(color: Colors.grey, fontSize: 16),
-            ),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pop(context);
-              _deleteClub();
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.red,
-              foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-            ),
-            child: const Text('Да, удалить'),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Future<void> _deleteClub() async {
-    setState(() => _isLoading = true);
-
-    final result = await ClubService.dissolveClub(widget.club['id']);
-
-    setState(() => _isLoading = false);
-
-    if (result['success']) {
-      _showSnackBar('Клуб удалён', Colors.green);
-      Future.delayed(const Duration(seconds: 1), () {
-        if (mounted) {
-          context.go('/lobby');
-        }
-      });
-    } else {
-      _showSnackBar(result['error'] ?? 'Ошибка удаления', Colors.red);
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
+    final primaryColor = theme.primaryColor;
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        title: const Text('Редактировать клуб'),
+        title: const Text('Создание клуба'),
         backgroundColor: theme.appBarTheme.backgroundColor,
         foregroundColor: theme.appBarTheme.foregroundColor,
         elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => context.go('/lobby'),
-        ),
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
@@ -258,7 +161,14 @@ class _EditClubScreenState extends ConsumerState<EditClubScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Аватарка
+                  const Text(
+                    'Создайте свой собственный клуб и приглашайте туда активных участников',
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Colors.grey,
+                    ),
+                  ),
+                  const SizedBox(height: 24),
                   Center(
                     child: GestureDetector(
                       onTap: _pickImage,
@@ -270,24 +180,18 @@ class _EditClubScreenState extends ConsumerState<EditClubScreen> {
                               ? Colors.grey.shade800
                               : Colors.grey.shade200,
                           shape: BoxShape.circle,
-                          border: Border.all(color: Colors.orange, width: 2),
+                          border: Border.all(
+                            color: primaryColor,
+                            width: 2,
+                          ),
                           image: _clubImage != null
                               ? DecorationImage(
                                   image: FileImage(_clubImage!),
                                   fit: BoxFit.cover,
                                 )
-                              : (widget.club['logo_url'] != null &&
-                                      widget.club['logo_url'].isNotEmpty
-                                  ? DecorationImage(
-                                      image:
-                                          NetworkImage(widget.club['logo_url']),
-                                      fit: BoxFit.cover,
-                                    )
-                                  : null),
+                              : null,
                         ),
-                        child: _clubImage == null &&
-                                (widget.club['logo_url'] == null ||
-                                    widget.club['logo_url'].isEmpty)
+                        child: _clubImage == null
                             ? Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
@@ -318,7 +222,9 @@ class _EditClubScreenState extends ConsumerState<EditClubScreen> {
                   const SizedBox(height: 8),
                   Center(
                     child: Text(
-                      'Нажмите чтобы сменить фото',
+                      _clubImage == null
+                          ? 'Нажмите для загрузки фото'
+                          : 'Нажмите чтобы сменить фото',
                       style: TextStyle(
                         fontSize: 12,
                         color: isDark
@@ -328,8 +234,6 @@ class _EditClubScreenState extends ConsumerState<EditClubScreen> {
                     ),
                   ),
                   const SizedBox(height: 24),
-
-                  // Общая информация
                   const Text(
                     'Общая информация',
                     style: TextStyle(
@@ -339,7 +243,6 @@ class _EditClubScreenState extends ConsumerState<EditClubScreen> {
                     ),
                   ),
                   const SizedBox(height: 16),
-
                   TextField(
                     controller: _titleController,
                     style: TextStyle(
@@ -359,12 +262,10 @@ class _EditClubScreenState extends ConsumerState<EditClubScreen> {
                         borderRadius: BorderRadius.circular(12),
                         borderSide: BorderSide.none,
                       ),
-                      prefixIcon:
-                          const Icon(Icons.emoji_events, color: Colors.orange),
+                      prefixIcon: Icon(Icons.emoji_events, color: primaryColor),
                     ),
                   ),
                   const SizedBox(height: 16),
-
                   TextField(
                     controller: _descriptionController,
                     maxLines: 4,
@@ -379,6 +280,12 @@ class _EditClubScreenState extends ConsumerState<EditClubScreen> {
                             ? Colors.grey.shade400
                             : Colors.grey.shade600,
                       ),
+                      hintText: 'Расскажите о вашем клубе...',
+                      hintStyle: TextStyle(
+                        color: isDark
+                            ? Colors.grey.shade600
+                            : Colors.grey.shade400,
+                      ),
                       filled: true,
                       fillColor:
                           isDark ? Colors.grey.shade800 : Colors.grey.shade200,
@@ -386,12 +293,10 @@ class _EditClubScreenState extends ConsumerState<EditClubScreen> {
                         borderRadius: BorderRadius.circular(12),
                         borderSide: BorderSide.none,
                       ),
-                      prefixIcon:
-                          const Icon(Icons.description, color: Colors.orange),
+                      prefixIcon: Icon(Icons.description, color: primaryColor),
                     ),
                   ),
                   const SizedBox(height: 16),
-
                   DropdownButtonFormField<String>(
                     value: _selectedCountry,
                     dropdownColor: isDark ? Colors.grey.shade800 : Colors.white,
@@ -412,8 +317,7 @@ class _EditClubScreenState extends ConsumerState<EditClubScreen> {
                         borderRadius: BorderRadius.circular(12),
                         borderSide: BorderSide.none,
                       ),
-                      prefixIcon:
-                          const Icon(Icons.public, color: Colors.orange),
+                      prefixIcon: Icon(Icons.public, color: primaryColor),
                     ),
                     items: _countries.map((country) {
                       return DropdownMenuItem<String>(
@@ -429,7 +333,6 @@ class _EditClubScreenState extends ConsumerState<EditClubScreen> {
                     },
                   ),
                   const SizedBox(height: 16),
-
                   TextField(
                     controller: _cityController,
                     style: TextStyle(
@@ -442,6 +345,12 @@ class _EditClubScreenState extends ConsumerState<EditClubScreen> {
                             ? Colors.grey.shade400
                             : Colors.grey.shade600,
                       ),
+                      hintText: 'Введите город',
+                      hintStyle: TextStyle(
+                        color: isDark
+                            ? Colors.grey.shade600
+                            : Colors.grey.shade400,
+                      ),
                       filled: true,
                       fillColor:
                           isDark ? Colors.grey.shade800 : Colors.grey.shade200,
@@ -450,11 +359,10 @@ class _EditClubScreenState extends ConsumerState<EditClubScreen> {
                         borderSide: BorderSide.none,
                       ),
                       prefixIcon:
-                          const Icon(Icons.location_city, color: Colors.orange),
+                          Icon(Icons.location_city, color: primaryColor),
                     ),
                   ),
                   const SizedBox(height: 16),
-
                   DropdownButtonFormField<String>(
                     value: _selectedRegion,
                     dropdownColor: isDark ? Colors.grey.shade800 : Colors.white,
@@ -475,7 +383,7 @@ class _EditClubScreenState extends ConsumerState<EditClubScreen> {
                         borderRadius: BorderRadius.circular(12),
                         borderSide: BorderSide.none,
                       ),
-                      prefixIcon: const Icon(Icons.map, color: Colors.orange),
+                      prefixIcon: Icon(Icons.map, color: primaryColor),
                     ),
                     items: _selectedCountry != null
                         ? (_regions[_selectedCountry!] ?? ['Другой'])
@@ -492,22 +400,21 @@ class _EditClubScreenState extends ConsumerState<EditClubScreen> {
                       });
                     },
                   ),
-                  const SizedBox(height: 32),
-
+                  const SizedBox(height: 24),
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
-                      onPressed: _saveClub,
+                      onPressed: _createClub,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.orange,
-                        foregroundColor: Colors.black,
+                        backgroundColor: primaryColor,
+                        foregroundColor: Colors.white,
                         padding: const EdgeInsets.symmetric(vertical: 16),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
                       ),
                       child: const Text(
-                        'Сохранить изменения',
+                        'Создать клуб',
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
@@ -515,31 +422,15 @@ class _EditClubScreenState extends ConsumerState<EditClubScreen> {
                       ),
                     ),
                   ),
-                  const SizedBox(height: 16),
-
-// ✅ КНОПКА УДАЛЕНИЯ КЛУБА
-                  SizedBox(
-                    width: double.infinity,
-                    child: OutlinedButton.icon(
-                      onPressed: _showDeleteClubDialog,
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: Colors.red,
-                        side: const BorderSide(color: Colors.red),
-                        padding: const EdgeInsets.symmetric(vertical: 14),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                      ),
-                      icon: const Icon(Icons.delete_forever),
-                      label: const Text(
-                        'Удалить клуб',
-                        style: TextStyle(
-                            fontSize: 16, fontWeight: FontWeight.bold),
-                      ),
+                  const SizedBox(height: 12),
+                  TextButton(
+                    onPressed: () => context.go('/settings'),
+                    child: const Text(
+                      '← Вернуться в профиль',
+                      style: TextStyle(color: Colors.grey),
                     ),
                   ),
-
-                  const SizedBox(height: 70),
+                  const SizedBox(height: 20),
                 ],
               ),
             ),

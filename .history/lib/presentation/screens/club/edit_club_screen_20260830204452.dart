@@ -1,21 +1,21 @@
-// lib/presentation/screens/create_club_screen.dart
+// lib/presentation/screens/edit_club_screen.dart
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:mafia_help/application/providers/club_provider.dart';
-import 'package:mafia_help/application/providers/user_provider.dart';
-import 'dart:io';
 import '../../../services/club_service.dart';
 
-class CreateClubScreen extends ConsumerStatefulWidget {
-  const CreateClubScreen({super.key});
+class EditClubScreen extends ConsumerStatefulWidget {
+  final Map<String, dynamic> club;
+
+  const EditClubScreen({super.key, required this.club});
 
   @override
-  ConsumerState<CreateClubScreen> createState() => _CreateClubScreenState();
+  ConsumerState<EditClubScreen> createState() => _EditClubScreenState();
 }
 
-class _CreateClubScreenState extends ConsumerState<CreateClubScreen> {
+class _EditClubScreenState extends ConsumerState<EditClubScreen> {
   final _titleController = TextEditingController();
   final _descriptionController = TextEditingController();
   final _cityController = TextEditingController();
@@ -52,6 +52,12 @@ class _CreateClubScreenState extends ConsumerState<CreateClubScreen> {
   ];
 
   @override
+  void initState() {
+    super.initState();
+    _loadClubData();
+  }
+
+  @override
   void dispose() {
     _titleController.dispose();
     _descriptionController.dispose();
@@ -66,6 +72,21 @@ class _CreateClubScreenState extends ConsumerState<CreateClubScreen> {
     super.dispose();
   }
 
+  void _loadClubData() {
+    _titleController.text = widget.club['title'] ?? '';
+    _descriptionController.text = widget.club['description'] ?? '';
+    _cityController.text = widget.club['city'] ?? '';
+    _addressController.text = widget.club['address'] ?? ''; // ← НОВОЕ
+    _vkController.text = widget.club['vk'] ?? '';
+    _telegramController.text = widget.club['telegram'] ?? '';
+    _twitchController.text = widget.club['twitch'] ?? '';
+    _instagramController.text = widget.club['instagram'] ?? ''; // ← НОВОЕ
+    _youtubeController.text = widget.club['youtube'] ?? ''; // ← НОВОЕ
+    _websiteController.text = widget.club['website'] ?? ''; // ← НОВОЕ
+    _selectedCountry = widget.club['country'];
+    _selectedRegion = widget.club['region'];
+  }
+
   Future<void> _pickImage() async {
     final ImagePicker picker = ImagePicker();
     final XFile? image = await picker.pickImage(source: ImageSource.gallery);
@@ -76,7 +97,7 @@ class _CreateClubScreenState extends ConsumerState<CreateClubScreen> {
     }
   }
 
-  Future<void> _createClub() async {
+  Future<void> _saveClub() async {
     final title = _titleController.text.trim();
     final description = _descriptionController.text.trim();
     final city = _cityController.text.trim();
@@ -109,10 +130,25 @@ class _CreateClubScreenState extends ConsumerState<CreateClubScreen> {
 
     setState(() => _isLoading = true);
 
-    final result = await ClubService.createClub(
+    String? newLogoUrl;
+
+    if (_clubImage != null) {
+      final uploadResult = await ClubService.uploadClubLogo(
+        clubId: widget.club['id'],
+        image: _clubImage!,
+      );
+      print('📦 uploadResult: $uploadResult');
+      if (uploadResult['success']) {
+        newLogoUrl = uploadResult['logo_url'];
+        print('📦 newLogoUrl: $newLogoUrl');
+      }
+    }
+
+    final result = await ClubService.updateClub(
+      clubId: widget.club['id'],
       title: title,
-      city: city,
       description: description,
+      city: city,
       country: _selectedCountry,
       region: _selectedRegion,
       address: address,
@@ -134,36 +170,21 @@ class _CreateClubScreenState extends ConsumerState<CreateClubScreen> {
       website: _websiteController.text.trim().isNotEmpty
           ? _websiteController.text.trim()
           : null,
+      logoUrl: newLogoUrl,
     );
 
-    if (result['success']) {
-      final clubId = result['id'];
-      ref.invalidate(clubProvider);
-      ref.invalidate(userProvider);
-      if (_clubImage != null) {
-        final uploadResult = await ClubService.uploadClubLogo(
-          clubId: clubId,
-          image: _clubImage!,
-        );
-        if (uploadResult['success']) {
-          print('📦 Логотип загружен: ${uploadResult['logo_url']}');
-        } else {
-          print('❌ Ошибка загрузки логотипа: ${uploadResult['error']}');
-        }
-      }
-
-      _showSnackBar('Клуб успешно создан!', Colors.green);
-      Future.delayed(const Duration(seconds: 1), () {
-        if (mounted) {
-          ref.invalidate(clubProvider);
-          context.go('/lobby');
-        }
-      });
-    } else {
-      _showSnackBar(result['error'] ?? 'Ошибка создания клуба', Colors.red);
-    }
+    print('📦 updateClub result: $result');
 
     setState(() => _isLoading = false);
+
+    if (result['success']) {
+      _showSnackBar('Клуб обновлён!', Colors.green);
+      Future.delayed(const Duration(seconds: 1), () {
+        if (mounted) context.go('/profile');
+      });
+    } else {
+      _showSnackBar(result['error'] ?? 'Ошибка', Colors.red);
+    }
   }
 
   void _showSnackBar(String message, Color color) {
@@ -176,6 +197,109 @@ class _CreateClubScreenState extends ConsumerState<CreateClubScreen> {
     );
   }
 
+  void _showDeleteClubDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
+        title: Row(
+          children: [
+            const Icon(Icons.warning_amber_rounded,
+                color: Colors.red, size: 28),
+            const SizedBox(width: 12),
+            Text(
+              '⚠️ Удалить клуб?',
+              style: TextStyle(
+                color: Theme.of(context).textTheme.titleLarge?.color ??
+                    Colors.white,
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Вы собираетесь удалить клуб "${widget.club['title']}".',
+              style: TextStyle(
+                color: Theme.of(context).textTheme.bodyLarge?.color ??
+                    Colors.white,
+                fontSize: 16,
+              ),
+            ),
+            const SizedBox(height: 12),
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.red.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: Colors.red.withOpacity(0.3)),
+              ),
+              child: const Text(
+                'Все данные клуба будут безвозвратно удалены:\n'
+                '• Все игры\n'
+                '• Статистика игроков\n'
+                '• Участники клуба\n'
+                '• Рейтинг',
+                style: TextStyle(
+                  color: Colors.red,
+                  fontSize: 14,
+                ),
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text(
+              'Отмена',
+              style: TextStyle(color: Colors.grey, fontSize: 16),
+            ),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context);
+              _deleteClub();
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red,
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+            ),
+            child: const Text('Да, удалить'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _deleteClub() async {
+    setState(() => _isLoading = true);
+
+    final result = await ClubService.dissolveClub(widget.club['id']);
+
+    setState(() => _isLoading = false);
+
+    if (result['success']) {
+      _showSnackBar('Клуб удалён', Colors.green);
+      Future.delayed(const Duration(seconds: 1), () {
+        if (mounted) {
+          context.go('/lobby');
+        }
+      });
+    } else {
+      _showSnackBar(result['error'] ?? 'Ошибка удаления', Colors.red);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -185,10 +309,14 @@ class _CreateClubScreenState extends ConsumerState<CreateClubScreen> {
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        title: const Text('Создание клуба'),
+        title: const Text('Редактировать клуб'),
         backgroundColor: theme.appBarTheme.backgroundColor,
         foregroundColor: theme.appBarTheme.foregroundColor,
         elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => context.go('/lobby'),
+        ),
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
@@ -197,15 +325,6 @@ class _CreateClubScreenState extends ConsumerState<CreateClubScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    'Создайте свой собственный клуб и приглашайте туда активных участников',
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Colors.grey,
-                    ),
-                  ),
-                  const SizedBox(height: 24),
-
                   // 📷 ФОТО
                   Center(
                     child: GestureDetector(
@@ -218,18 +337,24 @@ class _CreateClubScreenState extends ConsumerState<CreateClubScreen> {
                               ? Colors.grey.shade800
                               : Colors.grey.shade200,
                           shape: BoxShape.circle,
-                          border: Border.all(
-                            color: primaryColor,
-                            width: 2,
-                          ),
+                          border: Border.all(color: primaryColor, width: 2),
                           image: _clubImage != null
                               ? DecorationImage(
                                   image: FileImage(_clubImage!),
                                   fit: BoxFit.cover,
                                 )
-                              : null,
+                              : (widget.club['logo_url'] != null &&
+                                      widget.club['logo_url'].isNotEmpty
+                                  ? DecorationImage(
+                                      image:
+                                          NetworkImage(widget.club['logo_url']),
+                                      fit: BoxFit.cover,
+                                    )
+                                  : null),
                         ),
-                        child: _clubImage == null
+                        child: _clubImage == null &&
+                                (widget.club['logo_url'] == null ||
+                                    widget.club['logo_url'].isEmpty)
                             ? Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
@@ -260,9 +385,7 @@ class _CreateClubScreenState extends ConsumerState<CreateClubScreen> {
                   const SizedBox(height: 8),
                   Center(
                     child: Text(
-                      _clubImage == null
-                          ? 'Нажмите для загрузки фото'
-                          : 'Нажмите чтобы сменить фото',
+                      'Нажмите чтобы сменить фото',
                       style: TextStyle(
                         fontSize: 12,
                         color: isDark
@@ -322,12 +445,6 @@ class _CreateClubScreenState extends ConsumerState<CreateClubScreen> {
                         color: isDark
                             ? Colors.grey.shade400
                             : Colors.grey.shade600,
-                      ),
-                      hintText: 'Расскажите о вашем клубе...',
-                      hintStyle: TextStyle(
-                        color: isDark
-                            ? Colors.grey.shade600
-                            : Colors.grey.shade400,
                       ),
                       filled: true,
                       fillColor:
@@ -428,12 +545,6 @@ class _CreateClubScreenState extends ConsumerState<CreateClubScreen> {
                         color: isDark
                             ? Colors.grey.shade400
                             : Colors.grey.shade600,
-                      ),
-                      hintText: 'Введите город',
-                      hintStyle: TextStyle(
-                        color: isDark
-                            ? Colors.grey.shade600
-                            : Colors.grey.shade400,
                       ),
                       filled: true,
                       fillColor:
@@ -679,11 +790,11 @@ class _CreateClubScreenState extends ConsumerState<CreateClubScreen> {
                   ),
                   const SizedBox(height: 32),
 
-                  // КНОПКА СОЗДАНИЯ
+                  // КНОПКА СОХРАНЕНИЯ
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
-                      onPressed: _createClub,
+                      onPressed: _saveClub,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: primaryColor,
                         foregroundColor: Colors.white,
@@ -693,7 +804,7 @@ class _CreateClubScreenState extends ConsumerState<CreateClubScreen> {
                         ),
                       ),
                       child: const Text(
-                        'Создать клуб',
+                        'Сохранить изменения',
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
@@ -701,15 +812,30 @@ class _CreateClubScreenState extends ConsumerState<CreateClubScreen> {
                       ),
                     ),
                   ),
-                  const SizedBox(height: 12),
-                  TextButton(
-                    onPressed: () => context.go('/settings'),
-                    child: const Text(
-                      '← Вернуться в профиль',
-                      style: TextStyle(color: Colors.grey),
+                  const SizedBox(height: 16),
+
+                  // КНОПКА УДАЛЕНИЯ
+                  SizedBox(
+                    width: double.infinity,
+                    child: OutlinedButton.icon(
+                      onPressed: _showDeleteClubDialog,
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: Colors.red,
+                        side: const BorderSide(color: Colors.red),
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      icon: const Icon(Icons.delete_forever),
+                      label: const Text(
+                        'Удалить клуб',
+                        style: TextStyle(
+                            fontSize: 16, fontWeight: FontWeight.bold),
+                      ),
                     ),
                   ),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 70),
                 ],
               ),
             ),
