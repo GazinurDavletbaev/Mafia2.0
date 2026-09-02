@@ -6,10 +6,10 @@ import 'package:mafia_help/presentation/widgets/club/club_header.dart';
 import 'package:mafia_help/presentation/widgets/club/club_rating_table.dart';
 import 'package:mafia_help/presentation/widgets/club/club_search_list.dart';
 import 'package:mafia_help/presentation/widgets/club/club_members_table.dart';
+import 'package:mafia_help/presentation/widgets/tutorial/tutorial_manager.dart';
+import 'package:mafia_help/presentation/widgets/tutorial/tutorials/club_tutorials.dart';
 import 'package:mdi_plus/mdi_plus.dart';
 import '../../../services/club_service.dart';
-import '../../widgets/tutorial/tutorial_manager.dart';
-import '../../widgets/tutorial/tutorials.dart';
 
 class ClubScreen extends ConsumerStatefulWidget {
   const ClubScreen({super.key});
@@ -21,6 +21,8 @@ class ClubScreen extends ConsumerStatefulWidget {
 class _ClubScreenState extends ConsumerState<ClubScreen> {
   bool _isLoading = true;
   bool _hasClub = false;
+  final GlobalKey _residentsKey = GlobalKey(); // ← ДОБАВИТЬ
+
   bool _showClubSearch = false;
   int? _myClubId;
   Map<String, dynamic>? _club;
@@ -38,37 +40,25 @@ class _ClubScreenState extends ConsumerState<ClubScreen> {
   int get _month => _currentDate.month;
   int get _year => _currentDate.year;
 
-  // 🔥 КЛЮЧИ ДЛЯ ТУТОРИАЛОВ
-  final Map<String, GlobalKey> _tutorialKeys = {
-    'club_residents': GlobalKey(),
-    'club_games': GlobalKey(),
-    // 'club_search': GlobalKey(),  // если добавишь подсказку для поиска
-  };
-
   @override
   void initState() {
     super.initState();
     _loadData();
-
-    // 🔥 ПОКАЗЫВАЕМ ПОДСКАЗКИ ПОСЛЕ ЗАГРУЗКИ
+    // 🔥 ПОКАЗЫВАЕМ ПОДСКАЗКУ
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _showTutorials();
+      TutorialManager.startTutorials(
+        context: context,
+        ref: ref,
+        tutorialGroup: ClubTutorials(
+          residentsKey: _residentsKey,
+          // gamesKey: _gamesKey,      // ← если добавишь
+          // searchButtonKey: _searchButtonKey,  // ← если добавишь
+        ),
+        onAllCompleted: () {
+          print('🎉 Все подсказки в клубе показаны!');
+        },
+      );
     });
-  }
-
-  void _showTutorials() {
-    // Показываем только если есть клуб и подсказки включены
-    if (!_hasClub) return;
-
-    TutorialManager.startTutorials(
-      context: context,
-      screen: 'club',
-      ref: ref,
-      keys: _tutorialKeys,
-      onAllCompleted: () {
-        print('🎉 Все подсказки в клубе показаны!');
-      },
-    );
   }
 
   void _selectClub(int clubId) {
@@ -95,7 +85,6 @@ class _ClubScreenState extends ConsumerState<ClubScreen> {
           final clubData = result['club'] ?? result;
           _club = clubData;
           _hasClub = true;
-          _showClubSearch = false;
           await _loadRating();
           await _loadGames();
           await _loadMembers();
@@ -116,30 +105,22 @@ class _ClubScreenState extends ConsumerState<ClubScreen> {
           _club = clubData;
           _myClubId = clubData['id'];
           _hasClub = true;
-          _showClubSearch = false;
           await _loadRating();
           await _loadGames();
           await _loadMembers();
         } else {
           _hasClub = false;
           _club = null;
-          _showClubSearch = true;
+          _showClubSearch = true; // ← ЕСЛИ НЕТ КЛУБА — ВКЛЮЧАЕМ ПОИСК!
         }
       }
     } catch (e) {
       _hasClub = false;
       _club = null;
-      _showClubSearch = true;
+      _showClubSearch = true; // ← ПРИ ОШИБКЕ ТОЖЕ ПОКАЗЫВАЕМ ПОИСК
     }
 
     setState(() => _isLoading = false);
-
-    // 🔥 ПОСЛЕ ЗАГРУЗКИ ПОКАЗЫВАЕМ ПОДСКАЗКИ
-    if (_hasClub) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        _showTutorials();
-      });
-    }
   }
 
   Future<void> _loadRating() async {
@@ -236,11 +217,6 @@ class _ClubScreenState extends ConsumerState<ClubScreen> {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
 
-    // 🔥 ЕСЛИ НЕТ КЛУБА — ПОКАЗЫВАЕМ ПУСТОТУ (НО ЭТО НЕ ИСПОЛЬЗУЕТСЯ, Т.К. ВКЛЮЧЁН ПОИСК)
-    if (!_hasClub) {
-      return const SizedBox.shrink();
-    }
-
     switch (_currentTab) {
       case 0:
         return _hasGames
@@ -302,7 +278,7 @@ class _ClubScreenState extends ConsumerState<ClubScreen> {
                     _currentTab = 0;
                   });
                 },
-                tutorialKeys: _tutorialKeys, // ← ПЕРЕДАЁМ КЛЮЧИ
+                residentsKey: _residentsKey, // ← ПЕРЕДАЁМ КЛЮЧ
               ),
               Expanded(
                 child: _showClubSearch
@@ -329,69 +305,69 @@ class _ClubScreenState extends ConsumerState<ClubScreen> {
           ),
 
           // 🔥 ПЛАВАЮЩИЙ ВИДЖЕТ С МЕСЯЦЕМ И ГОДОМ
-          if (_hasClub)
-            Positioned(
-              top: 210,
-              left: 290,
-              child: Stack(
-                clipBehavior: Clip.none,
-                children: [
-                  Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+          Positioned(
+            top: 210,
+            left: 290,
+            child: Stack(
+              clipBehavior: Clip.none,
+              children: [
+                // 🔥 ОСНОВНОЙ КОНТЕЙНЕР С МЕСЯЦЕМ
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: isDark ? Colors.black : Colors.white,
+                    borderRadius: BorderRadius.circular(16),
+                    boxShadow: [
+                      BoxShadow(
+                        color: isDark
+                            ? Colors.white.withOpacity(0.3)
+                            : Colors.black.withOpacity(0.3),
+                        blurRadius: isDark ? 10 : 7,
+                        spreadRadius: 1,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  child: Text(
+                    _getMonthName(_month),
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w700,
+                      color: isDark ? Colors.white : Colors.black87,
+                    ),
+                  ),
+                ),
+                // 🔥 КРУГЛЫЙ БЕЙДЖ С ГОДОМ
+                Positioned(
+                  top: -8,
+                  right: -10,
+                  child: Container(
+                    width: 25,
+                    height: 25,
                     decoration: BoxDecoration(
-                      color: isDark ? Colors.black : Colors.white,
-                      borderRadius: BorderRadius.circular(16),
-                      boxShadow: [
-                        BoxShadow(
-                          color: isDark
-                              ? Colors.white.withOpacity(0.3)
-                              : Colors.black.withOpacity(0.3),
-                          blurRadius: isDark ? 10 : 7,
-                          spreadRadius: 1,
-                          offset: const Offset(0, 2),
-                        ),
-                      ],
-                    ),
-                    child: Text(
-                      _getMonthName(_month),
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w700,
-                        color: isDark ? Colors.white : Colors.black87,
+                      color: primaryColor.withOpacity(0.7),
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: isDark ? Colors.grey.shade900 : Colors.white,
+                        width: 1,
                       ),
                     ),
-                  ),
-                  Positioned(
-                    top: -8,
-                    right: -10,
-                    child: Container(
-                      width: 25,
-                      height: 25,
-                      decoration: BoxDecoration(
-                        color: primaryColor.withOpacity(0.7),
-                        shape: BoxShape.circle,
-                        border: Border.all(
-                          color: isDark ? Colors.grey.shade900 : Colors.white,
-                          width: 1,
-                        ),
-                      ),
-                      child: Center(
-                        child: Text(
-                          _year.toString().substring(2),
-                          style: const TextStyle(
-                            fontSize: 13,
-                            fontWeight: FontWeight.w700,
-                            color: Colors.white,
-                          ),
+                    child: Center(
+                      child: Text(
+                        _year.toString().substring(2),
+                        style: const TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w700,
+                          color: Colors.white,
                         ),
                       ),
                     ),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
-
+          ),
           // 🔥 КНОПКА "КЛУБЫ"
           if (!_showClubSearch)
             Positioned(
@@ -490,7 +466,11 @@ class _ClubScreenState extends ConsumerState<ClubScreen> {
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Icon(Icons.close, color: Colors.white, size: 20),
+                            Icon(
+                              Icons.close,
+                              color: Colors.white,
+                              size: 20,
+                            ),
                             const SizedBox(height: 1),
                             Text(
                               'Свой',

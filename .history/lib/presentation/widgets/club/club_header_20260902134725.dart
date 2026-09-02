@@ -5,6 +5,8 @@ import 'package:mafia_help/presentation/widgets/app_card.dart';
 import 'package:mafia_help/presentation/widgets/app_text.dart';
 import 'package:mafia_help/services/club_service.dart';
 import 'package:mdi_plus/mdi_plus.dart';
+import 'package:mafia_help/presentation/widgets/tutorial/tutorial_manager.dart';
+import 'package:mafia_help/presentation/widgets/tutorial/tutorials/club_tutorials.dart';
 
 class ClubHeader extends StatelessWidget {
   final Map<String, dynamic>? club;
@@ -14,7 +16,7 @@ class ClubHeader extends StatelessWidget {
   final VoidCallback onGamesTap;
   final VoidCallback onMembersTap;
   final VoidCallback onMyClubTap;
-  final Map<String, GlobalKey>? tutorialKeys; // ← ДОБАВИТЬ
+  final GlobalKey? residentsKey; // ← ДОБАВИТЬ
 
   const ClubHeader({
     super.key,
@@ -25,7 +27,7 @@ class ClubHeader extends StatelessWidget {
     required this.onGamesTap,
     required this.onMembersTap,
     required this.onMyClubTap,
-    this.tutorialKeys, // ← ДОБАВИТЬ
+    this.residentsKey, // ← ДОБАВИТЬ
   });
 
   @override
@@ -135,13 +137,12 @@ class ClubHeader extends StatelessWidget {
                     ),
                   ),
 
-                  // 🔥 БЕЙДЖ 2: ИГРЫ КЛУБА (СПРАВА ПО ЦЕНТРУ) — С КЛЮЧОМ!
+                  // 🔥 БЕЙДЖ 2: ИГРЫ КЛУБА (СПРАВА ПО ЦЕНТРУ)
                   Positioned(
                     top: 100,
                     right: -15,
                     child: _buildCircleBadge(
                       context,
-                      key: tutorialKeys?['club_games'], // ← ДОБАВИТЬ
                       icon: Mdi.clipboardList,
                       count: gamesCount,
                       color: theme.primaryColor,
@@ -149,13 +150,15 @@ class ClubHeader extends StatelessWidget {
                     ),
                   ),
 
-                  // 🔥 БЕЙДЖ 3: РЕЗИДЕНТЫ (СПРАВА СНИЗУ) — С КЛЮЧОМ!
+                  // 🔥 БЕЙДЖ 3: РЕЗИДЕНТЫ (СПРАВА СНИЗУ)
                   Positioned(
                     bottom: -7,
                     right: 10,
                     child: _buildCircleBadge(
+                      key: residentsKey, // ← ДОБАВИТЬ
+
                       context,
-                      key: tutorialKeys?['club_residents'], // ← ДОБАВИТЬ
+
                       icon: Mdi.accountGroup,
                       count: club?['members_count'] ?? 0,
                       color: theme.primaryColor,
@@ -323,14 +326,15 @@ class ClubHeader extends StatelessWidget {
   // 🔥 КРУГЛЫЙ БЕЙДЖ С ИКОНКОЙ
   Widget _buildCircleBadge(
     BuildContext context, {
-    Key? key, // ← ДОБАВИТЬ
     required IconData icon,
     required int count,
     required Color color,
     required VoidCallback onTap,
+    Key? key, // ← ДОБАВИТЬ
   }) {
     return GestureDetector(
       key: key, // ← ДОБАВИТЬ
+
       onTap: onTap,
       child: Container(
         width: 42,

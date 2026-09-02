@@ -14,7 +14,6 @@ class ClubHeader extends StatelessWidget {
   final VoidCallback onGamesTap;
   final VoidCallback onMembersTap;
   final VoidCallback onMyClubTap;
-  final Map<String, GlobalKey>? tutorialKeys; // ← ДОБАВИТЬ
 
   const ClubHeader({
     super.key,
@@ -25,7 +24,6 @@ class ClubHeader extends StatelessWidget {
     required this.onGamesTap,
     required this.onMembersTap,
     required this.onMyClubTap,
-    this.tutorialKeys, // ← ДОБАВИТЬ
   });
 
   @override
@@ -37,7 +35,6 @@ class ClubHeader extends StatelessWidget {
     final bool hasPendingRequest = club?['has_pending_request'] ?? false;
     final bool hasClub = club != null && club?['id'] != null;
 
-    // 🔥 ЕСЛИ НЕТ КЛУБА — ПОКАЗЫВАЕМ ЗАГЛУШКУ
     if (!hasClub) {
       return _buildNoClubHeader(context);
     }
@@ -50,11 +47,9 @@ class ClubHeader extends StatelessWidget {
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // 🔥 ЛЕВАЯ ЧАСТЬ: АВАТАРКА КЛУБА
               Stack(
                 clipBehavior: Clip.none,
                 children: [
-                  // Аватарка клуба
                   Container(
                     width: 180,
                     height: 180,
@@ -80,8 +75,6 @@ class ClubHeader extends StatelessWidget {
                               )
                             : null,
                   ),
-
-                  // 🔥 БЕЙДЖ 1: ПРЕЗИДЕНТ (СВЕРХУ СПРАВА)
                   Positioned(
                     top: -8,
                     right: -22,
@@ -134,52 +127,54 @@ class ClubHeader extends StatelessWidget {
                       ),
                     ),
                   ),
-
-                  // 🔥 БЕЙДЖ 2: ИГРЫ КЛУБА (СПРАВА ПО ЦЕНТРУ) — С КЛЮЧОМ!
                   Positioned(
                     top: 100,
                     right: -15,
                     child: _buildCircleBadge(
                       context,
-                      key: tutorialKeys?['club_games'], // ← ДОБАВИТЬ
                       icon: Mdi.clipboardList,
                       count: gamesCount,
                       color: theme.primaryColor,
                       onTap: onGamesTap,
                     ),
                   ),
-
-                  // 🔥 БЕЙДЖ 3: РЕЗИДЕНТЫ (СПРАВА СНИЗУ) — С КЛЮЧОМ!
                   Positioned(
                     bottom: -7,
                     right: 10,
-                    child: _buildCircleBadge(
-                      context,
-                      key: tutorialKeys?['club_residents'], // ← ДОБАВИТЬ
-                      icon: Mdi.accountGroup,
-                      count: club?['members_count'] ?? 0,
-                      color: theme.primaryColor,
-                      onTap: onMembersTap,
+                    child: Showcase(
+                      key: UniqueKey(),
+                      title: '👥 Резиденты клуба',
+                      description:
+                          'Нажмите на эту кнопку, чтобы посмотреть всех участников клуба, их статистику и рейтинг.',
+                      icon: const Icon(Icons.group_add, color: Colors.white),
+                      container: Container(
+                        decoration: BoxDecoration(
+                          color: theme.primaryColor,
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                      ),
+                      child: _buildCircleBadge(
+                        context,
+                        icon: Mdi.accountGroup,
+                        count: club?['members_count'] ?? 0,
+                        color: theme.primaryColor,
+                        onTap: onMembersTap,
+                      ),
                     ),
                   ),
-
-                  // 🔥 БЕЙДЖ 4: ПОДАТЬ ЗАЯВКУ / ОТОЗВАТЬ
                   Positioned(
                     bottom: -22,
                     left: 74,
                     child: GestureDetector(
                       onTap: () {
-                        // 🔥 ЕСЛИ ГАЛОЧКА (МОЙ КЛУБ) — ВОЗВРАТ НА РЕЙТИНГ
                         if (isMyClub) {
                           onMyClubTap();
                           return;
                         }
-                        // 🔥 ЕСЛИ ЗАЯВКА ОТПРАВЛЕНА — ОТОЗВАТЬ
                         if (hasPendingRequest) {
                           _cancelRequest(context);
                           return;
                         }
-                        // 🔥 ИНАЧЕ — ПОДАТЬ ЗАЯВКУ
                         _handleJoinButtonTap(context);
                       },
                       child: _buildJoinButtonContent(context),
@@ -188,8 +183,6 @@ class ClubHeader extends StatelessWidget {
                 ],
               ),
               const SizedBox(width: 16),
-
-              // 🔥 ПРАВАЯ ЧАСТЬ: ИНФОРМАЦИЯ
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
@@ -256,9 +249,6 @@ class ClubHeader extends StatelessWidget {
     );
   }
 
-  // ============================================================
-  // 🔥 ЗАГЛУШКА: НЕТ КЛУБА
-  // ============================================================
   Widget _buildNoClubHeader(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
@@ -298,7 +288,6 @@ class ClubHeader extends StatelessWidget {
             children: [
               ElevatedButton.icon(
                 onPressed: () {
-                  // Переход на создание клуба
                   context.push('/create-club');
                 },
                 style: ElevatedButton.styleFrom(
@@ -320,17 +309,14 @@ class ClubHeader extends StatelessWidget {
     );
   }
 
-  // 🔥 КРУГЛЫЙ БЕЙДЖ С ИКОНКОЙ
   Widget _buildCircleBadge(
     BuildContext context, {
-    Key? key, // ← ДОБАВИТЬ
     required IconData icon,
     required int count,
     required Color color,
     required VoidCallback onTap,
   }) {
     return GestureDetector(
-      key: key, // ← ДОБАВИТЬ
       onTap: onTap,
       child: Container(
         width: 42,
@@ -383,7 +369,6 @@ class ClubHeader extends StatelessWidget {
     );
   }
 
-  // 🔥 КОНТЕНТ БЕЙДЖА ЗАЯВКИ
   Widget _buildJoinButtonContent(BuildContext context) {
     final theme = Theme.of(context);
     final int? currentClubId = club?['id'];
@@ -431,7 +416,6 @@ class ClubHeader extends StatelessWidget {
     );
   }
 
-  // 🔥 ЛОГИКА ПОДАЧИ ЗАЯВКИ
   void _handleJoinButtonTap(BuildContext context) async {
     final int? currentClubId = club?['id'];
     final bool userHasClub = myClubId != null;
@@ -477,7 +461,6 @@ class ClubHeader extends StatelessWidget {
     }
   }
 
-  // 🔥 ОТОЗВАТЬ ЗАЯВКУ ПО ID КЛУБА
   Future<void> _cancelRequest(BuildContext context) async {
     final int? clubId = club?['id'];
     if (clubId == null) {

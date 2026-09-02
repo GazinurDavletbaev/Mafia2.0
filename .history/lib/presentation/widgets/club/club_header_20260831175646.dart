@@ -14,7 +14,6 @@ class ClubHeader extends StatelessWidget {
   final VoidCallback onGamesTap;
   final VoidCallback onMembersTap;
   final VoidCallback onMyClubTap;
-  final Map<String, GlobalKey>? tutorialKeys; // ← ДОБАВИТЬ
 
   const ClubHeader({
     super.key,
@@ -25,7 +24,6 @@ class ClubHeader extends StatelessWidget {
     required this.onGamesTap,
     required this.onMembersTap,
     required this.onMyClubTap,
-    this.tutorialKeys, // ← ДОБАВИТЬ
   });
 
   @override
@@ -135,13 +133,12 @@ class ClubHeader extends StatelessWidget {
                     ),
                   ),
 
-                  // 🔥 БЕЙДЖ 2: ИГРЫ КЛУБА (СПРАВА ПО ЦЕНТРУ) — С КЛЮЧОМ!
+                  // 🔥 БЕЙДЖ 2: ИГРЫ КЛУБА (СПРАВА ПО ЦЕНТРУ)
                   Positioned(
                     top: 100,
                     right: -15,
                     child: _buildCircleBadge(
                       context,
-                      key: tutorialKeys?['club_games'], // ← ДОБАВИТЬ
                       icon: Mdi.clipboardList,
                       count: gamesCount,
                       color: theme.primaryColor,
@@ -149,13 +146,12 @@ class ClubHeader extends StatelessWidget {
                     ),
                   ),
 
-                  // 🔥 БЕЙДЖ 3: РЕЗИДЕНТЫ (СПРАВА СНИЗУ) — С КЛЮЧОМ!
+                  // 🔥 БЕЙДЖ 3: РЕЗИДЕНТЫ (СПРАВА СНИЗУ)
                   Positioned(
                     bottom: -7,
                     right: 10,
                     child: _buildCircleBadge(
                       context,
-                      key: tutorialKeys?['club_residents'], // ← ДОБАВИТЬ
                       icon: Mdi.accountGroup,
                       count: club?['members_count'] ?? 0,
                       color: theme.primaryColor,
@@ -323,14 +319,12 @@ class ClubHeader extends StatelessWidget {
   // 🔥 КРУГЛЫЙ БЕЙДЖ С ИКОНКОЙ
   Widget _buildCircleBadge(
     BuildContext context, {
-    Key? key, // ← ДОБАВИТЬ
     required IconData icon,
     required int count,
     required Color color,
     required VoidCallback onTap,
   }) {
     return GestureDetector(
-      key: key, // ← ДОБАВИТЬ
       onTap: onTap,
       child: Container(
         width: 42,
