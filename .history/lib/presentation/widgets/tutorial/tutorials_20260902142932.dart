@@ -58,7 +58,7 @@ class Tutorials {
       icon: Icons.search_rounded,
       backgroundColor: Colors.blue.shade700,
       width: 230,
-      height: 110,
+      height: 90,
       customPosition: const Offset(100, 600),
     ),
   ];

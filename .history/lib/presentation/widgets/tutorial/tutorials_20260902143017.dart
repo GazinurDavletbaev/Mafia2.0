@@ -57,9 +57,9 @@ class Tutorials {
       description: 'Нажмите сюда, чтобы найти и вступить в клуб.',
       icon: Icons.search_rounded,
       backgroundColor: Colors.blue.shade700,
-      width: 230,
-      height: 110,
-      customPosition: const Offset(100, 600),
+      width: 250,
+      height: 190,
+      customPosition: const Offset(100, 500),
     ),
   ];
 

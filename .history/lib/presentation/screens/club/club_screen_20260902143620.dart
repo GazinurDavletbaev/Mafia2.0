@@ -42,7 +42,7 @@ class _ClubScreenState extends ConsumerState<ClubScreen> {
   final Map<String, GlobalKey> _tutorialKeys = {
     'club_residents': GlobalKey(),
     'club_games': GlobalKey(),
-    'club_search': GlobalKey(),
+    // 'club_search': GlobalKey(),  // если добавишь подсказку для поиска
   };
 
   @override
