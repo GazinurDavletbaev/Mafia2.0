@@ -44,7 +44,7 @@ class AppBottomNav extends ConsumerWidget {
       clipBehavior: Clip.none,
       children: [
         Container(
-          height: 55,
+          height: 50,
           margin: const EdgeInsets.symmetric(horizontal: 40, vertical: 4),
           decoration: BoxDecoration(
             color: isDark ? Colors.grey.shade900 : theme.colorScheme.surface,
@@ -79,19 +79,19 @@ class AppBottomNav extends ConsumerWidget {
         // 🔥 TIMER OVERALL — вокруг иконки "Игра"
         if (isRunning && seconds > 0)
           Positioned(
-            left: 4,
+            left: 0,
             right: 10,
-            top: 8,
+            top: 5,
             child: IgnorePointer(
               child: Center(
                 child: Container(
                   width: 50,
-                  height: 50,
+                  height: 47,
                   child: CustomPaint(
                     painter: TimerCirclePainter(
                       progress: seconds / 60,
                       color: isUrgent ? Colors.red : Colors.green,
-                      strokeWidth: 4,
+                      strokeWidth: 2,
                     ),
                   ),
                 ),
@@ -173,7 +173,7 @@ class AppBottomNav extends ConsumerWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(icon, size: 28, color: itemColor),
+            Icon(icon, size: 22, color: itemColor),
             const SizedBox(height: 2),
             Text(
               label,

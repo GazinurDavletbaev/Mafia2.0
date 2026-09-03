@@ -79,19 +79,19 @@ class AppBottomNav extends ConsumerWidget {
         // 🔥 TIMER OVERALL — вокруг иконки "Игра"
         if (isRunning && seconds > 0)
           Positioned(
-            left: 4,
+            left: 0,
             right: 10,
-            top: 8,
+            top: 5,
             child: IgnorePointer(
               child: Center(
                 child: Container(
                   width: 50,
-                  height: 50,
+                  height: 47,
                   child: CustomPaint(
                     painter: TimerCirclePainter(
                       progress: seconds / 60,
                       color: isUrgent ? Colors.red : Colors.green,
-                      strokeWidth: 4,
+                      strokeWidth: 2,
                     ),
                   ),
                 ),
@@ -163,7 +163,6 @@ class AppBottomNav extends ConsumerWidget {
     return GestureDetector(
       onTap: () => onTap(index),
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
         decoration: BoxDecoration(
           color: isSelected
               ? theme.primaryColor.withOpacity(0.15)

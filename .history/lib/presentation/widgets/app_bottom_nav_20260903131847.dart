@@ -91,7 +91,7 @@ class AppBottomNav extends ConsumerWidget {
                     painter: TimerCirclePainter(
                       progress: seconds / 60,
                       color: isUrgent ? Colors.red : Colors.green,
-                      strokeWidth: 4,
+                      strokeWidth: 2,
                     ),
                   ),
                 ),

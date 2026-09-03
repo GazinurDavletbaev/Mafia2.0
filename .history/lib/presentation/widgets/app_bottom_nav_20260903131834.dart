@@ -86,12 +86,12 @@ class AppBottomNav extends ConsumerWidget {
               child: Center(
                 child: Container(
                   width: 50,
-                  height: 50,
+                  height: 47,
                   child: CustomPaint(
                     painter: TimerCirclePainter(
                       progress: seconds / 60,
                       color: isUrgent ? Colors.red : Colors.green,
-                      strokeWidth: 4,
+                      strokeWidth: 2,
                     ),
                   ),
                 ),

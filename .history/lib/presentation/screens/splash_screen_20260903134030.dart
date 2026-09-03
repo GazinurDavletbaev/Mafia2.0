@@ -65,7 +65,7 @@ class _SplashScreenState extends State<SplashScreen> {
       }
     } catch (e) {}
 
-    _timer = Timer(const Duration(seconds: 4), _navigateToNext);
+    _timer = Timer(const Duration(seconds: 400), _navigateToNext);
   }
 
   Future<void> _navigateToNext() async {

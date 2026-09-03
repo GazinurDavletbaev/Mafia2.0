@@ -65,7 +65,7 @@ class _SplashScreenState extends State<SplashScreen> {
       }
     } catch (e) {}
 
-    _timer = Timer(const Duration(seconds: 4), _navigateToNext);
+    _timer = Timer(const Duration(seconds: 400), _navigateToNext);
   }
 
   Future<void> _navigateToNext() async {
@@ -147,7 +147,7 @@ class _SplashScreenState extends State<SplashScreen> {
           // 🔥 КАРТИНКА С ДВУМЯ БЕЙДЖАМИ
           // ============================================================
           Positioned(
-            bottom: -60,
+            bottom: -120,
             left: 0,
             right: 0,
             child: Center(
