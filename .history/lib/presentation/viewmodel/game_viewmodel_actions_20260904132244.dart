@@ -32,11 +32,19 @@ class PlayerActions {
     final gotThirdFoul = oldPlayer.fouls == 2 && newPlayer.fouls == 3;
     final isSpeaking = _vm.state.currentSpeakerSeat == seatNumber;
 
-    print('=== FOUL UPDATE ===');
-    print('old: fouls=${oldPlayer.fouls}, isAlive=${oldPlayer.isAlive}');
-    print('new: fouls=${newPlayer.fouls}, isAlive=${newPlayer.isAlive}');
     if (hasDied) {
-      _vm.state = _vm.state.copyWith(players: newPlayers);
+      // 🔥 ДОБАВЛЯЕМ В REMOVED_PLAYERS
+      final newRemoved = List<PlayerModel>.from(_vm.state.removedPlayers);
+      final deadPlayer =
+          newPlayers.firstWhere((p) => p.seatNumber == seatNumber);
+      if (!newRemoved.any((p) => p.seatNumber == seatNumber)) {
+        newRemoved.add(deadPlayer);
+      }
+
+      _vm.state = _vm.state.copyWith(
+        players: newPlayers,
+        removedPlayers: newRemoved, // ← ДОБАВЛЯЕМ!
+      );
       await _killPlayer(seatNumber);
       return;
     }
@@ -88,9 +96,9 @@ class PlayerActions {
       case 3: // 🔥 Тех. фол
         await _addTechFoul(seatNumber);
         break;
-      case 5: // ППК (пока просто логируем)
+      case 4: // ППК (пока просто логируем)
         AppLogger.d('ППК для игрока $seatNumber (пока не реализовано)');
-          await _ppkPlayer(seatNumber);
+        await _ppkPlayer(seatNumber);
 
         break;
       default:
@@ -140,47 +148,22 @@ class PlayerActions {
       _vm.state = _vm.state.copyWith(players: newPlayers);
     }
   }
-Future<void> _ppkPlayer(int seatNumber) async {
-  AppLogger.d('_ppkPlayer: seat=$seatNumber');
-  
-  final usecase = _ref.read(ppkUsecaseProvider);
-  final (newPlayers, winner) = usecase.execute(_vm.state.players, seatNumber);
-  
-  if (winner != null) {
-    _vm.state = _vm.state.copyWith(
-      players: newPlayers,
-      isGameEnded: true,
-      winner: winner,
-    );
-    
-    // Показываем уведомление
-    final player = _vm.state.players.firstWhere((p) => p.seatNumber == seatNumber);
-    final teamName = player.team == 'red' ? 'КРАСНЫХ' : 'ЧЁРНЫХ';
-    ScaffoldMessenger.of(_vm.context).showSnackBar(
-      SnackBar(
-        content: Text('⚠️ ППК! Команда $teamName проиграла!'),
-        backgroundColor: Colors.red,
-        duration: const Duration(seconds: 3),
-      ),
-    );
-  }
-}
-  Future<void> _removeTechFoul(int seatNumber) async {
-    AppLogger.d('_removeTechFoul: seat=$seatNumber');
 
-    final playerIndex =
-        _vm.state.players.indexWhere((p) => p.seatNumber == seatNumber);
-    if (playerIndex == -1) return;
+  Future<void> _ppkPlayer(int seatNumber) async {
+    AppLogger.d('_ppkPlayer: seat=$seatNumber');
 
-    final player = _vm.state.players[playerIndex];
-    if (player.techFouls <= 0) return;
+    final usecase = _ref.read(ppkUsecaseProvider);
+    final (newPlayers, winner) = usecase.execute(_vm.state.players, seatNumber);
 
-    final newPlayers = List<PlayerModel>.from(_vm.state.players);
-    newPlayers[playerIndex] = player.copyWith(
-      techFouls: player.techFouls - 1,
-    );
-
-    _vm.state = _vm.state.copyWith(players: newPlayers);
+    if (winner != null) {
+      _vm.state = _vm.state.copyWith(
+        players: newPlayers,
+        isGameEnded: true,
+        winner: winner,
+        ppkPlayerSeat: seatNumber, // 🔥 СОХРАНЯЕМ НОМЕР ИГРОКА С ППК (или null)
+      );
+      // 🔥 ВСЁ! ДАЛЬШЕ GameScreen САМ ПОКАЖЕТ ДИАЛОГ С ПЕРЕХОДОМ В ПРОТОКОЛ
+    }
   }
 
   Future<void> _killPlayer(int seatNumber) async {
@@ -206,9 +189,16 @@ Future<void> _ppkPlayer(int seatNumber) async {
       }
 
       if (winner != null) {
+        // 🔥 ЕСТЬ ПОБЕДА — ЗАВЕРШАЕМ ИГРУ
         _vm.state = _vm.state.copyWith(
           isGameEnded: true,
           winner: winner,
+        );
+      } else {
+        // 🔥 НЕТ ПОБЕДЫ — ОЧИЩАЕМ НОМИНАЦИИ
+        _vm.state = _vm.state.copyWith(
+          nominatedSeats: [],
+          isVotingDay: false,
         );
       }
       return;

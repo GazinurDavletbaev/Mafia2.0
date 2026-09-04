@@ -189,9 +189,16 @@ class PlayerActions {
       }
 
       if (winner != null) {
+        // 🔥 ЕСТЬ ПОБЕДА — ЗАВЕРШАЕМ ИГРУ
         _vm.state = _vm.state.copyWith(
           isGameEnded: true,
           winner: winner,
+        );
+      } else {
+        // 🔥 НЕТ ПОБЕДЫ — ОЧИЩАЕМ НОМИНАЦИИ
+        _vm.state = _vm.state.copyWith(
+          nominatedSeats: [],
+          isVotingDay: false,
         );
       }
       return;
