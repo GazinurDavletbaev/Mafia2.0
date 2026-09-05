@@ -43,30 +43,28 @@ class _ClubScreenState extends ConsumerState<ClubScreen> {
     'club_residents': GlobalKey(),
     'club_games': GlobalKey(),
     'club_search': GlobalKey(),
-    'club_create': GlobalKey(),
+    'club_create': GlobalKey(), // ← НОВЫЙ КЛЮЧ
   };
 
   @override
   void initState() {
     super.initState();
     _loadData();
+
+    // 🔥 ПОКАЗЫВАЕМ ПОДСКАЗКИ ПОСЛЕ ЗАГРУЗКИ
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _showTutorials();
+    });
   }
 
   void _showTutorials() {
+    print('🔍 _showTutorials called');
+    print('🔍 _hasClub = $_hasClub');
+    print('🔍 tipsEnabled = ${ref.read(tipsEnabledProvider)}');
+
     if (!mounted) return;
     if (!_hasClub) {
       print('🔍 Нет клуба — показываем подсказку на кнопку "Создать"');
-      TutorialManager.startTutorials(
-        context: context,
-        screen: 'noclub',
-        ref: ref,
-        keys: _tutorialKeys,
-        onAllCompleted: () {
-          print('🎉 Все подсказки в неклубе показаны!');
-        },
-      );
-      return;
-    } else {
       TutorialManager.startTutorials(
         context: context,
         screen: 'club',
@@ -244,6 +242,11 @@ class _ClubScreenState extends ConsumerState<ClubScreen> {
   Widget _buildContent() {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
+
+    // 🔥 ЕСЛИ НЕТ КЛУБА — ПОКАЗЫВАЕМ ПУСТОТУ (НО ЭТО НЕ ИСПОЛЬЗУЕТСЯ, Т.К. ВКЛЮЧЁН ПОИСК)
+    if (!_hasClub) {
+      return const SizedBox.shrink();
+    }
 
     switch (_currentTab) {
       case 0:

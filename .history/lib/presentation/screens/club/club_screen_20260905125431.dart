@@ -43,7 +43,7 @@ class _ClubScreenState extends ConsumerState<ClubScreen> {
     'club_residents': GlobalKey(),
     'club_games': GlobalKey(),
     'club_search': GlobalKey(),
-    'club_create': GlobalKey(),
+    'club_create': GlobalKey(), // ← НОВЫЙ КЛЮЧ
   };
 
   @override
@@ -53,20 +53,13 @@ class _ClubScreenState extends ConsumerState<ClubScreen> {
   }
 
   void _showTutorials() {
+    print('🔍 _showTutorials called');
+    print('🔍 _hasClub = $_hasClub');
+    print('🔍 tipsEnabled = ${ref.read(tipsEnabledProvider)}');
+
     if (!mounted) return;
     if (!_hasClub) {
       print('🔍 Нет клуба — показываем подсказку на кнопку "Создать"');
-      TutorialManager.startTutorials(
-        context: context,
-        screen: 'noclub',
-        ref: ref,
-        keys: _tutorialKeys,
-        onAllCompleted: () {
-          print('🎉 Все подсказки в неклубе показаны!');
-        },
-      );
-      return;
-    } else {
       TutorialManager.startTutorials(
         context: context,
         screen: 'club',

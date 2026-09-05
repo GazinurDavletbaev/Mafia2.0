@@ -60,15 +60,12 @@ class Tutorials {
       width: 230,
       height: 110,
     ),
-  ];
-
-  static final List<TutorialStep> noclubSteps = [
     TutorialStep(
       id: 'club_create',
       title: 'Создайте свой клуб!',
       description: 'Нажмите сюда, чтобы создать собственный клуб.',
       icon: Icons.add_rounded,
-      backgroundColor: Colors.green.shade700.withOpacity(0.5),
+      backgroundColor: Colors.green.shade700,
       width: 280,
       height: 120,
     ),
@@ -128,8 +125,6 @@ class Tutorials {
     switch (screen) {
       case 'club':
         return clubSteps;
-      case 'noclub':
-        return noclubSteps;
       case 'game':
         return gameSteps;
       case 'lobby':

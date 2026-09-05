@@ -40,9 +40,7 @@ class ClubHeader extends StatelessWidget {
 
     // 🔥 ЕСЛИ НЕТ КЛУБА — ПОКАЗЫВАЕМ ЗАГЛУШКУ
     if (!hasClub) {
-      return ClubNoHeader(
-        tutorialKeys: tutorialKeys, // ← ПРОСТО ПЕРЕДАЁШЬ ВСЕ КЛЮЧИ
-      ); // ← ВМЕСТО _buildNoClubHeader(context)
+      return const ClubNoHeader(); // ← ВМЕСТО _buildNoClubHeader(context)
     }
 
     return Column(
