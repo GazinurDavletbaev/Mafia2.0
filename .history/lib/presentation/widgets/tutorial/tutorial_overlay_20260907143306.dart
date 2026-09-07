@@ -115,7 +115,7 @@ class _TutorialOverlayState extends State<TutorialOverlay>
                 decoration: BoxDecoration(
                   border: Border.all(
                     color: Colors.green.withOpacity(0.5),
-                    width: 2,
+                    width: 4,
                   ),
                   borderRadius: BorderRadius.circular(50),
                   boxShadow: [

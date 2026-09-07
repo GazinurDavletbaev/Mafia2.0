@@ -13,6 +13,7 @@ class TutorialStep {
   final double? height;
   final Color backgroundColor;
   final Color textColor;
+  final Color? highlightColor; // ← ДОБАВИТЬ
 
   const TutorialStep({
     required this.id,
@@ -25,6 +26,7 @@ class TutorialStep {
     this.height,
     this.backgroundColor = Colors.deepPurple,
     this.textColor = Colors.white,
+    this.highlightColor, // ← ДОБАВИТЬ
   });
 }
 
@@ -54,7 +56,7 @@ class Tutorials {
       title: 'Резиденты клуба',
       description: 'Здесь отображаются все участники клуба.',
       icon: Icons.people_alt_rounded,
-      backgroundColor: Colors.green.withOpacity(0.5),
+      backgroundColor: Colors.deepPurple.withOpacity(0.5),
       width: 260,
       height: 100,
     ),
@@ -63,7 +65,7 @@ class Tutorials {
       title: 'История игр',
       description: 'Все игры клуба собраны здесь.',
       icon: Icons.sports_score_rounded,
-      backgroundColor: Colors.green.withOpacity(0.5),
+      backgroundColor: Colors.deepPurple.shade700.withOpacity(0.5),
       width: 240,
       height: 90,
     ),
@@ -72,7 +74,7 @@ class Tutorials {
       title: 'Найти клуб',
       description: 'Нажмите сюда, чтобы найти и вступить в клуб.',
       icon: Icons.search_rounded,
-      backgroundColor: Colors.green.withOpacity(0.5),
+      backgroundColor: Colors.blue.shade700.withOpacity(0.5),
       width: 230,
       height: 110,
     ),
@@ -98,18 +100,20 @@ class Tutorials {
       title: 'Фаза рассадки игроков',
       description: 'Игра начнется когда\nрассадите всех игроков за столом',
       icon: Mdi.accountGroupOutline,
-      backgroundColor: Colors.green.withOpacity(0.5),
+      backgroundColor: Colors.orange.shade700.withOpacity(0.5),
       width: 280,
       height: 120,
+      highlightColor: Colors.orange, // ← ОРАНЖЕВАЯ ПОДСВЕТКА
     ),
     TutorialStep(
       id: 'game',
       title: 'Начнем игру',
       description: 'Полный цикл игры\nбез бумаги и ручки',
       icon: Mdi.brain,
-      backgroundColor: Colors.green.withOpacity(0.5),
+      backgroundColor: Colors.deepPurple.shade700.withOpacity(0.5),
       width: 280,
       height: 120,
+      highlightColor: Colors.deepPurple, // ← ФИОЛЕТОВАЯ ПОДСВЕТКА
     ),
     TutorialStep(
       id: 'protocol',
@@ -117,9 +121,10 @@ class Tutorials {
       description:
           'Протокол игры в реальном\nвремени возможность сохранить\nв телефон, в рейтинг или сформировать\nexcel файл и распечатать\nв бумажном виде',
       icon: Mdi.listBox,
-      backgroundColor: Colors.green.withOpacity(0.5),
+      backgroundColor: Colors.blue.shade700.withOpacity(0.5),
       width: 280,
       height: 190,
+      highlightColor: Colors.blue, // ← СИНЯЯ ПОДСВЕТКА
     ),
   ];
 

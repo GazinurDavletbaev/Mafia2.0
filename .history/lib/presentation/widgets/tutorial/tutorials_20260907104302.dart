@@ -1,6 +1,5 @@
 // lib/presentation/widgets/tutorial/tutorials.dart
 import 'package:flutter/material.dart';
-import 'package:mdi_plus/mdi_plus.dart';
 
 class TutorialStep {
   final String id;
@@ -31,9 +30,49 @@ class TutorialStep {
 // 🔥 ВСЕ ПОДСКАЗКИ В ОДНОМ МЕСТЕ
 class Tutorials {
   // ============================================================
-  // 👋 ПУСТОЙ КЛУБ (noclub) — ПРИВЕТСТВИЕ + СОЗДАТЬ КЛУБ
+  // КЛУБ (ClubScreen)
   // ============================================================
+  static final List<TutorialStep> clubSteps = [
+    TutorialStep(
+      id: 'club_residents',
+      title: 'Резиденты клуба',
+      description: 'Здесь отображаются все участники клуба.',
+      icon: Icons.people_alt_rounded,
+      backgroundColor: Colors.deepPurple.withOpacity(0.5),
+      width: 260,
+      height: 100,
+    ),
+    TutorialStep(
+      id: 'club_games',
+      title: 'История игр',
+      description: 'Все игры клуба собраны здесь.',
+      icon: Icons.sports_score_rounded,
+      backgroundColor: Colors.deepPurple.shade700.withOpacity(0.5),
+      width: 240,
+      height: 90,
+    ),
+    TutorialStep(
+      id: 'club_search',
+      title: 'Найти клуб',
+      description: 'Нажмите сюда, чтобы найти и вступить в клуб.',
+      icon: Icons.search_rounded,
+      backgroundColor: Colors.blue.shade700.withOpacity(0.5),
+      width: 230,
+      height: 110,
+    ),
+  ];
+
   static final List<TutorialStep> noclubSteps = [
+    TutorialStep(
+      id: 'welcome',
+      title: 'Добро пожаловать в Mafia Help! 🎭',
+      description:
+          'Здесь вы можете стать\nпрезидентом своего\nсобственного клуба или\nрезидентом уже действующего.\nВести полноценный рейтинг клуба\nи просматривать свои сыгранные игры\nДавайте покажем, как всё работает!',
+      icon: Icons.emoji_emotions_rounded,
+      backgroundColor: Colors.green.withOpacity(0.5),
+      width: 290,
+      height: 220,
+    ),
     TutorialStep(
       id: 'club_create',
       title: 'Создайте свой клуб!',
@@ -46,85 +85,7 @@ class Tutorials {
   ];
 
   // ============================================================
-  // 🎯 КЛУБ (ClubScreen) — есть клуб
-  // ============================================================
-  static final List<TutorialStep> clubSteps = [
-    TutorialStep(
-      id: 'club_residents',
-      title: 'Резиденты клуба',
-      description: 'Здесь отображаются все участники клуба.',
-      icon: Icons.people_alt_rounded,
-      backgroundColor: Colors.green.withOpacity(0.5),
-      width: 260,
-      height: 100,
-    ),
-    TutorialStep(
-      id: 'club_games',
-      title: 'История игр',
-      description: 'Все игры клуба собраны здесь.',
-      icon: Icons.sports_score_rounded,
-      backgroundColor: Colors.green.withOpacity(0.5),
-      width: 240,
-      height: 90,
-    ),
-    TutorialStep(
-      id: 'club_search',
-      title: 'Найти клуб',
-      description: 'Нажмите сюда, чтобы найти и вступить в клуб.',
-      icon: Icons.search_rounded,
-      backgroundColor: Colors.green.withOpacity(0.5),
-      width: 230,
-      height: 110,
-    ),
-  ];
-
-  // ============================================================
-  // 🎯 НАВБАР В ЛОББИ (подсказки для кнопок)
-  // ============================================================
-  static final List<TutorialStep> lobbyNavSteps = [
-    TutorialStep(
-      id: 'welcome',
-      title: 'Добро пожаловать в Mafia Help! 🎭',
-      description:
-          'Здесь вы можете стать\nпрезидентом своего\nсобственного клуба или\nрезидентом уже действующего.\nВести полноценный рейтинг клуба\nи просматривать свои сыгранные игры\nДавайте покажем, как всё работает!',
-      icon: Icons.emoji_emotions_rounded,
-      backgroundColor: Colors.green.withOpacity(0.5),
-      width: 290,
-      height: 220,
-      // customPosition не нужен — будет по центру
-    ),
-    TutorialStep(
-      id: 'sitting',
-      title: 'Фаза рассадки игроков',
-      description: 'Игра начнется когда\nрассадите всех игроков за столом',
-      icon: Mdi.accountGroupOutline,
-      backgroundColor: Colors.green.withOpacity(0.5),
-      width: 280,
-      height: 120,
-    ),
-    TutorialStep(
-      id: 'game',
-      title: 'Начнем игру',
-      description: 'Полный цикл игры\nбез бумаги и ручки',
-      icon: Mdi.brain,
-      backgroundColor: Colors.green.withOpacity(0.5),
-      width: 280,
-      height: 120,
-    ),
-    TutorialStep(
-      id: 'protocol',
-      title: 'Протокол игры',
-      description:
-          'Протокол игры в реальном\nвремени возможность сохранить\nв телефон, в рейтинг или сформировать\nexcel файл и распечатать\nв бумажном виде',
-      icon: Mdi.listBox,
-      backgroundColor: Colors.green.withOpacity(0.5),
-      width: 280,
-      height: 190,
-    ),
-  ];
-
-  // ============================================================
-  // 🎯 ИГРА (GameScreen)
+  // ИГРА (GameScreen)
   // ============================================================
   static final List<TutorialStep> gameSteps = [
     TutorialStep(
@@ -157,7 +118,7 @@ class Tutorials {
   ];
 
   // ============================================================
-  // 🎯 ЛОББИ (LobbyScreen) — профиль
+  // ЛОББИ (LobbyScreen)
   // ============================================================
   static final List<TutorialStep> lobbySteps = [
     TutorialStep(
@@ -172,17 +133,13 @@ class Tutorials {
     ),
   ];
 
-  // ============================================================
   // 🔥 МЕТОД ДЛЯ ПОЛУЧЕНИЯ ПОДСКАЗОК ПО ЭКРАНУ
-  // ============================================================
   static List<TutorialStep> getSteps(String screen) {
     switch (screen) {
-      case 'noclub':
-        return noclubSteps;
       case 'club':
         return clubSteps;
-      case 'lobby_nav':
-        return lobbyNavSteps;
+      case 'noclub':
+        return noclubSteps;
       case 'game':
         return gameSteps;
       case 'lobby':

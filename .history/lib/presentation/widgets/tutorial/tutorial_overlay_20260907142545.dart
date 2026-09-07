@@ -114,15 +114,15 @@ class _TutorialOverlayState extends State<TutorialOverlay>
               child: Container(
                 decoration: BoxDecoration(
                   border: Border.all(
-                    color: Colors.green.withOpacity(0.5),
+                    color: Colors.deepPurple.withOpacity(0.1),
                     width: 2,
                   ),
                   borderRadius: BorderRadius.circular(50),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.green.withOpacity(0.6),
-                      blurRadius: 8,
-                      spreadRadius: 1,
+                      color: Colors.deepPurple.withOpacity(0.5),
+                      blurRadius: 5,
+                      spreadRadius: 4,
                     ),
                   ],
                 ),

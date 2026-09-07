@@ -9,8 +9,8 @@ import 'package:mafia_help/application/providers/user_provider.dart';
 import 'package:mafia_help/presentation/state/game_state.dart';
 import 'package:mafia_help/presentation/viewmodel/game_viewmodel.dart';
 import 'package:mafia_help/presentation/widgets/app_bottom_nav.dart';
-import 'package:mafia_help/presentation/widgets/tutorial/tutorial_manager.dart';
 import 'package:mafia_help/services/auth_service.dart';
+import 'package:mafia_help/services/club_service.dart';
 import 'lobby_data.dart';
 import 'lobby_pages.dart';
 
@@ -24,13 +24,6 @@ class LobbyScreen extends ConsumerStatefulWidget {
 class _LobbyScreenState extends ConsumerState<LobbyScreen> {
   int _selectedIndex = 0;
   GameData _gameData = GameData();
-  bool _tutorialsShown = false;
-
-  final Map<String, GlobalKey> _tutorialKeys = {
-    'sitting': GlobalKey(),
-    'game': GlobalKey(),
-    'protocol': GlobalKey(),
-  };
 
   @override
   void initState() {
@@ -41,28 +34,7 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
       ref.invalidate(userProvider);
       ref.invalidate(clubProvider);
       ref.invalidate(pendingRequestsProvider);
-
-      _showTutorials();
     });
-  }
-
-  void _showTutorials() {
-    if (_tutorialsShown) {
-      return;
-    }
-    if (!mounted) return;
-
-    _tutorialsShown = true;
-
-    TutorialManager.startTutorials(
-      context: context,
-      screen: 'lobby_nav',
-      ref: ref,
-      keys: _tutorialKeys,
-      onAllCompleted: () {
-        print('🎉 Подсказки навбара в лобби показаны!');
-      },
-    );
   }
 
   void _initGameData() {
@@ -128,6 +100,7 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
           ),
           child: Column(
             children: [
+              // 🔥 ИНДИКАТОР
               Container(
                 margin: const EdgeInsets.only(top: 12, bottom: 8),
                 width: 40,
@@ -137,6 +110,8 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
+
+              // 🔥 ПРОФИЛЬ (ШАПКА)
               Container(
                 padding:
                     const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
@@ -156,6 +131,7 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
                 ),
                 child: Row(
                   children: [
+                    // 🔥 АВАТАРКА
                     Stack(
                       clipBehavior: Clip.none,
                       children: [
@@ -227,6 +203,7 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
                       ],
                     ),
                     const SizedBox(width: 16),
+                    // 🔥 ИМЯ И EMAIL
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -281,6 +258,7 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
                         ],
                       ),
                     ),
+                    // 🔥 КНОПКА РЕДАКТИРОВАНИЯ
                     IconButton(
                       onPressed: () {
                         Navigator.pop(context);
@@ -298,7 +276,10 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
                   ],
                 ),
               ),
+
               const Divider(height: 1),
+
+              // 🔥 ПУНКТЫ МЕНЮ
               Expanded(
                 child: ListView(
                   controller: scrollController,
@@ -473,7 +454,7 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              'Версия 1.8.5',
+              'Версия 1.9.9',
               style: TextStyle(
                 color: isDark ? Colors.grey.shade400 : Colors.grey.shade600,
                 fontSize: 14,
@@ -600,6 +581,7 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
                 currentIndex: _selectedIndex,
                 onTap: (index) {
                   if (index == 4) {
+                    // 🔥 ОТКРЫВАЕМ ПРОФИЛЬНОЕ МЕНЮ
                     _showProfileMenu(context);
                   } else {
                     setState(() {
@@ -610,7 +592,6 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
                 },
                 phase: _gameData.gameState.currentPhase,
                 currentDay: _gameData.gameState.currentDay,
-                tutorialKeys: _tutorialKeys,
               ),
             ),
           ],

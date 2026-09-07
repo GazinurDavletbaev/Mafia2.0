@@ -13,7 +13,6 @@ class AppBottomNav extends ConsumerWidget {
   final Function(int) onTap;
   final Phase? phase;
   final int? currentDay;
-  final Map<String, GlobalKey>? tutorialKeys;
 
   const AppBottomNav({
     super.key,
@@ -21,7 +20,6 @@ class AppBottomNav extends ConsumerWidget {
     required this.onTap,
     this.phase,
     this.currentDay,
-    this.tutorialKeys,
   });
 
   @override
@@ -63,15 +61,7 @@ class AppBottomNav extends ConsumerWidget {
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               _buildNavItem(context, Mdi.home, 'Клуб', 0),
-              // 🔥 РАССАДКА — с ключом
-              _buildNavItem(
-                context,
-                Mdi.accountGroupOutline,
-                'Рассадка',
-                1,
-                key: tutorialKeys?['sitting'],
-              ),
-              // 🔥 ИГРА — с ключом
+              _buildNavItem(context, Mdi.accountGroupOutline, 'Рассадка', 1),
               _buildGameNavItem(
                 context,
                 icon: Mdi.brain,
@@ -80,16 +70,8 @@ class AppBottomNav extends ConsumerWidget {
                 isRunning: isRunning,
                 seconds: seconds,
                 isUrgent: isUrgent,
-                key: tutorialKeys?['game'],
               ),
-              // 🔥 ПРОТОКОЛ — с ключом
-              _buildNavItem(
-                context,
-                Mdi.listBox,
-                'Протокол',
-                3,
-                key: tutorialKeys?['protocol'],
-              ),
+              _buildNavItem(context, Mdi.listBox, 'Протокол', 3),
               _buildAvatarItem(context, ref, userAsync, pendingCount),
             ],
           ),
@@ -98,7 +80,7 @@ class AppBottomNav extends ConsumerWidget {
         if (isRunning && seconds > 0)
           Positioned(
             left: 4,
-            right: 4,
+            right: 8,
             top: 8,
             child: IgnorePointer(
               child: Center(
@@ -124,9 +106,8 @@ class AppBottomNav extends ConsumerWidget {
     BuildContext context,
     IconData icon,
     String label,
-    int index, {
-    Key? key,
-  }) {
+    int index,
+  ) {
     final theme = Theme.of(context);
     final isSelected = currentIndex == index;
     final Color itemColor = isSelected
@@ -135,7 +116,6 @@ class AppBottomNav extends ConsumerWidget {
             Colors.grey.shade400;
 
     return GestureDetector(
-      key: key,
       onTap: () => onTap(index),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
@@ -172,7 +152,6 @@ class AppBottomNav extends ConsumerWidget {
     required bool isRunning,
     required int seconds,
     required bool isUrgent,
-    Key? key,
   }) {
     final theme = Theme.of(context);
     final isSelected = currentIndex == index;
@@ -182,7 +161,6 @@ class AppBottomNav extends ConsumerWidget {
             Colors.grey.shade400;
 
     return GestureDetector(
-      key: key,
       onTap: () => onTap(index),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),

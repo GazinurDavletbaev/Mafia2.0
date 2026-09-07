@@ -11,6 +11,7 @@ import 'package:mafia_help/presentation/viewmodel/game_viewmodel.dart';
 import 'package:mafia_help/presentation/widgets/app_bottom_nav.dart';
 import 'package:mafia_help/presentation/widgets/tutorial/tutorial_manager.dart';
 import 'package:mafia_help/services/auth_service.dart';
+import 'package:mafia_help/services/club_service.dart';
 import 'lobby_data.dart';
 import 'lobby_pages.dart';
 
@@ -35,7 +36,9 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
   @override
   void initState() {
     super.initState();
+    print('🔥🔥🔥 LOBBY SCREEN INIT STATE CALLED!'); // ← ДОБАВЬ
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      print('🔥🔥🔥 POST FRAME CALLBACK CALLED!'); // ← ДОБАВЬ
       _initGameData();
       ref.read(savedGameIdProvider.notifier).state = null;
       ref.invalidate(userProvider);
@@ -48,6 +51,7 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
 
   void _showTutorials() {
     if (_tutorialsShown) {
+      print('🔍 Подсказки уже показаны (флаг)');
       return;
     }
     if (!mounted) return;

@@ -11,6 +11,7 @@ import 'package:mafia_help/presentation/viewmodel/game_viewmodel.dart';
 import 'package:mafia_help/presentation/widgets/app_bottom_nav.dart';
 import 'package:mafia_help/presentation/widgets/tutorial/tutorial_manager.dart';
 import 'package:mafia_help/services/auth_service.dart';
+import 'package:mafia_help/services/club_service.dart';
 import 'lobby_data.dart';
 import 'lobby_pages.dart';
 
@@ -47,9 +48,7 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
   }
 
   void _showTutorials() {
-    if (_tutorialsShown) {
-      return;
-    }
+    if (_tutorialsShown) return;
     if (!mounted) return;
 
     _tutorialsShown = true;

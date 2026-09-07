@@ -34,6 +34,19 @@ class Tutorials {
   // 👋 ПУСТОЙ КЛУБ (noclub) — ПРИВЕТСТВИЕ + СОЗДАТЬ КЛУБ
   // ============================================================
   static final List<TutorialStep> noclubSteps = [
+    // 1️⃣ ПРИВЕТСТВИЕ
+    TutorialStep(
+      id: 'welcome',
+      title: 'Добро пожаловать в Mafia Help! 🎭',
+      description:
+          'Здесь вы можете стать\nпрезидентом своего\nсобственного клуба или\nрезидентом уже действующего.\nВести полноценный рейтинг клуба\nи просматривать свои сыгранные игры\nДавайте покажем, как всё работает!',
+      icon: Icons.emoji_emotions_rounded,
+      backgroundColor: Colors.green.withOpacity(0.5),
+      width: 290,
+      height: 220,
+      // customPosition не нужен — будет по центру
+    ),
+    // 2️⃣ СОЗДАТЬ КЛУБ
     TutorialStep(
       id: 'club_create',
       title: 'Создайте свой клуб!',
@@ -54,7 +67,7 @@ class Tutorials {
       title: 'Резиденты клуба',
       description: 'Здесь отображаются все участники клуба.',
       icon: Icons.people_alt_rounded,
-      backgroundColor: Colors.green.withOpacity(0.5),
+      backgroundColor: Colors.deepPurple.withOpacity(0.5),
       width: 260,
       height: 100,
     ),
@@ -63,7 +76,7 @@ class Tutorials {
       title: 'История игр',
       description: 'Все игры клуба собраны здесь.',
       icon: Icons.sports_score_rounded,
-      backgroundColor: Colors.green.withOpacity(0.5),
+      backgroundColor: Colors.deepPurple.shade700.withOpacity(0.5),
       width: 240,
       height: 90,
     ),
@@ -72,7 +85,7 @@ class Tutorials {
       title: 'Найти клуб',
       description: 'Нажмите сюда, чтобы найти и вступить в клуб.',
       icon: Icons.search_rounded,
-      backgroundColor: Colors.green.withOpacity(0.5),
+      backgroundColor: Colors.blue.shade700.withOpacity(0.5),
       width: 230,
       height: 110,
     ),
@@ -83,22 +96,11 @@ class Tutorials {
   // ============================================================
   static final List<TutorialStep> lobbyNavSteps = [
     TutorialStep(
-      id: 'welcome',
-      title: 'Добро пожаловать в Mafia Help! 🎭',
-      description:
-          'Здесь вы можете стать\nпрезидентом своего\nсобственного клуба или\nрезидентом уже действующего.\nВести полноценный рейтинг клуба\nи просматривать свои сыгранные игры\nДавайте покажем, как всё работает!',
-      icon: Icons.emoji_emotions_rounded,
-      backgroundColor: Colors.green.withOpacity(0.5),
-      width: 290,
-      height: 220,
-      // customPosition не нужен — будет по центру
-    ),
-    TutorialStep(
       id: 'sitting',
       title: 'Фаза рассадки игроков',
       description: 'Игра начнется когда\nрассадите всех игроков за столом',
       icon: Mdi.accountGroupOutline,
-      backgroundColor: Colors.green.withOpacity(0.5),
+      backgroundColor: Colors.orange.shade700.withOpacity(0.5),
       width: 280,
       height: 120,
     ),
@@ -107,7 +109,7 @@ class Tutorials {
       title: 'Начнем игру',
       description: 'Полный цикл игры\nбез бумаги и ручки',
       icon: Mdi.brain,
-      backgroundColor: Colors.green.withOpacity(0.5),
+      backgroundColor: Colors.deepPurple.shade700.withOpacity(0.5),
       width: 280,
       height: 120,
     ),
@@ -117,7 +119,7 @@ class Tutorials {
       description:
           'Протокол игры в реальном\nвремени возможность сохранить\nв телефон, в рейтинг или сформировать\nexcel файл и распечатать\nв бумажном виде',
       icon: Mdi.listBox,
-      backgroundColor: Colors.green.withOpacity(0.5),
+      backgroundColor: Colors.blue.shade700.withOpacity(0.5),
       width: 280,
       height: 190,
     ),

@@ -120,9 +120,9 @@ class _TutorialOverlayState extends State<TutorialOverlay>
                   borderRadius: BorderRadius.circular(50),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.green.withOpacity(0.6),
-                      blurRadius: 8,
-                      spreadRadius: 1,
+                      color: Colors.green.withOpacity(0.3),
+                      blurRadius: 20,
+                      spreadRadius: 5,
                     ),
                   ],
                 ),
