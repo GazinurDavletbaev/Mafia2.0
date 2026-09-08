@@ -314,7 +314,6 @@ class _ClubScreenState extends ConsumerState<ClubScreen> {
                     ? ClubSearchList(
                         isDark: isDark,
                         onClubSelected: _selectClub,
-                        tutorialKeys: _tutorialKeys, // ← ПЕРЕДАЁМ
                       )
                     : GestureDetector(
                         onHorizontalDragEnd: (details) {

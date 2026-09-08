@@ -6,13 +6,11 @@ import 'package:mdi_plus/mdi_plus.dart';
 class ClubSearchList extends StatefulWidget {
   final bool isDark;
   final Function(int) onClubSelected;
-  final Map<String, GlobalKey>? tutorialKeys; // ← ДОБАВИТЬ
 
   const ClubSearchList({
     super.key,
     required this.isDark,
     required this.onClubSelected,
-    this.tutorialKeys, // ← ДОБАВИТЬ
   });
 
   @override
@@ -68,7 +66,7 @@ class _ClubSearchListState extends State<ClubSearchList> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = widget.isDark;
-    final club_first_search = widget.tutorialKeys?['club_first_result'];
+
     return Stack(
       children: [
         // 🔥 СПИСОК КЛУБОВ
@@ -126,7 +124,7 @@ class _ClubSearchListState extends State<ClubSearchList> {
                       )
                     : ListView.builder(
                         padding: const EdgeInsets.only(
-                          top: 10,
+                          top: 10, // 🔥 ОТСТУП СВЕРХУ ДЛЯ ПОИСКА
                           bottom: 16,
                           left: 2,
                           right: 2,
@@ -139,10 +137,7 @@ class _ClubSearchListState extends State<ClubSearchList> {
                               club['judges_count'] ??
                               0;
 
-                          // 🔥 ПЕРВЫЙ КЛУБ ПОЛУЧАЕТ КЛЮЧ ДЛЯ ПОДСКАЗКИ
-
                           return GestureDetector(
-                            key: index == 0 ? club_first_search : null,
                             onTap: () => widget.onClubSelected(club['id']),
                             child: Card(
                               color: theme.cardColor,
@@ -340,13 +335,13 @@ class _ClubSearchListState extends State<ClubSearchList> {
           child: Center(
             child: Container(
               height: 40,
-              width: MediaQuery.of(context).size.width * 0.6,
+              width: MediaQuery.of(context).size.width * 0.6, // 🔥 90% ШИРИНЫ
               padding: const EdgeInsets.symmetric(horizontal: 3, vertical: 3),
               decoration: BoxDecoration(
                 color: isDark
                     ? Colors.black.withOpacity(0.92)
                     : Colors.white.withOpacity(0.95),
-                borderRadius: BorderRadius.circular(16),
+                borderRadius: BorderRadius.circular(16), // 🔥 СКРУГЛЕНИЕ
                 border: Border.all(
                   color: isDark ? Colors.grey.shade800 : Colors.grey.shade300,
                   width: 0.5,
@@ -364,13 +359,13 @@ class _ClubSearchListState extends State<ClubSearchList> {
                 onChanged: _filterClubs,
                 style: TextStyle(
                   color: theme.textTheme.bodyLarge?.color ?? Colors.white,
-                  fontSize: 14,
+                  fontSize: 14, // ← РАЗМЕР ТЕКСТА ВВОДА
                 ),
                 decoration: InputDecoration(
                   hintText: 'Поиск по названию или городу...',
                   hintStyle: TextStyle(
                     color: isDark ? Colors.grey.shade500 : Colors.grey.shade500,
-                    fontSize: 10,
+                    fontSize: 10, // ← РАЗМЕР ТЕКСТА ПОДСКАЗКИ (ХИНТА)
                   ),
                   filled: true,
                   fillColor:

@@ -68,7 +68,7 @@ class _ClubSearchListState extends State<ClubSearchList> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = widget.isDark;
-    final club_first_search = widget.tutorialKeys?['club_first_result'];
+
     return Stack(
       children: [
         // 🔥 СПИСОК КЛУБОВ
@@ -140,9 +140,8 @@ class _ClubSearchListState extends State<ClubSearchList> {
                               0;
 
                           // 🔥 ПЕРВЫЙ КЛУБ ПОЛУЧАЕТ КЛЮЧ ДЛЯ ПОДСКАЗКИ
-
                           return GestureDetector(
-                            key: index == 0 ? club_first_search : null,
+                            key: widget.tutorialKeys?['club_first_result'],
                             onTap: () => widget.onClubSelected(club['id']),
                             child: Card(
                               color: theme.cardColor,

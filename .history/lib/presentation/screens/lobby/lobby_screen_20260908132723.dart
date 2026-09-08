@@ -342,7 +342,7 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
                       context,
                       icon: Icons.info_outline,
                       label: 'О приложении',
-                      subtitle: 'Версия 1.9.10',
+                      subtitle: 'Версия 1.8.5',
                       onTap: () {
                         Navigator.pop(context);
                         _showAboutDialog(context);

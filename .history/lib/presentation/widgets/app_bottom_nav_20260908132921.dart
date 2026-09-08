@@ -62,13 +62,8 @@ class AppBottomNav extends ConsumerWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              _buildNavItem(
-                context,
-                Mdi.home,
-                'Клуб',
-                0,
-                key: tutorialKeys?['club'],
-              ),
+              _buildNavItem(context, Mdi.home, 'Клуб', 0,
+                  key: tutorialKeys?['club']),
               // 🔥 РАССАДКА — с ключом
               _buildNavItem(
                 context,

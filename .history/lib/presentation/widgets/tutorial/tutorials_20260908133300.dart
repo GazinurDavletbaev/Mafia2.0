@@ -43,15 +43,6 @@ class Tutorials {
       width: 280,
       height: 120,
     ),
-    TutorialStep(
-      id: 'club_first_result',
-      title: 'Вступить в клуб',
-      description: 'Нажмите на клуб, чтобы посмотреть информацию и вступить.',
-      icon: Icons.people_alt_rounded,
-      backgroundColor: Colors.green.withOpacity(0.5),
-      width: 280,
-      height: 120,
-    ),
   ];
 
   // ============================================================
