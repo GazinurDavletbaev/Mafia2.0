@@ -464,7 +464,7 @@ class ProtocolSaveLogic {
       );
 
       final response = await http.post(
-        Uri.parse('${AppConfig.baseUrl}/protocol/generate'),
+        Uri.parse('http://161.104.46.234:8001/protocol/generate'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode(data),
       );
