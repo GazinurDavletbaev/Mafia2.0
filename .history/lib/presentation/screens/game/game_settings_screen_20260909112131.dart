@@ -1,7 +1,7 @@
 // lib/presentation/screens/game_settings_screen.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mafia_help/presentation/screens/lobby_screen.dart';
+import 'package:mafia_help/presentation/screens/lobby/lobby_data.dart';
 
 class GameSettingsScreen extends ConsumerStatefulWidget {
   final GameData initialData;

@@ -330,6 +330,10 @@ class SeatSetupNotifier extends StateNotifier<SeatSetupState> {
     );
     updateFilteredList();
 
+    if (state.clubMembers.isEmpty) {
+      return;
+    }
+
     if (SeatSearchOverlay.isVisible) {
       SeatSearchOverlay.close();
     }
@@ -377,8 +381,8 @@ class SeatSetupNotifier extends StateNotifier<SeatSetupState> {
 
       try {
         foundMember = state.clubMembers.firstWhere(
-          (m) => (m['username'] ?? '').toLowerCase() ==
-              value.trim().toLowerCase(),
+          (m) =>
+              (m['username'] ?? '').toLowerCase() == value.trim().toLowerCase(),
         );
       } catch (e) {
         foundMember = null;

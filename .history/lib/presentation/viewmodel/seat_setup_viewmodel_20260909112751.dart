@@ -13,14 +13,14 @@ class SeatSetupState {
   final List<Map<String, dynamic>> filteredMembers;
   final int focusedIndex;
   final String searchQuery;
-  final List<GlobalKey> textFieldKeys;
+  // 🔥 УДАЛЯЕМ textFieldKeys
   final TextEditingController tournamentController;
   final TextEditingController stageController;
   final TextEditingController tableController;
   final TextEditingController gameController;
   final DateTime selectedDate;
   final List<String> months;
-  final List<String> avatarUrls; // 🔥 ДОБАВЛЯЕМ
+  final List<String> avatarUrls;
 
   SeatSetupState({
     required this.nameControllers,
@@ -29,7 +29,6 @@ class SeatSetupState {
     required this.filteredMembers,
     required this.focusedIndex,
     required this.searchQuery,
-    required this.textFieldKeys,
     required this.tournamentController,
     required this.stageController,
     required this.tableController,
@@ -46,14 +45,13 @@ class SeatSetupState {
     List<Map<String, dynamic>>? filteredMembers,
     int? focusedIndex,
     String? searchQuery,
-    List<GlobalKey>? textFieldKeys,
     TextEditingController? tournamentController,
     TextEditingController? stageController,
     TextEditingController? tableController,
     TextEditingController? gameController,
     DateTime? selectedDate,
     List<String>? months,
-    List<String>? avatarUrls, // 🔥 ДОБАВЛЯЕМ
+    List<String>? avatarUrls,
   }) {
     return SeatSetupState(
       nameControllers: nameControllers ?? this.nameControllers,
@@ -62,7 +60,6 @@ class SeatSetupState {
       filteredMembers: filteredMembers ?? this.filteredMembers,
       focusedIndex: focusedIndex ?? this.focusedIndex,
       searchQuery: searchQuery ?? this.searchQuery,
-      textFieldKeys: textFieldKeys ?? this.textFieldKeys,
       tournamentController: tournamentController ?? this.tournamentController,
       stageController: stageController ?? this.stageController,
       tableController: tableController ?? this.tableController,
@@ -130,7 +127,6 @@ class SeatSetupNotifier extends StateNotifier<SeatSetupState> {
       filteredMembers: [],
       focusedIndex: -1,
       searchQuery: '',
-      textFieldKeys: List.generate(10, (index) => GlobalKey()),
       tournamentController: TextEditingController(
         text: initialData.tournamentName,
       ),
@@ -145,13 +141,12 @@ class SeatSetupNotifier extends StateNotifier<SeatSetupState> {
       ),
       selectedDate: initialData.date,
       months: months,
-      avatarUrls: initialAvatarUrls, // 🔥 УЖЕ С АВАТАРКАМИ
+      avatarUrls: initialAvatarUrls,
     );
   }
 
   @override
   void dispose() {
-    // 🔥 Вызываем super.dispose()
     super.dispose();
 
     if (state.nameControllers.isNotEmpty) {
@@ -188,9 +183,7 @@ class SeatSetupNotifier extends StateNotifier<SeatSetupState> {
 
     final takenUsernames = <String>{};
 
-    // 🔥 Берём имена ТОЛЬКО из контроллеров (всех полей)
     for (int i = 0; i < state.nameControllers.length; i++) {
-      // Пропускаем текущее поле (которое в фокусе)
       if (state.focusedIndex >= 0 && i == state.focusedIndex) continue;
 
       final text = state.nameControllers[i].text.trim();
@@ -343,10 +336,25 @@ class SeatSetupNotifier extends StateNotifier<SeatSetupState> {
 
     SeatSearchOverlay.show(
       context: context,
-      textFieldKey: state.textFieldKeys[index],
       members: state.filteredMembers,
       onSelect: (member) {
-        selectPlayer(index, member); // 🔥 ВЫЗЫВАЕМ МЕТОД
+        final newSelectedPlayers =
+            List<Map<String, dynamic>?>.from(state.selectedPlayers);
+        newSelectedPlayers[index] = member;
+        state.nameControllers[index].text = member['username'] ?? '';
+
+        final newAvatarUrls = List<String>.from(state.avatarUrls);
+        newAvatarUrls[index] = member['avatar_url'] ?? '';
+
+        state = state.copyWith(
+          selectedPlayers: newSelectedPlayers,
+          avatarUrls: newAvatarUrls,
+          filteredMembers: [],
+          focusedIndex: -1,
+          searchQuery: '',
+        );
+        SeatSearchOverlay.close();
+        notifyChanges();
       },
       onClose: () {
         state = state.copyWith(
@@ -358,37 +366,12 @@ class SeatSetupNotifier extends StateNotifier<SeatSetupState> {
     );
   }
 
-  void selectPlayer(int index, Map<String, dynamic> member) {
-    // Обновляем выбранного игрока
-    final newSelectedPlayers =
-        List<Map<String, dynamic>?>.from(state.selectedPlayers);
-    newSelectedPlayers[index] = member;
-
-    // Обновляем текст в поле
-
-    // Обновляем аватарку
-    final newAvatarUrls = List<String>.from(state.avatarUrls);
-    newAvatarUrls[index] = member['avatar_url'] ?? '';
-
-    state = state.copyWith(
-      selectedPlayers: newSelectedPlayers,
-      avatarUrls: newAvatarUrls,
-      filteredMembers: [],
-      focusedIndex: -1,
-      searchQuery: '',
-    );
-
-    SeatSearchOverlay.close();
-    notifyChanges();
-  }
-
   void onPlayerChanged(int index, String value) {
     state = state.copyWith(
       searchQuery: value,
       focusedIndex: index,
     );
 
-    // 🔥 ИЩЕМ АВАТАРКУ ПРИ ВВОДЕ
     if (value.trim().isNotEmpty) {
       Map<String, dynamic>? foundMember;
 
@@ -402,19 +385,36 @@ class SeatSetupNotifier extends StateNotifier<SeatSetupState> {
       }
 
       final newAvatarUrls = List<String>.from(state.avatarUrls);
+      final newSelectedPlayers =
+          List<Map<String, dynamic>?>.from(state.selectedPlayers);
 
       if (foundMember != null) {
         newAvatarUrls[index] = foundMember['avatar_url'] ?? '';
+        newSelectedPlayers[index] = foundMember;
       } else {
         newAvatarUrls[index] = '';
+        newSelectedPlayers[index] = null;
       }
 
-      state = state.copyWith(avatarUrls: newAvatarUrls);
+      state = state.copyWith(
+        avatarUrls: newAvatarUrls,
+        selectedPlayers: newSelectedPlayers,
+      );
     } else {
       final newAvatarUrls = List<String>.from(state.avatarUrls);
+      final newSelectedPlayers =
+          List<Map<String, dynamic>?>.from(state.selectedPlayers);
+
       newAvatarUrls[index] = '';
-      state = state.copyWith(avatarUrls: newAvatarUrls);
+      newSelectedPlayers[index] = null;
+
+      state = state.copyWith(
+        avatarUrls: newAvatarUrls,
+        selectedPlayers: newSelectedPlayers,
+      );
     }
+
+    notifyChanges();
 
     updateFilteredList();
     if (SeatSearchOverlay.isVisible) {
