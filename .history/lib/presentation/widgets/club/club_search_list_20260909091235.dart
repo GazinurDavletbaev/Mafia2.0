@@ -144,6 +144,7 @@ class _ClubSearchListState extends State<ClubSearchList> {
                           return GestureDetector(
                             onTap: () => widget.onClubSelected(club['id']),
                             child: Card(
+                              key: index == 0 ? club_first_search : null,
                               color: theme.cardColor,
                               margin: const EdgeInsets.symmetric(
                                   horizontal: 26, vertical: 8),
@@ -156,7 +157,6 @@ class _ClubSearchListState extends State<ClubSearchList> {
                                   ? Colors.amber.shade300.withOpacity(0.9)
                                   : Colors.green.withOpacity(0.3),
                               child: Padding(
-                                key: index == 0 ? club_first_search : null,
                                 padding: const EdgeInsets.all(8),
                                 child: Row(
                                   children: [

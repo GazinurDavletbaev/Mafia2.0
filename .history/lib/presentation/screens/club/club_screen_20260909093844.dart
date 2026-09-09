@@ -1,6 +1,7 @@
 // lib/presentation/screens/club/club_screen.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mafia_help/application/providers/tip_provider.dart';
 import 'package:mafia_help/presentation/widgets/club/club_game_table.dart';
 import 'package:mafia_help/presentation/widgets/club/club_header.dart';
 import 'package:mafia_help/presentation/widgets/club/club_rating_table.dart';
@@ -39,14 +40,13 @@ class _ClubScreenState extends ConsumerState<ClubScreen> {
 
   // 🔥 КЛЮЧИ ДЛЯ ТУТОРИАЛОВ
   final Map<String, GlobalKey> _tutorialKeys = {
-    'request': GlobalKey(),
+    'request': GlobalKey(), // ← НОВЫЙ КЛЮЧ ДЛЯ КНОПКИ "ОТПРАВИТЬ ЗАЯВКУ"
+
     'club_residents': GlobalKey(),
     'club_games': GlobalKey(),
-    'month': GlobalKey(),
-    'rating': GlobalKey(),
     'club_search': GlobalKey(),
     'club_create': GlobalKey(),
-    'club_first_result': GlobalKey(),
+    'club_first_result': GlobalKey(), // ← НОВЫЙ КЛЮЧ
   };
 
   @override
@@ -253,10 +253,7 @@ class _ClubScreenState extends ConsumerState<ClubScreen> {
         return _hasGames
             ? SingleChildScrollView(
                 padding: const EdgeInsets.symmetric(horizontal: 8),
-                child: ClubRatingTable(
-                  players: _ratingPlayers,
-                  tutorialKeys: _tutorialKeys, // ← ПЕРЕДАЁМ
-                ),
+                child: ClubRatingTable(players: _ratingPlayers),
               )
             : _buildNoGamesPlaceholder(isDark);
       case 1:
@@ -323,9 +320,9 @@ class _ClubScreenState extends ConsumerState<ClubScreen> {
                       )
                     : GestureDetector(
                         onHorizontalDragEnd: (details) {
-                          if (details.primaryVelocity! < -300) {
+                          if (details.primaryVelocity! < -100) {
                             _nextMonth();
-                          } else if (details.primaryVelocity! > 300) {
+                          } else if (details.primaryVelocity! > 100) {
                             _previousMonth();
                           }
                         },
@@ -348,7 +345,6 @@ class _ClubScreenState extends ConsumerState<ClubScreen> {
                 clipBehavior: Clip.none,
                 children: [
                   Container(
-                    key: _tutorialKeys['month'], // ← ДОБАВИТЬ КЛЮЧ
                     padding:
                         const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                     decoration: BoxDecoration(

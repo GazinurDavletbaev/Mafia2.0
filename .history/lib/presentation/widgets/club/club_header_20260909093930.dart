@@ -172,6 +172,7 @@ class ClubHeader extends StatelessWidget {
                     left: 74,
                     child: GestureDetector(
                       key: tutorialKeys?['request'], // ← ПРИВЯЗКА
+
                       onTap: () {
                         // 🔥 ЕСЛИ ГАЛОЧКА (МОЙ КЛУБ) — ВОЗВРАТ НА РЕЙТИНГ
                         if (isMyClub) {

@@ -67,7 +67,7 @@ class Tutorials {
       icon: Icons.people_alt_rounded,
       backgroundColor: Colors.green.withOpacity(0.5),
       width: 260,
-      height: 160,
+      height: 150,
     ),
     TutorialStep(
       id: 'club_residents',
@@ -86,25 +86,6 @@ class Tutorials {
       backgroundColor: Colors.green.withOpacity(0.5),
       width: 240,
       height: 90,
-    ),
-    TutorialStep(
-      id: 'month',
-      title: 'Текущий месяц',
-      description: 'Месяц и год текущего рейтинга',
-      icon: Icons.sports_score_rounded,
-      backgroundColor: Colors.green.withOpacity(0.5),
-      width: 250,
-      height: 110,
-    ),
-    TutorialStep(
-      id: 'rating',
-      title: 'Таблица рейтинга',
-      description:
-          'Свайп вправо -> прошлый месяц\nСвайп влево <- следующий месяц',
-      icon: Icons.sports_score_rounded,
-      backgroundColor: Colors.green.withOpacity(0.5),
-      width: 250,
-      height: 130,
     ),
     TutorialStep(
       id: 'club_search',
@@ -130,6 +111,7 @@ class Tutorials {
       backgroundColor: Colors.green.withOpacity(0.5),
       width: 290,
       height: 220,
+      // customPosition не нужен — будет по центру
     ),
     TutorialStep(
       id: 'club',

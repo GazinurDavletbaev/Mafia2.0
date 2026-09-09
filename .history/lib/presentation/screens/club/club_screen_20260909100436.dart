@@ -1,6 +1,7 @@
 // lib/presentation/screens/club/club_screen.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mafia_help/application/providers/tip_provider.dart';
 import 'package:mafia_help/presentation/widgets/club/club_game_table.dart';
 import 'package:mafia_help/presentation/widgets/club/club_header.dart';
 import 'package:mafia_help/presentation/widgets/club/club_rating_table.dart';

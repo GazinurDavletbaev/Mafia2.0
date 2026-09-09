@@ -46,7 +46,6 @@ class ClubRatingTable extends StatelessWidget {
       elevation: 4,
       shadowColor: Colors.white.withOpacity(0.3),
       child: Padding(
-        key: tutorialKeys?['rating'],
         padding: const EdgeInsets.all(6),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -54,6 +53,8 @@ class ClubRatingTable extends StatelessWidget {
             LayoutBuilder(
               builder: (context, constraints) {
                 return Table(
+                  key: tutorialKeys?['rating'], // ← ПРИВЯЗКА КЛЮЧА К КАРТОЧКЕ
+
                   columnWidths: {
                     0: const FlexColumnWidth(0.5), // №
                     1: const FlexColumnWidth(3), // Никнейм + аватарка

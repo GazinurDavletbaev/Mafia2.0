@@ -46,7 +46,6 @@ class ClubRatingTable extends StatelessWidget {
       elevation: 4,
       shadowColor: Colors.white.withOpacity(0.3),
       child: Padding(
-        key: tutorialKeys?['rating'],
         padding: const EdgeInsets.all(6),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,

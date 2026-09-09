@@ -40,13 +40,14 @@ class ClubRatingTable extends StatelessWidget {
     }
 
     return Card(
+      key: tutorialKeys?['rating'], // ← ПРИВЯЗКА КЛЮЧА К КАРТОЧКЕ
+
       color: theme.cardColor,
       margin: const EdgeInsets.all(20),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
       elevation: 4,
       shadowColor: Colors.white.withOpacity(0.3),
       child: Padding(
-        key: tutorialKeys?['rating'],
         padding: const EdgeInsets.all(6),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
