@@ -43,7 +43,7 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
       ref.invalidate(clubProvider);
       ref.invalidate(pendingRequestsProvider);
 
-      // _showTutorials();
+      _showTutorials();
     });
   }
 

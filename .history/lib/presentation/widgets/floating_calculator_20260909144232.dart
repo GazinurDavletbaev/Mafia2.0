@@ -8,11 +8,11 @@ import 'package:mafia_help/presentation/widgets/pie_menu_dialog.dart';
 import '../state/game_state.dart';
 
 class FloatingCalculator extends ConsumerStatefulWidget {
-  //final Map<String, GlobalKey>? tutorialKeys; // ← ДОБАВИТЬ
+  final Map<String, GlobalKey>? tutorialKeys; // ← ДОБАВИТЬ
 
   const FloatingCalculator({
     super.key,
-    //this.tutorialKeys, // ← ДОБАВИТЬ
+    this.tutorialKeys, // ← ДОБАВИТЬ
   });
 
   @override
@@ -248,8 +248,19 @@ class _FloatingCalculatorState extends ConsumerState<FloatingCalculator> {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
 
+    // 🔥 ОПРЕДЕЛЯЕМ КЛЮЧ ДЛЯ НАВИГАЦИОННЫХ КНОПОК
+    Key? key;
+    if (text == '←') {
+      key = widget.tutorialKeys?['game_back']; // ← НАЗАД
+    } else if (text == '→') {
+      key = widget.tutorialKeys?['game_forward']; // ← ВПЕРЕД
+    } else if (text == '🎭') {
+      key = widget.tutorialKeys?['game_roles']; // ← РОЛИ
+    }
+
     return Expanded(
       child: Container(
+        key: key, // ← ПРИВЯЗКА
         margin: const EdgeInsets.all(2),
         decoration: BoxDecoration(
           color: isDark

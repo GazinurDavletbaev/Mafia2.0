@@ -176,6 +176,9 @@ class PlayerCard extends StatelessWidget {
                                   children: [
                                     // 🔥 ФОН БЕЙДЖА — ПРИВЯЗЫВАЕМ КЛЮЧ
                                     Container(
+                                      key: player.seatNumber == 2
+                                          ? key
+                                          : null, // ← ПОДСКАЗКА ПОДСВЕЧИВАЕТ БЕЙДЖ
                                       width: 35,
                                       height: 35,
                                       decoration: BoxDecoration(

@@ -316,8 +316,9 @@ class Tutorials {
     // 7️⃣ ПРОМАХ (🙅)
     TutorialStep(
       id: 'game_miss',
-      title: 'Промах',
-      description: 'Нажмите, если мафия промахнулась.',
+      title: 'Промах/Воздержался',
+      description:
+          'Нажмите, чтобы отметить игрока, который воздержался или промахнулся.',
       icon: Icons.do_not_disturb_rounded,
       backgroundColor: Colors.green.withOpacity(0.5),
       width: 260,

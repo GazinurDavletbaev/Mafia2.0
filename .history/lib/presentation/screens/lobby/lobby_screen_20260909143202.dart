@@ -27,10 +27,10 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
   bool _tutorialsShown = false;
 
   final Map<String, GlobalKey> _tutorialKeys = {
-    'club': GlobalKey(),
-    'sitting': GlobalKey(),
-    'game': GlobalKey(),
-    'protocol': GlobalKey(),
+    //'club': GlobalKey(),
+    //'sitting': GlobalKey(),
+    //'game': GlobalKey(),
+    //'protocol': GlobalKey(),
   };
 
   @override
@@ -43,7 +43,7 @@ class _LobbyScreenState extends ConsumerState<LobbyScreen> {
       ref.invalidate(clubProvider);
       ref.invalidate(pendingRequestsProvider);
 
-      // _showTutorials();
+      _showTutorials();
     });
   }
 

@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:mafia_help/data/local/models/player_model.dart';
 import 'package:mdi_plus/mdi_plus.dart';
+import '../../core/logger/app_logger.dart';
 import 'timer/timer_overlay.dart';
 
 class PlayerCard extends StatelessWidget {
@@ -25,7 +26,7 @@ class PlayerCard extends StatelessWidget {
   final bool showRole;
 
   const PlayerCard({
-    Key? key,
+    Key? key, // ← ДОБАВИТЬ
     required this.player,
     required this.isSpeaking,
     this.isBlackTeam = false,
@@ -44,7 +45,7 @@ class PlayerCard extends StatelessWidget {
     this.isSelectedForBestMove = false,
     this.isEliminationCandidate = false,
     this.showRole = false,
-  }) : super(key: key);
+  }) : super(key: key); // ← ПЕРЕДАЁМ В SUPER
 
   @override
   Widget build(BuildContext context) {
@@ -167,14 +168,14 @@ class PlayerCard extends StatelessWidget {
                                       )
                                     : null,
                               ),
-                              // 🔥 БЕЙДЖ С НОМЕРОМ МЕСТА (ВВЕРХУ СЛЕВА) — СЮДА ПРИВЯЗЫВАЕМ КЛЮЧ!
+                              // 🔥 БЕЙДЖ С НОМЕРОМ МЕСТА (ВВЕРХУ СЛЕВА)
                               Positioned(
                                 top: -12,
                                 left: -12,
                                 child: Stack(
                                   alignment: Alignment.center,
                                   children: [
-                                    // 🔥 ФОН БЕЙДЖА — ПРИВЯЗЫВАЕМ КЛЮЧ
+                                    // 🔥 ФОН
                                     Container(
                                       width: 35,
                                       height: 35,

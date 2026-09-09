@@ -598,6 +598,7 @@ class PlayerGrid extends StatelessWidget {
     final isNight = currentSubPhase == SubPhase.mafiaShoot ||
         currentSubPhase == SubPhase.donCheck ||
         currentSubPhase == SubPhase.sheriffCheck;
+    final gamePhase = tutorialKeys?['game_phase'];
 
     return Row(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -637,7 +638,10 @@ class PlayerGrid extends StatelessWidget {
   ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: playersList.map((player) {
+      children: playersList.asMap().entries.map((entry) {
+        final index = entry.key;
+        final player = entry.value;
+
         final isSpeaking = currentSpeaker == player.seatNumber;
         final timerValue = isSpeaking ? timerSeconds : null;
         final isBlackTeam = (currentSubPhase == SubPhase.contract ||
@@ -662,10 +666,16 @@ class PlayerGrid extends StatelessWidget {
             currentSubPhase == SubPhase.eliminationVote &&
                 tiedSeats.contains(player.seatNumber);
 
+        // 🔥 КЛЮЧ ТОЛЬКО ДЛЯ ПЕРВОГО (index == 0)
+        final playerNumber = tutorialKeys?['game_player_number'];
+        final playerNumberKey =
+            (index == 2 && isLeftColumn) ? playerNumber : null;
+
         return Expanded(
           child: Padding(
             padding: const EdgeInsets.only(bottom: 8),
             child: PlayerCard(
+              key: playerNumberKey,
               player: player,
               isSpeaking: isSpeaking,
               isBlackTeam: isBlackTeam,

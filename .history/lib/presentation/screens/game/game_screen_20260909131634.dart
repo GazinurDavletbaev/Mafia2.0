@@ -1,4 +1,3 @@
-// lib/presentation/screens/game/game_screen.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mafia_help/presentation/screens/lobby/lobby_data.dart';
@@ -37,33 +36,16 @@ class _GameScreenState extends ConsumerState<GameScreen> {
   bool _tutorialsShown = false;
 
   final Map<String, GlobalKey> _tutorialKeys = {
-    //'game_player_number': GlobalKey(),
-    //'game_phase': GlobalKey(),
-    //'game_day': GlobalKey(),
-    //'game_forward': GlobalKey(),
-    //'game_back': GlobalKey(),
-    //'game_roles': GlobalKey(),
-    //'game_miss': GlobalKey(),
-    //'game_calculator': GlobalKey(),
-    //'game_voting': GlobalKey(),
+    'game_player_number': GlobalKey(),
+    'game_phase': GlobalKey(),
+    'game_day': GlobalKey(),
+    'game_forward': GlobalKey(),
+    'game_back': GlobalKey(),
+    'game_roles': GlobalKey(),
+    'game_miss': GlobalKey(),
+    'game_calculator': GlobalKey(),
+    'game_voting': GlobalKey(),
   };
-
-  void _showTutorials() {
-    if (_tutorialsShown) return;
-    if (!mounted) return;
-
-    _tutorialsShown = true;
-
-    TutorialManager.startTutorials(
-      context: context,
-      screen: 'game',
-      ref: ref,
-      keys: _tutorialKeys,
-      onAllCompleted: () {
-        print('🎉 Подсказки игры показаны!');
-      },
-    );
-  }
 
   @override
   void initState() {
@@ -75,14 +57,16 @@ class _GameScreenState extends ConsumerState<GameScreen> {
 
       // 🔥 1. СНАЧАЛА ПРОВЕРЯЕМ АКТИВНУЮ ИГРУ!
       final hasActiveGame = _vm.state.players.any((p) =>
-          p.role != 'unknown' && p.role != '' && p.name.trim().isNotEmpty);
+              p.role != 'unknown' &&
+              p.role != '' &&
+              p.name.trim().isNotEmpty // 🔥 ДОБАВИЛИ
+          );
 
       print(hasActiveGame);
 
       if (hasActiveGame) {
         print('✅ Игра уже идёт, продолжаем');
-        _showTutorials();
-        return;
+        return; // 🔥 ВЫХОДИМ, НИЧЕГО НЕ ДЕЛАЕМ
       }
 
       // 🔥 2. ИГРЫ НЕТ — ТОЛЬКО ТЕПЕРЬ ПРОВЕРЯЕМ ИМЕНА
@@ -116,10 +100,23 @@ class _GameScreenState extends ConsumerState<GameScreen> {
         stageName: widget.initialData.stageName,
       );
       _notifyGameStateChanged();
-
-      // 🔥 4. ПОСЛЕ ИНИЦИАЛИЗАЦИИ ИГРЫ ПОКАЗЫВАЕМ ПОДСКАЗКИ
-      _showTutorials();
     });
+    void _showTutorials() {
+      if (_tutorialsShown) return;
+      if (!mounted) return;
+
+      _tutorialsShown = true;
+
+      TutorialManager.startTutorials(
+        context: context,
+        screen: 'game',
+        ref: ref,
+        keys: _tutorialKeys,
+        onAllCompleted: () {
+          print('🎉 Подсказки игры показаны!');
+        },
+      );
+    }
   }
 
   @override
@@ -191,6 +188,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
         actions: [
           Row(
             children: [
+              // 🔥 КНОПКА ОТМЕНА
               TextButton(
                 onPressed: () {
                   Navigator.pop(context);
@@ -216,6 +214,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
                   ],
                 ),
               ),
+              // 🔥 КНОПКА ПРОТОКОЛ
               TextButton(
                 onPressed: () {
                   Navigator.pop(context);
@@ -284,6 +283,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
         backgroundColor: theme.scaffoldBackgroundColor,
         body: Stack(
           children: [
+            // 🔥 ОСНОВНОЙ КОНТЕНТ
             Padding(
               padding: const EdgeInsets.all(16.0),
               child: Column(
@@ -311,7 +311,7 @@ class _GameScreenState extends ConsumerState<GameScreen> {
                       onSwipeDown: _vm.onSwipeDown,
                       onSwipeLeft: _vm.onSwipeLeft,
                       onSwipeRight: _vm.onSwipeRight,
-                      showAllRoles: gameState.showAllRoles,
+                      showAllRoles: gameState.showAllRoles, // ← ДОБАВИТЬ
                     ),
                   ),
                   const SizedBox(height: 20),
@@ -319,11 +319,13 @@ class _GameScreenState extends ConsumerState<GameScreen> {
                 ],
               ),
             ),
+            // 🔥 УВЕДОМЛЕНИЕ (PhaseHeader) ПОВЕРХ
             Positioned(
               top: 10,
               left: 0,
               right: 0,
               child: PhaseHeader(
+                key: _tutorialKeys['game_phase_header'],
                 phase: gameState.currentPhase,
                 subPhase: gameState.currentSubPhase,
                 currentDay: gameState.currentDay,
@@ -331,8 +333,8 @@ class _GameScreenState extends ConsumerState<GameScreen> {
               ),
             ),
             FloatingCalculator(
-                //tutorialKeys: _tutorialKeys,
-                ),
+              tutorialKeys: _tutorialKeys, // ← ПЕРЕДАЁМ
+            ),
           ],
         ),
       ),

@@ -37,15 +37,15 @@ class _GameScreenState extends ConsumerState<GameScreen> {
   bool _tutorialsShown = false;
 
   final Map<String, GlobalKey> _tutorialKeys = {
-    //'game_player_number': GlobalKey(),
-    //'game_phase': GlobalKey(),
-    //'game_day': GlobalKey(),
-    //'game_forward': GlobalKey(),
-    //'game_back': GlobalKey(),
-    //'game_roles': GlobalKey(),
-    //'game_miss': GlobalKey(),
-    //'game_calculator': GlobalKey(),
-    //'game_voting': GlobalKey(),
+    'game_player_number': GlobalKey(),
+    'game_phase': GlobalKey(),
+    'game_day': GlobalKey(),
+    'game_forward': GlobalKey(),
+    'game_back': GlobalKey(),
+    'game_roles': GlobalKey(),
+    'game_miss': GlobalKey(),
+    'game_calculator': GlobalKey(),
+    'game_voting': GlobalKey(),
   };
 
   void _showTutorials() {
@@ -324,15 +324,17 @@ class _GameScreenState extends ConsumerState<GameScreen> {
               left: 0,
               right: 0,
               child: PhaseHeader(
+                key: _tutorialKeys['game_phase'],
                 phase: gameState.currentPhase,
                 subPhase: gameState.currentSubPhase,
                 currentDay: gameState.currentDay,
                 currentSpeaker: gameState.currentSpeakerSeat,
+                tutorialKeys: _tutorialKeys,
               ),
             ),
             FloatingCalculator(
-                //tutorialKeys: _tutorialKeys,
-                ),
+              tutorialKeys: _tutorialKeys,
+            ),
           ],
         ),
       ),

@@ -661,11 +661,12 @@ class PlayerGrid extends StatelessWidget {
         final isEliminationCandidate =
             currentSubPhase == SubPhase.eliminationVote &&
                 tiedSeats.contains(player.seatNumber);
-
+        final playerNumber = tutorialKeys?['game_player_number'];
         return Expanded(
           child: Padding(
             padding: const EdgeInsets.only(bottom: 8),
             child: PlayerCard(
+              key: currentSpeaker == 2 ? playerNumber : null,
               player: player,
               isSpeaking: isSpeaking,
               isBlackTeam: isBlackTeam,
@@ -676,8 +677,9 @@ class PlayerGrid extends StatelessWidget {
               isLeftColumn: isLeftColumn,
               timerSeconds: timerValue,
               isDon: isDon,
-              showRole:
-                  showAllRoles && player.role != 'unknown' && player.role != '',
+              showRole: showAllRoles &&
+                  player.role != 'unknown' &&
+                  player.role != '', // ← ДОБАВИЛИ
               onTap: () => onTap(player.seatNumber),
               onLongPress: () => onLongPress(player.seatNumber),
               onSwipeUp: () => onSwipeUp(player.seatNumber),

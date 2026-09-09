@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:mafia_help/data/local/models/player_model.dart';
 import 'package:mdi_plus/mdi_plus.dart';
+import '../../core/logger/app_logger.dart';
 import 'timer/timer_overlay.dart';
 
 class PlayerCard extends StatelessWidget {
@@ -176,6 +177,8 @@ class PlayerCard extends StatelessWidget {
                                   children: [
                                     // 🔥 ФОН БЕЙДЖА — ПРИВЯЗЫВАЕМ КЛЮЧ
                                     Container(
+                                      key:
+                                          key, // ← ПОДСКАЗКА ПОДСВЕЧИВАЕТ БЕЙДЖ
                                       width: 35,
                                       height: 35,
                                       decoration: BoxDecoration(

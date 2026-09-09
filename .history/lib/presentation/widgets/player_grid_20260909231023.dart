@@ -662,6 +662,72 @@ class PlayerGrid extends StatelessWidget {
             currentSubPhase == SubPhase.eliminationVote &&
                 tiedSeats.contains(player.seatNumber);
 
+        final playerNumber = tutorialKeys?['game_player_number'];
+        final playerNumberKey =
+            (player.seatNumber == 4 && isLeftColumn) ? playerNumber : null;
+        return Expanded(
+          child: Padding(
+            padding: const EdgeInsets.only(bottom: 8),
+            child: PlayerCard(
+              key: playerNumberKey,
+              player: player,
+              isSpeaking: isSpeaking,
+              isBlackTeam: isBlackTeam,
+              isSheriff: isSheriff,
+              isCurrentCandidate: isCurrentCandidate,
+              isSelectedForBestMove: isSelectedForBestMove,
+              isEliminationCandidate: isEliminationCandidate,
+              isLeftColumn: isLeftColumn,
+              timerSeconds: timerValue,
+              isDon: isDon,
+              showRole:
+                  showAllRoles && player.role != 'unknown' && player.role != '',
+              onTap: () => onTap(player.seatNumber),
+              onLongPress: () => onLongPress(player.seatNumber),
+              onSwipeUp: () => onSwipeUp(player.seatNumber),
+              onSwipeDown: () => onSwipeDown(player.seatNumber),
+              onSwipeLeft: () => onSwipeLeft(player.seatNumber),
+              onSwipeRight: () => onSwipeRight(player.seatNumber),
+            ),
+          ),
+        );
+      }).toList(),
+    );
+  }
+
+  Widget _buildColumn2(
+    List<PlayerModel> playersList,
+    bool isLeftColumn,
+    int? timerSeconds,
+    BuildContext context,
+  ) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: playersList.map((player) {
+        final isSpeaking = currentSpeaker == player.seatNumber;
+        final timerValue = isSpeaking ? timerSeconds : null;
+        final isBlackTeam = (currentSubPhase == SubPhase.contract ||
+                currentSubPhase == SubPhase.mafiaShoot) &&
+            (player.role == 'don' || player.role == 'mafia');
+        final isSheriff = (currentSubPhase == SubPhase.sheriffLook ||
+                currentSubPhase == SubPhase.sheriffCheck) &&
+            player.role == 'sheriff';
+        final isDon =
+            currentSubPhase == SubPhase.donCheck && player.role == 'don';
+        final isCurrentCandidate = isVotingActive &&
+                voteController?.currentSeat == player.seatNumber ||
+            currentSubPhase == SubPhase.tieBreak &&
+                currentSpeaker == player.seatNumber ||
+            currentSubPhase == SubPhase.finalWordKill &&
+                currentSpeaker == player.seatNumber ||
+            currentSubPhase == SubPhase.finalWord &&
+                currentSpeaker == player.seatNumber;
+        final isSelectedForBestMove = currentSubPhase == SubPhase.bestMove &&
+            partialBestMove.contains(player.seatNumber);
+        final isEliminationCandidate =
+            currentSubPhase == SubPhase.eliminationVote &&
+                tiedSeats.contains(player.seatNumber);
+
         return Expanded(
           child: Padding(
             padding: const EdgeInsets.only(bottom: 8),

@@ -602,7 +602,7 @@ class PlayerGrid extends StatelessWidget {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Expanded(child: _buildColumn(leftColumn, true, timerSeconds, context)),
+        Expanded(child: _buildColumn1(leftColumn, true, timerSeconds, context)),
         Container(
           width: 100,
           child: Column(
@@ -623,13 +623,78 @@ class PlayerGrid extends StatelessWidget {
           ),
         ),
         Expanded(
-          child: _buildColumn(rightColumn, false, timerSeconds, context),
+          child: _buildColumn2(rightColumn, false, timerSeconds, context),
         ),
       ],
     );
   }
 
-  Widget _buildColumn(
+  Widget _buildColumn1(
+    List<PlayerModel> playersList,
+    bool isLeftColumn,
+    int? timerSeconds,
+    BuildContext context,
+  ) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: playersList.map((player) {
+        final isSpeaking = currentSpeaker == player.seatNumber;
+        final timerValue = isSpeaking ? timerSeconds : null;
+        final isBlackTeam = (currentSubPhase == SubPhase.contract ||
+                currentSubPhase == SubPhase.mafiaShoot) &&
+            (player.role == 'don' || player.role == 'mafia');
+        final isSheriff = (currentSubPhase == SubPhase.sheriffLook ||
+                currentSubPhase == SubPhase.sheriffCheck) &&
+            player.role == 'sheriff';
+        final isDon =
+            currentSubPhase == SubPhase.donCheck && player.role == 'don';
+        final isCurrentCandidate = isVotingActive &&
+                voteController?.currentSeat == player.seatNumber ||
+            currentSubPhase == SubPhase.tieBreak &&
+                currentSpeaker == player.seatNumber ||
+            currentSubPhase == SubPhase.finalWordKill &&
+                currentSpeaker == player.seatNumber ||
+            currentSubPhase == SubPhase.finalWord &&
+                currentSpeaker == player.seatNumber;
+        final isSelectedForBestMove = currentSubPhase == SubPhase.bestMove &&
+            partialBestMove.contains(player.seatNumber);
+        final isEliminationCandidate =
+            currentSubPhase == SubPhase.eliminationVote &&
+                tiedSeats.contains(player.seatNumber);
+
+        final playerNumber = tutorialKeys?['game_player_number'];
+
+        return Expanded(
+          child: Padding(
+            padding: const EdgeInsets.only(bottom: 8),
+            child: PlayerCard(
+              key: player.seatNumber == 3 ? playerNumber : null,
+              player: player,
+              isSpeaking: isSpeaking,
+              isBlackTeam: isBlackTeam,
+              isSheriff: isSheriff,
+              isCurrentCandidate: isCurrentCandidate,
+              isSelectedForBestMove: isSelectedForBestMove,
+              isEliminationCandidate: isEliminationCandidate,
+              isLeftColumn: isLeftColumn,
+              timerSeconds: timerValue,
+              isDon: isDon,
+              showRole:
+                  showAllRoles && player.role != 'unknown' && player.role != '',
+              onTap: () => onTap(player.seatNumber),
+              onLongPress: () => onLongPress(player.seatNumber),
+              onSwipeUp: () => onSwipeUp(player.seatNumber),
+              onSwipeDown: () => onSwipeDown(player.seatNumber),
+              onSwipeLeft: () => onSwipeLeft(player.seatNumber),
+              onSwipeRight: () => onSwipeRight(player.seatNumber),
+            ),
+          ),
+        );
+      }).toList(),
+    );
+  }
+
+  Widget _buildColumn2(
     List<PlayerModel> playersList,
     bool isLeftColumn,
     int? timerSeconds,

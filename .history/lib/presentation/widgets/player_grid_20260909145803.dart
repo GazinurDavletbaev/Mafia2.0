@@ -637,7 +637,10 @@ class PlayerGrid extends StatelessWidget {
   ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: playersList.map((player) {
+      children: playersList.asMap().entries.map((entry) {
+        final index = entry.key;
+        final player = entry.value;
+
         final isSpeaking = currentSpeaker == player.seatNumber;
         final timerValue = isSpeaking ? timerSeconds : null;
         final isBlackTeam = (currentSubPhase == SubPhase.contract ||
@@ -661,6 +664,10 @@ class PlayerGrid extends StatelessWidget {
         final isEliminationCandidate =
             currentSubPhase == SubPhase.eliminationVote &&
                 tiedSeats.contains(player.seatNumber);
+
+        // 🔥 КЛЮЧ ТОЛЬКО ДЛЯ ПЕРВОГО (index == 0)
+        final playerNum = tutorialKeys?['game_player_number'];
+        final playerNumberKey = (index == 0 && isLeftColumn) ? playerNum : null;
 
         return Expanded(
           child: Padding(

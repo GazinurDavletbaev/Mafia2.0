@@ -48,7 +48,7 @@ class _SeatSetupScreenState extends ConsumerState<SeatSetupScreen> {
 
     // 🔥 ПОКАЗЫВАЕМ ПОДСКАЗКИ
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      //_showTutorials();
+      _showTutorials();
     });
   }
 

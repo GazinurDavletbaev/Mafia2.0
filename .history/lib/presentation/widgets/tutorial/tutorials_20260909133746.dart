@@ -257,7 +257,7 @@ class Tutorials {
       id: 'game_player_number',
       title: 'Номер игрока',
       description:
-          'Каждый игрок имеет свой номер. Нажмите на карточку, чтобы выбрать игрока.',
+          'Каждый игрок имеет свой номер.\nНажмите на карточку, чтобы выбрать игрока.',
       icon: Icons.numbers_rounded,
       backgroundColor: Colors.green.withOpacity(0.5),
       width: 260,
@@ -267,11 +267,11 @@ class Tutorials {
     TutorialStep(
       id: 'game_phase',
       title: 'Текущая фаза',
-      description: 'Здесь отображается текущая фаза игры и номер дня.',
+      description: 'Здесь отображается текущая фаза игры\nи номер дня.',
       icon: Icons.flag_rounded,
       backgroundColor: Colors.green.withOpacity(0.5),
       width: 260,
-      height: 140,
+      height: 110,
     ),
     // 3️⃣ ДЕНЬ
     TutorialStep(
@@ -281,7 +281,7 @@ class Tutorials {
       icon: Icons.calendar_today_rounded,
       backgroundColor: Colors.green.withOpacity(0.5),
       width: 240,
-      height: 140,
+      height: 100,
     ),
     // 4️⃣ ВПЕРЕД (→)
     TutorialStep(
@@ -291,7 +291,7 @@ class Tutorials {
       icon: Icons.arrow_forward_rounded,
       backgroundColor: Colors.green.withOpacity(0.5),
       width: 240,
-      height: 140,
+      height: 100,
     ),
     // 5️⃣ НАЗАД (←)
     TutorialStep(
@@ -301,7 +301,7 @@ class Tutorials {
       icon: Icons.arrow_back_rounded,
       backgroundColor: Colors.green.withOpacity(0.5),
       width: 240,
-      height: 140,
+      height: 100,
     ),
     // 6️⃣ РОЛИ (🎭)
     TutorialStep(
@@ -316,34 +316,35 @@ class Tutorials {
     // 7️⃣ ПРОМАХ (🙅)
     TutorialStep(
       id: 'game_miss',
-      title: 'Промах',
-      description: 'Нажмите, если мафия промахнулась.',
+      title: 'Промах/Воздержался',
+      description:
+          'Нажмите, чтобы отметить игрока,\nкоторый воздержался или промахнулся.',
       icon: Icons.do_not_disturb_rounded,
       backgroundColor: Colors.green.withOpacity(0.5),
       width: 260,
-      height: 140,
+      height: 110,
     ),
     // 8️⃣ КАЛЬКУЛЯТОР
     TutorialStep(
       id: 'game_calculator',
       title: 'Калькулятор',
       description:
-          'Используйте цифры для голосования, выбора лучшего хода или ночных действий.',
+          'Используйте цифры для голосования,\nвыбора лучшего хода или ночных действий.',
       icon: Icons.calculate_rounded,
       backgroundColor: Colors.green.withOpacity(0.5),
       width: 260,
-      height: 140,
+      height: 110,
     ),
     // 9️⃣ ГОЛОСОВАНИЕ
     TutorialStep(
       id: 'game_voting',
       title: 'Голосование',
       description:
-          'В фазе голосования распределите голоса между кандидатами с помощью калькулятора.',
+          'В фазе голосования распределите голоса\nмежду кандидатами с помощью калькулятора.',
       icon: Icons.how_to_vote_rounded,
       backgroundColor: Colors.green.withOpacity(0.5),
       width: 280,
-      height: 140,
+      height: 110,
     ),
   ];
 

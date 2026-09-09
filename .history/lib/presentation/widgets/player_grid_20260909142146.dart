@@ -229,7 +229,7 @@ class PlayerGrid extends StatelessWidget {
     );
   }
 
-  Widget _buildDayColumn(BuildContext context) {
+  Widget _buildDayColumn(BuildContext context, gamePhase) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
 
@@ -291,6 +291,7 @@ class PlayerGrid extends StatelessWidget {
     }
 
     final iconColor = isDark ? Colors.grey.shade600 : Colors.grey.shade500;
+    final isFirstIcon = currentSubPhase == SubPhase.roleDistribution;
 
     if (currentSubPhase == SubPhase.bestMove) {
       return Container(
@@ -550,6 +551,7 @@ class PlayerGrid extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.only(top: 5),
             child: Tooltip(
+              key: gamePhase,
               message: tooltip,
               child: Icon(icon, color: iconColor, size: 20),
             ),
@@ -598,6 +600,7 @@ class PlayerGrid extends StatelessWidget {
     final isNight = currentSubPhase == SubPhase.mafiaShoot ||
         currentSubPhase == SubPhase.donCheck ||
         currentSubPhase == SubPhase.sheriffCheck;
+    final gamePhase = tutorialKeys?['game_phase'];
 
     return Row(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -617,7 +620,7 @@ class PlayerGrid extends StatelessWidget {
               Expanded(
                 child: isNight
                     ? _buildNightActionsColumn(context)
-                    : _buildDayColumn(context),
+                    : _buildDayColumn(context, gamePhase),
               ),
             ],
           ),
@@ -637,7 +640,10 @@ class PlayerGrid extends StatelessWidget {
   ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: playersList.map((player) {
+      children: playersList.asMap().entries.map((entry) {
+        final index = entry.key;
+        final player = entry.value;
+
         final isSpeaking = currentSpeaker == player.seatNumber;
         final timerValue = isSpeaking ? timerSeconds : null;
         final isBlackTeam = (currentSubPhase == SubPhase.contract ||
@@ -662,10 +668,16 @@ class PlayerGrid extends StatelessWidget {
             currentSubPhase == SubPhase.eliminationVote &&
                 tiedSeats.contains(player.seatNumber);
 
+        // 🔥 КЛЮЧ ТОЛЬКО ДЛЯ ПЕРВОГО (index == 0)
+        final playerNumber = tutorialKeys?['game_player_number'];
+        final playerNumberKey =
+            (index == 2 && isLeftColumn) ? playerNumber : null;
+
         return Expanded(
           child: Padding(
             padding: const EdgeInsets.only(bottom: 8),
             child: PlayerCard(
+              key: playerNumberKey,
               player: player,
               isSpeaking: isSpeaking,
               isBlackTeam: isBlackTeam,
