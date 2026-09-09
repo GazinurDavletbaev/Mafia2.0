@@ -97,7 +97,7 @@ class _SeatSetupScreenState extends ConsumerState<SeatSetupScreen> {
                 children: [
                   Expanded(
                     child: SeatPlayerList(
-                      tutorialKeys: _tutorialKeys,
+                      key: _tutorialKeys['seat_player'],
                       seats: leftSeats,
                       isLeft: true,
                       controllers: state.nameControllers,

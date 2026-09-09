@@ -23,16 +23,19 @@ class SeatPlayerList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final seatplayer = tutorialKeys?['seat_player'];
     return Column(
       children: seats.asMap().entries.map((entry) {
         final index = entry.key;
         final seat = entry.value;
-        final isFirst = index == 3; // ← ТОЛЬКО ПЕРВЫЙ
+        // 🔥 ТОЛЬКО ПЕРВЫЙ ЭЛЕМЕНТ (индекс 0) ПОЛУЧАЕТ КЛЮЧ
+        final isFirst = index == 3;
 
         return Expanded(
           child: Padding(
             padding: const EdgeInsets.only(bottom: 4),
             child: SeatPlayerTile(
+              key: isFirst ? seatplayer : null,
               seatNumber: seat,
               controller: controllers[seat - 1],
               avatarUrl:
@@ -40,8 +43,6 @@ class SeatPlayerList extends StatelessWidget {
               isLeft: isLeft,
               onTap: () => onTap(seat - 1),
               onChanged: (value) => onChanged(seat - 1, value),
-              tutorialKeys:
-                  isFirst ? tutorialKeys : null, // ← ТОЛЬКО ПЕРВЫЙ ПОЛУЧАЕТ
             ),
           ),
         );

@@ -33,6 +33,7 @@ class SeatPlayerList extends StatelessWidget {
           child: Padding(
             padding: const EdgeInsets.only(bottom: 4),
             child: SeatPlayerTile(
+              // key НЕ ПЕРЕДАЁМ — КЛЮЧ ВНУТРИ
               seatNumber: seat,
               controller: controllers[seat - 1],
               avatarUrl:

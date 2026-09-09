@@ -70,7 +70,7 @@ class SeatPlayerTile extends StatelessWidget {
         const SizedBox(width: 6),
         Expanded(
           child: TextField(
-            key: tutorialKeys?['seat_player'],
+            key: tutorialKeys?['seat_player'], // ← КЛЮЧ НА TextField
             controller: controller,
             style: TextStyle(
               color: theme.textTheme.bodyLarge?.color ?? Colors.white,
@@ -87,12 +87,12 @@ class SeatPlayerTile extends StatelessWidget {
               filled: true,
               fillColor: isDark ? Colors.grey.shade800 : Colors.grey.shade200,
               border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(25),
+                borderRadius: BorderRadius.circular(6),
                 borderSide: BorderSide.none,
               ),
               contentPadding: const EdgeInsets.symmetric(
                 horizontal: 8,
-                vertical: 12,
+                vertical: 4,
               ),
               isDense: true,
             ),
