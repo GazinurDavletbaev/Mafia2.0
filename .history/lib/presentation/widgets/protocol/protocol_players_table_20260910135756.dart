@@ -12,8 +12,7 @@ class ProtocolPlayersTable extends StatefulWidget {
   final Function(int, double) onBonusChanged;
   final Function(PlayerModel, String) onNoteAdded;
   final Function(int, double) onBonusNoteAdded;
-  final GlobalKey? tutorialkeyball;
-  final GlobalKey? tutorialkeypenalty;
+  final GlobalKey? tutorialkey;
 
   const ProtocolPlayersTable({
     super.key,
@@ -23,8 +22,7 @@ class ProtocolPlayersTable extends StatefulWidget {
     required this.onBonusChanged,
     required this.onNoteAdded,
     required this.onBonusNoteAdded,
-    required this.tutorialkeyball,
-    required this.tutorialkeypenalty,
+    required this.tutorialkey,
   });
 
   @override
@@ -160,14 +158,7 @@ class _ProtocolPlayersTableState extends State<ProtocolPlayersTable> {
     bool hasPpk,
     double currentBonus,
   ) {
-    final isPlayer1 = player.seatNumber == 1;
-    final isPlayer2 = player.seatNumber == 2;
-    final key = isPlayer1
-        ? widget.tutorialkeyball
-        : isPlayer2
-            ? widget.tutorialkeypenalty
-            : null;
-
+    final isPlayer5 = player.seatNumber == 5;
     if (hasPpk) {
       return _buildPpkCell(context);
     }
@@ -175,7 +166,7 @@ class _ProtocolPlayersTableState extends State<ProtocolPlayersTable> {
       return _buildRemovedDropdown(context, player);
     }
     return Container(
-      key: key,
+      key: isPlayer5 ? widget.tutorialkey : null, // ← ПРИВЯЗКА
       child: _buildBonusDropdown(context, index, currentBonus),
     );
   }

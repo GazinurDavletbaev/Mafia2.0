@@ -362,17 +362,7 @@ class Tutorials {
       id: 'protocol_ball',
       title: 'Дополнительные баллы',
       description:
-          'Нажмите и выберите награду для игрока. Ниже в пояснение напишите за что он их получил.',
-      icon: Icons.add_rounded,
-      backgroundColor: Colors.green.withOpacity(0.5),
-      width: 280,
-      height: 170,
-    ),
-    TutorialStep(
-      id: 'protocol_penalty',
-      title: 'Штраф',
-      description:
-          'Если стоит минус, нажмите и выберите пункт правил который он нарушил и так же ниже объясните что он сделал.',
+          'Наградите игрока за хорошую игру. Ниже в пояснение напишите за что он их получил. Если игрок получил штраф, можете выбрать пункт правил по которому он его получил и так же ниже объясните что он сделал.',
       icon: Icons.add_rounded,
       backgroundColor: Colors.green.withOpacity(0.5),
       width: 280,

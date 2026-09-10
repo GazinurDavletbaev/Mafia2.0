@@ -33,8 +33,7 @@ class _GameProtocolScreenState extends ConsumerState<GameProtocolScreen> {
 
   // 🔑 КЛЮЧИ ДЛЯ ПОДСКАЗОК
   final Map<String, GlobalKey> _tutorialKeys = {
-    'protocol_ball': GlobalKey(),
-    'protocol_penalty': GlobalKey(),
+    //'protocol_ball': GlobalKey(),
     'protocol_server': GlobalKey(),
     'protocol_local': GlobalKey(),
     'protocol_file': GlobalKey(),
@@ -82,8 +81,6 @@ class _GameProtocolScreenState extends ConsumerState<GameProtocolScreen> {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
     final primaryColor = theme.primaryColor;
-    final ball = _tutorialKeys['protocol_ball'];
-    final penalty = _tutorialKeys['protocol_penalty'];
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
@@ -101,8 +98,6 @@ class _GameProtocolScreenState extends ConsumerState<GameProtocolScreen> {
               ProtocolHeader(gameState: widget.gameState),
               const SizedBox(height: 2),
               ProtocolPlayersTable(
-                tutorialkeyball: ball,
-                tutorialkeypenalty: penalty,
                 gameState: widget.gameState,
                 bonusPoints: _saveLogic.bonusPoints,
                 onRemovedRuleChanged: _saveLogic.updateRemovedRule,

@@ -359,26 +359,6 @@ class Tutorials {
   ];
   static final List<TutorialStep> protocolSteps = [
     TutorialStep(
-      id: 'protocol_ball',
-      title: 'Дополнительные баллы',
-      description:
-          'Нажмите и выберите награду для игрока. Ниже в пояснение напишите за что он их получил.',
-      icon: Icons.add_rounded,
-      backgroundColor: Colors.green.withOpacity(0.5),
-      width: 280,
-      height: 170,
-    ),
-    TutorialStep(
-      id: 'protocol_penalty',
-      title: 'Штраф',
-      description:
-          'Если стоит минус, нажмите и выберите пункт правил который он нарушил и так же ниже объясните что он сделал.',
-      icon: Icons.add_rounded,
-      backgroundColor: Colors.green.withOpacity(0.5),
-      width: 280,
-      height: 180,
-    ),
-    TutorialStep(
       id: 'protocol_server',
       title: 'Сохранить в рейтинг',
       description: 'Нажмите сюда, чтобы создать собственный клуб.',

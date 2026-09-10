@@ -83,8 +83,6 @@ class _GameProtocolScreenState extends ConsumerState<GameProtocolScreen> {
     final isDark = theme.brightness == Brightness.dark;
     final primaryColor = theme.primaryColor;
     final ball = _tutorialKeys['protocol_ball'];
-    final penalty = _tutorialKeys['protocol_penalty'];
-
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       body: Stack(
@@ -101,8 +99,7 @@ class _GameProtocolScreenState extends ConsumerState<GameProtocolScreen> {
               ProtocolHeader(gameState: widget.gameState),
               const SizedBox(height: 2),
               ProtocolPlayersTable(
-                tutorialkeyball: ball,
-                tutorialkeypenalty: penalty,
+                tutorialkey: ball,
                 gameState: widget.gameState,
                 bonusPoints: _saveLogic.bonusPoints,
                 onRemovedRuleChanged: _saveLogic.updateRemovedRule,

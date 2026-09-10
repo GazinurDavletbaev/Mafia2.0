@@ -162,11 +162,6 @@ class _ProtocolPlayersTableState extends State<ProtocolPlayersTable> {
   ) {
     final isPlayer1 = player.seatNumber == 1;
     final isPlayer2 = player.seatNumber == 2;
-    final key = isPlayer1
-        ? widget.tutorialkeyball
-        : isPlayer2
-            ? widget.tutorialkeypenalty
-            : null;
 
     if (hasPpk) {
       return _buildPpkCell(context);
@@ -175,7 +170,11 @@ class _ProtocolPlayersTableState extends State<ProtocolPlayersTable> {
       return _buildRemovedDropdown(context, player);
     }
     return Container(
-      key: key,
+      key: isPlayer1
+          ? widget.tutorialkeyball
+          : isPlayer2
+              ? widget.tutorialkeypenalty
+              : null, // ← ПРИВЯЗКА
       child: _buildBonusDropdown(context, index, currentBonus),
     );
   }

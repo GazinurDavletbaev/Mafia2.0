@@ -162,12 +162,14 @@ class _ProtocolPlayersTableState extends State<ProtocolPlayersTable> {
   ) {
     final isPlayer1 = player.seatNumber == 1;
     final isPlayer2 = player.seatNumber == 2;
-    final key = isPlayer1
-        ? widget.tutorialkeyball
-        : isPlayer2
-            ? widget.tutorialkeypenalty
-            : null;
-
+    Key? key;
+    if (isPlayer1) {
+      key = widget.tutorialkeyball;
+    } else if (isPlayer2) {
+      key = widget.tutorialkeypenalty;
+    } else {
+      key = null;
+    }
     if (hasPpk) {
       return _buildPpkCell(context);
     }
