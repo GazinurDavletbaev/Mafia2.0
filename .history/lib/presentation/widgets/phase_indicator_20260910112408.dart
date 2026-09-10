@@ -4,7 +4,7 @@ import 'package:mafia_help/data/local/models/phase.dart';
 class PhaseIndicator extends StatelessWidget {
   final Phase phase;
   final int currentDay;
-  final GlobalKey? gameDay;
+  final GlobalKey gameDay;
   const PhaseIndicator({
     super.key,
     required this.phase,
@@ -26,7 +26,6 @@ class PhaseIndicator extends StatelessWidget {
     final String icon = isNight ? '🌚' : '🌞';
 
     return Container(
-      key: gameDay,
       width: 50,
       height: 50,
       decoration: BoxDecoration(

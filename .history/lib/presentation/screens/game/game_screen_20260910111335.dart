@@ -38,15 +38,14 @@ class _GameScreenState extends ConsumerState<GameScreen> {
 
   final Map<String, GlobalKey> _tutorialKeys = {
     'game_player_number': GlobalKey(),
-    'game_phase': GlobalKey(),
-    'game_day': GlobalKey(),
-    'game_calculator': GlobalKey(),
-    'game_forward': GlobalKey(),
-    'game_back': GlobalKey(),
-    'game_roles': GlobalKey(),
-    'game_miss': GlobalKey(),
+    //'game_phase': GlobalKey(),
+    //'game_day': GlobalKey(),
+    //'game_forward': GlobalKey(),
+    //'game_back': GlobalKey(),
+    //'game_roles': GlobalKey(),
+    //'game_miss': GlobalKey(),
+    //'game_calculator': GlobalKey(),
     //'game_voting': GlobalKey(),
-    //'game_start': GlobalKey(),
   };
 
   void _showTutorials() {
@@ -332,8 +331,8 @@ class _GameScreenState extends ConsumerState<GameScreen> {
               ),
             ),
             FloatingCalculator(
-              tutorialKeys: _tutorialKeys,
-            ),
+                //tutorialKeys: _tutorialKeys,
+                ),
           ],
         ),
       ),

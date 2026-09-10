@@ -124,11 +124,6 @@ class _FloatingCalculatorState extends ConsumerState<FloatingCalculator> {
     final screenHeight = MediaQuery.of(context).size.height;
     final screenWidth = MediaQuery.of(context).size.width;
     final maxTop = screenHeight - (_isMinimized ? 60 : 280);
-    final calclulator = widget.tutorialKeys?['game_calculator'];
-    final forward = widget.tutorialKeys?['game_forward'];
-    final back = widget.tutorialKeys?['game_back'];
-    final miss = widget.tutorialKeys?['game_miss'];
-    final roles = widget.tutorialKeys?['game_roles'];
 
     return Positioned(
       left: _position.dx.clamp(0, screenWidth - 150),
@@ -148,7 +143,6 @@ class _FloatingCalculatorState extends ConsumerState<FloatingCalculator> {
         },
         onPanEnd: (_) => setState(() => _isDragging = false),
         child: Container(
-          key: calclulator, // ← ПРИВЯЗКА КО ВСЕМУ КАЛЬКУЛЯТОРУ
           width: 140,
           decoration: BoxDecoration(
             color: Colors.transparent,
@@ -167,30 +161,30 @@ class _FloatingCalculatorState extends ConsumerState<FloatingCalculator> {
                         children: [
                           Row(
                             children: [
-                              _buildKey('10', 10, context, null),
-                              _buildKey('9', 9, context, null),
-                              _buildKey('8', 8, context, null),
+                              _buildKey('10', 10, context),
+                              _buildKey('9', 9, context),
+                              _buildKey('8', 8, context),
                             ],
                           ),
                           Row(
                             children: [
-                              _buildKey('7', 7, context, null),
-                              _buildKey('6', 6, context, null),
-                              _buildKey('5', 5, context, null),
+                              _buildKey('7', 7, context),
+                              _buildKey('6', 6, context),
+                              _buildKey('5', 5, context),
                             ],
                           ),
                           Row(
                             children: [
-                              _buildKey('4', 4, context, null),
-                              _buildKey('3', 3, context, null),
-                              _buildKey('2', 2, context, null),
+                              _buildKey('4', 4, context),
+                              _buildKey('3', 3, context),
+                              _buildKey('2', 2, context),
                             ],
                           ),
                           Row(
                             children: [
-                              _buildKey('1', 1, context, null),
-                              _buildKey('0', 0, context, null),
-                              _buildKey('🙅', -1, context, miss),
+                              _buildKey('1', 1, context),
+                              _buildKey('0', 0, context),
+                              _buildKey('🙅', -1, context),
                             ],
                           ),
                         ],
@@ -198,11 +192,10 @@ class _FloatingCalculatorState extends ConsumerState<FloatingCalculator> {
               ),
               Row(
                 children: [
-                  _buildNavKey('←', () => _vm.onPhaseBack(), context, back),
-                  _buildNavKey(_isMinimized ? '🎭' : '🎭', _toggleShowRoles,
-                      context, roles),
+                  _buildNavKey('←', () => _vm.onPhaseBack(), context),
                   _buildNavKey(
-                      '→', () => _vm.onPhaseForward(), context, forward),
+                      _isMinimized ? '🎭' : '🎭', _toggleShowRoles, context),
+                  _buildNavKey('→', () => _vm.onPhaseForward(), context),
                 ],
               ),
             ],
@@ -212,14 +205,12 @@ class _FloatingCalculatorState extends ConsumerState<FloatingCalculator> {
     );
   }
 
-  Widget _buildKey(
-      String text, int value, BuildContext context, GlobalKey? miss) {
+  Widget _buildKey(String text, int value, BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
 
     return Expanded(
       child: Container(
-        key: miss,
         margin: const EdgeInsets.all(1),
         decoration: BoxDecoration(
           color: isDark ? Colors.grey.shade800.withOpacity(0.7) : Colors.white,
@@ -253,14 +244,12 @@ class _FloatingCalculatorState extends ConsumerState<FloatingCalculator> {
     );
   }
 
-  Widget _buildNavKey(
-      String text, VoidCallback onTap, BuildContext context, GlobalKey? key) {
+  Widget _buildNavKey(String text, VoidCallback onTap, BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
 
     return Expanded(
       child: Container(
-        key: key,
         margin: const EdgeInsets.all(2),
         decoration: BoxDecoration(
           color: isDark

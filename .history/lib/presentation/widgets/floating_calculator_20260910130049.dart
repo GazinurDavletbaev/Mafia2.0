@@ -202,7 +202,7 @@ class _FloatingCalculatorState extends ConsumerState<FloatingCalculator> {
                   _buildNavKey(_isMinimized ? '🎭' : '🎭', _toggleShowRoles,
                       context, roles),
                   _buildNavKey(
-                      '→', () => _vm.onPhaseForward(), context, forward),
+                      '→', () => _vm.onPhaseForward(), context.forward),
                 ],
               ),
             ],

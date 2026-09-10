@@ -93,10 +93,10 @@ class PlayerCard extends StatelessWidget {
           backgroundColor = Colors.red;
           break;
         case 'mafia':
-          backgroundColor = Colors.grey.shade500;
+          backgroundColor = Colors.black.withOpacity(0.5);
           break;
         case 'don':
-          backgroundColor = Colors.grey.shade800;
+          backgroundColor = Colors.black.withOpacity(0.8);
           break;
         default:
           backgroundColor = isDark ? Colors.black : Colors.white;
@@ -152,6 +152,7 @@ class PlayerCard extends StatelessWidget {
                             clipBehavior: Clip.none,
                             children: [
                               CircleAvatar(
+                                key: playerNumber ? tutorialkey : null,
                                 radius: 28,
                                 backgroundColor: isDark
                                     ? Colors.grey.shade800
@@ -178,7 +179,6 @@ class PlayerCard extends StatelessWidget {
                                   children: [
                                     // 🔥 ФОН БЕЙДЖА — ПРИВЯЗЫВАЕМ КЛЮЧ
                                     Container(
-                                      key: playerNumber ? tutorialkey : null,
                                       width: 35,
                                       height: 35,
                                       decoration: BoxDecoration(

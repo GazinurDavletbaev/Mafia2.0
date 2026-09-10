@@ -283,17 +283,6 @@ class Tutorials {
       width: 240,
       height: 140,
     ),
-    // 8️⃣ КАЛЬКУЛЯТОР
-    TutorialStep(
-      id: 'game_calculator',
-      title: 'Калькулятор',
-      description:
-          'Используйте цифры для голосования, выбора лучшего хода или ночных действий.',
-      icon: Icons.calculate_rounded,
-      backgroundColor: Colors.green.withOpacity(0.5),
-      width: 260,
-      height: 140,
-    ),
     // 4️⃣ ВПЕРЕД (→)
     TutorialStep(
       id: 'game_forward',
@@ -334,7 +323,18 @@ class Tutorials {
       width: 260,
       height: 140,
     ),
-// 9️⃣ ГОЛОСОВАНИЕ
+    // 8️⃣ КАЛЬКУЛЯТОР
+    TutorialStep(
+      id: 'game_calculator',
+      title: 'Калькулятор',
+      description:
+          'Используйте цифры для голосования, выбора лучшего хода или ночных действий.',
+      icon: Icons.calculate_rounded,
+      backgroundColor: Colors.green.withOpacity(0.5),
+      width: 260,
+      height: 140,
+    ),
+    // 9️⃣ ГОЛОСОВАНИЕ
     TutorialStep(
       id: 'game_voting',
       title: 'Голосование',
@@ -344,17 +344,6 @@ class Tutorials {
       backgroundColor: Colors.green.withOpacity(0.5),
       width: 280,
       height: 140,
-    ),
-    // 9️⃣ ГОЛОСОВАНИЕ
-    TutorialStep(
-      id: 'game_start',
-      title: 'Начало игры',
-      description:
-          'Нажмите на первого игрока и покажите ему его роль прямо с экрана телефона, после 10 игрока нажимайте вперед! Желаем прекрасной игры и получить максимум удовольствия!',
-      icon: Icons.how_to_vote_rounded,
-      backgroundColor: Colors.green.withOpacity(0.5),
-      width: 280,
-      height: 180,
     ),
   ];
 

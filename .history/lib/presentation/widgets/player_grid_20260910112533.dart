@@ -229,7 +229,7 @@ class PlayerGrid extends StatelessWidget {
     );
   }
 
-  Widget _buildDayColumn(BuildContext context, GlobalKey? gamePhase) {
+  Widget _buildDayColumn(BuildContext context, GlobalKey gamePhase) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
 
@@ -548,7 +548,6 @@ class PlayerGrid extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
           Padding(
-            key: gamePhase,
             padding: const EdgeInsets.only(top: 5),
             child: Tooltip(
               message: tooltip,

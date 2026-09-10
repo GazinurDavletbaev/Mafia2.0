@@ -543,12 +543,12 @@ class PlayerGrid extends StatelessWidget {
     }
 
     return Container(
+      key: gamePhase,
       width: 100,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
           Padding(
-            key: gamePhase,
             padding: const EdgeInsets.only(top: 5),
             child: Tooltip(
               message: tooltip,

@@ -46,7 +46,6 @@ class _GameScreenState extends ConsumerState<GameScreen> {
     'game_roles': GlobalKey(),
     'game_miss': GlobalKey(),
     //'game_voting': GlobalKey(),
-    //'game_start': GlobalKey(),
   };
 
   void _showTutorials() {

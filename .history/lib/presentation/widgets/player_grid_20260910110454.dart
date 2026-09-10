@@ -229,7 +229,7 @@ class PlayerGrid extends StatelessWidget {
     );
   }
 
-  Widget _buildDayColumn(BuildContext context, GlobalKey? gamePhase) {
+  Widget _buildDayColumn(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
 
@@ -548,7 +548,6 @@ class PlayerGrid extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
           Padding(
-            key: gamePhase,
             padding: const EdgeInsets.only(top: 5),
             child: Tooltip(
               message: tooltip,
@@ -600,8 +599,6 @@ class PlayerGrid extends StatelessWidget {
         currentSubPhase == SubPhase.donCheck ||
         currentSubPhase == SubPhase.sheriffCheck;
     final playerNumber = tutorialKeys?['game_player_number'];
-    final gamePhase = tutorialKeys?['game_phase'];
-    final gameDay = tutorialKeys?['game_day'];
     return Row(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -617,13 +614,12 @@ class PlayerGrid extends StatelessWidget {
                 PhaseIndicator(
                   phase: phase!,
                   currentDay: currentDay!,
-                  gameDay: gameDay,
                 ),
               const SizedBox(height: 8),
               Expanded(
                 child: isNight
                     ? _buildNightActionsColumn(context)
-                    : _buildDayColumn(context, gamePhase),
+                    : _buildDayColumn(context),
               ),
             ],
           ),
@@ -673,7 +669,7 @@ class PlayerGrid extends StatelessWidget {
           child: Padding(
             padding: const EdgeInsets.only(bottom: 8),
             child: PlayerCard(
-              tutorialkey: playerNumber,
+              key: playerNumber,
               player: player,
               isSpeaking: isSpeaking,
               isBlackTeam: isBlackTeam,

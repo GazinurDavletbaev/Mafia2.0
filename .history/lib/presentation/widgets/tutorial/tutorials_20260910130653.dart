@@ -347,14 +347,14 @@ class Tutorials {
     ),
     // 9️⃣ ГОЛОСОВАНИЕ
     TutorialStep(
-      id: 'game_start',
-      title: 'Начало игры',
+      id: 'game_voting',
+      title: 'Голосование',
       description:
-          'Нажмите на первого игрока и покажите ему его роль прямо с экрана телефона, после 10 игрока нажимайте вперед! Желаем прекрасной игры и получить максимум удовольствия!',
+          'В фазе голосования распределите голоса между кандидатами с помощью калькулятора.',
       icon: Icons.how_to_vote_rounded,
       backgroundColor: Colors.green.withOpacity(0.5),
       width: 280,
-      height: 180,
+      height: 140,
     ),
   ];
 

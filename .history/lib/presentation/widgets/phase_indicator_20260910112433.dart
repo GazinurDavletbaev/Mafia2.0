@@ -26,7 +26,6 @@ class PhaseIndicator extends StatelessWidget {
     final String icon = isNight ? '🌚' : '🌞';
 
     return Container(
-      key: gameDay,
       width: 50,
       height: 50,
       decoration: BoxDecoration(
