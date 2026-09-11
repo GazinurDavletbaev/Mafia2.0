@@ -150,7 +150,7 @@ class _ClubScreenState extends ConsumerState<ClubScreen> {
     // 🔥 ПОСЛЕ ЗАГРУЗКИ ПОКАЗЫВАЕМ ПОДСКАЗКИ
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _showTutorials();
+      //_showTutorials();
     });
   }
 

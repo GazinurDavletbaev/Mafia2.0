@@ -105,7 +105,7 @@ class AppBottomNav extends ConsumerWidget {
           Positioned(
             left: 4,
             right: 5,
-            top: 7,
+            top: 8,
             child: IgnorePointer(
               child: Center(
                 child: Container(

@@ -227,7 +227,7 @@ class _TutorialOverlayState extends State<TutorialOverlay>
               color: step.textColor.withOpacity(0.9),
               fontSize: 13,
             ),
-            maxLines: 20,
+            maxLines: 14,
             overflow: TextOverflow.ellipsis,
           ),
         ],

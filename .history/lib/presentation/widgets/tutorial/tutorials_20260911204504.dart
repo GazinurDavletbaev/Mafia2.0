@@ -224,7 +224,7 @@ class Tutorials {
       id: 'seat_game',
       title: 'Номер игры',
       description:
-          'Нажмите и измените номер игры. Игры с одинаковыми номерами стола и игры не сохраняются.',
+          'Нажмите и измените номер стола. Игры с одинаковыми номерами стола и игры не сохраняются.',
       icon: Icons.sports_esports_rounded,
       backgroundColor: Colors.green.withOpacity(0.5),
       width: 220,
@@ -271,12 +271,11 @@ class Tutorials {
     TutorialStep(
       id: 'game_phase',
       title: 'Фаза игры',
-      description:
-          'По этой картинке можно понять текущую фазу игры - раздача карт',
-      icon: Mdi.cards,
+      description: 'По этой картинке можно понять текущую фазу игры',
+      icon: Mdi.card,
       backgroundColor: Colors.green.withOpacity(0.5),
       width: 200,
-      height: 120,
+      height: 110,
     ),
     // 3️⃣ ДЕНЬ
     TutorialStep(
@@ -348,7 +347,7 @@ class Tutorials {
       icon: Mdi.thumbsUpDown,
       backgroundColor: Colors.green.withOpacity(0.5),
       width: 230,
-      height: 330,
+      height: 320,
     ),
     // 9️⃣ ГОЛОСОВАНИЕ
     TutorialStep(
@@ -381,7 +380,7 @@ class Tutorials {
       icon: Mdi.emoticonDead,
       backgroundColor: Colors.green.withOpacity(0.5),
       width: 200,
-      height: 160,
+      height: 150,
     ),
     TutorialStep(
       id: 'protocol_server',
@@ -389,7 +388,7 @@ class Tutorials {
       description: 'Нажмите сюда, чтобы игра сохранилась в рейтинг клуба.',
       icon: Mdi.cloudArrowDown,
       backgroundColor: Colors.green.withOpacity(0.5),
-      width: 270,
+      width: 280,
       height: 100,
     ),
     TutorialStep(
@@ -400,7 +399,7 @@ class Tutorials {
       icon: Mdi.harddiskPlus,
       backgroundColor: Colors.green.withOpacity(0.5),
       width: 280,
-      height: 120,
+      height: 140,
     ),
     TutorialStep(
       id: 'protocol_file',

@@ -271,8 +271,7 @@ class Tutorials {
     TutorialStep(
       id: 'game_phase',
       title: 'Фаза игры',
-      description:
-          'По этой картинке можно понять текущую фазу игры - раздача карт',
+      description: 'По этой картинке можно понять текущую фазу игры',
       icon: Mdi.cards,
       backgroundColor: Colors.green.withOpacity(0.5),
       width: 200,
@@ -348,7 +347,7 @@ class Tutorials {
       icon: Mdi.thumbsUpDown,
       backgroundColor: Colors.green.withOpacity(0.5),
       width: 230,
-      height: 330,
+      height: 320,
     ),
     // 9️⃣ ГОЛОСОВАНИЕ
     TutorialStep(

@@ -224,7 +224,7 @@ class Tutorials {
       id: 'seat_game',
       title: 'Номер игры',
       description:
-          'Нажмите и измените номер игры. Игры с одинаковыми номерами стола и игры не сохраняются.',
+          'Нажмите и измените номер стола. Игры с одинаковыми номерами стола и игры не сохраняются.',
       icon: Icons.sports_esports_rounded,
       backgroundColor: Colors.green.withOpacity(0.5),
       width: 220,
@@ -262,21 +262,20 @@ class Tutorials {
       title: 'Номер игрока',
       description:
           'Игроки расположены как за столом.\nОдно нажатие - фол.\nДолгое Нажатие - действия с игроком\nСвайп вправо - Удалить\nСвайп влево - Вернуть за стол\nСвайп вверх - выставить\nСвайп вниз - Убрать с голосования\n',
-      icon: Mdi.numeric4Box,
+      icon: Icons.numbers_rounded,
       backgroundColor: Colors.green.withOpacity(0.5),
-      width: 280,
-      height: 220,
+      width: 260,
+      height: 160,
     ),
     // 2️⃣ ФАЗА
     TutorialStep(
       id: 'game_phase',
       title: 'Фаза игры',
-      description:
-          'По этой картинке можно понять текущую фазу игры - раздача карт',
-      icon: Mdi.cards,
+      description: 'По этой картинке можно понять текущую фазу игры',
+      icon: Mdi.cardOutline,
       backgroundColor: Colors.green.withOpacity(0.5),
       width: 200,
-      height: 120,
+      height: 100,
     ),
     // 3️⃣ ДЕНЬ
     TutorialStep(
@@ -286,7 +285,7 @@ class Tutorials {
       icon: Mdi.themeLightDark,
       backgroundColor: Colors.green.withOpacity(0.5),
       width: 180,
-      height: 90,
+      height: 80,
     ),
     // 8️⃣ КАЛЬКУЛЯТОР
     TutorialStep(
@@ -297,7 +296,7 @@ class Tutorials {
       icon: Icons.calculate_rounded,
       backgroundColor: Colors.green.withOpacity(0.5),
       width: 200,
-      height: 180,
+      height: 160,
     ),
     // 4️⃣ ВПЕРЕД (→)
     TutorialStep(
@@ -347,70 +346,70 @@ class Tutorials {
           'Выставленные игроки появляются в центре стола в порядке выставления. Все автоматизировано под правила ФСМ. Если было удаление или выставлен один игрок в первый день - голосование не проводится. Голосование, переголосование, перестрелка, голосование за подъем все автоматизировано по правилам ФСМ... просто вводите голоса.',
       icon: Mdi.thumbsUpDown,
       backgroundColor: Colors.green.withOpacity(0.5),
-      width: 230,
-      height: 330,
+      width: 220,
+      height: 200,
     ),
     // 9️⃣ ГОЛОСОВАНИЕ
     TutorialStep(
       id: 'game_start',
       title: 'Начало игры',
       description:
-          'Нажмите на первого игрока и покажите ему его роль прямо с экрана телефона, после 10 игрока нажимайте вперед, игра начилась. Пожелайте всем хорошей игры!',
+          'Нажмите на первого игрока и покажите ему его роль прямо с экрана телефона, после 10 игрока нажимайте вперед! Желаем прекрасной игры и получить максимум удовольствия!',
       icon: Mdi.play,
       backgroundColor: Colors.green.withOpacity(0.5),
-      width: 250,
+      width: 280,
       height: 180,
     ),
   ];
   static final List<TutorialStep> protocolSteps = [
     TutorialStep(
       id: 'protocol_ball',
-      title: 'Допы',
+      title: 'Дополнительные баллы',
       description:
           'Нажмите и выберите награду для игрока. Ниже в пояснение напишите за что он их получил.',
-      icon: Mdi.emoticonHappy,
+      icon: Icons.add_rounded,
       backgroundColor: Colors.green.withOpacity(0.5),
-      width: 200,
-      height: 150,
+      width: 280,
+      height: 170,
     ),
     TutorialStep(
       id: 'protocol_penalty',
       title: 'Штраф',
       description:
           'Если стоит минус, нажмите и выберите пункт правил который он нарушил и так же ниже объясните что он сделал.',
-      icon: Mdi.emoticonDead,
+      icon: Icons.add_rounded,
       backgroundColor: Colors.green.withOpacity(0.5),
-      width: 200,
-      height: 160,
+      width: 280,
+      height: 180,
     ),
     TutorialStep(
       id: 'protocol_server',
       title: 'Сохранить в рейтинг',
-      description: 'Нажмите сюда, чтобы игра сохранилась в рейтинг клуба.',
-      icon: Mdi.cloudArrowDown,
-      backgroundColor: Colors.green.withOpacity(0.5),
-      width: 270,
-      height: 100,
-    ),
-    TutorialStep(
-      id: 'protocol_local',
-      title: 'Сохранить на телефон',
-      description:
-          'Нажмите сюда, чтобы сохранит игру на телефон. Нет интернета, жми сюда, потом загрузишь в рейтинг',
-      icon: Mdi.harddiskPlus,
+      description: 'Нажмите сюда, чтобы создать собственный клуб.',
+      icon: Icons.add_rounded,
       backgroundColor: Colors.green.withOpacity(0.5),
       width: 280,
       height: 120,
     ),
     TutorialStep(
+      id: 'protocol_local',
+      title: 'Сохранить на телефон',
+      description:
+          'Нажмите на клуб, чтобы посмотреть информацию и вступить.\nОписание:\nНазвание клуба, город\nНикнейм президента\nКоличество резидентов клуба\nЕсли подсвечен золотым значит\nклуб официально подтвержден',
+      icon: Icons.people_alt_rounded,
+      backgroundColor: Colors.green.withOpacity(0.5),
+      width: 280,
+      height: 220,
+    ),
+    TutorialStep(
       id: 'protocol_file',
       title: 'Сохраненные игры',
       description:
-          'Все ваши игры. Можете отправить игры в рейтинг или сделать ексель протокол и распечатать протокол ФСМ.',
-      icon: Mdi.microsoftExcel,
+          'Нажмите на клуб, чтобы посмотреть информацию и вступить.\nОписание:\nНазвание клуба, город\nНикнейм президента\nКоличество резидентов клуба\nЕсли подсвечен золотым значит\nклуб официально подтвержден',
+      icon: Icons.people_alt_rounded,
       backgroundColor: Colors.green.withOpacity(0.5),
-      width: 260,
-      height: 140,
+      width: 280,
+      height: 220,
     ),
   ];
   // ============================================================
